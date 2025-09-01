@@ -137,6 +137,7 @@ dist
 
 # AI
 CLAUDE.md
-.claude
+.claude/commands/
+!.claude/commands/
 .serena
 AGENTS.md
