@@ -106,5 +106,13 @@
   },
   "common": {
     "scrollToTop": "Scroll to top"
+  },
+  "language": {
+    "selector": "Language",
+    "changed": "Language changed successfully",
+    "auto": "Auto",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文"
   }
 }

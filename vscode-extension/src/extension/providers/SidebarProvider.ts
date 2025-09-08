@@ -139,6 +139,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         case 'open-external-url':
           await this.openExternalUrl(message.url);
           break;
+        case 'get-language-preference':
+          await this.sendLanguagePreference();
+          break;
+        case 'set-language-preference':
+          await this.setLanguagePreference(message.language);
+          break;
       }
     });
 
@@ -730,6 +736,35 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     } catch (error) {
       console.error(`SidebarProvider: Failed to open external URL '${url}':`, error);
       this.sendError('Failed to open external URL: ' + (error as Error).message);
+    }
+  }
+
+  private async sendLanguagePreference() {
+    try {
+      const config = vscode.workspace.getConfiguration('specWorkflow');
+      const language = config.get<string>('language', 'auto');
+      this.postMessageToWebview({
+        type: 'language-preference-updated',
+        data: language
+      });
+    } catch (error) {
+      console.error('SidebarProvider: Failed to get language preference:', error);
+      this.sendError('Failed to get language preference: ' + (error as Error).message);
+    }
+  }
+
+  private async setLanguagePreference(language: string) {
+    try {
+      const config = vscode.workspace.getConfiguration('specWorkflow');
+      await config.update('language', language, vscode.ConfigurationTarget.Global);
+      this.postMessageToWebview({
+        type: 'language-preference-updated',
+        data: language
+      });
+      console.log(`SidebarProvider: Language preference set to: ${language}`);
+    } catch (error) {
+      console.error('SidebarProvider: Failed to set language preference:', error);
+      this.sendError('Failed to set language preference: ' + (error as Error).message);
     }
   }
 

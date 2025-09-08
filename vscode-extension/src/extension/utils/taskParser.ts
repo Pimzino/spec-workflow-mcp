@@ -125,10 +125,31 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
           leverage.push(...levText.split(',').map(l => l.trim()).filter(l => l));
         }
       } else if (contentLine.includes('_Prompt:')) {
-        const promptMatch = contentLine.match(/_Prompt:\s*(.+?)_?$/);
-        if (promptMatch) {
-          prompt = promptMatch[1].replace(/_$/, '').trim();
+        // Capture single-line prompt and optional multi-line continuation
+        const afterPrompt = contentLine.match(/_Prompt:\s*(.+)$/);
+        let promptText = afterPrompt ? afterPrompt[1] : '';
+        promptText = promptText.replace(/_$/, '').trim();
+
+        // Accumulate continuation lines that are not new bullets/metadata
+        let j = lineIdx + 1;
+        while (j < endLine) {
+          const nextTrim = lines[j].trim();
+          if (!nextTrim) break; // stop at blank line
+          // Stop if we hit another bullet/metadata marker or files/purpose sections
+          if (
+            /^-\s/.test(nextTrim) ||
+            /^_?(Requirements|Leverage|Prompt):/i.test(nextTrim) ||
+            /^Files?:/i.test(nextTrim) ||
+            /^Purpose:/i.test(nextTrim)
+          ) {
+            break;
+          }
+          promptText += ' ' + nextTrim.replace(/_$/, '').trim();
+          j++;
         }
+        prompt = promptText;
+        // Skip consumed continuation lines
+        lineIdx = j - 1;
       } else if (contentLine.match(/Files?:/)) {
         const fileMatch = contentLine.match(/Files?:\s*(.+)$/);
         if (fileMatch) {

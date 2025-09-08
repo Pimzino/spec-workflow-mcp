@@ -17,5 +17,10 @@
   "config.sounds.enabled.description": "Enable sound notifications for spec workflow events",
   "config.sounds.volume.description": "Volume level for sound notifications (0.0 to 1.0)",
   "config.sounds.approvalSound.description": "Play sound when new approval requests are pending",
-  "config.sounds.taskCompletionSound.description": "Play sound when tasks are completed"
+  "config.sounds.taskCompletionSound.description": "Play sound when tasks are completed",
+  "config.language.description": "Language for the extension interface",
+  "config.language.auto.description": "Auto-detect based on VS Code settings",
+  "config.language.en.description": "English",
+  "config.language.ja.description": "Japanese (日本語)",
+  "config.language.zh.description": "Chinese (中文)"
 }

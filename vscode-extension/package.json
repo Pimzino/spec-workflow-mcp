@@ -183,6 +183,19 @@
           "default": true,
           "scope": "window",
           "description": "%config.sounds.taskCompletionSound.description%"
+        },
+        "specWorkflow.language": {
+          "type": "string",
+          "enum": ["auto", "en", "ja", "zh"],
+          "enumDescriptions": [
+            "%config.language.auto.description%",
+            "%config.language.en.description%",
+            "%config.language.ja.description%",
+            "%config.language.zh.description%"
+          ],
+          "default": "auto",
+          "scope": "window",
+          "description": "%config.language.description%"
         }
       }
     }

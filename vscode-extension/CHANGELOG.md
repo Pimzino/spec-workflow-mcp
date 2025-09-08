@@ -13,11 +13,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Structured prompts follow Role | Task | Restrictions | Success format for better AI guidance
   - Graceful fallback to default prompts for backward compatibility with existing workflows
   - New localization keys for prompt-related UI elements in English, Chinese, and Japanese
+  - Added Prompt to UI for previewing the prompt for the task in a collapsible section
 
 ### Enhanced
 - **Task Parsing** - Extended task parser to extract and utilize custom AI prompts
 - **User Experience** - Context-aware prompts provide more specific guidance to AI agents
 - **Multi-language Support** - Added prompt-related translations for all supported languages
+
+### Added
+- **Manual Language Selector** - Added dropdown for manual language selection in VSCode extension webview
+  - Implemented Radix UI dropdown menu component with proper styling
+  - Added language selector to extension header with support for English, Japanese, and Chinese
+  - Integrated with existing i18n framework for dynamic language switching
+  - Includes message handling between webview and extension for language preference persistence
 
 ## [0.0.8]
 

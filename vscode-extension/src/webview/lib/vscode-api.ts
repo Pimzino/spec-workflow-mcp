@@ -26,6 +26,7 @@ export type ExtensionMessage =
   | { type: 'navigate-to-approvals'; data: { specName: string; approvalId: string } }
   | { type: 'archived-specs-updated'; data: SpecData[] }
   | { type: 'approval-categories-updated'; data: { value: string; label: string; count: number }[] }
+  | { type: 'language-preference-updated'; data: string }
   | { type: 'error'; message: string }
   | { type: 'notification'; message: string; level: 'info' | 'warning' | 'error' | 'success' };
 
@@ -52,6 +53,8 @@ export type WebviewMessage =
   | { type: 'archive-spec'; specName: string }
   | { type: 'unarchive-spec'; specName: string }
   | { type: 'get-approval-categories' }
+  | { type: 'get-language-preference' }
+  | { type: 'set-language-preference'; language: string }
   | { type: 'open-external-url'; url: string };
 
 export type TaskStatus = 'pending' | 'in-progress' | 'completed';
@@ -103,6 +106,7 @@ export interface TaskInfo {
   requirements?: string[];
   leverage?: string;
   purposes?: string[];
+  prompt?: string;
   inProgress?: boolean; // For backward compatibility
 }
 
@@ -313,6 +317,14 @@ class VsCodeApiService {
 
   openExternalUrl(url: string) {
     this.postMessage({ type: 'open-external-url', url });
+  }
+
+  getLanguagePreference() {
+    this.postMessage({ type: 'get-language-preference' });
+  }
+
+  setLanguagePreference(language: string) {
+    this.postMessage({ type: 'set-language-preference', language });
   }
 }
 

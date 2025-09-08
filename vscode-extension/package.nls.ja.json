@@ -17,5 +17,10 @@
   "config.sounds.enabled.description": "スペックワークフローイベントのサウンド通知を有効にする",
   "config.sounds.volume.description": "サウンド通知の音量レベル (0.0 から 1.0)",
   "config.sounds.approvalSound.description": "新しい承認リクエストが保留中の場合にサウンドを再生する",
-  "config.sounds.taskCompletionSound.description": "タスク完了時にサウンドを再生する"
+  "config.sounds.taskCompletionSound.description": "タスク完了時にサウンドを再生する",
+  "config.language.description": "拡張機能インターフェースの言語",
+  "config.language.auto.description": "VS Code設定に基づいて自動検出",
+  "config.language.en.description": "English",
+  "config.language.ja.description": "日本語",
+  "config.language.zh.description": "中文"
 }

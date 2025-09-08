@@ -35,12 +35,7 @@
     "task": "任务",
     "copied": "已复制！",
     "copyPromptTitle": "为 AI 代理复制提示",
-    "copyPromptAI": "为任务 {{taskId}} 复制 AI 提示",
-    "copyPromptDefault": "为任务 {{taskId}} 复制默认提示",
     "copyPrompt": "请为规范 \"{{specName}}\" 处理任务 {{taskId}}",
-    "promptAvailable": "AI 提示可用",
-    "promptPreview": "AI 提示预览",
-    "usingDefaultPrompt": "使用默认提示",
     "status": {
       "pending": "待处理",
       "inProgress": "进行中",
@@ -106,5 +101,13 @@
   },
   "common": {
     "scrollToTop": "滚动到顶部"
+  },
+  "language": {
+    "selector": "语言",
+    "changed": "语言更改成功",
+    "auto": "自动",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文"
   }
 }

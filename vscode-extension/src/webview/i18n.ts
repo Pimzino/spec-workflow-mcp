@@ -25,6 +25,12 @@ i18n
       escapeValue: false, // react already safes from xss
     },
     debug: true, // Enable debug mode for webview
+    detection: {
+      // Configure language detector to check for manual preference first
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      lookupLocalStorage: 'spec-workflow-language',
+      caches: ['localStorage'],
+    },
   });
 
 export default i18n;

@@ -655,6 +655,8 @@ export class SpecWorkflowService {
       requirements: task.requirements,
       leverage: task.leverage,
       purposes: task.purposes,
+      // Preserve parsed AI prompt for UI and copy functionality
+      prompt: task.prompt,
       inProgress: task.inProgress
     }));
     

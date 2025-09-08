@@ -101,5 +101,13 @@
   },
   "common": {
     "scrollToTop": "滚动到顶部"
+  },
+  "language": {
+    "selector": "语言",
+    "changed": "语言更改成功",
+    "auto": "自动",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文"
   }
 }

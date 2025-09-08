@@ -35,7 +35,12 @@
     "task": "Task",
     "copied": "Copied!",
     "copyPromptTitle": "Copy prompt for AI agent",
+    "copyPromptAI": "Copy AI prompt for task {{taskId}}",
+    "copyPromptDefault": "Copy default prompt for task {{taskId}}",
     "copyPrompt": "Please work on task {{taskId}} for spec \"{{specName}}\"",
+    "promptAvailable": "AI prompt available",
+    "promptPreview": "AI Prompt Preview",
+    "usingDefaultPrompt": "Using default prompt",
     "status": {
       "pending": "Pending",
       "inProgress": "In Progress",
@@ -101,5 +106,13 @@
   },
   "common": {
     "scrollToTop": "Scroll to top"
+  },
+  "language": {
+    "selector": "Language",
+    "changed": "Language changed successfully",
+    "auto": "Auto",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文"
   }
 }

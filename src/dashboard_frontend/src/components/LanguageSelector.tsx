@@ -8,6 +8,7 @@ interface LanguageSelectorProps {
 const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 
 export function LanguageSelector({ className = '' }: LanguageSelectorProps) {

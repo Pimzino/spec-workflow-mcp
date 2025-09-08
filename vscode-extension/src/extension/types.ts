@@ -50,6 +50,7 @@ export interface TaskInfo {
   requirements?: string[];             // Referenced requirements
   leverage?: string;                   // Code to leverage
   purposes?: string[];                 // Purpose statements
+  prompt?: string;                     // AI prompt for this task
   
   // For backward compatibility
   inProgress?: boolean;                // true if status === 'in-progress'
