@@ -425,6 +425,41 @@ function TaskList({ specName }: { specName: string }) {
   const [showFloatingButton, setShowFloatingButton] = useState(false);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [copiedTaskId, setCopiedTaskId] = useState<string | null>(null);
+  
+  // Filter and sort state
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
+  const [sortBy, setSortBy] = useState<'default' | 'status' | 'id' | 'description'>('default');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Storage key for per-spec preferences
+  const storageKey = useMemo(() => `spec-workflow:task-preferences:${specName}`, [specName]);
+
+  // Load preferences from localStorage
+  useEffect(() => {
+    try {
+      const savedPreferences = localStorage.getItem(storageKey);
+      if (savedPreferences) {
+        const { statusFilter: savedStatusFilter, sortBy: savedSortBy, sortOrder: savedSortOrder } = JSON.parse(savedPreferences);
+        if (savedStatusFilter) setStatusFilter(savedStatusFilter);
+        if (savedSortBy) setSortBy(savedSortBy);
+        if (savedSortOrder) setSortOrder(savedSortOrder);
+      }
+    } catch (error) {
+      // Ignore localStorage errors
+      console.warn('Failed to load task preferences from localStorage:', error);
+    }
+  }, [storageKey]);
+  
+  // Save preferences to localStorage
+  useEffect(() => {
+    try {
+      const preferences = { statusFilter, sortBy, sortOrder };
+      localStorage.setItem(storageKey, JSON.stringify(preferences));
+    } catch (error) {
+      // Ignore localStorage errors
+      console.warn('Failed to save task preferences to localStorage:', error);
+    }
+  }, [storageKey, statusFilter, sortBy, sortOrder]);
 
   useEffect(() => {
     let active = true;
@@ -461,9 +496,98 @@ function TaskList({ specName }: { specName: string }) {
     };
   }, [specName, subscribe, unsubscribe]);
 
+  // Helper functions
+  const filterTasksByStatus = useCallback((tasks: any[]) => {
+    if (statusFilter === 'all') return tasks;
+    
+    return tasks.filter((task: any) => {
+      if (task.isHeader) return true; // Always include headers
+      
+      switch (statusFilter) {
+        case 'pending':
+          return task.status === 'pending';
+        case 'in-progress':
+          return task.status === 'in-progress';
+        case 'completed':
+          return task.status === 'completed';
+        default:
+          return true;
+      }
+    });
+  }, [statusFilter]);
+  
+  const sortTasks = useCallback((tasks: any[]) => {
+    if (sortBy === 'default') return tasks;
+    
+    const sorted = [...tasks].sort((a: any, b: any) => {
+      // Headers always stay at the top
+      if (a.isHeader && !b.isHeader) return -1;
+      if (!a.isHeader && b.isHeader) return 1;
+      if (a.isHeader && b.isHeader) return 0;
+      
+      let aValue: string | number;
+      let bValue: string | number;
+      
+      switch (sortBy) {
+        case 'status':
+          // Sort by status priority: pending -> in-progress -> completed
+          const statusOrder = { 'pending': 0, 'in-progress': 1, 'completed': 2 };
+          aValue = statusOrder[a.status as keyof typeof statusOrder] || 0;
+          bValue = statusOrder[b.status as keyof typeof statusOrder] || 0;
+          break;
+        case 'id':
+          aValue = parseFloat(a.id) || 0;
+          bValue = parseFloat(b.id) || 0;
+          break;
+        case 'description':
+          aValue = (a.description || '').toLowerCase();
+          bValue = (b.description || '').toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+      
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+    
+    return sorted;
+  }, [sortBy, sortOrder]);
+  
+  const getTaskCounts = useCallback((tasks: any[]) => {
+    const counts = {
+      all: 0,
+      pending: 0,
+      'in-progress': 0,
+      completed: 0
+    };
+    
+    tasks?.forEach((task: any) => {
+      if (!task.isHeader) {
+        counts.all++;
+        counts[task.status as keyof typeof counts]++;
+      }
+    });
+    
+    return counts;
+  }, []);
+  
+  // Create filtered and sorted task list
+  const filteredAndSortedTasks = useMemo(() => {
+    if (!data?.taskList) return [];
+    
+    const filtered = filterTasksByStatus(data.taskList);
+    const sorted = sortTasks(filtered);
+    
+    return sorted;
+  }, [data?.taskList, filterTasksByStatus, sortTasks]);
+  
+  const taskCounts = useMemo(() => getTaskCounts(data?.taskList), [data?.taskList, getTaskCounts]);
+
   // Show/hide floating buttons based on pending tasks and scroll position
   useEffect(() => {
-    const hasPendingTasks = data?.taskList?.some((task: any) => !task.completed && !task.isHeader);
+    const hasPendingTasks = filteredAndSortedTasks?.some((task: any) => !task.completed && !task.isHeader);
     setShowFloatingButton(hasPendingTasks);
 
     const handleScroll = () => {
@@ -475,14 +599,14 @@ function TaskList({ specName }: { specName: string }) {
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [data]);
+  }, [filteredAndSortedTasks]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const scrollToNextPending = () => {
-    const nextPending = data?.taskList?.find((task: any) => !task.completed && !task.isHeader);
+    const nextPending = filteredAndSortedTasks?.find((task: any) => !task.completed && !task.isHeader);
     if (nextPending) {
       scrollToTask(nextPending.id);
     }
@@ -604,13 +728,106 @@ function TaskList({ specName }: { specName: string }) {
         </div>
       </div>
 
-      {/* Task List */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-        <div className="p-4 sm:p-6">
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-4">Task Details</h3>
+      {/* Filter and Sort Controls */}
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Task Details</h3>
           
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Status Filter */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Status:</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'in-progress' | 'completed')}
+                className="px-3 py-1.5 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All ({taskCounts.all})</option>
+                <option value="pending">Pending ({taskCounts.pending})</option>
+                <option value="in-progress">In Progress ({taskCounts['in-progress']})</option>
+                <option value="completed">Completed ({taskCounts.completed})</option>
+              </select>
+            </div>
+            
+            {/* Sort Controls */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Sort:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'default' | 'status' | 'id' | 'description')}
+                className="px-3 py-1.5 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="default">Default Order</option>
+                <option value="status">By Status</option>
+                <option value="id">By Task ID</option>
+                <option value="description">By Description</option>
+              </select>
+              
+              {sortBy !== 'default' && (
+                <button
+                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  className="px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  title={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+                >
+                  {sortOrder === 'asc' ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Results Summary */}
+        {statusFilter !== 'all' && (
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+            <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span>
+                Showing {filteredAndSortedTasks.filter((t: any) => !t.isHeader).length} tasks with status "{statusFilter.replace('-', ' ')}"
+                {filteredAndSortedTasks.filter((t: any) => !t.isHeader).length === 0 && (
+                  <span> - <button 
+                    onClick={() => setStatusFilter('all')}
+                    className="underline hover:no-underline"
+                  >
+                    show all tasks
+                  </button></span>
+                )}
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {filteredAndSortedTasks.length === 0 ? (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            <p className="text-lg font-medium">No tasks found</p>
+            <p className="text-sm mt-1">
+              {statusFilter !== 'all' ? (
+                <>No tasks with status "{statusFilter.replace('-', ' ')}" found. <button 
+                  onClick={() => setStatusFilter('all')}
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  Show all tasks
+                </button></>
+              ) : (
+                'No tasks available for this specification'
+              )}
+            </p>
+          </div>
+        ) : (
           <div className="grid grid-cols-1 gap-3 sm:gap-4">
-            {data.taskList?.map((task: any) => (
+            {filteredAndSortedTasks?.map((task: any) => (
               <div
                 key={task.id}
                 data-task-id={task.id}
@@ -803,7 +1020,7 @@ function TaskList({ specName }: { specName: string }) {
               </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Floating Action Buttons */}
