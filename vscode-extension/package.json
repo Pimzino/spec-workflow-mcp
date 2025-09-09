@@ -2,7 +2,7 @@
   "name": "spec-workflow-mcp",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "publisher": "Pimzino",
   "license": "GPL-3.0",
   "icon": "icon.png",

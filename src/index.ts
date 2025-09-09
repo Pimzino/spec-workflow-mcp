@@ -5,7 +5,7 @@ import { DashboardServer } from './dashboard/server.js';
 import { homedir } from 'os';
 
 function showHelp() {
-  console.log(`
+  console.error(`
 Spec Workflow MCP Server - A Model Context Protocol server for spec-driven development
 
 USAGE:
@@ -177,7 +177,7 @@ async function main() {
       // Dashboard only mode
       console.error(`Starting Spec Workflow Dashboard for project: ${projectPath}`);
       if (port) {
-        console.log(`Using custom port: ${port}`);
+        console.error(`Using custom port: ${port}`);
       }
       
       const dashboardServer = new DashboardServer({
@@ -187,12 +187,12 @@ async function main() {
       });
       
       const dashboardUrl = await dashboardServer.start();
-      console.log(`Dashboard started at: ${dashboardUrl}`);
-      console.log('Press Ctrl+C to stop the dashboard');
+      console.error(`Dashboard started at: ${dashboardUrl}`);
+      console.error('Press Ctrl+C to stop the dashboard');
       
       // Handle graceful shutdown
       const shutdown = async () => {
-        console.log('\nShutting down dashboard...');
+        console.error('\nShutting down dashboard...');
         await dashboardServer.stop();
         process.exit(0);
       };

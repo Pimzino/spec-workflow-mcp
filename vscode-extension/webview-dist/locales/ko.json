@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Spec Workflow MCP",
+    "support": "이 프로젝트 지원하기"
+  },
+  "tabs": {
+    "overview": "프로젝트 개요",
+    "steering": "가이드 문서",
+    "specs": "명세서 문서",
+    "tasks": "태스크 관리",
+    "approvals": "승인 요청"
+  },
+  "overview": {
+    "projectTitle": "프로젝트 개요",
+    "activeSpecs": "활성 스펙",
+    "archivedSpecs": "아카이브된 스펙",
+    "totalSpecs": "전체 스펙",
+    "tasks": "태스크",
+    "overallProgress": "전체 진행률",
+    "recentActivity": "최근 활동",
+    "modified": "{{time}}",
+    "noSpecs": "스펙을 찾을 수 없음"
+  },
+  "tasks": {
+    "specLabel": "명세서",
+    "specPlaceholder": "명세서 선택",
+    "stats": {
+      "total": "전체",
+      "done": "완료",
+      "left": "남음",
+      "progress": "진행률"
+    },
+    "overallProgress": "전체 진행률",
+    "section": "섹션",
+    "task": "태스크",
+    "copied": "복사됨!",
+    "copyPromptTitle": "AI 에이전트용 프롬프트 복사",
+    "copyPromptAI": "태스크 {{taskId}}에 대한 AI 프롬프트 복사",
+    "copyPromptDefault": "태스크 {{taskId}}에 대한 기본 프롬프트 복사",
+    "copyPrompt": "스펙 \"{{specName}}\"의 태스크 {{taskId}}를 작업해 주세요",
+    "promptAvailable": "AI 프롬프트 사용 가능",
+    "promptPreview": "AI 프롬프트 미리보기",
+    "usingDefaultPrompt": "기본 프롬프트 사용 중",
+    "status": {
+      "pending": "대기 중",
+      "inProgress": "진행 중",
+      "completed": "완료됨"
+    },
+    "taskGroup": "태스크 그룹",
+    "meta": {
+      "files": "파일",
+      "implementation": "구현",
+      "purposes": "목적",
+      "requirements": "요구사항",
+      "leverage": "활용"
+    },
+    "loading": "태스크 로딩 중...",
+    "noSpecs": "명세서를 찾을 수 없음",
+    "selectSpec": "태스크를 보려면 위에서 명세서를 선택하세요"
+  },
+  "approvals": {
+    "docLabel": "문서",
+    "categoryPlaceholder": "카테고리 선택",
+    "status": {
+      "pending": "대기 중"
+    },
+    "created": "생성됨: {{time}}",
+    "response": {
+      "approved": "승인됨",
+      "rejected": "거부됨",
+      "needsRevision": "수정 필요"
+    },
+    "processing": "처리 중...",
+    "approve": "승인",
+    "reject": "거부",
+    "requestRevision": "수정 요청",
+    "openInEditor": "편집기에서 열기",
+    "noPending": "이 명세서에 대한 대기 중인 승인이 없습니다",
+    "noPendingDocuments": "승인 대기 중인 문서를 찾을 수 없습니다",
+    "selectCategory": "승인 대기 중인 항목을 보려면 위에서 카테고리를 선택하세요"
+  },
+  "specs": {
+    "active": "활성",
+    "archived": "아카이브됨",
+    "specLabel": "명세서",
+    "specPlaceholder": "명세서 선택",
+    "archive": "아카이브",
+    "unarchive": "아카이브 해제",
+    "docsTitle": "명세서 문서",
+    "modified": "수정됨 {{time}}",
+    "fileNotFound": "파일을 찾을 수 없음",
+    "open": "열기",
+    "noDocs": "이 명세서에 대한 문서를 찾을 수 없습니다",
+    "noActiveSpecs": "활성 명세서를 찾을 수 없습니다",
+    "noArchivedSpecs": "아카이브된 명세서를 찾을 수 없습니다",
+    "selectSpec": "문서를 보려면 위에서 명세서를 선택하세요"
+  },
+  "steering": {
+    "title": "가이드 문서",
+    "modified": "수정됨 {{time}}",
+    "fileNotFound": "파일을 찾을 수 없음",
+    "open": "열기",
+    "noDocs": "가이드 문서를 찾을 수 없습니다",
+    "copyInstructions": "지침 복사",
+    "copied": "복사됨!"
+  },
+  "common": {
+    "scrollToTop": "맨 위로 스크롤"
+  },
+  "language": {
+    "selector": "언어",
+    "changed": "언어가 성공적으로 변경되었습니다",
+    "auto": "자동",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "spanish": "Español",
+    "portuguese": "Português", 
+    "german": "Deutsch",
+    "french": "Français",
+    "russian": "Русский",
+    "italian": "Italiano",
+    "korean": "한국어",
+    "arabic": "العربية"
+  }
+}

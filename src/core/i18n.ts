@@ -23,7 +23,7 @@ const SUPPORTED_LANGUAGES = process.env.SUPPORTED_LANGUAGES
         }
         return isValid;
       })
-  : ['en', 'ja'];
+  : ['en', 'ja', 'zh', 'es', 'pt', 'de', 'fr', 'ru', 'it', 'ko', 'ar'];
 
 // Use LRU cache for memory-efficient translation storage
 // Max 10MB of translation data (approximate)

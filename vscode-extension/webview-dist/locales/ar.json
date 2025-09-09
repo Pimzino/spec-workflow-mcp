@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Spec Workflow MCP",
+    "support": "ادعم هذا المشروع"
+  },
+  "tabs": {
+    "overview": "نظرة عامة على المشروع",
+    "steering": "وثائق التوجيه",
+    "specs": "وثائق المواصفات",
+    "tasks": "إدارة المهام",
+    "approvals": "طلبات الموافقة"
+  },
+  "overview": {
+    "projectTitle": "نظرة عامة على المشروع",
+    "activeSpecs": "المواصفات النشطة",
+    "archivedSpecs": "المواصفات المؤرشفة",
+    "totalSpecs": "إجمالي المواصفات",
+    "tasks": "المهام",
+    "overallProgress": "التقدم الإجمالي",
+    "recentActivity": "النشاط الأخير",
+    "modified": "{{time}}",
+    "noSpecs": "لم توجد مواصفات"
+  },
+  "tasks": {
+    "specLabel": "المواصفة",
+    "specPlaceholder": "اختر مواصفة",
+    "stats": {
+      "total": "الإجمالي",
+      "done": "مكتمل",
+      "left": "متبقي",
+      "progress": "التقدم"
+    },
+    "overallProgress": "التقدم الإجمالي",
+    "section": "القسم",
+    "task": "المهمة",
+    "copied": "تم النسخ!",
+    "copyPromptTitle": "نسخ موجه لوكيل الذكاء الاصطناعي",
+    "copyPromptAI": "نسخ موجه الذكاء الاصطناعي للمهمة {{taskId}}",
+    "copyPromptDefault": "نسخ الموجه الافتراضي للمهمة {{taskId}}",
+    "copyPrompt": "يرجى العمل على المهمة {{taskId}} للمواصفة \"{{specName}}\"",
+    "promptAvailable": "موجه الذكاء الاصطناعي متاح",
+    "promptPreview": "معاينة موجه الذكاء الاصطناعي",
+    "usingDefaultPrompt": "استخدام الموجه الافتراضي",
+    "status": {
+      "pending": "معلق",
+      "inProgress": "قيد التنفيذ",
+      "completed": "مكتمل"
+    },
+    "taskGroup": "مجموعة المهام",
+    "meta": {
+      "files": "الملفات",
+      "implementation": "التنفيذ",
+      "purposes": "الأغراض",
+      "requirements": "المتطلبات",
+      "leverage": "الاستفادة"
+    },
+    "loading": "جاري تحميل المهام...",
+    "noSpecs": "لم توجد مواصفات",
+    "selectSpec": "اختر مواصفة أعلاه لعرض المهام"
+  },
+  "approvals": {
+    "docLabel": "الوثيقة",
+    "categoryPlaceholder": "اختر فئة",
+    "status": {
+      "pending": "معلق"
+    },
+    "created": "تم إنشاؤه: {{time}}",
+    "response": {
+      "approved": "موافق",
+      "rejected": "مرفوض",
+      "needsRevision": "يحتاج مراجعة"
+    },
+    "processing": "جاري المعالجة...",
+    "approve": "موافق",
+    "reject": "رفض",
+    "requestRevision": "طلب مراجعة",
+    "openInEditor": "فتح في المحرر",
+    "noPending": "لا توجد موافقات معلقة لهذه المواصفة",
+    "noPendingDocuments": "لم توجد وثائق بموافقات معلقة",
+    "selectCategory": "اختر فئة أعلاه لعرض الموافقات المعلقة"
+  },
+  "specs": {
+    "active": "نشط",
+    "archived": "مؤرشف",
+    "specLabel": "المواصفة",
+    "specPlaceholder": "اختر مواصفة",
+    "archive": "أرشف",
+    "unarchive": "إلغاء الأرشفة",
+    "docsTitle": "وثائق المواصفة",
+    "modified": "تم التعديل {{time}}",
+    "fileNotFound": "الملف غير موجود",
+    "open": "فتح",
+    "noDocs": "لم توجد وثائق لهذه المواصفة",
+    "noActiveSpecs": "لم توجد مواصفات نشطة",
+    "noArchivedSpecs": "لم توجد مواصفات مؤرشفة",
+    "selectSpec": "اختر مواصفة أعلاه لعرض الوثائق"
+  },
+  "steering": {
+    "title": "وثائق التوجيه",
+    "modified": "تم التعديل {{time}}",
+    "fileNotFound": "الملف غير موجود",
+    "open": "فتح",
+    "noDocs": "لم توجد وثائق توجيه",
+    "copyInstructions": "نسخ التعليمات",
+    "copied": "تم النسخ!"
+  },
+  "common": {
+    "scrollToTop": "التمرير للأعلى"
+  },
+  "language": {
+    "selector": "اللغة",
+    "changed": "تم تغيير اللغة بنجاح",
+    "auto": "تلقائي",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "german": "Deutsch",
+    "french": "Français",
+    "russian": "Русский",
+    "italian": "Italiano",
+    "korean": "한국어",
+    "arabic": "العربية"
+  }
+}

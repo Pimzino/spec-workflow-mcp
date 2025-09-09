@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.29] - 2025-09-08
+
+### Improved
+- Improved localization support for all components.
+
+### Added
+- **Multi-Language Support Expansion** - Added comprehensive translations for 8 new languages
+  - Spanish (es) 🇪🇸 translations for all components
+  - Portuguese (pt) 🇧🇷 translations for all components
+  - German (de) 🇩🇪 translations for all components
+  - French (fr) 🇫🇷 translations for all components
+  - Russian (ru) 🇷🇺 translations for all components
+  - Italian (it) 🇮🇹 translations for all components
+  - Korean (ko) 🇰🇷 translations for all components
+  - Arabic (ar) 🇸🇦 translations for all components
+  - Total of 24 new translation files across MCP server, dashboard, and VSCode extension
+  - Updated language selectors in both dashboard and VSCode extension to include all new languages
+
+### Enhanced
+- **i18n Infrastructure** - Updated validation and build processes to support 11 total languages
+  - Enhanced validation script to check all supported languages for consistency
+  - Updated all i18n configurations to register new language resources
+  - Added comprehensive i18n structure documentation explaining the three translation contexts
+
+### Technical Changes
+- Updated SUPPORTED_LANGUAGES arrays across all three components
+- Added flag emoji representations for improved language selection UX
+- Maintained backward compatibility with existing English, Japanese, and Chinese translations
+- All Mustache template variables validated for consistency across all 11 languages
+
 ## [0.0.28] - 2025-09-08
 
 ### Added
@@ -228,6 +258,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the ability to change task status directly from the task page in the dashboard.
 
 ## [0.0.10] - 2025-08-10
+
+### Added
+- **Initial Multi-Language Framework** - Established foundational support for internationalization
+  - Set up i18n infrastructure to support future language translations
+  - Implemented framework for dynamic language switching across components
+  - Laid groundwork for comprehensive multi-language support later expanded in v0.0.26-0.0.29
 
 ### Fixed
 - Fixed bug with spec steering page not displaying correctly on smaller screens (mobile devices).

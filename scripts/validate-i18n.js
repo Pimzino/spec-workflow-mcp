@@ -87,7 +87,7 @@ function validateI18nFiles() {
   // Get supported languages from environment variable or use defaults
   const supportedLanguages = process.env.SUPPORTED_LANGUAGES 
     ? process.env.SUPPORTED_LANGUAGES.split(',').map(lang => lang.trim())
-    : ['en', 'ja', 'zh'];
+    : ['en', 'ja', 'zh', 'es', 'pt', 'de', 'fr', 'ru', 'it', 'ko', 'ar'];
   
   console.log(`📌 Supported languages: ${supportedLanguages.join(', ')}`);
   

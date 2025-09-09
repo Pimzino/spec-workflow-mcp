@@ -1,0 +1,370 @@
+{
+  "documentTitle": "لوحة تحكم {{projectName}}",
+  "projectNameDefault": "Spec Workflow",
+  "projectDescription": "لوحة تحكم سير عمل التطوير",
+  "nav": {
+    "statistics": "الإحصائيات",
+    "steering": "التوجيه",
+    "specs": "المواصفات",
+    "tasks": "المهام",
+    "approvals": "الموافقات"
+  },
+  "connectionStatus": {
+    "connected": "متصل",
+    "disconnected": "منقطع"
+  },
+  "theme": {
+    "toggle": "تبديل المظهر",
+    "dark": "مظلم",
+    "light": "فاتح"
+  },
+  "support": {
+    "me": "ادعمني",
+    "project": "ادعم المشروع"
+  },
+  "mobile": {
+    "menu": "القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "notificationVolume": "مستوى صوت الإشعارات",
+    "theme": "المظهر"
+  },
+  "stats": {
+    "specifications": {
+      "title": "المواصفات",
+      "label": "المواصفات النشطة"
+    },
+    "taskProgress": {
+      "title": "تقدم المهام",
+      "summary_one": "{{count}} مهمة عبر {{specs}} مواصفة",
+      "summary_other": "{{count}} مهام عبر {{specs}} مواصفات",
+      "noActiveSpecs": "لا توجد مواصفات نشطة"
+    },
+    "approvals": {
+      "title": "الموافقات",
+      "awaiting": "في انتظار المراجعة",
+      "allClear": "الكل واضح"
+    }
+  },
+  "comingSoon": {
+    "title": "المزيد من الميزات قريباً",
+    "description": "نحن نعمل على تحليلات ورؤى إضافية لسير عمل التطوير الخاص بك. ترقبوا التحديثات!"
+  },
+  "links": {
+    "npm": "حزمة npm",
+    "github": "GitHub"
+  },
+  "editor": {
+    "markdown": {
+      "title": "محرر الماركداون",
+      "saving": "جاري الحفظ...",
+      "save": "حفظ",
+      "saved": "تم الحفظ",
+      "error": "خطأ",
+      "unsavedChanges": "تغييرات غير محفوظة",
+      "hints": "Ctrl+S للحفظ • Tab للمسافة البادئة",
+      "placeholder": "ابدأ في كتابة محتوى الماركداون...",
+      "lines": "الأسطر",
+      "characters": "الأحرف"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "وثائق المواصفة" },
+    "tooltips": { "viewRendered": "عرض الوثيقة المعروضة", "viewSource": "عرض مصدر الماركداون" },
+    "empty": { "docNotCreated": "لم يتم إنشاء وثيقة {{doc}} هذه بعد." }
+  },
+  "language": {
+    "select": "اختر اللغة"
+  },
+  "common": {
+    "viewMode": {
+      "rendered": "معروض",
+      "source": "المصدر",
+      "editor": "المحرر"
+    },
+    "loadingContent": "جاري تحميل المحتوى...",
+    "noContentAvailable": "لا يتوفر محتوى",
+    "percentComplete": "{{percent}}% مكتمل",
+    "lastModified": "آخر تعديل {{date}}",
+    "never": "أبداً",
+    "unknown": "غير معروف",
+    "close": "إغلاق",
+    "keepEditing": "متابعة التحرير",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "closeModalAria": "إغلاق النافذة المنبثقة"
+  },
+  "tasksPage": {
+    "header": {
+      "title": "إدارة المهام",
+      "subtitle": {
+        "selected": "إدارة وتتبع إنجاز المهام",
+        "unselected": "اختر مواصفة لعرض وإدارة مهامها"
+      }
+    },
+    "taskDetails": "تفاصيل المهمة",
+    "status": "الحالة",
+    "noTasksFound": "لم توجد مهام",
+    "showAllTasks": "إظهار جميع المهام",
+    "noTasksWithStatus": "لم توجد مهام بحالة \"{{status}}\".",
+    "noTasksAvailable": "لا توجد مهام متاحة لهذه المواصفة",
+    "showingTasksWithStatus": "إظهار {{count}} مهام بحالة \"{{status}}\"",
+    "filters": {
+      "all": "الكل",
+      "pending": "معلق",
+      "inProgress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "filterByTooltip": "تصفية بمهام {{status}}"
+    },
+    "sort": {
+      "label": "ترتيب",
+      "defaultOrder": "الترتيب الافتراضي",
+      "defaultOrderDesc": "ترتيب المهام الأصلي",
+      "status": "الحالة",
+      "statusDesc": "تجميع بحالة المهمة",
+      "taskId": "معرف المهمة",
+      "taskIdDesc": "ترتيب بمعرف المهمة",
+      "description": "الوصف",
+      "descriptionDesc": "ترتيب أبجدياً بالوصف",
+      "byStatus": "بالحالة",
+      "byTaskId": "بمعرف المهمة",
+      "byDescription": "بالوصف",
+      "changeSortOrder": "تغيير ترتيب الفرز",
+      "sortOrder": "ترتيب الفرز",
+      "ascending": "تصاعدي",
+      "descending": "تنازلي",
+      "sortAscending": "ترتيب تصاعدي",
+      "sortDescending": "ترتيب تنازلي"
+    },
+    "statusPill": {
+      "pending": "معلق",
+      "inProgress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "clickToChange": "انقر لتغيير الحالة"
+    },
+    "dropdown": {
+      "selectPlaceholder": "اختر مواصفة...",
+      "completedOutOfTotal": "{{completed}} / {{total}} مهام مكتملة",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} مهام"
+    },
+    "search": {
+      "placeholder": "البحث في المواصفات...",
+      "noSpecsFound": "لم توجد مواصفات",
+      "tryAdjusting": "حاول تعديل البحث"
+    },
+    "loading": "جاري تحميل تقدم المهام...",
+    "overallProgress": "التقدم الإجمالي",
+    "item": {
+      "section": "القسم",
+      "task": "المهمة",
+      "groupBadge": "مجموعة المهام"
+    },
+    "files": { "label": "الملفات:" },
+    "implementation": { "label": "التنفيذ:" },
+    "labels": { "spec": "المواصفة:" },
+    "noSpecsFound": {
+      "title": "لم توجد مواصفات",
+      "noMatch": "لا توجد مواصفات تطابق \"{{query}}\"",
+      "noSpecsAvailable": "لا توجد مواصفات متاحة لإدارة المهام لها."
+    },
+    "copyFailed": {
+      "title": "فشل النسخ",
+      "message": "فشل النسخ. يرجى نسخ هذا النص يدوياً:"
+    },
+    "copyPrompt": {
+      "tooltip": "نسخ موجه لوكيل الذكاء الاصطناعي",
+      "copied": "تم النسخ!",
+      "copyPrompt": "نسخ الموجه",
+      "copy": "نسخ"
+    },
+    "notifications": {
+      "statusUpdated": "تم تحديد المهمة {{taskId}} كـ {{status}}",
+      "updateFailed": "فشل في تحديث حالة المهمة {{taskId}}",
+      "updateError": "خطأ في تحديث حالة المهمة {{taskId}}"
+    },
+    "noTaskData": "لا تتوفر بيانات مهام",
+    "stats": {
+      "total": "الإجمالي",
+      "totalDesc": "جميع المهام",
+      "done": "مكتمل",
+      "doneDesc": "مكتملة",
+      "left": "متبقي",
+      "leftDesc": "متبقية",
+      "progress": "التقدم",
+      "progressDesc": "مكتمل"
+    }
+  },
+  "specsPage": {
+    "header": {
+      "title": "المواصفات",
+      "subtitle": {
+        "active": "عرض وإدارة وثائق المتطلبات والتصميم والمهام النشطة",
+        "archived": "عرض المواصفات المؤرشفة"
+      }
+    },
+    "modal": {
+      "archivedBadge": "مؤرشف",
+      "archivedNotice": "مواصفة مؤرشفة (التحرير متاح)",
+      "closeAria": "إغلاق عارض المواصفة",
+      "docLabel": "الوثيقة:",
+      "docSelectAria": "اختر نوع الوثيقة"
+    },
+    "documents": {
+      "requirements": "المتطلبات",
+      "design": "التصميم",
+      "tasks": "المهام"
+    },
+    "search": {
+      "placeholder": {
+        "active": "البحث في المواصفات النشطة...",
+        "archived": "البحث في المواصفات المؤرشفة..."
+      }
+    },
+    "empty": {
+      "title": "لا توجد وثائق متاحة",
+      "description": "هذه المواصفة لا تحتوي على وثائق تم إنشاؤها بعد."
+    },
+    "tabs": {
+      "active": "نشط",
+      "archived": "الأرشيف"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "وثائق التوجيه",
+      "subtitle": "عرض وإدارة وثائق توجيه المشروع للإرشاد المنتج والهندسة التقنية والبنية"
+    },
+    "table": {
+      "document": "الوثيقة",
+      "status": "الحالة",
+      "lastModified": "آخر تعديل",
+      "actions": "الإجراءات"
+    },
+    "badge": {
+      "available": "متاح",
+      "notCreated": "غير منشأ"
+    },
+    "modal": {
+      "title": "وثيقة التوجيه {{name}}",
+      "closeAria": "إغلاق وثيقة التوجيه"
+    },
+    "controls": {
+      "documentLabel": "الوثيقة:"
+    },
+    "empty": {
+      "title": "لا توجد وثائق توجيه",
+      "description": "وثائق التوجيه توفر سياق المشروع والإرشاد. انقر على أي وثيقة أعلاه لإنشائها أو عرضها."
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "معلق",
+      "needsRevision": "يحتاج مراجعة",
+      "approved": "موافق",
+      "rejected": "مرفوض"
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "الموافقات",
+      "subtitle": "مراجعة وإدارة طلبات الموافقة المعلقة"
+    },
+    "pendingCount_one": "{{count}} معلق",
+    "pendingCount_other": "{{count}} معلق",
+    "messages": {
+      "approvedViaDashboard": "تمت الموافقة عبر لوحة التحكم"
+    },
+    "actions": {
+      "openReview": "مراجعة وتعليق",
+      "closeReview": "إغلاق المراجعة",
+      "reviewShort": "مراجعة",
+      "quickApprove": "موافقة سريعة",
+      "approve": "موافق",
+      "quickReject": "رفض سريع",
+      "reject": "رفض",
+      "requestRevisions": "طلب مراجعات",
+      "revisions": "مراجعات"
+    },
+    "tooltips": {
+      "goToAnnotations": "الذهاب للتعليقات التوضيحية",
+      "goToComments": "الذهاب للتعليقات"
+    },
+    "filter": {
+      "label": "تصفية بـ:",
+      "options": {
+        "all": "جميع الوثائق",
+        "steering": "وثائق التوجيه"
+      }
+    },
+    "empty": {
+      "title": "لا توجد موافقات معلقة",
+      "description": "تمت معالجة جميع الموافقات. طلبات الموافقة الجديدة ستظهر هنا."
+    },
+    "reject": {
+      "title": "رفض الموافقة",
+      "placeholder": "يرجى تقديم تغذية راجعة توضح سبب الرفض...",
+      "submit": "رفض"
+    },
+    "approvalWarning": {
+      "title": "لا يمكن الموافقة",
+      "message": "لا يمكن الموافقة عند وجود تعليقات. استخدم \"طلب مراجعات\" لإرسال التغذية الراجعة."
+    },
+    "revision": {
+      "noCommentsTitle": "لم تُضاف تعليقات",
+      "noCommentsMessage": "يرجى إضافة تعليق واحد على الأقل قبل طلب المراجعات."
+    }
+  },
+  "approvals.annotator": {
+    "instructions": {
+      "title": "كيفية التعليق:",
+      "mobile": "اختر النص ← نقر مزدوج على الاختيار ← يظهر مربع حوار التعليق. اضغط على النص المميز لتحرير التعليقات.",
+      "step1": "• اختر أي نص لإضافة تعليق - سيظهر مربع حوار تلقائياً",
+      "step2": "• انقر على التمييزات الموجودة (النص الملون) لعرض أو تحرير التعليقات",
+      "step3": "• استخدم زر \"إضافة تعليق عام\" للتغذية الراجعة على مستوى الوثيقة"
+    },
+    "editCommentTitle": "تحرير التعليق",
+    "addCommentTitle": "إضافة تعليق",
+    "subtitle": "علق على النص المميز أدناه",
+    "highlightedText": "النص المميز:",
+    "chooseHighlightColor": "اختر لون التمييز:",
+    "pickColorTooltip": "اختر لون التمييز",
+    "yourComment": "تعليقك:",
+    "commentPlaceholder": "أدخل تعليقك هنا...",
+    "hints": {
+      "desktop": "اضغط Ctrl/Cmd + Enter للحفظ، أو Escape للإلغاء",
+      "mobile": "اضغط حفظ للتأكيد"
+    },
+    "updateCommentButton": "تحديث التعليق",
+    "addCommentButton": "إضافة تعليق",
+    "updateShort": "تحديث",
+    "saveShort": "حفظ",
+    "tooltips": {
+      "viewEditComment": "انقر لعرض/تحرير التعليق",
+      "deleteComment": "حذف التعليق"
+    },
+    "badge": {
+      "textSelection": "اختيار النص",
+      "generalComment": "تعليق عام"
+    },
+    "colorHighlight": "تمييز {{color}}",
+    "addGeneralComment": {
+      "title": "إضافة تعليق عام",
+      "placeholder": "أدخل تعليقاً عاماً...",
+      "submit": "إضافة تعليق",
+      "button": "إضافة تعليق عام"
+    },
+    "addCommentShort": "إضافة تعليق",
+    "empty": {
+      "title": "لا توجد تعليقات بعد",
+      "description": "اختر نصاً أو أضف تعليقاً عاماً"
+    },
+    "switchHelp": "التبديل لوضع التعليق لإضافة تعليقات بتحديد النص أو إضافة تغذية راجعة عامة.",
+    "viewMode": {
+      "preview": "معاينة",
+      "annotate": "تعليق"
+    },
+    "delete": {
+      "title": "حذف التعليق",
+      "message": "هل أنت متأكد من أنك تريد إزالة هذا التعليق؟ هذا الإجراء لا يمكن التراجع عنه."
+    }
+  }
+}

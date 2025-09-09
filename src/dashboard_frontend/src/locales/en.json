@@ -53,10 +53,54 @@
     "npm": "npm package",
     "github": "GitHub"
   },
+  "editor": {
+    "markdown": {
+      "title": "Markdown Editor",
+      "saving": "Saving...",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "Error",
+      "unsavedChanges": "Unsaved changes",
+      "hints": "Ctrl+S to save • Tab to indent",
+      "placeholder": "Start typing your markdown content...",
+      "lines": "Lines",
+      "characters": "Characters"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "Spec Documents" },
+    "tooltips": { "viewRendered": "View rendered document", "viewSource": "View source markdown" },
+    "empty": { "docNotCreated": "This {{doc}} document hasn't been created yet." }
+  },
   "language": {
     "select": "Select language"
   },
+  "common": {
+    "viewMode": {
+      "rendered": "Rendered",
+      "source": "Source",
+      "editor": "Editor"
+    },
+    "loadingContent": "Loading content...",
+    "noContentAvailable": "No content available",
+    "percentComplete": "{{percent}}% complete",
+    "lastModified": "Last modified {{date}}",
+    "never": "Never",
+    "unknown": "Unknown",
+    "close": "Close",
+    "keepEditing": "Keep Editing",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "closeModalAria": "Close modal"
+  },
   "tasksPage": {
+    "header": {
+      "title": "Task Management",
+      "subtitle": {
+        "selected": "Manage and track task completion",
+        "unselected": "Select a specification to view and manage its tasks"
+      }
+    },
     "taskDetails": "Task Details",
     "status": "Status",
     "noTasksFound": "No tasks found",
@@ -96,6 +140,232 @@
       "inProgress": "In Progress",
       "completed": "Completed",
       "clickToChange": "Click to change status"
+    },
+    "dropdown": {
+      "selectPlaceholder": "Select a spec...",
+      "completedOutOfTotal": "{{completed}} / {{total}} tasks completed",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} tasks"
+    },
+    "search": {
+      "placeholder": "Search specs...",
+      "noSpecsFound": "No specs found",
+      "tryAdjusting": "Try adjusting your search"
+    },
+    "loading": "Loading task progress…",
+    "overallProgress": "Overall Progress",
+    "item": {
+      "section": "Section",
+      "task": "Task",
+      "groupBadge": "Task Group"
+    },
+    "files": { "label": "Files:" },
+    "implementation": { "label": "Implementation:" },
+    "labels": { "spec": "Spec:" },
+    "noSpecsFound": {
+      "title": "No specs found",
+      "noMatch": "No specs match \"{{query}}\"",
+      "noSpecsAvailable": "No specifications available to manage tasks for."
+    },
+    "copyFailed": {
+      "title": "Copy Failed",
+      "message": "Copy failed. Please copy this text manually:"
+    },
+    "copyPrompt": {
+      "tooltip": "Copy prompt for AI agent",
+      "copied": "Copied!",
+      "copyPrompt": "Copy Prompt",
+      "copy": "Copy"
+    },
+    "notifications": {
+      "statusUpdated": "Task {{taskId}} marked as {{status}}",
+      "updateFailed": "Failed to update task {{taskId}} status",
+      "updateError": "Error updating task {{taskId}} status"
+    },
+    "noTaskData": "No task data available",
+    "stats": {
+      "total": "Total",
+      "totalDesc": "All tasks",
+      "done": "Done",
+      "doneDesc": "Completed",
+      "left": "Left",
+      "leftDesc": "Remaining",
+      "progress": "Progress",
+      "progressDesc": "Complete"
+    }
+  }
+  ,
+  "specsPage": {
+    "header": {
+      "title": "Specifications",
+      "subtitle": {
+        "active": "View and manage active requirements, design and task documents",
+        "archived": "View archived specifications"
+      }
+    },
+    "modal": {
+      "archivedBadge": "Archived",
+      "archivedNotice": "Archived specification (editing enabled)",
+      "closeAria": "Close spec viewer",
+      "docLabel": "Doc:",
+      "docSelectAria": "Select document type"
+    },
+    "documents": {
+      "requirements": "Requirements",
+      "design": "Design",
+      "tasks": "Tasks"
+    },
+    "search": {
+      "placeholder": {
+        "active": "Search active specs...",
+        "archived": "Search archived specs..."
+      }
+    },
+    "empty": {
+      "title": "No Documents Available",
+      "description": "This spec doesn't have any documents created yet."
+    },
+    "tabs": {
+      "active": "Active",
+      "archived": "Archive"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "Steering Documents",
+      "subtitle": "View and manage project steering documents for product guidance, technical architecture, and structure"
+    },
+    "table": {
+      "document": "Document",
+      "status": "Status",
+      "lastModified": "Last Modified",
+      "actions": "Actions"
+    },
+    "badge": {
+      "available": "Available",
+      "notCreated": "Not Created"
+    },
+    "modal": {
+      "title": "{{name}} Steering Document",
+      "closeAria": "Close steering document"
+    },
+    "controls": {
+      "documentLabel": "Document:"
+    },
+    "empty": {
+      "title": "No Steering Documents",
+      "description": "Steering documents provide project context and guidance. Click on any document above to create or view it."
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "pending",
+      "needsRevision": "needs revision",
+      "approved": "approved",
+      "rejected": "rejected"
+    },
+    "annotator": {
+      "instructions": {
+        "title": "How to annotate:",
+        "mobile": "Select text → double tap selection → comment dialog appears. Tap highlighted text to edit comments.",
+        "step1": "• Select any text to add a comment - a dialog will appear automatically",
+        "step2": "• Click on existing highlights (colored text) to view or edit comments",
+        "step3": "• Use the \"Add General Comment\" button for document-wide feedback"
+      },
+      "editCommentTitle": "Edit Comment",
+      "addCommentTitle": "Add Comment",
+      "subtitle": "Comment on the highlighted text below",
+      "highlightedText": "Highlighted Text:",
+      "chooseHighlightColor": "Choose Highlight Color:",
+      "pickColorTooltip": "Pick highlight color",
+      "yourComment": "Your Comment:",
+      "commentPlaceholder": "Enter your comment here...",
+      "hints": {
+        "desktop": "Press Ctrl/Cmd + Enter to save, or Escape to cancel",
+        "mobile": "Tap Save to confirm"
+      },
+      "updateCommentButton": "Update Comment",
+      "addCommentButton": "Add Comment",
+      "updateShort": "Update",
+      "saveShort": "Save",
+      "tooltips": {
+        "viewEditComment": "Click to view/edit comment",
+        "deleteComment": "Delete comment"
+      },
+      "badge": {
+        "textSelection": "Text Selection",
+        "generalComment": "General Comment"
+      },
+      "colorHighlight": "{{color}} highlight",
+      "addGeneralComment": {
+        "title": "Add General Comment",
+        "placeholder": "Enter a general comment...",
+        "submit": "Add Comment",
+        "button": "Add General Comment"
+      },
+      "addCommentShort": "Add Comment",
+      "empty": {
+        "title": "No comments yet",
+        "description": "Select text or add a general comment"
+      },
+      "switchHelp": "Switch to Annotate mode to add comments by selecting text or add general feedback.",
+      "viewMode": {
+        "preview": "Preview",
+        "annotate": "Annotate"
+      },
+      "delete": {
+        "title": "Delete Comment",
+        "message": "Are you sure you want to remove this comment? This action cannot be undone."
+      }
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "Approvals",
+      "subtitle": "Review and manage pending approval requests"
+    },
+    "pendingCount_one": "{{count}} pending",
+    "pendingCount_other": "{{count}} pending",
+    "messages": {
+      "approvedViaDashboard": "Approved via dashboard"
+    },
+    "actions": {
+      "openReview": "Review & Annotate",
+      "closeReview": "Close Review",
+      "reviewShort": "Review",
+      "quickApprove": "Quick Approve",
+      "approve": "Approve",
+      "quickReject": "Quick Reject",
+      "reject": "Reject",
+      "requestRevisions": "Request Revisions",
+      "revisions": "Revisions"
+    },
+    "tooltips": {
+      "goToAnnotations": "Go to annotations",
+      "goToComments": "Go to comments"
+    },
+    "filter": {
+      "label": "Filter by:",
+      "options": {
+        "all": "All Documents",
+        "steering": "Steering Documents"
+      }
+    },
+    "empty": {
+      "title": "No Pending Approvals",
+      "description": "All approvals have been processed. New approval requests will appear here."
+    },
+    "reject": {
+      "title": "Reject Approval",
+      "placeholder": "Please provide feedback explaining why this is being rejected...",
+      "submit": "Reject"
+    },
+    "approvalWarning": {
+      "title": "Cannot Approve",
+      "message": "Cannot approve when comments exist. Use \"Request Revisions\" to send feedback."
+    },
+    "revision": {
+      "noCommentsTitle": "No Comments Added",
+      "noCommentsMessage": "Please add at least one comment before requesting revisions."
     }
   }
 }

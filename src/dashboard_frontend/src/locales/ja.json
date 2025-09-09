@@ -53,10 +53,74 @@
     "npm": "npm パッケージ",
     "github": "GitHub"
   },
+  "editor": {
+    "markdown": {
+      "title": "Markdown エディタ",
+      "saving": "保存中...",
+      "save": "保存",
+      "saved": "保存しました",
+      "error": "エラー",
+      "unsavedChanges": "未保存の変更",
+      "hints": "Ctrl+S で保存 • Tab でインデント",
+      "placeholder": "Markdown コンテンツを入力してください...",
+      "lines": "行数",
+      "characters": "文字数"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "仕様ドキュメント" },
+    "tooltips": { "viewRendered": "レンダリング表示", "viewSource": "ソース(Markdown)を表示" },
+    "empty": { "docNotCreated": "この {{doc}} ドキュメントはまだ作成されていません。" }
+  },
   "language": {
     "select": "言語を選択"
   },
+  "common": {
+    "viewMode": {
+      "rendered": "レンダリング",
+      "source": "ソース",
+      "editor": "エディタ"
+    },
+    "loadingContent": "コンテンツを読み込み中...",
+    "noContentAvailable": "コンテンツはありません",
+    "percentComplete": "{{percent}}% 完了",
+    "lastModified": "最終更新 {{date}}",
+    "never": "なし",
+    "unknown": "不明",
+    "close": "閉じる",
+    "keepEditing": "編集を続ける",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "closeModalAria": "モーダルを閉じる"
+  },
   "tasksPage": {
+    "header": {
+      "title": "タスク管理",
+      "subtitle": {
+        "selected": "タスクの進捗を管理・追跡",
+        "unselected": "仕様を選択してタスクを表示・管理します"
+      }
+    },
+    "dropdown": {
+      "selectPlaceholder": "仕様を選択...",
+      "completedOutOfTotal": "{{completed}} / {{total}} 件のタスクが完了",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} タスク"
+    },
+    "search": {
+      "placeholder": "仕様を検索...",
+      "noSpecsFound": "仕様が見つかりません",
+      "tryAdjusting": "検索条件を変更してみてください"
+    },
+    "loading": "タスク進捗を読み込み中…",
+    "overallProgress": "全体の進捗",
+    "item": {
+      "section": "セクション",
+      "task": "タスク",
+      "groupBadge": "タスクグループ"
+    },
+    "files": { "label": "ファイル:" },
+    "implementation": { "label": "実装:" },
+    "labels": { "spec": "仕様:" },
     "taskDetails": "タスクの詳細",
     "status": "ステータス",
     "noTasksFound": "タスクが見つかりません",
@@ -96,6 +160,206 @@
       "inProgress": "進行中",
       "completed": "完了",
       "clickToChange": "クリックしてステータスを変更"
+    },
+    "copyFailed": {
+      "title": "コピーに失敗しました",
+      "message": "コピーに失敗しました。次のテキストを手動でコピーしてください:"
+    },
+    "copyPrompt": {
+      "tooltip": "AI エージェント用のプロンプトをコピー",
+      "copied": "コピーしました",
+      "copyPrompt": "プロンプトをコピー",
+      "copy": "コピー"
+    },
+    "notifications": {
+      "statusUpdated": "タスク {{taskId}} を {{status}} に更新",
+      "updateFailed": "タスク {{taskId}} の更新に失敗しました",
+      "updateError": "タスク {{taskId}} の更新中にエラーが発生しました"
+    },
+    "noTaskData": "タスクデータがありません",
+    "stats": {
+      "total": "合計",
+      "totalDesc": "すべてのタスク",
+      "done": "完了",
+      "doneDesc": "完了済み",
+      "left": "残り",
+      "leftDesc": "未完了",
+      "progress": "進捗",
+      "progressDesc": "完了率"
+    }
+  },
+  "specsPage": {
+    "header": {
+      "title": "仕様書",
+      "subtitle": {
+        "active": "アクティブな要件・設計・タスク文書を表示・管理",
+        "archived": "アーカイブされた仕様書を表示"
+      }
+    },
+    "modal": {
+      "archivedBadge": "アーカイブ",
+      "archivedNotice": "アーカイブされた仕様（編集可能）",
+      "closeAria": "仕様ビューアを閉じる",
+      "docLabel": "ドキュメント:",
+      "docSelectAria": "ドキュメント種類を選択"
+    },
+    "documents": {
+      "requirements": "要件",
+      "design": "設計",
+      "tasks": "タスク"
+    },
+    "search": {
+      "placeholder": {
+        "active": "アクティブな仕様を検索...",
+        "archived": "アーカイブ済み仕様を検索..."
+      }
+    },
+    "empty": {
+      "title": "ドキュメントはありません",
+      "description": "この仕様にはまだドキュメントが作成されていません。"
+    },
+    "tabs": {
+      "active": "アクティブ",
+      "archived": "アーカイブ"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "ステアリング文書",
+      "subtitle": "プロダクト方針・技術アーキテクチャ・組織構造に関するプロジェクトのステアリング文書を表示・管理"
+    },
+    "table": {
+      "document": "ドキュメント",
+      "status": "ステータス",
+      "lastModified": "最終更新",
+      "actions": "操作"
+    },
+    "badge": {
+      "available": "利用可",
+      "notCreated": "未作成"
+    },
+    "modal": {
+      "title": "{{name}} ステアリング文書",
+      "closeAria": "ステアリング文書を閉じる"
+    },
+    "controls": {
+      "documentLabel": "ドキュメント:"
+    },
+    "empty": {
+      "title": "ステアリング文書がありません",
+      "description": "ステアリング文書はプロジェクトの文脈と指針を提供します。上の任意の文書をクリックして作成または表示します。"
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "保留中",
+      "needsRevision": "修正が必要",
+      "approved": "承認済み",
+      "rejected": "却下"
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "承認",
+      "subtitle": "保留中の承認リクエストをレビュー・管理"
+    },
+    "pendingCount_one": "保留中 {{count}} 件",
+    "pendingCount_other": "保留中 {{count}} 件",
+    "messages": {
+      "approvedViaDashboard": "ダッシュボードから承認"
+    },
+    "actions": {
+      "openReview": "レビューと注釈",
+      "closeReview": "レビューを閉じる",
+      "reviewShort": "レビュー",
+      "quickApprove": "即時承認",
+      "approve": "承認",
+      "quickReject": "即時却下",
+      "reject": "却下",
+      "requestRevisions": "修正を依頼",
+      "revisions": "修正"
+    },
+    "tooltips": {
+      "goToAnnotations": "注釈に移動",
+      "goToComments": "コメントに移動"
+    },
+    "filter": {
+      "label": "フィルター:",
+      "options": {
+        "all": "すべてのドキュメント",
+        "steering": "ステアリング文書"
+      }
+    },
+    "empty": {
+      "title": "保留中の承認はありません",
+      "description": "すべての承認が処理されました。新しい承認リクエストはここに表示されます。"
+    },
+    "reject": {
+      "title": "承認を却下",
+      "placeholder": "却下する理由やフィードバックを入力してください...",
+      "submit": "却下"
+    },
+    "approvalWarning": {
+      "title": "承認できません",
+      "message": "コメントが存在する場合は承認できません。\"修正を依頼\"を使用してフィードバックを送信してください。"
+    },
+    "revision": {
+      "noCommentsTitle": "コメントが追加されていません",
+      "noCommentsMessage": "修正を依頼する前に少なくとも1つコメントを追加してください。"
+    }
+  },
+  "approvals.annotator": {
+    "instructions": {
+      "title": "注釈の方法:",
+      "mobile": "テキストを選択 → ダブルタップでダイアログが表示。ハイライトをタップして編集",
+      "step1": "• テキストを選択するとコメントを追加できます（自動でダイアログが開きます）",
+      "step2": "• 既存のハイライト（色付きのテキスト）をクリックしてコメントを表示/編集",
+      "step3": "• 『全般コメントを追加』ボタンで文書全体へのフィードバック"
+    },
+    "editCommentTitle": "コメントを編集",
+    "addCommentTitle": "コメントを追加",
+    "subtitle": "以下のハイライトされたテキストにコメントします",
+    "highlightedText": "ハイライトされたテキスト:",
+    "chooseHighlightColor": "ハイライト色を選択:",
+    "pickColorTooltip": "ハイライト色を選択",
+    "yourComment": "コメント:",
+    "commentPlaceholder": "ここにコメントを入力...",
+    "hints": {
+      "desktop": "Ctrl/Cmd + Enter で保存、Esc でキャンセル",
+      "mobile": "保存をタップして確定"
+    },
+    "updateCommentButton": "コメントを更新",
+    "addCommentButton": "コメントを追加",
+    "updateShort": "更新",
+    "saveShort": "保存",
+    "tooltips": {
+      "viewEditComment": "クリックしてコメントを表示/編集",
+      "deleteComment": "コメントを削除"
+    },
+    "badge": {
+      "textSelection": "テキスト選択",
+      "generalComment": "全般コメント"
+    },
+    "colorHighlight": "{{color}} のハイライト",
+    "addGeneralComment": {
+      "title": "全般コメントを追加",
+      "placeholder": "全般コメントを入力...",
+      "submit": "コメントを追加",
+      "button": "全般コメントを追加"
+    },
+    "addCommentShort": "コメント追加",
+    "empty": {
+      "title": "コメントはまだありません",
+      "description": "テキストを選択してコメントを追加するか、全般コメントを追加してください"
+    },
+    "switchHelp": "注釈モードに切り替えて、テキスト選択でコメントを追加するか、全般フィードバックを追加してください。",
+    "viewMode": {
+      "preview": "プレビュー",
+      "annotate": "注釈"
+    },
+    "delete": {
+      "title": "コメントを削除",
+      "message": "このコメントを削除してもよろしいですか？この操作は元に戻せません。"
     }
   }
 }

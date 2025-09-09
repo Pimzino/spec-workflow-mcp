@@ -4,6 +4,21 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.10]
+
+### Added
+- **Multi-Language Support Expansion** - Added comprehensive translations for 8 new languages
+  - Spanish (es) 🇪🇸 translations for all components
+  - Portuguese (pt) 🇧🇷 translations for all components
+  - German (de) 🇩🇪 translations for all components
+  - French (fr) 🇫🇷 translations for all components
+  - Russian (ru) 🇷🇺 translations for all components
+  - Italian (it) 🇮🇹 translations for all components
+  - Korean (ko) 🇰🇷 translations for all components
+  - Arabic (ar) 🇸🇦 translations for all components
+  - Total of 24 new translation files across MCP server, dashboard, and VSCode extension
+  - Updated language selectors in both dashboard and VSCode extension to include all new languages
+
 ## [0.0.9]
 
 ### Added

@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Spec Workflow MCP",
+    "support": "Dieses Projekt unterstützen"
+  },
+  "tabs": {
+    "overview": "Projektübersicht",
+    "steering": "Steuerungsdokumente",
+    "specs": "Spezifikationsdokumente",
+    "tasks": "Aufgabenverwaltung",
+    "approvals": "Genehmigungsanfragen"
+  },
+  "overview": {
+    "projectTitle": "Projektübersicht",
+    "activeSpecs": "Aktive Spezifikationen",
+    "archivedSpecs": "Archivierte Spezifikationen",
+    "totalSpecs": "Spezifikationen gesamt",
+    "tasks": "Aufgaben",
+    "overallProgress": "Gesamtfortschritt",
+    "recentActivity": "Letzte Aktivität",
+    "modified": "{{time}}",
+    "noSpecs": "Keine Spezifikationen gefunden"
+  },
+  "tasks": {
+    "specLabel": "Spezifikation",
+    "specPlaceholder": "Spezifikation auswählen",
+    "stats": {
+      "total": "Gesamt",
+      "done": "Erledigt",
+      "left": "Verbleibend",
+      "progress": "Fortschritt"
+    },
+    "overallProgress": "Gesamtfortschritt",
+    "section": "Abschnitt",
+    "task": "Aufgabe",
+    "copied": "Kopiert!",
+    "copyPromptTitle": "Prompt für KI-Agent kopieren",
+    "copyPromptAI": "KI-Prompt für Aufgabe {{taskId}} kopieren",
+    "copyPromptDefault": "Standard-Prompt für Aufgabe {{taskId}} kopieren",
+    "copyPrompt": "Bitte arbeite an Aufgabe {{taskId}} für Spezifikation \"{{specName}}\"",
+    "promptAvailable": "KI-Prompt verfügbar",
+    "promptPreview": "KI-Prompt Vorschau",
+    "usingDefaultPrompt": "Standard-Prompt verwenden",
+    "status": {
+      "pending": "Ausstehend",
+      "inProgress": "In Arbeit",
+      "completed": "Abgeschlossen"
+    },
+    "taskGroup": "Aufgabengruppe",
+    "meta": {
+      "files": "Dateien",
+      "implementation": "Implementierung",
+      "purposes": "Zwecke",
+      "requirements": "Anforderungen",
+      "leverage": "Nutzen"
+    },
+    "loading": "Aufgaben werden geladen...",
+    "noSpecs": "Keine Spezifikationen gefunden",
+    "selectSpec": "Wählen Sie oben eine Spezifikation aus um Aufgaben anzuzeigen"
+  },
+  "approvals": {
+    "docLabel": "Dokument",
+    "categoryPlaceholder": "Kategorie auswählen",
+    "status": {
+      "pending": "Ausstehend"
+    },
+    "created": "Erstellt: {{time}}",
+    "response": {
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "needsRevision": "Überarbeitung erforderlich"
+    },
+    "processing": "Verarbeitung läuft...",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "requestRevision": "Überarbeitung anfordern",
+    "openInEditor": "Im Editor öffnen",
+    "noPending": "Keine ausstehenden Genehmigungen für diese Spezifikation",
+    "noPendingDocuments": "Keine Dokumente mit ausstehenden Genehmigungen gefunden",
+    "selectCategory": "Wählen Sie oben eine Kategorie aus um ausstehende Genehmigungen anzuzeigen"
+  },
+  "specs": {
+    "active": "Aktiv",
+    "archived": "Archiviert",
+    "specLabel": "Spezifikation",
+    "specPlaceholder": "Spezifikation auswählen",
+    "archive": "Archivieren",
+    "unarchive": "Aus Archiv holen",
+    "docsTitle": "Spezifikationsdokumente",
+    "modified": "Geändert {{time}}",
+    "fileNotFound": "Datei nicht gefunden",
+    "open": "Öffnen",
+    "noDocs": "Keine Dokumente für diese Spezifikation gefunden",
+    "noActiveSpecs": "Keine aktiven Spezifikationen gefunden",
+    "noArchivedSpecs": "Keine archivierten Spezifikationen gefunden",
+    "selectSpec": "Wählen Sie oben eine Spezifikation aus um Dokumente anzuzeigen"
+  },
+  "steering": {
+    "title": "Steuerungsdokumente",
+    "modified": "Geändert {{time}}",
+    "fileNotFound": "Datei nicht gefunden",
+    "open": "Öffnen",
+    "noDocs": "Keine Steuerungsdokumente gefunden",
+    "copyInstructions": "Anweisungen kopieren",
+    "copied": "Kopiert!"
+  },
+  "common": {
+    "scrollToTop": "Nach oben scrollen"
+  },
+  "language": {
+    "selector": "Sprache",
+    "changed": "Sprache erfolgreich geändert",
+    "auto": "Automatisch",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "german": "Deutsch",
+    "french": "Français",
+    "russian": "Русский",
+    "italian": "Italiano",
+    "korean": "한국어",
+    "arabic": "العربية"
+  }
+}

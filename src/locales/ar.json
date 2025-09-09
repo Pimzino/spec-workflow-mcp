@@ -1,0 +1,414 @@
+{
+  "tools": {
+    "steeringGuide": {
+      "description": "تحميل دليل إنشاء وثائق توجيه المشروع.\n\n# التعليمات\nاستدعاء فقط عندما يطلب المستخدم صراحة إنشاء وثيقة توجيه أو يسأل عن وثائق هندسة المشروع. ليس جزءًا من سير عمل المواصفات العادي. يوفر قوالب وإرشادات لإنشاء product.md و tech.md و structure.md.",
+      "successMessage": "تم تحميل دليل سير عمل التوجيه - اتبع هذا السير تمامًا",
+      "dashboardMessage": "لوحة التحكم: {{dashboardUrl}}",
+      "dashboardUnavailable": "لوحة التحكم غير متاحة",
+      "nextSteps": {
+        "proceedIfRequested": "تابع فقط إذا طلب المستخدم وثائق التوجيه",
+        "createProduct": "أنشئ product.md أولاً",
+        "createTechAndStructure": "ثم tech.md و structure.md",
+        "reference": "مرجع في المواصفات المستقبلية"
+      },
+      "guide": "# سير عمل التوجيه\n\n## نظرة عامة\n\nأنشئ وثائق إرشادية على مستوى المشروع عند الطلب صراحة. وثائق التوجيه تحدد الرؤية والهندسة والاتفاقيات للقواعد الكودية المعمول بها.\n\n## مخطط سير العمل\n\n```mermaid\nflowchart TD\n    Start([البداية: إعداد وثائق التوجيه]) --> Guide[steering-guide<br/>تحميل تعليمات سير العمل]\n    \n    %% المرحلة 1: المنتج\n    Guide --> P1_Template[get-template-context<br/>templateType: steering<br/>template: product]\n    P1_Template --> P1_Generate[إنتاج الرؤية والأهداف]\n    P1_Generate --> P1_Create[create-steering-doc<br/>document: product]\n    P1_Create --> P1_Approve[request-approval<br/>filePath فقط]\n    P1_Approve --> P1_Status[get-approval-status<br/>استطلاع الحالة]\n    P1_Status --> P1_Check{الحالة؟}\n    P1_Check -->|needs-revision| P1_Update[تحديث الوثيقة باستخدام تعليقات المستخدم كإرشاد]\n    P1_Update --> P1_Create\n    P1_Check -->|approved| P1_Clean[delete-approval]\n    P1_Clean -->|failed| P1_Status\n    \n    %% المرحلة 2: التقنية\n    P1_Clean -->|success| P2_Template[get-template-context<br/>templateType: steering<br/>template: tech]\n    P2_Template --> P2_Analyze[تحليل المكدس التقني]\n    P2_Analyze --> P2_Create[create-steering-doc<br/>document: tech]\n    P2_Create --> P2_Approve[request-approval<br/>filePath فقط]\n    P2_Approve --> P2_Status[get-approval-status<br/>استطلاع الحالة]\n    P2_Status --> P2_Check{الحالة؟}\n    P2_Check -->|needs-revision| P2_Update[تحديث الوثيقة باستخدام تعليقات المستخدم كإرشاد]\n    P2_Update --> P2_Create\n    P2_Check -->|approved| P2_Clean[delete-approval]\n    P2_Clean -->|failed| P2_Status\n    \n    %% المرحلة 3: البنية\n    P2_Clean -->|success| P3_Template[get-template-context<br/>templateType: steering<br/>template: structure]\n    P3_Template --> P3_Analyze[تحليل بنية قاعدة الكود]\n    P3_Analyze --> P3_Create[create-steering-doc<br/>document: structure]\n    P3_Create --> P3_Approve[request-approval<br/>filePath فقط]\n    P3_Approve --> P3_Status[get-approval-status<br/>استطلاع الحالة]\n    P3_Status --> P3_Check{الحالة؟}\n    P3_Check -->|needs-revision| P3_Update[تحديث الوثيقة باستخدام تعليقات المستخدم كإرشاد]\n    P3_Update --> P3_Create\n    P3_Check -->|approved| P3_Clean[delete-approval]\n    P3_Clean -->|failed| P3_Status\n    \n    P3_Clean -->|success| Complete([وثائق التوجيه مكتملة])\n    \n    style Start fill:#e6f3ff\n    style Complete fill:#e6f3ff\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n```\n\n## مراحل سير عمل التوجيه\n\n### المرحلة 1: وثيقة المنتج\n**الغرض**: تحديد الرؤية والأهداف ونتائج المستخدم.\n\n**الأدوات**:\n- steering-guide: تحميل تعليمات سير العمل\n- get-template-context: تحميل قالب المنتج (templateType: \"steering\", template: \"product\")\n- create-steering-doc: إنشاء product.md\n- request-approval: الحصول على موافقة المستخدم\n- get-approval-status: فحص حالة الموافقة\n- delete-approval: التنظيف بعد الموافقة\n\n**العملية**:\n1. تحميل دليل التوجيه لنظرة عامة على سير العمل\n2. تحميل قالب المنتج\n3. إنتاج رؤية وأهداف المنتج\n4. إنشاء الوثيقة باستخدام create-steering-doc\n5. طلب الموافقة (filePath فقط)\n6. استطلاع الحالة حتى موافق/يحتاج مراجعة (لا تقبل الموافقة الشفهية أبداً)\n7. إذا يحتاج مراجعة: تحديث الوثيقة، إنشاء موافقة جديدة، لا تتابع\n8. بمجرد الموافقة: delete-approval (يجب أن تنجح) قبل المتابعة\n9. إذا فشل delete-approval: توقف - عد للاستطلاع\n\n### المرحلة 2: وثيقة التقنية\n**الغرض**: توثيق القرارات التقنية والهندسة.\n\n**الأدوات**:\n- get-template-context: تحميل قالب التقنية (templateType: \"steering\", template: \"tech\")\n- create-steering-doc: إنشاء tech.md\n- request-approval: الحصول على موافقة المستخدم\n- get-approval-status: فحص الحالة\n- delete-approval: التنظيف\n\n**العملية**:\n1. تحميل قالب التقنية\n2. تحليل المكدس التقني الموجود\n3. توثيق القرارات الهندسية والأنماط\n4. إنشاء الوثيقة وطلب الموافقة\n5. استطلاع الحالة حتى موافق/يحتاج مراجعة\n6. إذا يحتاج مراجعة: تحديث الوثيقة، إنشاء موافقة جديدة، لا تتابع\n7. بمجرد الموافقة: delete-approval (يجب أن تنجح) قبل المتابعة\n8. إذا فشل delete-approval: توقف - عد للاستطلاع\n\n### المرحلة 3: وثيقة البنية\n**الغرض**: رسم تنظيم قاعدة الكود والأنماط.\n\n**الأدوات**:\n- get-template-context: تحميل قالب البنية (templateType: \"steering\", template: \"structure\")\n- create-steering-doc: إنشاء structure.md\n- request-approval: الحصول على موافقة المستخدم\n- get-approval-status: فحص الحالة\n- delete-approval: التنظيف\n\n**العملية**:\n1. تحميل قالب البنية\n2. تحليل بنية المجلد وتنظيم الملفات\n3. توثيق أنماط الترميز والاتفاقيات\n4. إنشاء الوثيقة وطلب الموافقة\n5. استطلاع الحالة حتى موافق/يحتاج مراجعة\n6. إذا يحتاج مراجعة: تحديث الوثيقة، إنشاء موافقة جديدة، لا تتابع\n7. بمجرد الموافقة: delete-approval (يجب أن تنجح) قبل المتابعة\n8. إذا فشل delete-approval: توقف - عد للاستطلاع\n9. بعد التنظيف الناجح: \"وثائق التوجيه مكتملة. جاهز لإنشاء المواصفات؟\"\n\n## قواعد سير العمل\n\n- استخدم أدوات MCP دائماً، لا تنشئ الوثائق يدوياً\n- اتبع هياكل القوالب بدقة\n- احصل على موافقة صريحة من المستخدم بين المراحل\n- أكمل المراحل بالتسلسل (لا تخطي)\n- طلبات الموافقة: قدم filePath فقط، ليس المحتوى أبداً\n- منع: لا تتابع أبداً إذا فشل delete-approval\n- حرج: يجب أن تكون الحالة موافقة والتنظيف ناجح قبل المرحلة التالية\n- حرج: الموافقة الشفهية غير مقبولة أبداً - لوحة التحكم أو امتداد VS Code فقط\n- لا تتابع أبداً عندما يقول المستخدم \"موافق\" - فحص حالة النظام فقط"
+    },
+    "specStatus": {
+      "description": "عرض نظرة عامة شاملة على تقدم المواصفات.\n\n# التعليمات\nاستدعاء عند استئناف العمل على مواصفة أو فحص حالة الإكمال الإجمالية. يظهر المراحل المكتملة وتقدم تنفيذ المهام. مفيد لفهم موقعك في سير العمل قبل المتابعة.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "specNameDescription": "اسم المواصفة",
+      "successMessage": "حالة المواصفة '{{specName}}': {{overallStatus}}",
+      "phases": {
+        "requirements": "المتطلبات",
+        "design": "التصميم",
+        "tasks": "المهام",
+        "implementation": "التنفيذ"
+      },
+      "nextSteps": {
+        "requirements": {
+          "create": "إنشاء requirements.md",
+          "loadContext": "تحميل السياق باستخدام get-steering-context",
+          "requestApproval": "طلب الموافقة"
+        },
+        "design": {
+          "create": "إنشاء design.md",
+          "reference": "مرجع المتطلبات",
+          "requestApproval": "طلب الموافقة"
+        },
+        "tasks": {
+          "create": "إنشاء tasks.md",
+          "breakdown": "تفكيك التصميم",
+          "requestApproval": "طلب الموافقة"
+        },
+        "implementation": {
+          "nextPending": "استخدم manage-tasks مع next-pending",
+          "implement": "تنفيذ المهام",
+          "updateStatus": "تحديث الحالة باستخدام manage-tasks",
+          "begin": "بدء التنفيذ باستخدام manage-tasks"
+        },
+        "completed": {
+          "complete": "المواصفة مكتملة",
+          "runTests": "تشغيل الاختبارات"
+        }
+      },
+      "errors": {
+        "notFound": "المواصفة '{{specName}}' غير موجودة",
+        "genericFail": "فشل في الحصول على حالة المواصفة: {{message}}",
+        "nextSteps": {
+          "checkName": "فحص اسم المواصفة",
+          "useList": "استخدم spec-list للمواصفات المتاحة",
+          "create": "إنشاء مواصفة باستخدام create-spec-doc",
+          "checkExists": "فحص وجود المواصفة",
+          "verifyPath": "تحقق من مسار المشروع",
+          "useListGeneric": "استخدم spec-list لرؤية المواصفات المتاحة"
+        }
+      }
+    },
+    "specList": {
+      "description": "عرض جميع المواصفات في المشروع.\n\n# التعليمات\nاستدعاء لرؤية المواصفات المتاحة قبل اختيار واحدة للعمل عليها. يظهر حالة كل مواصفة بما في ذلك إكمال المراحل. مفيد لاختيار أي مواصفة لتنفيذها أو مواصلة العمل عليها.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "successMessage_one": "وُجدت {{count}} مواصفة",
+      "successMessage_other": "وُجدت {{count}} مواصفات",
+      "messages": {
+        "noSpecs": "لم توجد مواصفات"
+      },
+      "nextSteps": {
+        "noSpecs": {
+          "create": "إنشاء مواصفة جديدة باستخدام spec-create",
+          "example": "مثال: spec-create user-authentication \"تسجيل دخول وتسجيل المستخدمين\""
+        },
+        "success": {
+          "viewStatus": "استخدم spec-status <name> لعرض الحالة التفصيلية لمواصفة محددة",
+          "continue": "استخدم spec-execute <task-id> <name> لمتابعة التنفيذ",
+          "create": "إنشاء مواصفات جديدة باستخدام spec-create"
+        }
+      },
+      "errors": {
+        "failed": "فشل في سرد المواصفات: {{message}}",
+        "nextSteps": {
+          "checkPath": "فحص وجود مسار المشروع",
+          "verifyDir": "تحقق من وجود مجلد .spec-workflow",
+          "create": "إنشاء مواصفة باستخدام spec-create إذا لم توجد أي منها"
+        }
+      }
+    },
+    "requestApproval": {
+      "description": "طلب موافقة المستخدم من خلال واجهة لوحة التحكم.\n\n# التعليمات\nاستدعاء فوراً بعد إنشاء كل وثيقة. مطلوب قبل المتابعة للمرحلة التالية. حرج: قدم معامل filePath فقط - لوحة التحكم تقرأ الملفات مباشرة. لا تتضمن محتوى الوثيقة في الطلب أبداً. انتظر المستخدم للمراجعة والموافقة قبل المتابعة.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "titleDescription": "عنوان مختصر يصف ما يحتاج موافقة",
+      "filePathDescription": "مسار الملف الذي يحتاج موافقة (نسبة لجذر المشروع). لوحة التحكم ستقرأ وتعرض هذا الملف.",
+      "typeDescription": "نوع طلب الموافقة - \"document\" لموافقة المحتوى، \"action\" لموافقة الإجراء",
+      "categoryDescription": "فئة طلب الموافقة - \"spec\" للمواصفات، \"steering\" لوثائق التوجيه",
+      "categoryNameDescription": "اسم المواصفة أو \"steering\" لوثائق التوجيه",
+      "successMessage": "تم إنشاء طلب الموافقة بنجاح. يرجى المراجعة في لوحة التحكم: {{dashboardUrl}}",
+      "dashboardUnavailable": "رابط لوحة التحكم غير متاح",
+      "nextSteps": {
+        "blocking": "منع - موافقة لوحة التحكم أو امتداد VS Code مطلوبة",
+        "noVerbal": "الموافقة الشفهية غير مقبولة",
+        "noVerbalConfirm": "لا تتابع على التأكيد الشفهي",
+        "useDashboard": "استخدم لوحة التحكم: {{dashboardUrl}} أو امتداد VS Code",
+        "useVscode": "استخدم امتداد VS Code للموافقة",
+        "poll": "استطلاع الحالة باستخدام: get-approval-status \"{{approvalId}}\""
+      },
+      "errors": {
+        "failed": "فشل في إنشاء طلب الموافقة: {{message}}"
+      }
+    },
+    "refreshTasks": {
+      "description": "إعادة إنتاج قائمة المهام بناءً على المتطلبات والتصميم الحاليين.\n\n# التعليمات\nاستدعاء عندما تحتاج المهام للتحديث بعد تغييرات التصميم أو لجسر الفجوات بين التنفيذ والمتطلبات. يحلل requirements.md و design.md الموجودين لإنشاء قائمة مهام شاملة محدثة. يستبدل tasks.md الموجود بالإصدار المحدث.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "specNameDescription": "اسم المواصفة",
+      "successMessage": "تم تحميل سياق تحديث المهام لـ \"{{specName}}\". جاهز لوكيل الذكاء الاصطناعي لتحليل وتحديث المهام.",
+      "analysis": {
+        "hasTasks": "\n## تحليل المهام الحالية\n**إجمالي المهام**: {{total}}\n**مكتملة**: {{completed}} (احفظ كما هي، حتى لو أُزيلت الميزة)\n**قيد التنفيذ**: {{inProgress}} (احفظ كما هي، حتى لو أُزيلت الميزة)\n**معلقة**: {{pending}} (تحقق من requirements.md/design.md)\n\n### مهام للحفظ (لا تُعدل):\n{{completedList}}\n{{inProgressList}}\n\n### المهام المعلقة (يجب التحقق):\n{{pendingList}}\n\n**التحقق مطلوب**: لكل مهمة معلقة أعلاه، تحقق من ذكر الميزة في requirements.md أو design.md. إذا لم تُذكر، احذف المهمة.\n",
+        "noTasks": "\n## تحليل المهام الحالية\n**لا يوجد tasks.md** - ستحتاج لإنشاء قائمة المهام الكاملة من الصفر.\n",
+        "none": "لا شيء",
+        "checkPrompt": "فحص: هل هذه الميزة في requirements.md؟"
+      },
+      "instructions": {
+        "main": "# تعليمات تحديث المهام\n\n## السياق\nتقوم بتحديث قائمة المهام للمواصفة \"{{specName}}\" لأن المتطلبات أو التصميم قد تغيروا أثناء التنفيذ. هدفك هو التأكد من أن قائمة المهام تعكس بدقة ما يحتاج عمله لجسر الفجوة بين التنفيذ الحالي والمتطلبات/التصميم المحدثين.\n\n## حرج: مصدر الحقيقة\n- **المتطلبات تأتي فقط من requirements.md** - ليس من المهام الموجودة\n- **قرارات التصميم تأتي فقط من design.md** - ليس من المهام الموجودة  \n- **المهام هي خطوات التنفيذ** - تنفذ المتطلبات، لا تحددها\n- إذا وُجدت ميزة في المهام لكن ليست في requirements.md/design.md، فقد أُزيلت من المواصفة\n\n## عملية التحقق ثلاثية المراحل\n\n### المرحلة 1: تحقق من المهام الموجودة ضد المواصفة الحالية\nلكل مهمة موجودة، اسأل: \"هل الميزة التي تنفذها هذه المهمة ما زالت في requirements.md أو design.md؟\"\n\n**إجراءات للمهام المعلقة:**\n- **احتفظ**: إذا كانت الميزة ما زالت في المتطلبات/التصميم\n- **احذف**: إذا لم تعد الميزة في المتطلبات/التصميم (الميزة قُطعت من المواصفة)\n\n**إجراءات للمهام المكتملة/قيد التنفيذ:**\n- **احفظ**: احفظ دائماً المهام المكتملة [x] وقيد التنفيذ [-]\n- **علم**: إذا أُزيلت الميزة، أضف تعليق: \"_ملاحظة: أُزيلت الميزة من المواصفة لكن المهمة محفوظة_\"\n\n### المرحلة 2: تحليل الفجوات  \nلكل متطلب في requirements.md، اسأل: \"هل يوجد مهمة تنفذ هذا؟\"\nلكل قرار تصميم في design.md، اسأل: \"هل توجد مهام متماشية مع هذه الهندسة؟\"\n\n**إجراءات:**\n- **أضف**: مهام جديدة لعناصر المتطلبات/التصميم بدون مهام\n- **حديث**: المهام المعلقة الموجودة التي تحتاج تماشي مع المتطلبات المحدثة\n\n### المرحلة 3: إنشاء قائمة المهام المحدثة (فقط إذا كانت التغييرات مطلوبة)\n**نقطة القرار**: بعد المرحلة 1 و 2، فحص:\n- هل توجد مهام معلقة للحذف؟\n- هل توجد مهام جديدة للإضافة؟ \n- هل توجد مهام موجودة للتعديل؟\n\n**إذا لم تكن التغييرات مطلوبة**: أبلغ \"قائمة المهام متماشية بالفعل مع المتطلبات الحالية - لا حاجة للتحديث\" وتوقف.\n\n**إذا كانت التغييرات مطلوبة**، اصنع tasks.md الجديد مع:\n1. جميع المهام المكتملة [x] (محفوظة كما هي)\n2. جميع المهام قيد التنفيذ [-] (محفوظة كما هي، مع ملاحظات الحذف إذا كانت قابلة للتطبيق)\n3. فقط المهام المعلقة [ ] التي لها دعم في المتطلبات/التصميم الحالي\n4. مهام جديدة لأي عناصر متطلبات/تصميم مفقودة\n5. تسلسل مناسب ومراجع المتطلبات\n\n## قواعد حرجة\n- **لا تُعدل أبداً** المهام المكتملة (موسومة بـ [x])\n- **لا تُعدل أبداً** المهام قيد التنفيذ (موسومة بـ [-])  \n- **احذف** المهام المعلقة للميزات ليست في المتطلبات/التصميم الحالي\n- **أشر دائماً** لمتطلبات محددة (مثل _المتطلبات: 1.1, 2.3_)\n- **تأكد** من أن المهام تبني تدريجياً\n- **اصنع** المهام ذرية ومحددة وقابلة للتنفيذ\n- **احفظ** بنية tasks.md الأصلية - حديث فقط عناصر المهام نفسها\n- **لا** أقسام إضافية في tasks.md (لا تبعيات، مقاييس، ملاحظات، تغييرات، إلخ)\n- **أبق** tasks.md نظيفاً - أي ملخص تغيير يذهب في استجابة الدردشة فقط\n\n## متطلبات تنسيق المهام\nكل مهمة يجب أن تتبع هذا التنسيق:\n```\n- [ ] 1.1 إنشاء واجهة مصادقة المستخدم\n  - الملف: src/auth/UserAuth.ts\n  - تنفيذ نماذج تسجيل الدخول والتسجيل\n  - إضافة تحقق النماذج والتعامل مع الأخطاء\n  - الغرض: تمكين إدارة حسابات المستخدمين\n  - _الاستفادة: src/components/BaseForm.tsx, src/utils/validation.ts_\n  - _المتطلبات: 1.1, 1.2_\n```\n\n## استراتيجية التنفيذ\n1. **اقرأ** requirements.md و design.md بعناية - هذه تحدد ما يجب أن يوجد\n2. **تحقق** من المهام الموجودة ضد المواصفة الحالية (المرحلة 1)\n3. **حدد** الفجوات في تغطية المهام (المرحلة 2)  \n4. **اصنع** قائمة مهام محدثة بتحقق مناسب (المرحلة 3)\n5. **استخدم** أداة create-spec-doc لحفظ tasks.md المحدث\n6. **مهم**: أبق tasks.md بنفس تنسيق الأصل - فقط عناصر المهام يجب أن تتغير\n\n## مثال: التعامل مع الميزات المحذوفة\nإذا وُجدت مهام لـ \"عرض كانبان\" لكن \"عرض كانبان\" غير مذكور في requirements.md:\n- **احذف** أي مهام كانبان معلقة [ ] \n- **احفظ** أي مهام كانبان مكتملة [x] أو قيد التنفيذ [-]\n- **أضف ملاحظة**: \"_ملاحظة: أُزيلت ميزة كانبان من المواصفة لكن العمل المكتمل محفوظ_\"\n\n## الخطوات التالية\nبعد تحليل الوثائق أدناه:\n1. قم بعملية التحقق ثلاثية المراحل\n2. **نقطة القرار**: إذا لم تكن التغييرات مطلوبة بعد التحقق، فقط أبلغ \"المهام متماشية بالفعل\" وتوقف\n3. **فقط إذا كانت التغييرات مطلوبة**: استخدم أداة create-spec-doc مع:\n   - projectPath: \"{{projectPath}}\"\n   - specName: \"{{specName}}\"\n   - document: \"tasks\"\n   - content: [قائمة المهام المحققة والمحدثة - نفس تنسيق الأصل]\n4. تأكد من أن فقط المتطلبات الحالية لها مهام\n5. تحقق من أن تبعيات المهام والترتيب منطقيان\n6. **تذكر**: Tasks.md يجب أن يحتوي فقط على قائمة المهام المحدثة - لا أقسام إضافية"
+      },
+      "fullContext": "{{instructions}}\n\n{{taskAnalysis}}\n\n---\n\n## وثيقة المتطلبات\n{{requirementsContent}}\n\n---\n\n## وثيقة التصميم  \n{{designContent}}\n\n---\n\n## وثيقة المهام الحالية\n{{tasksContent}}\n\n---\n\n## الملخص\nلديك الآن كل السياق المطلوب لتحديث قائمة المهام. استخدم أداة create-spec-doc لإنشاء tasks.md محدث يقوم بـ:\n- حفظ جميع المهام المكتملة ([x]) وقيد التنفيذ ([-]) (حتى لو أُزيلت الميزة)\n- حذف المهام المعلقة ([ ]) للميزات ليست في requirements.md/design.md الحالي  \n- إضافة مهام جديدة لعناصر المتطلبات/التصميم المفقودة المهام\n- ضمان تسلسل المهام المناسب ومراجع المتطلبات\n- يتضمن فقط المهام التي تنفذ الميزات المحددة فعلياً في requirements.md/design.md\n\n**تذكر**: إذا وُجدت ميزة في المهام لكن ليس في requirements.md/design.md، فقد قُطعت من المواصفة والمهام المعلقة يجب حذفها.",
+      "messages": {
+        "noRequirements": "لم توجد requirements.md",
+        "noDesign": "لم توجد design.md",
+        "noTasks": "لا يوجد tasks.md - إنشاء من الصفر"
+      },
+      "nextSteps": {
+        "pass1": "المرحلة 1: تحقق من كل مهمة موجودة ضد requirements.md/design.md",
+        "pass2": "المرحلة 2: حدد الفجوات - ابحث عن عناصر المتطلبات/التصميم بدون مهام",
+        "decision": "القرار: إذا لم تكن التغييرات مطلوبة، أبلغ \"المهام متماشية بالفعل\" وتوقف",
+        "pass3": "المرحلة 3: فقط إذا كانت التغييرات مطلوبة، إنشاء tasks.md محدث باستخدام أداة create-spec-doc"
+      },
+      "errors": {
+        "noContext": "لم توجد requirements.md أو design.md. لا يمكن تحديث المهام بدون سياق المواصفة.",
+        "genericFail": "فشل في تحميل سياق التحديث: {{message}}",
+        "nextSteps": {
+          "createReq": "إنشاء requirements.md أولاً باستخدام أداة create-spec-doc",
+          "createDesign": "إنشاء design.md بعد موافقة المتطلبات",
+          "thenRefresh": "ثم استخدم refresh-tasks لإنشاء قائمة مهام متماشية",
+          "checkDir": "فحص وجود مجلد المواصفة",
+          "checkPerms": "تحقق من أذونات الملفات",
+          "checkName": "تأكد من صحة اسم المواصفة"
+        }
+      }
+    },
+    "getTemplateContext": {
+      "description": "تحميل قالب وثيقة محدد للمواصفات أو وثائق التوجيه.\n\n# التعليمات\nاستدعاء مع القالب المطلوب تماماً لمرحلتك الحالية. لسير عمل المواصفات، اطلب قوالب المتطلبات أو التصميم أو المهام. لوثائق التوجيه، اطلب قوالب المنتج أو التقنية أو البنية. كل قالب يوفر التنسيق الدقيق المتوقع بواسطة أدوات create-spec-doc أو create-steering-doc.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "templateTypeDescription": "نوع القالب: spec لقوالب سير العمل، steering لوثائق المشروع",
+      "templateDescription": "القالب المحدد للتحميل",
+      "docTitles": {
+        "requirements": "قالب المتطلبات",
+        "design": "قالب التصميم",
+        "tasks": "قالب المهام",
+        "product": "قالب المنتج",
+        "tech": "قالب التقنية",
+        "structure": "قالب البنية"
+      },
+      "successMessage": "تم تحميل قالب {{template}} لـ {{templateType}}",
+      "messages": {
+        "fullContext": "## {{title}}\n\n{{content}}\n\n**ملاحظة**: تم تحميل القالب. استخدم هذه البنية عند إنشاء وثيقة {{template}} الخاصة بك."
+      },
+      "nextSteps": {
+        "success": {
+          "useTemplate": "استخدم القالب لوثيقة {{template}}",
+          "followStructure": "اتبع بنية القالب تماماً",
+          "nextSpec": "التالي: create-spec-doc مع document: \"{{template}}\"",
+          "nextSteering": "التالي: create-steering-doc مع document: \"{{template}}\""
+        }
+      },
+      "errors": {
+        "invalidType": "نوع قالب غير صالح: {{templateType}}",
+        "validTypes": "استخدم: spec أو steering",
+        "invalidTemplateForType": "قالب غير صالح \"{{template}}\" للنوع \"{{templateType}}\"",
+        "validTemplates": "القوالب الصالحة: {{validTemplates}}",
+        "validSpecTemplates": "استخدم: requirements أو design أو tasks",
+        "validSteeringTemplates": "استخدم: product أو tech أو structure",
+        "templateEmpty": "ملف القالب موجود لكن فارغ: {{file}}",
+        "fileNotFound": "ملف القالب غير موجود: {{file}}",
+        "genericFail": "فشل في تحميل سياق القالب: {{message}}",
+        "nextSteps": {
+          "checkContent": "فحص محتوى ملف القالب",
+          "verifyIntegrity": "تحقق من سلامة الملف",
+          "checkDirectory": "فحص مجلد القوالب",
+          "verifyExists": "تحقق من وجود ملف القالب",
+          "location": "الموقع: {{location}}",
+          "checkPermissions": "تحقق من أذونات الملف",
+          "checkFiles": "فحص ملفات القوالب"
+        }
+      }
+    },
+    "getSteeringContext": {
+      "description": "تحميل وثائق توجيه المشروع للسياق المعماري والمنتج.\n\n# التعليمات\nاستدعاء أثناء إعداد المواصفة الأولية للتحقق من إرشادات المشروع الموجودة (product.md، tech.md، structure.md). اختياري للمشاريع الجديدة لكن موصى به لقواعد الكود المعمول بها. إذا لم توجد وثائق توجيه، اسأل المستخدم عما إذا كان يريد إنشاؤها أولاً أو المتابعة مع المواصفة.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "docTitles": {
+        "product": "سياق المنتج",
+        "tech": "السياق التقني",
+        "structure": "سياق البنية"
+      },
+      "successMessage": "تم تحميل سياق التوجيه بنجاح",
+      "messages": {
+        "notFound": "لم توجد وثائق توجيه",
+        "notFoundContext": "## سياق وثائق التوجيه\n\nلم توجد وثائق توجيه. تابع باستخدام أفضل الممارسات للمكدس التقني المكتشف.",
+        "emptyDocs": "وثائق التوجيه موجودة لكن فارغة",
+        "emptyContext": "## سياق وثائق التوجيه\n\nوُجدت وثائق التوجيه لكن جميعها فارغة.",
+        "fullContext": "## سياق وثائق التوجيه (محملة مسبقاً)\n\n{{sections}}\n\n**ملاحظة**: تم تحميل وثائق التوجيه مسبقاً. لا تستخدم get-content لجلبها مرة أخرى."
+      },
+      "nextSteps": {
+        "notFound": {
+          "useBestPractices": "استخدم أفضل الممارسات والاتفاقيات للمكدس التقني المكتشف",
+          "askToCreate": "لقواعد الكود المعمول بها: اسأل المستخدم إذا كان يريد إنشاء وثائق توجيه للإرشاد الخاص بالمشروع",
+          "newProjectNote": "للمشاريع الجديدة: سياق التوجيه عادة غير مطلوب - تابع مع أفضل ممارسات التقنية"
+        },
+        "empty": {
+          "useBestPractices": "استخدم أفضل الممارسات والاتفاقيات للمكدس التقني",
+          "askToPopulate": "لقواعد الكود المعمول بها: اسأل المستخدم إذا كان يريد ملء وثائق التوجيه بسياق خاص بالمشروع",
+          "newProjectNote": "للمشاريع الجديدة: وثائق التوجيه الفارغة لا بأس بها - تابع مع الممارسات المعيارية"
+        },
+        "success": {
+          "doNotCallAgain": "تم تحميل سياق التوجيه - لا تستدعي get-steering-context مرة أخرى",
+          "reference": "أشر لهذه المعايير في المتطلبات والتصميم والمهام",
+          "align": "تأكد من أن جميع القرارات متماشية مع رؤية المشروع الموثقة"
+        }
+      },
+      "errors": {
+        "genericFail": "فشل في تحميل سياق التوجيه: {{message}}",
+        "nextSteps": {
+          "checkPath": "فحص وجود مسار المشروع",
+          "checkPermissions": "تحقق من أذونات الملفات",
+          "runSetup": "شغل spec-steering-setup إذا كانت وثائق التوجيه مفقودة"
+        }
+      }
+    },
+    "getSpecContext": {
+      "description": "تحميل وثائق المواصفة الموجودة للعمل المستأنف.\n\n# التعليمات\nاستدعاء فقط عند العودة للعمل على مواصفات موجودة بعد استراحة أو البدء جديداً على مواصفة لم تنشئها. لا تستخدم أبداً أثناء إنشاء المواصفة النشط إذا كنت قد أنشأت الوثائق للتو. يحمل requirements.md و design.md و tasks.md لسياق التنفيذ.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "specNameDescription": "اسم المواصفة لتحميل السياق لها",
+      "docTitles": {
+        "requirements": "المتطلبات",
+        "design": "التصميم",
+        "tasks": "المهام"
+      },
+      "successMessage": "تم تحميل سياق المواصفة بنجاح لـ: {{specName}}",
+      "messages": {
+        "emptyDocs": "وثائق المواصفة لـ \"{{specName}}\" موجودة لكن فارغة",
+        "emptyContext": "## سياق المواصفة\n\nلم توجد وثائق مواصفة لـ: {{specName}}",
+        "fullContext": "## سياق المواصفة (محمل مسبقاً): {{specName}}\n\n{{sections}}\n\n**ملاحظة**: تم تحميل وثائق المواصفة مسبقاً. لا تستخدم get-content لجلبها مرة أخرى."
+      },
+      "nextSteps": {
+        "empty": {
+          "addContent": "أضف محتوى لـ .spec-workflow/specs/{{specName}}/",
+          "createMissing": "إنشاء الوثائق المفقودة",
+          "ensureContent": "تأكد من أن جميع الوثائق الثلاث لها محتوى"
+        },
+        "success": {
+          "proceed": "تم تحميل السياق - تابع مع التنفيذ",
+          "reference": "أشر للمتطلبات والتصميم لكل مهمة",
+          "updateStatus": "حديث حالة المهمة باستخدام manage-tasks"
+        }
+      },
+      "errors": {
+        "notFound": "لم توجد مواصفة لـ: {{specName}}",
+        "availableSpecs": "المواصفات المتاحة: {{specs}}",
+        "genericFail": "فشل في تحميل سياق المواصفة: {{message}}",
+        "nextSteps": {
+          "useExisting": "استخدم اسم مواصفة موجود",
+          "createNew": "أو إنشاء جديد باستخدام create-spec-doc",
+          "create": "إنشاء مواصفة باستخدام create-spec-doc",
+          "checkSpelling": "فحص إملاء اسم المواصفة",
+          "verifySetup": "تحقق من إعداد المشروع",
+          "checkPath": "فحص مسار المشروع",
+          "verifyName": "تحقق من اسم المواصفة",
+          "checkPermissions": "فحص أذونات الملفات",
+          "createIfMissing": "إنشاء المواصفة إذا كانت مفقودة"
+        }
+      }
+    },
+    "getApprovalStatus": {
+      "description": "فحص الحالة الحالية لطلب موافقة.\n\n# التعليمات\nاستدعاء بعد request-approval لاستطلاع قرار المستخدم. تابع الفحص حتى تكون الحالة \"approved\" أو \"needs-revision\". إذا needs-revision، راجع التغذية الراجعة، حديث الوثيقة باستخدام create-spec-doc، ثم أنشئ طلب موافقة جديد. تابع فقط للمرحلة التالية بعد حالة \"approved\".",
+      "projectPathDescription": "المسار المطلق لجذر المشروع (اختياري - سيستخدم السياق إذا لم يُقدم)",
+      "approvalIdDescription": "معرف طلب الموافقة للفحص",
+      "messages": {
+        "pending": "محظور: الحالة {{status}}. الموافقة الشفهية غير مقبولة. استخدم لوحة التحكم أو امتداد VS Code فقط.",
+        "other": "حالة الموافقة: {{status}}"
+      },
+      "nextSteps": {
+        "pending": {
+          "blocked": "محظور - لا تتابع",
+          "noVerbal": "الموافقة الشفهية غير مقبولة - استخدم لوحة التحكم أو امتداد VS Code فقط",
+          "useUI": "يجب أن تتم الموافقة عبر لوحة التحكم أو امتداد VS Code",
+          "poll": "تابع الاستطلاع باستخدام get-approval-status"
+        },
+        "approved": {
+          "canProceed": "موافق - يمكن المتابعة",
+          "delete": "شغل delete-approval قبل المتابعة",
+          "response": "الاستجابة: {{response}}"
+        },
+        "rejected": {
+          "blocked": "محظور - مرفوض",
+          "doNotProceed": "لا تتابع",
+          "revise": "راجع التغذية الراجعة وعدل",
+          "reason": "السبب: {{reason}}",
+          "notes": "الملاحظات: {{notes}}"
+        },
+        "needsRevision": {
+          "blocked": "محظور - لا تتابع",
+          "update": "حديث الوثيقة بالتغذية الراجعة",
+          "newRequest": "إنشاء طلب موافقة جديد",
+          "feedback": "التغذية الراجعة: {{feedback}}",
+          "notes": "الملاحظات: {{notes}}",
+          "comments": "{{count}} تعليقات للإصلاحات المستهدفة"
+        }
+      },
+      "errors": {
+        "projectPathRequired": "مسار المشروع مطلوب. يرجى تقديم معامل projectPath.",
+        "notFound": "طلب الموافقة غير موجود: {{approvalId}}",
+        "genericFail": "فشل في فحص حالة الموافقة: {{message}}"
+      }
+    },
+    "deleteApproval": {
+      "description": "تنظيف طلبات الموافقة المكتملة من النظام.\n\n# التعليمات\nاستدعاء فوراً بعد تلقي حالة \"approved\". خطوة تنظيف أساسية لمنع فوضى الموافقات. يجب الإكمال قبل الانتقال لمرحلة سير العمل التالية. يبقي نظام الموافقات منظماً للطلبات المستقبلية.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع (اختياري - سيستخدم السياق إذا لم يُقدم)",
+      "approvalIdDescription": "معرف طلب الموافقة للحذف",
+      "successMessage": "تم حذف طلب الموافقة \"{{approvalId}}\" بنجاح",
+      "nextSteps": {
+        "cleanupComplete": "التنظيف مكتمل",
+        "continue": "تابع للمرحلة التالية"
+      },
+      "errors": {
+        "projectPathRequired": "مسار المشروع مطلوب. يرجى تقديم معامل projectPath.",
+        "notFound": "طلب الموافقة \"{{approvalId}}\" غير موجود",
+        "notApproved": "محظور: لا يمكن المتابعة - الحالة \"{{status}}\". الموافقة الشفهية غير مقبولة. استخدم لوحة التحكم أو امتداد VS Code.",
+        "deleteFailed": "فشل في حذف طلب الموافقة \"{{approvalId}}\"",
+        "genericFail": "فشل في حذف الموافقة: {{message}}",
+        "nextSteps": {
+          "verifyId": "تحقق من معرف الموافقة",
+          "checkStatus": "فحص الحالة باستخدام get-approval-status",
+          "stop": "توقف - لا تتابع للمرحلة التالية",
+          "wait": "انتظر الموافقة",
+          "poll": "استطلع باستخدام get-approval-status",
+          "checkPermissions": "فحص أذونات الملفات",
+          "verifyExists": "تحقق من وجود الموافقة",
+          "retry": "إعادة المحاولة",
+          "checkPath": "فحص مسار المشروع",
+          "checkSystem": "فحص نظام الموافقات"
+        }
+      }
+    },
+    "createSteeringDoc": {
+      "description": "إنشاء وثائق توجيه المشروع مع الإرشاد المعماري.\n\n# التعليمات\nاستدعاء فقط بعد موافقة المستخدم الصريحة على إنشاء وثيقة توجيه. غير مطلوب لسير عمل المواصفات. ينشئ واحداً من: product.md (الرؤية/الأهداف)، tech.md (القرارات التقنية)، أو structure.md (تنظيم قاعدة الكود). استخدم steering-guide أولاً للقوالب.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "documentDescription": "أي وثيقة توجيه لإنشائها: product أو tech أو structure",
+      "contentDescription": "المحتوى الكامل للماركداون لوثيقة التوجيه",
+      "docNames": {
+        "product": "توجيه المنتج",
+        "tech": "التوجيه التقني",
+        "structure": "توجيه البنية"
+      },
+      "successMessage": "تم إنشاء وثيقة {{docName}} بنجاح",
+      "nextSteps": {
+        "saved": "تم حفظ {{filename}}",
+        "product": "التالي: إنشاء tech.md",
+        "tech": "التالي: إنشاء structure.md",
+        "structure": "التوجيه مكتمل. استخدم request-approval مع category:\"steering\" و categoryName:\"steering\"",
+        "dashboard": "لوحة التحكم: {{dashboardUrl}}",
+        "dashboardUnavailable": "لوحة التحكم غير متاحة"
+      },
+      "errors": {
+        "failed": "فشل في إنشاء وثيقة التوجيه {{document}}: {{message}}",
+        "nextSteps": {
+          "checkPath": "فحص وجود مسار المشروع",
+          "verifyContent": "تحقق من محتوى الماركداون",
+          "retry": "إعادة المحاولة بمعاملات صحيحة"
+        }
+      }
+    },
+    "createSpecDoc": {
+      "description": "إنشاء أو تحديث وثائق المواصفة بتتابع سير العمل.\n\n# التعليمات\nاستدعاء بعد تحميل القوالب وإنتاج المحتوى لكل مرحلة. ينشئ وثيقة واحدة في المرة: المتطلبات أولاً، ثم التصميم، ثم المهام. لا تنشئ أبداً وثائق متعددة بدون موافقة المستخدم بين كل واحدة. اتبع دائماً بنية القالب من get-template-context.",
+      "projectPathDescription": "المسار المطلق لجذر المشروع",
+      "specNameDescription": "اسم الميزة بصيغة kebab-case (مثل، user-authentication)",
+      "documentDescription": "أي وثيقة مواصفة لإنشاء/تحديث: requirements أو design أو tasks",
+      "contentDescription": "المحتوى الكامل للماركداون لوثيقة المواصفة",
+      "errors": {
+        "designBeforeReq": "انتهاك سير العمل: لا يمكن إنشاء design.md قبل وجود requirements.md!\nإنشئ requirements.md أولاً، احصل على مراجعة المستخدم، ثم إنشئ design.md.",
+        "tasksBeforeDesign": "انتهاك سير العمل: لا يمكن إنشاء tasks.md قبل وجود design.md!\nإنشئ design.md أولاً، احصل على مراجعة المستخدم، ثم إنشئ tasks.md.",
+        "failed": "فشل: {{message}}"
+      },
+      "successMessage": "تم إنشاء {{filename}} في: {{filePath}}\n\nمحظور: يجب طلب الموافقة عبر لوحة التحكم أو امتداد VS Code.\nالموافقة الشفهية غير مقبولة.\nلا تتابع حتى يظهر النظام حالة الموافقة."
+    },
+    "specWorkflowGuide": {
+      "description": "تحميل تعليمات سير عمل المواصفات الأساسية لتوجيه تطوير الميزات من الفكرة للتنفيذ.\n\n# التعليمات\nاستدعي هذه الأداة أولاً عندما يطلب المستخدمون إنشاء مواصفة أو تطوير ميزة أو يذكرون المواصفات. هذا يوفر تسلسل سير العمل الكامل (المتطلبات ← التصميم ← المهام ← التنفيذ) الذي يجب اتباعه. احمل دائماً قبل أي أدوات مواصفة أخرى لضمان الفهم المناسب لسير العمل.",
+      "dashboardMessage": "راقب التقدم على لوحة التحكم: {{dashboardUrl}}",
+      "dashboardUnavailable": "لوحة التحكم غير متاحة - تعمل في وضع headless",
+      "successMessage": "تم تحميل دليل سير العمل الكامل للمواصفات - اتبع هذا السير تماماً",
+      "nextSteps": {
+        "step1": "اتبع التسلسل: المتطلبات ← التصميم ← المهام ← التنفيذ",
+        "step2": "حمل القوالب باستخدام get-template-context أولاً",
+        "step3": "اطلب الموافقة بعد كل وثيقة",
+        "step4": "استخدم أدوات MCP فقط"
+      },
+      "guide": "# سير عمل تطوير المواصفات\n\n## نظرة عامة\n\nتوجه المستخدمين خلال التطوير المدفوع بالمواصفات باستخدام أدوات MCP. حول الأفكار الخام لمواصفات مفصلة من خلال مراحل المتطلبات ← التصميم ← المهام ← التنفيذ. استخدم البحث الويب عند توفره لأفضل الممارسات الحالية.\n\nأسماء الميزات تستخدم kebab-case (مثل، user-authentication). إنشئ مواصفة واحدة في المرة.\n\n## مخطط سير العمل\n```mermaid\nflowchart TD\n    Start([البداية: المستخدم يطلب ميزة]) --> CheckSteering{وثائق التوجيه موجودة؟}\n    CheckSteering -->|نعم| P1_Load[get-steering-context]\n    CheckSteering -->|لا| P1_Template\n    \n    %% المرحلة 1: المتطلبات\n    P1_Load --> P1_Template[get-template-context<br/>templateType: spec<br/>template: requirements]\n    P1_Template --> P1_Research[البحث الويب إن توفر]\n    P1_Research --> P1_Create[create-spec-doc<br/>document: requirements]\n    P1_Create --> P1_Approve[request-approval<br/>filePath فقط]\n    P1_Approve --> P1_Status[get-approval-status<br/>استطلاع الحالة]\n    P1_Status --> P1_Check{الحالة؟}\n    P1_Check -->|needs-revision| P1_Update[تحديث الوثيقة باستخدام تعليقات المستخدم كإرشاد]\n    P1_Update --> P1_Create\n    P1_Check -->|approved| P1_Clean[delete-approval]\n    P1_Clean -->|failed| P1_Status\n    \n    %% المرحلة 2: التصميم\n    P1_Clean -->|success| P2_Template[get-template-context<br/>templateType: spec<br/>template: design]\n    P2_Template --> P2_Analyze[تحليل أنماط قاعدة الكود]\n    P2_Analyze --> P2_Create[create-spec-doc<br/>document: design]\n    P2_Create --> P2_Approve[request-approval<br/>filePath فقط]\n    P2_Approve --> P2_Status[get-approval-status<br/>استطلاع الحالة]\n    P2_Status --> P2_Check{الحالة؟}\n    P2_Check -->|needs-revision| P2_Update[تحديث الوثيقة باستخدام تعليقات المستخدم كإرشاد]\n    P2_Update --> P2_Create\n    P2_Check -->|approved| P1_Clean[delete-approval]\n    P2_Clean -->|failed| P2_Status\n    \n    %% المرحلة 3: المهام\n    P2_Clean -->|success| P3_Template[get-template-context<br/>templateType: spec<br/>template: tasks]\n    P3_Template --> P3_Break[تحويل التصميم لمهام]\n    P3_Break --> P3_Create[create-spec-doc<br/>document: tasks]\n    P3_Create --> P3_Approve[request-approval<br/>filePath فقط]\n    P3_Approve --> P3_Status[get-approval-status<br/>استطلاع الحالة]\n    P3_Status --> P3_Check{الحالة؟}\n    P3_Check -->|needs-revision| P3_Update[تحديث الوثيقة باستخدام تعليقات المستخدم كإرشاد]\n    P3_Update --> P3_Create\n    P3_Check -->|approved| P3_Clean[delete-approval]\n    P3_Clean -->|failed| P3_Status\n    \n    %% المرحلة 4: التنفيذ\n    P3_Clean -->|success| P4_Ready[المواصفة مكتملة.<br/>جاهز للتنفيذ؟]\n    P4_Ready -->|نعم| P4_Status[spec-status]\n    P4_Status --> P4_Task[manage-tasks<br/>action: set-status<br/>status: in-progress]\n    P4_Task --> P4_Code[تنفيذ الكود]\n    P4_Code --> P4_Complete[manage-tasks<br/>action: set-status<br/>status: completed]\n    P4_Complete --> P4_More{مهام أخرى؟}\n    P4_More -->|نعم| P4_Task\n    P4_More -->|لا| End([التنفيذ مكتمل])\n    \n    style Start fill:#e1f5e1\n    style End fill:#e1f5e1\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n    style CheckSteering fill:#fff4e6\n    style P4_More fill:#fff4e6\n```\n\n## سير عمل المواصفات\n\n### المرحلة 1: المتطلبات\n**الغرض**: تحديد ما يُبنى بناءً على احتياجات المستخدم.\n\n**الأدوات**:\n- get-steering-context: فحص إرشادات المشروع (إذا كانت قاعدة كود معمول بها)\n- get-template-context: تحميل قالب المتطلبات (templateType: \"spec\", template: \"requirements\")\n- create-spec-doc: إنشاء requirements.md\n- request-approval: الحصول على موافقة المستخدم\n- get-approval-status: فحص حالة الموافقة\n- delete-approval: التنظيف بعد الموافقة\n\n**العملية**:\n1. فحص وثائق التوجيه (اسأل المستخدم إذا كان يريد إنشاؤها لقواعد الكود المعمول بها)\n2. تحميل قالب المتطلبات\n3. بحث توقعات السوق/المستخدم (إذا توفر البحث الويب)\n4. إنتاج المتطلبات كقصص مستخدم بمعايير EARS\n5. إنشاء الوثيقة باستخدام create-spec-doc\n6. طلب الموافقة (filePath فقط، ليس المحتوى أبداً)\n7. استطلاع الحالة حتى موافق/يحتاج مراجعة (لا تقبل الموافقة الشفهية أبداً)\n8. إذا يحتاج مراجعة: تحديث الوثيقة، إنشاء موافقة جديدة، لا تتابع\n9. بمجرد الموافقة: delete-approval (يجب أن تنجح) قبل المتابعة\n10. إذا فشل delete-approval: توقف - عد للاستطلاع\n\n### المرحلة 2: التصميم\n**الغرض**: إنشاء تصميم تقني يعالج جميع المتطلبات.\n\n**الأدوات**:\n- get-template-context: تحميل قالب التصميم (templateType: \"spec\", template: \"design\")\n- create-spec-doc: إنشاء design.md\n- request-approval: الحصول على موافقة المستخدم\n- get-approval-status: فحص الحالة\n- delete-approval: التنظيف\n\n**العملية**:\n1. تحميل قالب التصميم\n2. تحليل قاعدة الكود للأنماط لإعادة الاستخدام\n3. بحث الخيارات التقنية (إذا توفر البحث الويب)\n4. إنتاج التصميم مع جميع أقسام القالب\n5. إنشاء الوثيقة وطلب الموافقة\n6. استطلاع الحالة حتى موافق/يحتاج مراجعة\n7. إذا يحتاج مراجعة: تحديث الوثيقة، إنشاء موافقة جديدة، لا تتابع\n8. بمجرد الموافقة: delete-approval (يجب أن تنجح) قبل المتابعة\n9. إذا فشل delete-approval: توقف - عد للاستطلاع\n\n### المرحلة 3: المهام\n**الغرض**: تفكيك التصميم لمهام تنفيذ ذرية.\n\n**الأدوات**:\n- get-template-context: تحميل قالب المهام (templateType: \"spec\", template: \"tasks\")\n- create-spec-doc: إنشاء tasks.md\n- request-approval: الحصول على موافقة المستخدم\n- get-approval-status: فحص الحالة\n- delete-approval: التنظيف\n\n**العملية**:\n1. تحميل قالب المهام\n2. تحويل التصميم لمهام ذرية (1-3 ملفات لكل مهمة)\n3. تتضمن مسارات الملفات ومراجع المتطلبات\n4. إنشاء الوثيقة وطلب الموافقة\n5. استطلاع الحالة حتى موافق/يحتاج مراجعة\n6. إذا يحتاج مراجعة: تحديث الوثيقة، إنشاء موافقة جديدة، لا تتابع\n7. بمجرد الموافقة: delete-approval (يجب أن تنجح) قبل المتابعة\n8. إذا فشل delete-approval: توقف - عد للاستطلاع\n9. بعد التنظيف الناجح: \"المواصفة مكتملة. جاهز للتنفيذ؟\"\n\n### المرحلة 4: التنفيذ\n**الغرض**: تنفيذ المهام منهجياً.\n\n**الأدوات**:\n- spec-status: فحص التقدم الإجمالي\n- manage-tasks: تتبع وتحديث حالة المهام\n- get-spec-context: تحميل المواصفات إذا كنت تعود للعمل\n\n**العملية**:\n1. فحص الحالة الحالية باستخدام spec-status\n2. لكل مهمة:\n   - manage-tasks action: \"set-status\", status: \"in-progress\"\n   - تنفيذ الكود\n   - manage-tasks action: \"set-status\", status: \"completed\"\n3. تابع حتى تكتمل جميع المهام\n\n## قواعد سير العمل\n\n- استخدم أدوات MCP دائماً، لا تنشئ الوثائق يدوياً\n- اتبع هياكل القوالب الدقيقة\n- احصل على موافقة صريحة من المستخدم بين المراحل\n- أكمل المراحل بالتسلسل (لا تخطي)\n- مواصفة واحدة في المرة\n- استخدم kebab-case لأسماء المواصفات\n- طلبات الموافقة: قدم filePath فقط، ليس المحتوى أبداً\n- منع: لا تتابع أبداً إذا فشل delete-approval\n- حرج: يجب أن تكون الحالة موافقة والتنظيف ناجح قبل المرحلة التالية\n- حرج: الموافقة الشفهية غير مقبولة أبداً - لوحة التحكم أو امتداد VS Code فقط\n- لا تتابع أبداً عندما يقول المستخدم \"موافق\" - فحص حالة النظام فقط\n- وثائق التوجيه اختيارية - إنشئ فقط عند الطلب صراحة"
+    }
+  }
+}

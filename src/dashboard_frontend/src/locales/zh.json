@@ -53,10 +53,74 @@
     "npm": "npm 包",
     "github": "GitHub"
   },
+  "editor": {
+    "markdown": {
+      "title": "Markdown 编辑器",
+      "saving": "正在保存...",
+      "save": "保存",
+      "saved": "已保存",
+      "error": "错误",
+      "unsavedChanges": "有未保存的更改",
+      "hints": "Ctrl+S 保存 • Tab 缩进",
+      "placeholder": "开始编写 Markdown 内容...",
+      "lines": "行数",
+      "characters": "字符数"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "规范文档" },
+    "tooltips": { "viewRendered": "查看渲染文档", "viewSource": "查看源 Markdown" },
+    "empty": { "docNotCreated": "该 {{doc}} 文档尚未创建。" }
+  },
   "language": {
     "select": "选择语言"
   },
+  "common": {
+    "viewMode": {
+      "rendered": "渲染",
+      "source": "源代码",
+      "editor": "编辑器"
+    },
+    "loadingContent": "正在加载内容...",
+    "noContentAvailable": "暂无内容",
+    "percentComplete": "已完成 {{percent}}%",
+    "lastModified": "最后修改 {{date}}",
+    "never": "无",
+    "unknown": "未知",
+    "close": "关闭",
+    "keepEditing": "继续编辑",
+    "cancel": "取消",
+    "delete": "删除",
+    "closeModalAria": "关闭弹窗"
+  },
   "tasksPage": {
+    "header": {
+      "title": "任务管理",
+      "subtitle": {
+        "selected": "管理并跟踪任务完成情况",
+        "unselected": "选择一个规范以查看并管理其任务"
+      }
+    },
+    "dropdown": {
+      "selectPlaceholder": "选择规范...",
+      "completedOutOfTotal": "已完成 {{completed}} / 共 {{total}} 个任务",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} 任务"
+    },
+    "search": {
+      "placeholder": "搜索规范...",
+      "noSpecsFound": "未找到规范",
+      "tryAdjusting": "请尝试调整搜索条件"
+    },
+    "loading": "正在加载任务进度…",
+    "overallProgress": "总体进度",
+    "item": {
+      "section": "章节",
+      "task": "任务",
+      "groupBadge": "任务组"
+    },
+    "files": { "label": "文件:" },
+    "implementation": { "label": "实现:" },
+    "labels": { "spec": "规范:" },
     "taskDetails": "任务详情",
     "status": "状态",
     "noTasksFound": "未找到任务",
@@ -96,6 +160,206 @@
       "inProgress": "进行中",
       "completed": "已完成",
       "clickToChange": "点击更改状态"
+    },
+    "copyFailed": {
+      "title": "复制失败",
+      "message": "复制失败。请手动复制以下文本："
+    },
+    "copyPrompt": {
+      "tooltip": "复制供 AI 代理使用的提示",
+      "copied": "已复制",
+      "copyPrompt": "复制提示",
+      "copy": "复制"
+    },
+    "notifications": {
+      "statusUpdated": "任务 {{taskId}} 已标记为 {{status}}",
+      "updateFailed": "更新任务 {{taskId}} 状态失败",
+      "updateError": "更新任务 {{taskId}} 状态时出错"
+    },
+    "noTaskData": "暂无任务数据",
+    "stats": {
+      "total": "总计",
+      "totalDesc": "所有任务",
+      "done": "已完成",
+      "doneDesc": "完成",
+      "left": "剩余",
+      "leftDesc": "未完成",
+      "progress": "进度",
+      "progressDesc": "完成度"
+    }
+  },
+  "specsPage": {
+    "header": {
+      "title": "规范",
+      "subtitle": {
+        "active": "查看并管理活动的需求、设计和任务文档",
+        "archived": "查看已归档的规范"
+      }
+    },
+    "modal": {
+      "archivedBadge": "已归档",
+      "archivedNotice": "已归档的规范（可编辑）",
+      "closeAria": "关闭规范查看器",
+      "docLabel": "文档:",
+      "docSelectAria": "选择文档类型"
+    },
+    "documents": {
+      "requirements": "需求",
+      "design": "设计",
+      "tasks": "任务"
+    },
+    "search": {
+      "placeholder": {
+        "active": "搜索活动规范...",
+        "archived": "搜索已归档规范..."
+      }
+    },
+    "empty": {
+      "title": "暂无文档",
+      "description": "此规范尚未创建任何文档。"
+    },
+    "tabs": {
+      "active": "活动",
+      "archived": "归档"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "指导文档",
+      "subtitle": "查看并管理项目的产品指导、技术架构和组织结构相关的指导文档"
+    },
+    "table": {
+      "document": "文档",
+      "status": "状态",
+      "lastModified": "最后修改",
+      "actions": "操作"
+    },
+    "badge": {
+      "available": "可用",
+      "notCreated": "未创建"
+    },
+    "modal": {
+      "title": "{{name}} 指导文档",
+      "closeAria": "关闭指导文档"
+    },
+    "controls": {
+      "documentLabel": "文档:"
+    },
+    "empty": {
+      "title": "暂无指导文档",
+      "description": "指导文档提供项目背景与指导。点击上方任意文档以创建或查看。"
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "待处理",
+      "needsRevision": "需修订",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "审批",
+      "subtitle": "审阅并管理待处理的审批请求"
+    },
+    "pendingCount_one": "{{count}} 个待处理",
+    "pendingCount_other": "{{count}} 个待处理",
+    "messages": {
+      "approvedViaDashboard": "通过仪表板批准"
+    },
+    "actions": {
+      "openReview": "审阅与注释",
+      "closeReview": "关闭审阅",
+      "reviewShort": "审阅",
+      "quickApprove": "快速批准",
+      "approve": "批准",
+      "quickReject": "快速拒绝",
+      "reject": "拒绝",
+      "requestRevisions": "请求修订",
+      "revisions": "修订"
+    },
+    "tooltips": {
+      "goToAnnotations": "跳转到注释",
+      "goToComments": "跳转到评论"
+    },
+    "filter": {
+      "label": "筛选：",
+      "options": {
+        "all": "所有文档",
+        "steering": "指导文档"
+      }
+    },
+    "empty": {
+      "title": "暂无待处理审批",
+      "description": "所有审批均已处理。新的审批请求将显示在此处。"
+    },
+    "reject": {
+      "title": "拒绝审批",
+      "placeholder": "请输入拒绝原因或反馈...",
+      "submit": "拒绝"
+    },
+    "approvalWarning": {
+      "title": "无法批准",
+      "message": "存在评论时无法批准。请使用“请求修订”发送反馈。"
+    },
+    "revision": {
+      "noCommentsTitle": "尚未添加评论",
+      "noCommentsMessage": "在请求修订之前，请至少添加一条评论。"
+    }
+  },
+  "approvals.annotator": {
+    "instructions": {
+      "title": "如何添加注释：",
+      "mobile": "选择文本 → 双击选择 → 弹出评论对话框。点击高亮文本可编辑评论",
+      "step1": "• 选择任意文本以添加评论（会自动弹出对话框）",
+      "step2": "• 点击已有高亮（彩色文本）以查看或编辑评论",
+      "step3": "• 使用“添加通用评论”按钮为整篇文档提供反馈"
+    },
+    "editCommentTitle": "编辑评论",
+    "addCommentTitle": "添加评论",
+    "subtitle": "对下方高亮的文本进行评论",
+    "highlightedText": "高亮文本:",
+    "chooseHighlightColor": "选择高亮颜色:",
+    "pickColorTooltip": "选择高亮颜色",
+    "yourComment": "你的评论:",
+    "commentPlaceholder": "在此输入评论...",
+    "hints": {
+      "desktop": "按 Ctrl/Cmd + Enter 保存，Esc 取消",
+      "mobile": "点击保存以确认"
+    },
+    "updateCommentButton": "更新评论",
+    "addCommentButton": "添加评论",
+    "updateShort": "更新",
+    "saveShort": "保存",
+    "tooltips": {
+      "viewEditComment": "点击查看/编辑评论",
+      "deleteComment": "删除评论"
+    },
+    "badge": {
+      "textSelection": "文本选中",
+      "generalComment": "通用评论"
+    },
+    "colorHighlight": "{{color}} 高亮",
+    "addGeneralComment": {
+      "title": "添加通用评论",
+      "placeholder": "输入通用评论...",
+      "submit": "添加评论",
+      "button": "添加通用评论"
+    },
+    "addCommentShort": "添加评论",
+    "empty": {
+      "title": "暂无评论",
+      "description": "选择文本以添加评论，或添加通用评论"
+    },
+    "switchHelp": "切换到注释模式以通过选择文本添加评论，或添加通用反馈。",
+    "viewMode": {
+      "preview": "预览",
+      "annotate": "注释"
+    },
+    "delete": {
+      "title": "删除评论",
+      "message": "确定要删除此评论吗？该操作不可撤销。"
     }
   }
 }

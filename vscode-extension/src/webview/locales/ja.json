@@ -113,6 +113,14 @@
     "auto": "自動",
     "english": "English",
     "japanese": "日本語",
-    "chinese": "中文"
+    "chinese": "中文",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "german": "Deutsch",
+    "french": "Français",
+    "russian": "Русский",
+    "italian": "Italiano",
+    "korean": "한국어",
+    "arabic": "العربية"
   }
 }

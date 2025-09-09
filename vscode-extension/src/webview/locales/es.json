@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Spec Workflow MCP",
+    "support": "Apoya este proyecto"
+  },
+  "tabs": {
+    "overview": "Resumen del Proyecto",
+    "steering": "Documentos de Dirección",
+    "specs": "Documentos de Especificación",
+    "tasks": "Gestión de Tareas",
+    "approvals": "Solicitudes de Aprobación"
+  },
+  "overview": {
+    "projectTitle": "Resumen del Proyecto",
+    "activeSpecs": "Especificaciones Activas",
+    "archivedSpecs": "Especificaciones Archivadas",
+    "totalSpecs": "Total de Especificaciones",
+    "tasks": "Tareas",
+    "overallProgress": "Progreso General",
+    "recentActivity": "Actividad Reciente",
+    "modified": "{{time}}",
+    "noSpecs": "No se encontraron especificaciones"
+  },
+  "tasks": {
+    "specLabel": "Especificación",
+    "specPlaceholder": "Seleccionar una especificación",
+    "stats": {
+      "total": "Total",
+      "done": "Completadas",
+      "left": "Restantes",
+      "progress": "Progreso"
+    },
+    "overallProgress": "Progreso General",
+    "section": "Sección",
+    "task": "Tarea",
+    "copied": "¡Copiado!",
+    "copyPromptTitle": "Copiar prompt para agente IA",
+    "copyPromptAI": "Copiar prompt IA para tarea {{taskId}}",
+    "copyPromptDefault": "Copiar prompt predeterminado para tarea {{taskId}}",
+    "copyPrompt": "Por favor trabaja en la tarea {{taskId}} para la especificación \"{{specName}}\"",
+    "promptAvailable": "Prompt IA disponible",
+    "promptPreview": "Vista Previa del Prompt IA",
+    "usingDefaultPrompt": "Usando prompt predeterminado",
+    "status": {
+      "pending": "Pendiente",
+      "inProgress": "En Progreso",
+      "completed": "Completada"
+    },
+    "taskGroup": "Grupo de Tareas",
+    "meta": {
+      "files": "Archivos",
+      "implementation": "Implementación",
+      "purposes": "Propósitos",
+      "requirements": "Requisitos",
+      "leverage": "Aprovechar"
+    },
+    "loading": "Cargando tareas...",
+    "noSpecs": "No se encontraron especificaciones",
+    "selectSpec": "Selecciona una especificación arriba para ver las tareas"
+  },
+  "approvals": {
+    "docLabel": "Documento",
+    "categoryPlaceholder": "Seleccionar una categoría",
+    "status": {
+      "pending": "Pendiente"
+    },
+    "created": "Creado: {{time}}",
+    "response": {
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "needsRevision": "Necesita revisión"
+    },
+    "processing": "Procesando...",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "requestRevision": "Solicitar Revisión",
+    "openInEditor": "Abrir en Editor",
+    "noPending": "No hay aprobaciones pendientes para esta especificación",
+    "noPendingDocuments": "No se encontraron documentos con aprobaciones pendientes",
+    "selectCategory": "Selecciona una categoría arriba para ver aprobaciones pendientes"
+  },
+  "specs": {
+    "active": "Activas",
+    "archived": "Archivadas",
+    "specLabel": "Especificación",
+    "specPlaceholder": "Seleccionar una especificación",
+    "archive": "Archivar",
+    "unarchive": "Desarchivar",
+    "docsTitle": "Documentos de Especificación",
+    "modified": "Modificado {{time}}",
+    "fileNotFound": "Archivo no encontrado",
+    "open": "Abrir",
+    "noDocs": "No se encontraron documentos para esta especificación",
+    "noActiveSpecs": "No se encontraron especificaciones activas",
+    "noArchivedSpecs": "No se encontraron especificaciones archivadas",
+    "selectSpec": "Selecciona una especificación arriba para ver documentos"
+  },
+  "steering": {
+    "title": "Documentos de Dirección",
+    "modified": "Modificado {{time}}",
+    "fileNotFound": "Archivo no encontrado",
+    "open": "Abrir",
+    "noDocs": "No se encontraron documentos de dirección",
+    "copyInstructions": "Copiar Instrucciones",
+    "copied": "¡Copiado!"
+  },
+  "common": {
+    "scrollToTop": "Volver arriba"
+  },
+  "language": {
+    "selector": "Idioma",
+    "changed": "Idioma cambiado exitosamente",
+    "auto": "Auto",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "german": "Deutsch",
+    "french": "Français",
+    "russian": "Русский",
+    "italian": "Italiano",
+    "korean": "한국어",
+    "arabic": "العربية"
+  }
+}

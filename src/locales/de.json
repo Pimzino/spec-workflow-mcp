@@ -1,0 +1,414 @@
+{
+  "tools": {
+    "steeringGuide": {
+      "description": "Leitfaden zum Erstellen von Projekt-Steuerungsdokumenten laden.\n\n# Anweisungen\nNur aufrufen, wenn Benutzer explizit die Erstellung von Steuerungsdokumenten anfordert oder nach Projektarchitekturdokumenten fragt. Ist nicht Teil des Standard-Spezifikationsworkflows. Stellt Vorlagen und Leitfäden für die Erstellung von product.md, tech.md und structure.md bereit.",
+      "successMessage": "Steuerungsworkflow-Leitfaden geladen - folgen Sie diesem Workflow exakt",
+      "dashboardMessage": "Dashboard: {{dashboardUrl}}",
+      "dashboardUnavailable": "Dashboard nicht verfügbar",
+      "nextSteps": {
+        "proceedIfRequested": "Nur fortfahren, wenn Benutzer Steuerungsdokumente angefordert hat",
+        "createProduct": "Zuerst product.md erstellen",
+        "createTechAndStructure": "Dann tech.md und structure.md",
+        "reference": "In zukünftigen Spezifikationen referenzieren"
+      },
+      "guide": "# Steuerungsworkflow\n\n## Überblick\n\nErstellen Sie projektbezogene Leitdokumente, wenn explizit angefordert. Steuerungsdokumente etablieren Vision, Architektur und Konventionen für bestehende Codebasen.\n\n## Workflow-Diagramm\n\n```mermaid\nflowchart TD\n    Start([Start: Setup Steuerungsdokumente]) --> Guide[steering-guide<br/>Workflow-Anweisungen laden]\n    \n    %% Phase 1: Product\n    Guide --> P1_Template[get-template-context<br/>templateType: steering<br/>template: product]\n    P1_Template --> P1_Generate[Vision & Ziele generieren]\n    P1_Generate --> P1_Create[create-steering-doc<br/>document: product]\n    P1_Create --> P1_Approve[request-approval<br/>nur filePath]\n    P1_Approve --> P1_Status[get-approval-status<br/>Status abfragen]\n    P1_Status --> P1_Check{Status?}\n    P1_Check -->|needs-revision| P1_Update[Dokument mit Benutzerkommentaren aktualisieren]\n    P1_Update --> P1_Create\n    P1_Check -->|approved| P1_Clean[delete-approval]\n    P1_Clean -->|failed| P1_Status\n    \n    %% Phase 2: Tech\n    P1_Clean -->|success| P2_Template[get-template-context<br/>templateType: steering<br/>template: tech]\n    P2_Template --> P2_Analyze[Tech-Stack analysieren]\n    P2_Analyze --> P2_Create[create-steering-doc<br/>document: tech]\n    P2_Create --> P2_Approve[request-approval<br/>nur filePath]\n    P2_Approve --> P2_Status[get-approval-status<br/>Status abfragen]\n    P2_Status --> P2_Check{Status?}\n    P2_Check -->|needs-revision| P2_Update[Dokument mit Benutzerkommentaren aktualisieren]\n    P2_Update --> P2_Create\n    P2_Check -->|approved| P2_Clean[delete-approval]\n    P2_Clean -->|failed| P2_Status\n    \n    %% Phase 3: Structure\n    P2_Clean -->|success| P3_Template[get-template-context<br/>templateType: steering<br/>template: structure]\n    P3_Template --> P3_Analyze[Codebase-Struktur analysieren]\n    P3_Analyze --> P3_Create[create-steering-doc<br/>document: structure]\n    P3_Create --> P3_Approve[request-approval<br/>nur filePath]\n    P3_Approve --> P3_Status[get-approval-status<br/>Status abfragen]\n    P3_Status --> P3_Check{Status?}\n    P3_Check -->|needs-revision| P3_Update[Dokument mit Benutzerkommentaren aktualisieren]\n    P3_Update --> P3_Create\n    P3_Check -->|approved| P3_Clean[delete-approval]\n    P3_Clean -->|failed| P3_Status\n    \n    P3_Clean -->|success| Complete([Steuerungsdokumente vollständig])\n    \n    style Start fill:#e6f3ff\n    style Complete fill:#e6f3ff\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n```\n\n## Steuerungsworkflow-Phasen\n\n### Phase 1: Produktdokument\n**Zweck**: Vision, Ziele und Benutzerergebnisse definieren.\n\n**Tools**:\n- steering-guide: Workflow-Anweisungen laden\n- get-template-context: Produktvorlage laden (templateType: \"steering\", template: \"product\")\n- create-steering-doc: product.md erstellen\n- request-approval: Benutzergenehmigung einholen\n- get-approval-status: Genehmigungsstatus prüfen\n- delete-approval: Nach Genehmigung aufräumen\n\n**Prozess**:\n1. Steuerungsleitfaden für Workflow-Überblick laden\n2. Produktvorlage laden\n3. Produktvision und -ziele generieren\n4. Dokument mit create-steering-doc erstellen\n5. Genehmigung anfordern (nur filePath)\n6. Status abfragen bis genehmigt/überarbeitungsbedürftig (NIEMALS mündliche Genehmigung akzeptieren)\n7. Bei Überarbeitungsbedarf: Dokument aktualisieren, NEUE Genehmigung erstellen, NICHT fortfahren\n8. Nach Genehmigung: delete-approval (muss erfolgreich sein) vor Fortfahren\n9. Bei Fehlschlag von delete-approval: STOPP - zur Abfrage zurückkehren\n\n### Phase 2: Tech-Dokument\n**Zweck**: Technologieentscheidungen und Architektur dokumentieren.\n\n**Tools**:\n- get-template-context: Tech-Vorlage laden (templateType: \"steering\", template: \"tech\")\n- create-steering-doc: tech.md erstellen\n- request-approval: Benutzergenehmigung einholen\n- get-approval-status: Status prüfen\n- delete-approval: Aufräumen\n\n**Prozess**:\n1. Tech-Vorlage laden\n2. Bestehenden Technologie-Stack analysieren\n3. Architekturentscheidungen und Muster dokumentieren\n4. Dokument erstellen und Genehmigung anfordern\n5. Status abfragen bis genehmigt/überarbeitungsbedürftig\n6. Bei Überarbeitungsbedarf: Dokument aktualisieren, NEUE Genehmigung erstellen, NICHT fortfahren\n7. Nach Genehmigung: delete-approval (muss erfolgreich sein) vor Fortfahren\n8. Bei Fehlschlag von delete-approval: STOPP - zur Abfrage zurückkehren\n\n### Phase 3: Strukturdokument\n**Zweck**: Codebase-Organisation und Muster abbilden.\n\n**Tools**:\n- get-template-context: Strukturvorlage laden (templateType: \"steering\", template: \"structure\")\n- create-steering-doc: structure.md erstellen\n- request-approval: Benutzergenehmigung einholen\n- get-approval-status: Status prüfen\n- delete-approval: Aufräumen\n\n**Prozess**:\n1. Strukturvorlage laden\n2. Verzeichnisstruktur und Dateiorganisation analysieren\n3. Codemuster und Konventionen dokumentieren\n4. Dokument erstellen und Genehmigung anfordern\n5. Status abfragen bis genehmigt/überarbeitungsbedürftig\n6. Bei Überarbeitungsbedarf: Dokument aktualisieren, NEUE Genehmigung erstellen, NICHT fortfahren\n7. Nach Genehmigung: delete-approval (muss erfolgreich sein) vor Fortfahren\n8. Bei Fehlschlag von delete-approval: STOPP - zur Abfrage zurückkehren\n9. Nach erfolgreichem Aufräumen: \"Steuerungsdokumente vollständig. Bereit für Spezifikationserstellung?\"\n\n## Workflow-Regeln\n\n- Immer MCP-Tools verwenden, niemals Dokumente manuell erstellen\n- Exakte Vorlagenstrukturen befolgen\n- Explizite Benutzergenehmigung zwischen Phasen einholen\n- Phasen in Reihenfolge abschließen (kein Überspringen)\n- Genehmigungsanfragen: nur filePath bereitstellen, niemals Inhalt\n- BLOCKIEREND: Niemals fortfahren, wenn delete-approval fehlschlägt\n- KRITISCH: Muss genehmigten Status UND erfolgreiches Aufräumen vor nächster Phase haben\n- KRITISCH: Mündliche Genehmigung wird NIEMALS akzeptiert - nur Dashboard oder VS Code-Extension\n- NIEMALS fortfahren bei Benutzeräußerung \"genehmigt\" - nur Systemstatus prüfen"
+    },
+    "specStatus": {
+      "description": "Umfassende Spezifikationsfortschrittsübersicht anzeigen.\n\n# Anweisungen\nAufrufen beim Wiederaufnehmen der Arbeit an einer Spezifikation oder beim Prüfen des Gesamtfertigstellungsstatus. Zeigt welche Phasen abgeschlossen sind und den Aufgaben-Implementierungsfortschritt. Nützlich zum Verstehen der aktuellen Position im Workflow vor dem Fortfahren.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "specNameDescription": "Name der Spezifikation",
+      "successMessage": "Spezifikation '{{specName}}' Status: {{overallStatus}}",
+      "phases": {
+        "requirements": "Anforderungen",
+        "design": "Design",
+        "tasks": "Aufgaben",
+        "implementation": "Implementierung"
+      },
+      "nextSteps": {
+        "requirements": {
+          "create": "requirements.md erstellen",
+          "loadContext": "Kontext mit get-steering-context laden",
+          "requestApproval": "Genehmigung anfordern"
+        },
+        "design": {
+          "create": "design.md erstellen",
+          "reference": "Anforderungen referenzieren",
+          "requestApproval": "Genehmigung anfordern"
+        },
+        "tasks": {
+          "create": "tasks.md erstellen",
+          "breakdown": "Design aufschlüsseln",
+          "requestApproval": "Genehmigung anfordern"
+        },
+        "implementation": {
+          "nextPending": "manage-tasks mit next-pending verwenden",
+          "implement": "Aufgaben implementieren",
+          "updateStatus": "Status mit manage-tasks aktualisieren",
+          "begin": "Implementierung mit manage-tasks beginnen"
+        },
+        "completed": {
+          "complete": "Spezifikation vollständig",
+          "runTests": "Tests ausführen"
+        }
+      },
+      "errors": {
+        "notFound": "Spezifikation '{{specName}}' nicht gefunden",
+        "genericFail": "Spezifikationsstatus konnte nicht abgerufen werden: {{message}}",
+        "nextSteps": {
+          "checkName": "Spezifikationsname prüfen",
+          "useList": "spec-list für verfügbare Spezifikationen verwenden",
+          "create": "Spezifikation mit create-spec-doc erstellen",
+          "checkExists": "Prüfen ob die Spezifikation existiert",
+          "verifyPath": "Projektpfad verifizieren",
+          "useListGeneric": "spec-list verwenden um verfügbare Spezifikationen zu sehen"
+        }
+      }
+    },
+    "specList": {
+      "description": "Alle Spezifikationen im Projekt auflisten.\n\n# Anweisungen\nAufrufen um verfügbare Spezifikationen zu sehen, bevor eine zum Bearbeiten ausgewählt wird. Zeigt Status jeder Spezifikation einschließlich Phasenabschluss. Nützlich zur Auswahl welche Spezifikation zu implementieren oder fortzusetzen ist.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "successMessage_one": "{{count}} Spezifikation gefunden",
+      "successMessage_other": "{{count}} Spezifikationen gefunden",
+      "messages": {
+        "noSpecs": "Keine Spezifikationen gefunden"
+      },
+      "nextSteps": {
+        "noSpecs": {
+          "create": "Neue Spezifikation mit spec-create erstellen",
+          "example": "Beispiel: spec-create user-authentication \"Benutzeranmeldung und Registrierung\""
+        },
+        "success": {
+          "viewStatus": "spec-status <name> verwenden um detaillierten Status einer bestimmten Spezifikation anzuzeigen",
+          "continue": "spec-execute <task-id> <name> verwenden um Implementierung fortzusetzen",
+          "create": "Neue Spezifikationen mit spec-create erstellen"
+        }
+      },
+      "errors": {
+        "failed": "Spezifikationen konnten nicht aufgelistet werden: {{message}}",
+        "nextSteps": {
+          "checkPath": "Prüfen ob der Projektpfad existiert",
+          "verifyDir": "Verifizieren dass das .spec-workflow Verzeichnis existiert",
+          "create": "Spezifikation mit spec-create erstellen falls keine existieren"
+        }
+      }
+    },
+    "requestApproval": {
+      "description": "Benutzergenehmigung über das Dashboard-Interface anfordern.\n\n# Anweisungen\nSOFORT nach Erstellen jedes Dokuments aufrufen. Erforderlich vor Fortfahren zur nächsten Phase. KRITISCH: Nur filePath-Parameter bereitstellen - das Dashboard liest Dateien direkt. Niemals Dokumentinhalt in die Anfrage einschließen. Warten bis Benutzer überprüft und genehmigt hat vor Fortfahren.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "titleDescription": "Kurzer Titel der beschreibt was genehmigt werden muss",
+      "filePathDescription": "Pfad zur Datei die Genehmigung benötigt (relativ zum Projektstamm). Das Dashboard wird diese Datei lesen und anzeigen.",
+      "typeDescription": "Typ der Genehmigungsanfrage - \"document\" für Inhaltsgenehmigung, \"action\" für Aktionsgenehmigung",
+      "categoryDescription": "Kategorie der Genehmigungsanfrage - \"spec\" für Spezifikationen, \"steering\" für Steuerungsdokumente",
+      "categoryNameDescription": "Name der Spezifikation oder \"steering\" für Steuerungsdokumente",
+      "successMessage": "Genehmigungsanfrage erfolgreich erstellt. Bitte im Dashboard überprüfen: {{dashboardUrl}}",
+      "dashboardUnavailable": "Dashboard-URL nicht verfügbar",
+      "nextSteps": {
+        "blocking": "BLOCKIEREND - Dashboard oder VS Code Extension-Genehmigung erforderlich",
+        "noVerbal": "MÜNDLICHE GENEHMIGUNG NICHT AKZEPTIERT",
+        "noVerbalConfirm": "Nicht bei mündlicher Bestätigung fortfahren",
+        "useDashboard": "Dashboard verwenden: {{dashboardUrl}} oder VS Code Extension",
+        "useVscode": "VS Code Extension für Genehmigung verwenden",
+        "poll": "Status abfragen mit: get-approval-status \"{{approvalId}}\""
+      },
+      "errors": {
+        "failed": "Genehmigungsanfrage konnte nicht erstellt werden: {{message}}"
+      }
+    },
+    "refreshTasks": {
+      "description": "Aufgabenliste basierend auf aktuellen Anforderungen und Design regenerieren.\n\n# Anweisungen\nAufrufen wenn Aufgaben nach Designänderungen aktualisiert werden müssen oder um Lücken zwischen Implementierung und Anforderungen zu überbrücken. Analysiert bestehende requirements.md und design.md um umfassende aktualisierte Aufgabenliste zu erstellen. Ersetzt bestehende tasks.md mit aktualisierter Version.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "specNameDescription": "Name der Spezifikation",
+      "successMessage": "Aufgabenaktualisierungskontext für \"{{specName}}\" geladen. Bereit für KI-Agent zur Analyse und Aktualisierung der Aufgaben.",
+      "analysis": {
+        "hasTasks": "\n## Aktuelle Aufgabenanalyse\n**Gesamtaufgaben**: {{total}}\n**Abgeschlossen**: {{completed}} (als-ist beibehalten, auch wenn Feature entfernt)\n**In Arbeit**: {{inProgress}} (als-ist beibehalten, auch wenn Feature entfernt)\n**Ausstehend**: {{pending}} (GEGEN requirements.md/design.md VALIDIEREN)\n\n### Beizubehaltende Aufgaben (NICHT ÄNDERN):\n{{completedList}}\n{{inProgressList}}\n\n### Ausstehende Aufgaben (MUSS VALIDIERT WERDEN):\n{{pendingList}}\n\n**VALIDIERUNG ERFORDERLICH**: Für jede ausstehende Aufgabe oben verifizieren, dass das Feature in requirements.md oder design.md erwähnt wird. Falls NICHT erwähnt, Aufgabe ENTFERNEN.\n",
+        "noTasks": "\n## Aktuelle Aufgabenanalyse\n**Keine tasks.md existiert** - Sie müssen die komplette Aufgabenliste von Grund auf erstellen.\n",
+        "none": "Keine",
+        "checkPrompt": "PRÜFEN: Ist dieses Feature in requirements.md?"
+      },
+      "instructions": {
+        "main": "# Aufgabenaktualisierungs-Anweisungen\n\n## Kontext\nSie aktualisieren die Aufgabenliste für Spezifikation \"{{specName}}\", da sich Anforderungen oder Design während der Implementierung geändert haben könnten. Ihr Ziel ist es sicherzustellen, dass die Aufgabenliste genau widerspiegelt, was getan werden muss, um die Lücke zwischen aktueller Implementierung und den aktualisierten Anforderungen/Design zu überbrücken.\n\n## KRITISCH: Quelle der Wahrheit\n- **Anforderungen kommen NUR aus requirements.md** - nicht aus bestehenden Aufgaben\n- **Designentscheidungen kommen NUR aus design.md** - nicht aus bestehenden Aufgaben  \n- **Aufgaben sind Implementierungsschritte** - sie implementieren Anforderungen, definieren sie nicht\n- Falls ein Feature in Aufgaben aber NICHT in requirements.md/design.md existiert, wurde es aus der Spezifikation ENTFERNT\n\n## Drei-Pass-Validierungsprozess\n\n### PASS 1: Bestehende Aufgaben gegen aktuelle Spezifikation validieren\nFür jede bestehende Aufgabe fragen: \"Ist das Feature, das diese Aufgabe implementiert, noch in requirements.md oder design.md?\"\n\n**Aktionen für AUSSTEHENDE Aufgaben:**\n- **BEHALTEN**: Falls Feature noch in requirements/design ist\n- **ENTFERNEN**: Falls Feature NICHT in requirements/design ist (Feature wurde aus Spezifikation entfernt)\n\n**Aktionen für ABGESCHLOSSENE/IN-ARBEIT Aufgaben:**\n- **BEIBEHALTEN**: Immer abgeschlossene [x] und in-Arbeit [-] Aufgaben behalten\n- **KENNZEICHNEN**: Falls Feature entfernt wurde, Kommentar hinzufügen: \"_Hinweis: Feature aus Spezifikation entfernt aber Aufgabe beibehalten_\"\n\n### PASS 2: Lückenanalyse  \nFür jede Anforderung in requirements.md fragen: \"Gibt es eine Aufgabe die dies implementiert?\"\nFür jede Designentscheidung in design.md fragen: \"Gibt es Aufgaben die mit dieser Architektur übereinstimmen?\"\n\n**Aktionen:**\n- **HINZUFÜGEN**: Neue Aufgaben für Anforderungen/Design-Elemente ohne Aufgaben\n- **AKTUALISIEREN**: Bestehende ausstehende Aufgaben die Anpassung an aktualisierte Anforderungen benötigen\n\n### PASS 3: Aktualisierte Aufgabenliste erstellen (Nur wenn Änderungen erforderlich)\n**ENTSCHEIDUNGSPUNKT**: Nach Pass 1 und Pass 2 prüfen:\n- Gibt es ausstehende Aufgaben zu entfernen?\n- Gibt es neue Aufgaben hinzuzufügen? \n- Gibt es bestehende Aufgaben zu ändern?\n\n**Falls KEINE Änderungen nötig**: \"Aufgabenliste ist bereits mit aktuellen Anforderungen abgestimmt - keine Aktualisierung nötig\" melden und STOPPEN.\n\n**Falls Änderungen nötig SIND**, neue tasks.md erstellen mit:\n1. Alle abgeschlossenen [x] Aufgaben (als-ist beibehalten)\n2. Alle in-Arbeit [-] Aufgaben (als-ist beibehalten, mit Entfernungshinweisen falls zutreffend)\n3. Nur ausstehende [ ] Aufgaben die Unterstützung in aktuellen requirements/design haben\n4. Neue Aufgaben für fehlende requirements/design-Elemente\n5. Ordnungsgemäße Reihenfolge und Anforderungsreferenzen\n\n## Kritische Regeln\n- **NIEMALS** abgeschlossene Aufgaben ändern (mit [x] markiert)\n- **NIEMALS** in-Arbeit Aufgaben ändern (mit [-] markiert)  \n- **ENTFERNEN** ausstehende Aufgaben für Features nicht in aktuellen requirements/design\n- **IMMER** spezifische Anforderungen referenzieren (z.B. _Requirements: 1.1, 2.3_)\n- **SICHERSTELLEN** dass Aufgaben inkrementell aufbauen\n- **MACHEN** Aufgaben atomisch, spezifisch und umsetzbar\n- **BEIBEHALTEN** der ursprünglichen tasks.md Struktur - nur die Aufgabenelemente selbst aktualisieren\n- **KEINE** zusätzlichen Abschnitte in tasks.md (keine Dependencies, Metrics, Notes, Changes Made, etc.)\n- **HALTEN** tasks.md sauber - jede Änderungszusammenfassung gehört nur in Ihre Chat-Antwort\n\n## Aufgabenformat-Anforderungen\nJede Aufgabe muss diesem Format folgen:\n```\n- [ ] 1.1 Benutzerauthentifizierungsschnittstelle erstellen\n  - Datei: src/auth/UserAuth.ts\n  - Anmelde- und Registrierungsformulare implementieren\n  - Formularvalidierung und Fehlerbehandlung hinzufügen\n  - Zweck: Benutzerkontenverwaltung ermöglichen\n  - _Nutzen: src/components/BaseForm.tsx, src/utils/validation.ts_\n  - _Requirements: 1.1, 1.2_\n```\n\n## Implementierungsstrategie\n1. **LESEN** Sie requirements.md und design.md sorgfältig - diese definieren was existieren sollte\n2. **VALIDIEREN** Sie bestehende Aufgaben gegen aktuelle Spezifikation (Pass 1)\n3. **IDENTIFIZIEREN** Sie Lücken in der Aufgabenabdeckung (Pass 2)  \n4. **ERSTELLEN** Sie aktualisierte Aufgabenliste mit ordnungsgemäßer Validierung (Pass 3)\n5. **VERWENDEN** Sie create-spec-doc Tool um die aktualisierte tasks.md zu speichern\n6. **WICHTIG**: tasks.md im gleichen Format wie das Original halten - nur die Aufgabenelemente sollten sich ändern\n\n## Beispiel: Umgang mit entfernten Features\nFalls Aufgaben für \"Kanban-Ansicht\" existieren aber \"Kanban-Ansicht\" NICHT in requirements.md erwähnt wird:\n- **ENTFERNEN** aller ausstehenden [ ] Kanban-Aufgaben \n- **BEIBEHALTEN** aller abgeschlossenen [x] oder in-Arbeit [-] Kanban-Aufgaben\n- **HINWEIS HINZUFÜGEN**: \"_Hinweis: Kanban-Feature aus Spezifikation entfernt aber abgeschlossene Arbeit beibehalten_\"\n\n## Nächste Schritte\nNach Analyse der unten stehenden Dokumente:\n1. Drei-Pass-Validierungsprozess durchführen\n2. **ENTSCHEIDUNGSPUNKT**: Falls nach Validierung keine Änderungen nötig sind, einfach \"Aufgaben bereits abgestimmt\" melden und STOPPEN\n3. **NUR falls Änderungen nötig**: create-spec-doc Tool verwenden mit:\n   - projectPath: \"{{projectPath}}\"\n   - specName: \"{{specName}}\"\n   - document: \"tasks\"\n   - content: [Ihre validierte und aktualisierte Aufgaben-Markdown - GLEICHES FORMAT wie Original]\n4. Sicherstellen dass NUR aktuelle Anforderungen Aufgaben haben\n5. Verifizieren dass Aufgabenabhängigkeiten und -reihenfolge sinnvoll sind\n6. **MERKEN**: tasks.md sollte NUR die aktualisierte Aufgabenliste enthalten - keine zusätzlichen Abschnitte"
+      },
+      "fullContext": "{{instructions}}\n\n{{taskAnalysis}}\n\n---\n\n## Anforderungsdokument\n{{requirementsContent}}\n\n---\n\n## Designdokument  \n{{designContent}}\n\n---\n\n## Aktuelles Aufgabendokument\n{{tasksContent}}\n\n---\n\n## Zusammenfassung\nSie haben nun allen Kontext den Sie benötigen um die Aufgabenliste zu aktualisieren. Verwenden Sie das create-spec-doc Tool um eine aktualisierte tasks.md zu erstellen die:\n- Alle abgeschlossenen ([x]) und in-Arbeit ([-]) Aufgaben beibehält (auch wenn Feature entfernt wurde)\n- Ausstehende ([ ]) Aufgaben für Features ENTFERNT die NICHT in aktueller requirements.md/design.md sind  \n- Neue Aufgaben für requirements/design-Elemente ohne Aufgaben hinzufügt\n- Ordnungsgemäße Aufgabenreihenfolge und Anforderungsreferenzen sicherstellt\n- Nur Aufgaben einschließt die Features implementieren die tatsächlich in requirements.md/design.md spezifiziert sind\n\n**MERKEN**: Falls ein Feature in Aufgaben aber NICHT in requirements.md/design.md existiert, wurde es aus der Spezifikation ENTFERNT und ausstehende Aufgaben sollten ENTFERNT werden.",
+      "messages": {
+        "noRequirements": "Keine requirements.md gefunden",
+        "noDesign": "Keine design.md gefunden",
+        "noTasks": "Keine tasks.md existiert - von Grund auf erstellen"
+      },
+      "nextSteps": {
+        "pass1": "PASS 1: Jede bestehende Aufgabe gegen requirements.md/design.md validieren",
+        "pass2": "PASS 2: Lücken identifizieren - requirements/design-Elemente ohne Aufgaben finden",
+        "decision": "ENTSCHEIDUNG: Falls keine Änderungen nötig, \"Aufgaben bereits abgestimmt\" melden und stoppen",
+        "pass3": "PASS 3: Nur falls Änderungen nötig, aktualisierte tasks.md mit create-spec-doc Tool erstellen"
+      },
+      "errors": {
+        "noContext": "Keine requirements.md oder design.md gefunden. Kann Aufgaben nicht ohne Spezifikationskontext aktualisieren.",
+        "genericFail": "Aktualisierungskontext konnte nicht geladen werden: {{message}}",
+        "nextSteps": {
+          "createReq": "Zuerst requirements.md mit create-spec-doc Tool erstellen",
+          "createDesign": "design.md nach Genehmigung der Anforderungen erstellen",
+          "thenRefresh": "Dann refresh-tasks verwenden um abgestimmte Aufgabenliste zu erstellen",
+          "checkDir": "Prüfen ob das Spezifikationsverzeichnis existiert",
+          "checkPerms": "Dateiberechtigungen verifizieren",
+          "checkName": "Sicherstellen dass der Spezifikationsname korrekt ist"
+        }
+      }
+    },
+    "getTemplateContext": {
+      "description": "Spezifische Dokumentvorlage für Spezifikations- oder Steuerungsdokumente laden.\n\n# Anweisungen\nMit der exakt benötigten Vorlage für Ihre aktuelle Phase aufrufen. Für Spezifikationsworkflow requirements-, design- oder tasks-Vorlagen anfordern. Für Steuerungsdokumente product-, tech- oder structure-Vorlagen anfordern. Jede Vorlage stellt das exakte Format bereit das von create-spec-doc oder create-steering-doc Tools erwartet wird.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "templateTypeDescription": "Vorlagentyp: spec für Workflow-Vorlagen, steering für Projektdokumente",
+      "templateDescription": "Spezifische zu ladende Vorlage",
+      "docTitles": {
+        "requirements": "Anforderungsvorlage",
+        "design": "Designvorlage",
+        "tasks": "Aufgabenvorlage",
+        "product": "Produktvorlage",
+        "tech": "Tech-Vorlage",
+        "structure": "Strukturvorlage"
+      },
+      "successMessage": "{{template}}-Vorlage für {{templateType}} geladen",
+      "messages": {
+        "fullContext": "## {{title}}\n\n{{content}}\n\n**Hinweis**: Vorlage geladen. Diese Struktur beim Erstellen Ihres {{template}}-Dokuments verwenden."
+      },
+      "nextSteps": {
+        "success": {
+          "useTemplate": "Vorlage für {{template}}-Dokument verwenden",
+          "followStructure": "Vorlagenstruktur exakt befolgen",
+          "nextSpec": "Weiter: create-spec-doc mit document: \"{{template}}\"",
+          "nextSteering": "Weiter: create-steering-doc mit document: \"{{template}}\""
+        }
+      },
+      "errors": {
+        "invalidType": "Ungültiger Vorlagentyp: {{templateType}}",
+        "validTypes": "Verwenden: spec oder steering",
+        "invalidTemplateForType": "Ungültige Vorlage \"{{template}}\" für Typ \"{{templateType}}\"",
+        "validTemplates": "Gültige Vorlagen: {{validTemplates}}",
+        "validSpecTemplates": "Verwenden: requirements, design oder tasks",
+        "validSteeringTemplates": "Verwenden: product, tech oder structure",
+        "templateEmpty": "Vorlagendatei existiert aber ist leer: {{file}}",
+        "fileNotFound": "Vorlagendatei nicht gefunden: {{file}}",
+        "genericFail": "Vorlagenkontext konnte nicht geladen werden: {{message}}",
+        "nextSteps": {
+          "checkContent": "Vorlagendateiinhalt prüfen",
+          "verifyIntegrity": "Dateiintegrität verifizieren",
+          "checkDirectory": "Vorlagenverzeichnis prüfen",
+          "verifyExists": "Verifizieren dass Vorlagendatei existiert",
+          "location": "Ort: {{location}}",
+          "checkPermissions": "Dateiberechtigungen verifizieren",
+          "checkFiles": "Vorlagendateien prüfen"
+        }
+      }
+    },
+    "getSteeringContext": {
+      "description": "Projekt-Steuerungsdokumente für architektonischen und Produktkontext laden.\n\n# Anweisungen\nWährend der initialen Spezifikations-Einrichtung aufrufen um nach bestehenden Projektrichtlinien (product.md, tech.md, structure.md) zu suchen. Optional für neue Projekte aber empfohlen für bestehende Codebasen. Falls keine Steuerungsdokumente existieren, Benutzer fragen ob diese zuerst erstellt werden sollen oder mit Spezifikation fortgefahren werden soll.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "docTitles": {
+        "product": "Produktkontext",
+        "tech": "Technologiekontext",
+        "structure": "Strukturkontext"
+      },
+      "successMessage": "Steuerungskontext erfolgreich geladen",
+      "messages": {
+        "notFound": "Keine Steuerungsdokumente gefunden",
+        "notFoundContext": "## Steuerungsdokumente-Kontext\n\nKeine Steuerungsdokumente gefunden. Mit Best Practices für den erkannten Technologie-Stack fortfahren.",
+        "emptyDocs": "Steuerungsdokumente existieren aber sind leer",
+        "emptyContext": "## Steuerungsdokumente-Kontext\n\nSteuerungsdokumente gefunden aber alle sind leer.",
+        "fullContext": "## Steuerungsdokumente-Kontext (Vorgeladen)\n\n{{sections}}\n\n**Hinweis**: Steuerungsdokumente wurden vorgeladen. get-content nicht nochmal verwenden um sie abzurufen."
+      },
+      "nextSteps": {
+        "notFound": {
+          "useBestPractices": "Best Practices und Konventionen für den erkannten Technologie-Stack verwenden",
+          "askToCreate": "Für bestehende Codebasen: Benutzer fragen ob sie Steuerungsdokumente für projektspezifische Führung erstellen möchten",
+          "newProjectNote": "Für neue Projekte: Steuerungskontext ist typischerweise nicht nötig - mit Technologie-Best-Practices fortfahren"
+        },
+        "empty": {
+          "useBestPractices": "Best Practices und Konventionen für den Technologie-Stack verwenden",
+          "askToPopulate": "Für bestehende Codebasen: Benutzer fragen ob sie Steuerungsdokumente mit projektspezifischem Kontext füllen möchten",
+          "newProjectNote": "Für neue Projekte: Leere Steuerungsdokumente sind in Ordnung - mit Standard-Praktiken fortfahren"
+        },
+        "success": {
+          "doNotCallAgain": "Steuerungskontext geladen - get-steering-context nicht nochmal aufrufen",
+          "reference": "Diese Standards in Anforderungen, Design und Aufgaben referenzieren",
+          "align": "Sicherstellen dass alle Entscheidungen mit dokumentierter Projektvision übereinstimmen"
+        }
+      },
+      "errors": {
+        "genericFail": "Steuerungskontext konnte nicht geladen werden: {{message}}",
+        "nextSteps": {
+          "checkPath": "Prüfen ob der Projektpfad existiert",
+          "checkPermissions": "Dateiberechtigungen verifizieren",
+          "runSetup": "spec-steering-setup ausführen falls Steuerungsdokumente fehlen"
+        }
+      }
+    },
+    "getSpecContext": {
+      "description": "Bestehende Spezifikationsdokumente für wiederaufgenommene Arbeit laden.\n\n# Anweisungen\nNUR aufrufen bei Rückkehr zur Arbeit an bestehenden Spezifikationen nach einer Pause oder bei Neustart an einer Spezifikation die Sie nicht erstellt haben. Niemals während aktiver Spezifikationserstellung verwenden falls Sie gerade die Dokumente erstellt haben. Lädt requirements.md, design.md und tasks.md für Implementierungskontext.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "specNameDescription": "Name der Spezifikation für die Kontext geladen werden soll",
+      "docTitles": {
+        "requirements": "Anforderungen",
+        "design": "Design",
+        "tasks": "Aufgaben"
+      },
+      "successMessage": "Spezifikationskontext erfolgreich geladen für: {{specName}}",
+      "messages": {
+        "emptyDocs": "Spezifikationsdokumente für \"{{specName}}\" existieren aber sind leer",
+        "emptyContext": "## Spezifikationskontext\n\nKeine Spezifikationsdokumente gefunden für: {{specName}}",
+        "fullContext": "## Spezifikationskontext (Vorgeladen): {{specName}}\n\n{{sections}}\n\n**Hinweis**: Spezifikationsdokumente wurden vorgeladen. get-content nicht nochmal verwenden um sie abzurufen."
+      },
+      "nextSteps": {
+        "empty": {
+          "addContent": "Inhalt zu .spec-workflow/specs/{{specName}}/ hinzufügen",
+          "createMissing": "Fehlende Dokumente erstellen",
+          "ensureContent": "Sicherstellen dass alle drei Dokumente Inhalt haben"
+        },
+        "success": {
+          "proceed": "Kontext geladen - mit Implementierung fortfahren",
+          "reference": "Anforderungen und Design für jede Aufgabe referenzieren",
+          "updateStatus": "Aufgabenstatus mit manage-tasks aktualisieren"
+        }
+      },
+      "errors": {
+        "notFound": "Keine Spezifikation gefunden für: {{specName}}",
+        "availableSpecs": "Verfügbare Spezifikationen: {{specs}}",
+        "genericFail": "Spezifikationskontext konnte nicht geladen werden: {{message}}",
+        "nextSteps": {
+          "useExisting": "Bestehenden Spezifikationsnamen verwenden",
+          "createNew": "Oder neue mit create-spec-doc erstellen",
+          "create": "Spezifikation mit create-spec-doc erstellen",
+          "checkSpelling": "Spezifikationsname-Schreibweise prüfen",
+          "verifySetup": "Projekt-Setup verifizieren",
+          "checkPath": "Projektpfad prüfen",
+          "verifyName": "Spezifikationsname verifizieren",
+          "checkPermissions": "Dateiberechtigungen prüfen",
+          "createIfMissing": "Spezifikation erstellen falls fehlend"
+        }
+      }
+    },
+    "getApprovalStatus": {
+      "description": "Aktuellen Status einer Genehmigungsanfrage prüfen.\n\n# Anweisungen\nNach request-approval aufrufen um auf Benutzerentscheidung zu warten. Status weiter prüfen bis Status \"approved\" oder \"needs-revision\" ist. Bei needs-revision Feedback überprüfen, Dokument mit create-spec-doc aktualisieren, dann NEUE Genehmigungsanfrage erstellen. Nur zur nächsten Phase nach \"approved\" Status fortfahren.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm (optional - verwendet Kontext falls nicht bereitgestellt)",
+      "approvalIdDescription": "Die ID der zu prüfenden Genehmigungsanfrage",
+      "messages": {
+        "pending": "BLOCKIERT: Status ist {{status}}. Mündliche Genehmigung wird NICHT akzeptiert. Nur Dashboard oder VS Code Extension verwenden.",
+        "other": "Genehmigungsstatus: {{status}}"
+      },
+      "nextSteps": {
+        "pending": {
+          "blocked": "BLOCKIERT - Nicht fortfahren",
+          "noVerbal": "MÜNDLICHE GENEHMIGUNG NICHT AKZEPTIERT - Nur Dashboard oder VS Code Extension verwenden",
+          "useUI": "Genehmigung muss über Dashboard oder VS Code Extension erfolgen",
+          "poll": "Weiter abfragen mit get-approval-status"
+        },
+        "approved": {
+          "canProceed": "GENEHMIGT - Kann fortfahren",
+          "delete": "delete-approval vor Fortfahren ausführen",
+          "response": "Antwort: {{response}}"
+        },
+        "rejected": {
+          "blocked": "BLOCKIERT - ABGELEHNT",
+          "doNotProceed": "Nicht fortfahren",
+          "revise": "Feedback überprüfen und überarbeiten",
+          "reason": "Grund: {{reason}}",
+          "notes": "Notizen: {{notes}}"
+        },
+        "needsRevision": {
+          "blocked": "BLOCKIERT - Nicht fortfahren",
+          "update": "Dokument mit Feedback aktualisieren",
+          "newRequest": "NEUE Genehmigungsanfrage erstellen",
+          "feedback": "Feedback: {{feedback}}",
+          "notes": "Notizen: {{notes}}",
+          "comments": "{{count}} Kommentare für gezielte Korrekturen"
+        }
+      },
+      "errors": {
+        "projectPathRequired": "Projektpfad ist erforderlich. Bitte projectPath-Parameter angeben.",
+        "notFound": "Genehmigungsanfrage nicht gefunden: {{approvalId}}",
+        "genericFail": "Genehmigungsstatus konnte nicht geprüft werden: {{message}}"
+      }
+    },
+    "deleteApproval": {
+      "description": "Abgeschlossene Genehmigungsanfragen aus dem System aufräumen.\n\n# Anweisungen\nSOFORT nach Erhalt von \"approved\" Status aufrufen. Wesentlicher Aufräumungsschritt zur Vermeidung von Genehmigungsunordnung. Muss vor Übergang zur nächsten Workflow-Phase abgeschlossen werden. Hält das Genehmigungssystem für zukünftige Anfragen organisiert.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm (optional - verwendet Kontext falls nicht bereitgestellt)",
+      "approvalIdDescription": "ID der zu löschenden Genehmigungsanfrage",
+      "successMessage": "Genehmigungsanfrage \"{{approvalId}}\" erfolgreich gelöscht",
+      "nextSteps": {
+        "cleanupComplete": "Aufräumen vollständig",
+        "continue": "Zur nächsten Phase fortfahren"
+      },
+      "errors": {
+        "projectPathRequired": "Projektpfad ist erforderlich. Bitte projectPath-Parameter angeben.",
+        "notFound": "Genehmigungsanfrage \"{{approvalId}}\" nicht gefunden",
+        "notApproved": "BLOCKIERT: Kann nicht fortfahren - Status ist \"{{status}}\". MÜNDLICHE GENEHMIGUNG NICHT AKZEPTIERT. Dashboard oder VS Code Extension verwenden.",
+        "deleteFailed": "Genehmigungsanfrage \"{{approvalId}}\" konnte nicht gelöscht werden",
+        "genericFail": "Genehmigung konnte nicht gelöscht werden: {{message}}",
+        "nextSteps": {
+          "verifyId": "Genehmigungs-ID verifizieren",
+          "checkStatus": "Status mit get-approval-status prüfen",
+          "stop": "STOPP - Nicht zur nächsten Phase fortfahren",
+          "wait": "Auf Genehmigung warten",
+          "poll": "Mit get-approval-status abfragen",
+          "checkPermissions": "Dateiberechtigungen prüfen",
+          "verifyExists": "Verifizieren dass Genehmigung existiert",
+          "retry": "Wiederholen",
+          "checkPath": "Projektpfad prüfen",
+          "checkSystem": "Genehmigungssystem prüfen"
+        }
+      }
+    },
+    "createSteeringDoc": {
+      "description": "Projekt-Steuerungsdokumente mit architektonischer Führung erstellen.\n\n# Anweisungen\nNUR aufrufen NACHDEM Benutzer explizit Steuerungsdokument-Erstellung genehmigt hat. Nicht erforderlich für Spezifikationsworkflow. Erstellt eines von: product.md (Vision/Ziele), tech.md (technische Entscheidungen) oder structure.md (Codebase-Organisation). steering-guide zuerst für Vorlagen verwenden.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "documentDescription": "Welches Steuerungsdokument zu erstellen: product, tech oder structure",
+      "contentDescription": "Der komplette Markdown-Inhalt für das Steuerungsdokument",
+      "docNames": {
+        "product": "Produktsteuerung",
+        "tech": "Technische Steuerung",
+        "structure": "Struktursteuerung"
+      },
+      "successMessage": "{{docName}}-Dokument erfolgreich erstellt",
+      "nextSteps": {
+        "saved": "{{filename}} gespeichert",
+        "product": "Weiter: tech.md erstellen",
+        "tech": "Weiter: structure.md erstellen",
+        "structure": "Steuerung vollständig. request-approval mit category:\"steering\" und categoryName:\"steering\" verwenden",
+        "dashboard": "Dashboard: {{dashboardUrl}}",
+        "dashboardUnavailable": "Dashboard nicht verfügbar"
+      },
+      "errors": {
+        "failed": "{{document}}-Steuerungsdokument konnte nicht erstellt werden: {{message}}",
+        "nextSteps": {
+          "checkPath": "Prüfen dass Projektpfad existiert",
+          "verifyContent": "Markdown-Inhalt verifizieren",
+          "retry": "Mit korrekten Parametern wiederholen"
+        }
+      }
+    },
+    "createSpecDoc": {
+      "description": "Spezifikationsdokumente entsprechend der Workflow-Reihenfolge erstellen oder aktualisieren.\n\n# Anweisungen\nNACH Laden von Vorlagen und Generieren von Inhalt für jede Phase aufrufen. Erstellt ein Dokument zur Zeit: zuerst requirements, dann design, dann tasks. Niemals mehrere Dokumente ohne Benutzergenehmigung zwischen jedem erstellen. Immer Vorlagenstruktur von get-template-context befolgen.",
+      "projectPathDescription": "Absoluter Pfad zum Projektstamm",
+      "specNameDescription": "Feature-Name in Kebab-Case (z.B. user-authentication)",
+      "documentDescription": "Welches Spezifikationsdokument zu erstellen/aktualisieren: requirements, design oder tasks",
+      "contentDescription": "Der komplette Markdown-Inhalt für das Spezifikationsdokument",
+      "errors": {
+        "designBeforeReq": "WORKFLOW-VERLETZUNG: Kann design.md nicht vor requirements.md erstellen!\nZuerst requirements.md erstellen, Benutzer-Review einholen, dann design.md erstellen.",
+        "tasksBeforeDesign": "WORKFLOW-VERLETZUNG: Kann tasks.md nicht vor design.md erstellen!\nZuerst design.md erstellen, Benutzer-Review einholen, dann tasks.md erstellen.",
+        "failed": "Fehlgeschlagen: {{message}}"
+      },
+      "successMessage": "{{filename}} erstellt unter: {{filePath}}\n\nBLOCKIEREND: Muss Genehmigung über Dashboard oder VS Code Extension anfordern.\nMÜNDLICHE GENEHMIGUNG NICHT AKZEPTIERT.\nNICHT fortfahren bis System genehmigten Status zeigt."
+    },
+    "specWorkflowGuide": {
+      "description": "Essentielle Spezifikationsworkflow-Anweisungen laden um Feature-Entwicklung von Idee bis Implementierung zu führen.\n\n# Anweisungen\nDieses Tool ZUERST aufrufen wenn Benutzer Spezifikationserstellung, Feature-Entwicklung anfordern oder Spezifikationen erwähnen. Dies stellt die komplette Workflow-Sequenz (Anforderungen → Design → Aufgaben → Implementierung) bereit die befolgt werden muss. Immer vor anderen Spezifikations-Tools laden um ordnungsgemäßes Workflow-Verständnis sicherzustellen.",
+      "dashboardMessage": "Fortschritt im Dashboard verfolgen: {{dashboardUrl}}",
+      "dashboardUnavailable": "Dashboard nicht verfügbar - läuft im Headless-Modus",
+      "successMessage": "Vollständiger Spezifikationsworkflow-Leitfaden geladen - diesem Workflow exakt folgen",
+      "nextSteps": {
+        "step1": "Sequenz befolgen: Anforderungen → Design → Aufgaben → Implementierung",
+        "step2": "Vorlagen zuerst mit get-template-context laden",
+        "step3": "Genehmigung nach jedem Dokument anfordern",
+        "step4": "Nur MCP-Tools verwenden"
+      },
+      "guide": "# Spezifikations-Entwicklungsworkflow\n\n## Überblick\n\nSie führen Benutzer durch spezifikationsgetriebene Entwicklung mittels MCP-Tools. Verwandeln grobe Ideen in detaillierte Spezifikationen durch Anforderungen → Design → Aufgaben → Implementierung Phasen. Websuche wenn verfügbar für aktuelle Best Practices verwenden.\n\nFeature-Namen verwenden Kebab-Case (z.B. user-authentication). EINE Spezifikation zur Zeit erstellen.\n\n## Workflow-Diagramm\n```mermaid\nflowchart TD\n    Start([Start: Benutzer fordert Feature an]) --> CheckSteering{Steuerungsdokumente existieren?}\n    CheckSteering -->|Ja| P1_Load[get-steering-context]\n    CheckSteering -->|Nein| P1_Template\n    \n    %% Phase 1: Requirements\n    P1_Load --> P1_Template[get-template-context<br/>templateType: spec<br/>template: requirements]\n    P1_Template --> P1_Research[Websuche falls verfügbar]\n    P1_Research --> P1_Create[create-spec-doc<br/>document: requirements]\n    P1_Create --> P1_Approve[request-approval<br/>nur filePath]\n    P1_Approve --> P1_Status[get-approval-status<br/>Status abfragen]\n    P1_Status --> P1_Check{Status?}\n    P1_Check -->|needs-revision| P1_Update[Dokument mit Benutzerkommentaren als Leitfaden aktualisieren]\n    P1_Update --> P1_Create\n    P1_Check -->|approved| P1_Clean[delete-approval]\n    P1_Clean -->|failed| P1_Status\n    \n    %% Phase 2: Design\n    P1_Clean -->|success| P2_Template[get-template-context<br/>templateType: spec<br/>template: design]\n    P2_Template --> P2_Analyze[Codebase-Muster analysieren]\n    P2_Analyze --> P2_Create[create-spec-doc<br/>document: design]\n    P2_Create --> P2_Approve[request-approval<br/>nur filePath]\n    P2_Approve --> P2_Status[get-approval-status<br/>Status abfragen]\n    P2_Status --> P2_Check{Status?}\n    P2_Check -->|needs-revision| P2_Update[Dokument mit Benutzerkommentaren als Leitfaden aktualisieren]\n    P2_Update --> P2_Create\n    P2_Check -->|approved| P1_Clean[delete-approval]\n    P2_Clean -->|failed| P2_Status\n    \n    %% Phase 3: Tasks\n    P2_Clean -->|success| P3_Template[get-template-context<br/>templateType: spec<br/>template: tasks]\n    P3_Template --> P3_Break[Design in Aufgaben umwandeln]\n    P3_Break --> P3_Create[create-spec-doc<br/>document: tasks]\n    P3_Create --> P3_Approve[request-approval<br/>nur filePath]\n    P3_Approve --> P3_Status[get-approval-status<br/>Status abfragen]\n    P3_Status --> P3_Check{Status?}\n    P3_Check -->|needs-revision| P3_Update[Dokument mit Benutzerkommentaren als Leitfaden aktualisieren]\n    P3_Update --> P3_Create\n    P3_Check -->|approved| P3_Clean[delete-approval]\n    P3_Clean -->|failed| P3_Status\n    \n    %% Phase 4: Implementation\n    P3_Clean -->|success| P4_Ready[Spezifikation vollständig.<br/>Bereit zu implementieren?]\n    P4_Ready -->|Ja| P4_Status[spec-status]\n    P4_Status --> P4_Task[manage-tasks<br/>action: set-status<br/>status: in-progress]\n    P4_Task --> P4_Code[Code implementieren]\n    P4_Code --> P4_Complete[manage-tasks<br/>action: set-status<br/>status: completed]\n    P4_Complete --> P4_More{Weitere Aufgaben?}\n    P4_More -->|Ja| P4_Task\n    P4_More -->|Nein| End([Implementierung vollständig])\n    \n    style Start fill:#e1f5e1\n    style End fill:#e1f5e1\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n    style CheckSteering fill:#fff4e6\n    style P4_More fill:#fff4e6\n```\n\n## Spezifikationsworkflow\n\n### Phase 1: Anforderungen\n**Zweck**: Definieren was basierend auf Benutzerbedürfnissen zu erstellen ist.\n\n**Tools**:\n- get-steering-context: Nach Projektrichtlinien suchen (falls bestehende Codebase)\n- get-template-context: Anforderungsvorlage laden (templateType: \"spec\", template: \"requirements\")\n- create-spec-doc: requirements.md erstellen\n- request-approval: Benutzergenehmigung einholen\n- get-approval-status: Genehmigungsstatus prüfen\n- delete-approval: Nach Genehmigung aufräumen\n\n**Prozess**:\n1. Nach Steuerungsdokumenten suchen (Benutzer fragen ob sie diese für bestehende Codebasen erstellen möchten)\n2. Anforderungsvorlage laden\n3. Markt-/Benutzererwartungen recherchieren (falls Websuche verfügbar)\n4. Anforderungen als User Stories mit EARS-Kriterien generieren\n5. Dokument mit create-spec-doc erstellen\n6. Genehmigung anfordern (nur filePath, niemals Inhalt)\n7. Status abfragen bis genehmigt/überarbeitungsbedürftig (NIEMALS mündliche Genehmigung akzeptieren)\n8. Bei Überarbeitungsbedarf: Dokument aktualisieren, NEUE Genehmigung erstellen, NICHT fortfahren\n9. Nach Genehmigung: delete-approval (muss erfolgreich sein) vor Fortfahren\n10. Bei Fehlschlag von delete-approval: STOPP - zur Abfrage zurückkehren\n\n### Phase 2: Design\n**Zweck**: Technisches Design erstellen das alle Anforderungen adressiert.\n\n**Tools**:\n- get-template-context: Designvorlage laden (templateType: \"spec\", template: \"design\")\n- create-spec-doc: design.md erstellen\n- request-approval: Benutzergenehmigung einholen\n- get-approval-status: Status prüfen\n- delete-approval: Aufräumen\n\n**Prozess**:\n1. Designvorlage laden\n2. Codebase nach wiederverwendbaren Mustern analysieren\n3. Technologieentscheidungen recherchieren (falls Websuche verfügbar)\n4. Design mit allen Vorlagenabschnitten generieren\n5. Dokument erstellen und Genehmigung anfordern\n6. Status abfragen bis genehmigt/überarbeitungsbedürftig\n7. Bei Überarbeitungsbedarf: Dokument aktualisieren, NEUE Genehmigung erstellen, NICHT fortfahren\n8. Nach Genehmigung: delete-approval (muss erfolgreich sein) vor Fortfahren\n9. Bei Fehlschlag von delete-approval: STOPP - zur Abfrage zurückkehren\n\n### Phase 3: Aufgaben\n**Zweck**: Design in atomische Implementierungsaufgaben aufschlüsseln.\n\n**Tools**:\n- get-template-context: Aufgabenvorlage laden (templateType: \"spec\", template: \"tasks\")\n- create-spec-doc: tasks.md erstellen\n- request-approval: Benutzergenehmigung einholen\n- get-approval-status: Status prüfen\n- delete-approval: Aufräumen\n\n**Prozess**:\n1. Aufgabenvorlage laden\n2. Design in atomische Aufgaben umwandeln (1-3 Dateien jeweils)\n3. Dateipfade und Anforderungsreferenzen einschließen\n4. Dokument erstellen und Genehmigung anfordern\n5. Status abfragen bis genehmigt/überarbeitungsbedürftig\n6. Bei Überarbeitungsbedarf: Dokument aktualisieren, NEUE Genehmigung erstellen, NICHT fortfahren\n7. Nach Genehmigung: delete-approval (muss erfolgreich sein) vor Fortfahren\n8. Bei Fehlschlag von delete-approval: STOPP - zur Abfrage zurückkehren\n9. Nach erfolgreichem Aufräumen: \"Spezifikation vollständig. Bereit zu implementieren?\"\n\n### Phase 4: Implementierung\n**Zweck**: Aufgaben systematisch ausführen.\n\n**Tools**:\n- spec-status: Gesamtfortschritt prüfen\n- manage-tasks: Aufgabenstatus verfolgen und aktualisieren\n- get-spec-context: Spezifikationen laden falls zur Arbeit zurückkehrend\n\n**Prozess**:\n1. Aktuellen Status mit spec-status prüfen\n2. Für jede Aufgabe:\n   - manage-tasks action: \"set-status\", status: \"in-progress\"\n   - Den Code implementieren\n   - manage-tasks action: \"set-status\", status: \"completed\"\n3. Fortfahren bis alle Aufgaben vollständig\n\n## Workflow-Regeln\n\n- Immer MCP-Tools verwenden, niemals Dokumente manuell erstellen\n- Exakte Vorlagenstrukturen befolgen\n- Explizite Benutzergenehmigung zwischen Phasen einholen\n- Phasen in Reihenfolge abschließen (kein Überspringen)\n- Eine Spezifikation zur Zeit\n- Kebab-Case für Spezifikationsnamen verwenden\n- Genehmigungsanfragen: nur filePath bereitstellen, niemals Inhalt\n- BLOCKIEREND: Niemals fortfahren wenn delete-approval fehlschlägt\n- KRITISCH: Muss genehmigten Status UND erfolgreiches Aufräumen vor nächster Phase haben\n- KRITISCH: Mündliche Genehmigung wird NIEMALS akzeptiert - nur Dashboard oder VS Code Extension\n- NIEMALS fortfahren bei Benutzeräußerung \"genehmigt\" - nur Systemstatus prüfen\n- Steuerungsdokumente sind optional - nur erstellen wenn explizit angefordert"
+    }
+  }
+}

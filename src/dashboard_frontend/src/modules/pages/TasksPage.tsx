@@ -6,8 +6,8 @@ import { useNotifications } from '../notifications/NotificationProvider';
 import { AlertModal } from '../modals/AlertModal';
 import { useTranslation } from 'react-i18next';
 
-function formatDate(dateStr?: string) {
-  if (!dateStr) return 'Never';
+function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
+  if (!dateStr) return t ? t('common.never') : 'Never';
   return new Date(dateStr).toLocaleDateString(undefined, { 
     month: 'short', 
     day: 'numeric', 
@@ -62,7 +62,7 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
         className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[200px] md:min-w-[240px] px-3 py-2 md:px-4 md:py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
       >
         <span className="truncate">
-          {selectedSpec ? selectedSpec.displayName : 'Select a spec...'}
+          {selectedSpec ? selectedSpec.displayName : t('tasksPage.dropdown.selectPlaceholder')}
         </span>
         <svg 
           className={`w-4 h-4 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
@@ -80,7 +80,7 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
           <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-600">
             <input
               type="text"
-              placeholder="Search specs..."
+              placeholder={t('tasksPage.search.placeholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -104,7 +104,7 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
                       <div className="font-medium truncate">{spec.displayName}</div>
                       {spec.taskProgress && (
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {spec.taskProgress.completed} / {spec.taskProgress.total} tasks completed
+                          {t('tasksPage.dropdown.completedOutOfTotal', { completed: spec.taskProgress.completed, total: spec.taskProgress.total })}
                         </div>
                       )}
                     </div>
@@ -121,8 +121,8 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
                 <svg className="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <p className="text-sm">No specs found</p>
-                <p className="text-xs mt-1">Try adjusting your search</p>
+                <p className="text-sm">{t('tasksPage.search.noSpecsFound')}</p>
+                <p className="text-xs mt-1">{t('tasksPage.search.tryAdjusting')}</p>
               </div>
             )}
           </div>
@@ -271,16 +271,19 @@ function StatusPill({
         onStatusChange?.(newStatus);
         
         // Show success notification
-        const statusLabel = newStatus === 'completed' ? 'completed' : 
-                          newStatus === 'in-progress' ? 'in progress' : 'pending';
-        showNotification(`Task ${taskId} marked as ${statusLabel}`, 'success');
+        const statusLabel = newStatus === 'completed' 
+          ? t('tasksPage.statusPill.completed') 
+          : newStatus === 'in-progress' 
+            ? t('tasksPage.statusPill.inProgress') 
+            : t('tasksPage.statusPill.pending');
+        showNotification(t('tasksPage.notifications.statusUpdated', { taskId, status: statusLabel }), 'success');
       } else {
         // Handle error - show error notification
-        showNotification(`Failed to update task ${taskId} status`, 'error');
+        showNotification(t('tasksPage.notifications.updateFailed', { taskId }), 'error');
         console.error('Failed to update task status');
       }
     } catch (error) {
-      showNotification(`Error updating task ${taskId} status`, 'error');
+      showNotification(t('tasksPage.notifications.updateError', { taskId }), 'error');
       console.error('Error updating task status:', error);
     } finally {
       setIsUpdating(false);
@@ -352,6 +355,7 @@ function StatusPill({
 }
 
 function SpecCard({ spec, onSelect, isSelected }: { spec: any; onSelect: (spec: any) => void; isSelected: boolean }) {
+  const { t } = useTranslation();
   const progress = spec.taskProgress?.total
     ? Math.round((spec.taskProgress.completed / spec.taskProgress.total) * 100)
     : 0;
@@ -384,14 +388,14 @@ function SpecCard({ spec, onSelect, isSelected }: { spec: any; onSelect: (spec: 
                 <svg className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {formatDate(spec.lastModified)}
+                {formatDate(spec.lastModified, t)}
               </span>
               {spec.taskProgress && (
                 <span className="flex items-center gap-1">
                   <svg className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                   </svg>
-                  <span className="truncate">{spec.taskProgress.completed} / {spec.taskProgress.total} tasks</span>
+                  <span className="truncate">{t('tasksPage.dropdown.completedOutOfTotalShort', { completed: spec.taskProgress.completed, total: spec.taskProgress.total })}</span>
                 </span>
               )}
             </div>
@@ -411,7 +415,7 @@ function SpecCard({ spec, onSelect, isSelected }: { spec: any; onSelect: (spec: 
               />
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {progress}% complete
+              {t('common.percentComplete', { percent: progress })}
             </p>
           </div>
         )}
@@ -638,7 +642,7 @@ function TaskList({ specName }: { specName: string }) {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span>Loading task progress…</span>
+          <span>{t('tasksPage.loading')}</span>
         </div>
       </div>
     );
@@ -651,7 +655,7 @@ function TaskList({ specName }: { specName: string }) {
           <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
-          <p className="text-lg font-medium">No task data available</p>
+          <p className="text-lg font-medium">{t('tasksPage.noTaskData')}</p>
         </div>
       </div>
     );
@@ -664,10 +668,10 @@ function TaskList({ specName }: { specName: string }) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
-              Task Progress: {specName.replace(/-/g, ' ')}
+              {t('tasksPage.header.title')}: {specName.replace(/-/g, ' ')}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Manage and track task completion
+              {t('tasksPage.header.subtitle.selected')}
             </p>
           </div>
         </div>
@@ -683,10 +687,10 @@ function TaskList({ specName }: { specName: string }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Total</div>
+            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.total')}</div>
           </div>
           <div className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1">{data.total}</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">All tasks</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.totalDesc')}</div>
         </div>
 
         {/* Completed Tasks Card */}
@@ -697,10 +701,10 @@ function TaskList({ specName }: { specName: string }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Done</div>
+            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.done')}</div>
           </div>
           <div className="text-xl sm:text-2xl font-semibold text-green-600 dark:text-green-400 mb-1">{data.completed}</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Completed</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.doneDesc')}</div>
         </div>
 
         {/* Remaining Tasks Card */}
@@ -711,10 +715,10 @@ function TaskList({ specName }: { specName: string }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Left</div>
+            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.left')}</div>
           </div>
           <div className="text-xl sm:text-2xl font-semibold text-amber-600 dark:text-amber-400 mb-1">{data.total - data.completed}</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Remaining</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.leftDesc')}</div>
         </div>
 
         {/* Progress Percentage Card */}
@@ -725,17 +729,17 @@ function TaskList({ specName }: { specName: string }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Progress</div>
+            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.progress')}</div>
           </div>
           <div className="text-xl sm:text-2xl font-semibold text-purple-600 dark:text-purple-400 mb-1">{Math.round(data.progress)}%</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Complete</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.progressDesc')}</div>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">Overall Progress</h3>
+          <h3 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">{t('tasksPage.overallProgress')}</h3>
           <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{Math.round(data.progress)}%</span>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-3">
@@ -901,7 +905,7 @@ function TaskList({ specName }: { specName: string }) {
                             ? 'text-orange-700 dark:text-orange-300'
                             : 'text-gray-900 dark:text-gray-200'
                         }`}>
-                          {task.isHeader ? 'Section' : 'Task'} {task.id}
+                          {task.isHeader ? t('tasksPage.item.section') : t('tasksPage.item.task')} {task.id}
                         </span>
                         {!task.isHeader && (
                           <button
@@ -914,7 +918,7 @@ function TaskList({ specName }: { specName: string }) {
                                 ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' 
                                 : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                             }`}
-                            title="Copy prompt for AI agent"
+                            title={t('tasksPage.copyPrompt.tooltip')}
                           >
                             {copiedTaskId === task.id ? (
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -926,16 +930,16 @@ function TaskList({ specName }: { specName: string }) {
                               </svg>
                             )}
                             <span className="hidden sm:inline">
-                              {copiedTaskId === task.id ? 'Copied!' : 'Copy Prompt'}
+                              {copiedTaskId === task.id ? t('tasksPage.copyPrompt.copied') : t('tasksPage.copyPrompt.copyPrompt')}
                             </span>
                             <span className="sm:hidden">
-                              {copiedTaskId === task.id ? 'Copied!' : 'Copy'}
+                              {copiedTaskId === task.id ? t('tasksPage.copyPrompt.copied') : t('tasksPage.copyPrompt.copy')}
                             </span>
                           </button>
                         )}
                         {task.isHeader && (
                           <span className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-200 rounded whitespace-nowrap">
-                            Task Group
+                            {t('tasksPage.item.groupBadge')}
                           </span>
                         )}
                       </div>
@@ -985,7 +989,7 @@ function TaskList({ specName }: { specName: string }) {
                           <svg className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
-                          Files:
+                          {t('tasksPage.files.label')}
                         </div>
                         <div className="flex flex-wrap gap-1 sm:gap-2">
                           {task.files.map((file: string) => (
@@ -1005,7 +1009,7 @@ function TaskList({ specName }: { specName: string }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
-                          Implementation:
+                          {t('tasksPage.implementation.label')}
                         </div>
                         <ul className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
                           {task.implementationDetails.map((detail: string, index: number) => (
@@ -1119,6 +1123,7 @@ function TaskList({ specName }: { specName: string }) {
 
 function Content() {
   const { specs, reloadAll, info } = useApi();
+  const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
   const specFromUrl = params.get('spec');
   const [selected, setSelected] = useState<string>('');
@@ -1204,13 +1209,13 @@ function Content() {
         {/* Header with Spec Selector */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Task Management</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">{t('tasksPage.header.title')}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Manage and track task completion
+              {t('tasksPage.header.subtitle.selected')}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Spec:</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('tasksPage.labels.spec')}</label>
             <SearchableSpecDropdown 
               specs={specs}
               selected={selected}
@@ -1228,14 +1233,14 @@ function Content() {
       {/* Header with Search */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Task Management</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">{t('tasksPage.header.title')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Select a specification to view and manage its tasks
+            {t('tasksPage.header.subtitle.unselected')}
           </p>
         </div>
         <input 
           className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto" 
-          placeholder="Search specs..." 
+          placeholder={t('tasksPage.search.placeholder')} 
           value={query} 
           onChange={(e) => setQuery(e.target.value)} 
         />
@@ -1259,8 +1264,8 @@ function Content() {
             <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <p className="text-lg font-medium mb-2">No specs found</p>
-            <p className="text-sm">{query ? `No specs match "${query}"` : 'No specifications available to manage tasks for.'}</p>
+            <p className="text-lg font-medium mb-2">{t('tasksPage.noSpecsFound.title')}</p>
+            <p className="text-sm">{query ? t('tasksPage.noSpecsFound.noMatch', { query }) : t('tasksPage.noSpecsFound.noSpecsAvailable')}</p>
           </div>
         </div>
       )}
@@ -1269,10 +1274,10 @@ function Content() {
       <AlertModal
         isOpen={copyFailureModal.isOpen}
         onClose={() => setCopyFailureModal({ isOpen: false, text: '' })}
-        title="Copy Failed"
-        message={`Copy failed. Please copy this text manually:\n\n${copyFailureModal.text}`}
+        title={t('tasksPage.copyFailed.title')}
+        message={`${t('tasksPage.copyFailed.message')}\n\n${copyFailureModal.text}`}
         variant="error"
-        okText="Close"
+        okText={t('common.close')}
       />
     </div>
   );

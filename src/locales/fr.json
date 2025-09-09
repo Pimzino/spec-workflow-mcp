@@ -1,0 +1,414 @@
+{
+  "tools": {
+    "steeringGuide": {
+      "description": "Charger le guide pour la création de documents de pilotage de projet.\n\n# Instructions\nAppeler UNIQUEMENT lorsque l'utilisateur demande explicitement la création de documents de pilotage ou s'interroge sur les documents d'architecture de projet. Ne fait pas partie du workflow de spécification standard. Fournit des modèles et des conseils pour la création de product.md, tech.md et structure.md.",
+      "successMessage": "Guide de workflow de pilotage chargé - suivre ce workflow exactement",
+      "dashboardMessage": "Tableau de bord : {{dashboardUrl}}",
+      "dashboardUnavailable": "Tableau de bord non disponible",
+      "nextSteps": {
+        "proceedIfRequested": "Procéder uniquement si l'utilisateur a demandé des documents de pilotage",
+        "createProduct": "Créer product.md en premier",
+        "createTechAndStructure": "Puis tech.md et structure.md",
+        "reference": "Référencer dans les spécifications futures"
+      },
+      "guide": "# Workflow de Pilotage\n\n## Vue d'ensemble\n\nCréer des documents de guidance au niveau projet lorsque explicitement demandé. Les documents de pilotage établissent la vision, l'architecture et les conventions pour les bases de code établies.\n\n## Diagramme de Workflow\n\n```mermaid\nflowchart TD\n    Start([Début: Configuration des documents de pilotage]) --> Guide[steering-guide<br/>Charger les instructions de workflow]\n    \n    %% Phase 1: Product\n    Guide --> P1_Template[get-template-context<br/>templateType: steering<br/>template: product]\n    P1_Template --> P1_Generate[Générer vision et objectifs]\n    P1_Generate --> P1_Create[create-steering-doc<br/>document: product]\n    P1_Create --> P1_Approve[request-approval<br/>filePath uniquement]\n    P1_Approve --> P1_Status[get-approval-status<br/>vérifier statut]\n    P1_Status --> P1_Check{Statut?}\n    P1_Check -->|needs-revision| P1_Update[Mettre à jour le document en utilisant les commentaires utilisateur comme guidance]\n    P1_Update --> P1_Create\n    P1_Check -->|approved| P1_Clean[delete-approval]\n    P1_Clean -->|failed| P1_Status\n    \n    %% Phase 2: Tech\n    P1_Clean -->|success| P2_Template[get-template-context<br/>templateType: steering<br/>template: tech]\n    P2_Template --> P2_Analyze[Analyser la pile technologique]\n    P2_Analyze --> P2_Create[create-steering-doc<br/>document: tech]\n    P2_Create --> P2_Approve[request-approval<br/>filePath uniquement]\n    P2_Approve --> P2_Status[get-approval-status<br/>vérifier statut]\n    P2_Status --> P2_Check{Statut?}\n    P2_Check -->|needs-revision| P2_Update[Mettre à jour le document en utilisant les commentaires utilisateur comme guidance]\n    P2_Update --> P2_Create\n    P2_Check -->|approved| P2_Clean[delete-approval]\n    P2_Clean -->|failed| P2_Status\n    \n    %% Phase 3: Structure\n    P2_Clean -->|success| P3_Template[get-template-context<br/>templateType: steering<br/>template: structure]\n    P3_Template --> P3_Analyze[Analyser la structure de la base de code]\n    P3_Analyze --> P3_Create[create-steering-doc<br/>document: structure]\n    P3_Create --> P3_Approve[request-approval<br/>filePath uniquement]\n    P3_Approve --> P3_Status[get-approval-status<br/>vérifier statut]\n    P3_Status --> P3_Check{Statut?}\n    P3_Check -->|needs-revision| P3_Update[Mettre à jour le document en utilisant les commentaires utilisateur comme guidance]\n    P3_Update --> P3_Create\n    P3_Check -->|approved| P3_Clean[delete-approval]\n    P3_Clean -->|failed| P3_Status\n    \n    P3_Clean -->|success| Complete([Documents de pilotage terminés])\n    \n    style Start fill:#e6f3ff\n    style Complete fill:#e6f3ff\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n```\n\n## Phases du Workflow de Pilotage\n\n### Phase 1 : Document Produit\n**Objectif** : Définir la vision, les objectifs et les résultats utilisateur.\n\n**Outils** :\n- steering-guide : Charger les instructions de workflow\n- get-template-context : Charger le modèle produit (templateType: \"steering\", template: \"product\")\n- create-steering-doc : Créer product.md\n- request-approval : Obtenir l'approbation utilisateur\n- get-approval-status : Vérifier le statut d'approbation\n- delete-approval : Nettoyer après approbation\n\n**Processus** :\n1. Charger le guide de pilotage pour vue d'ensemble du workflow\n2. Charger le modèle produit\n3. Générer la vision et les objectifs produit\n4. Créer le document avec create-steering-doc\n5. Demander approbation (filePath uniquement)\n6. Vérifier statut jusqu'à approved/needs-revision (JAMAIS accepter d'approbation verbale)\n7. Si needs-revision : mettre à jour le document, créer NOUVELLE approbation, NE PAS procéder\n8. Une fois approuvé : delete-approval (doit réussir) avant de procéder\n9. Si delete-approval échoue : ARRÊTER - retourner à la vérification\n\n### Phase 2 : Document Technique\n**Objectif** : Documenter les décisions technologiques et l'architecture.\n\n**Outils** :\n- get-template-context : Charger le modèle technique (templateType: \"steering\", template: \"tech\")\n- create-steering-doc : Créer tech.md\n- request-approval : Obtenir l'approbation utilisateur\n- get-approval-status : Vérifier le statut\n- delete-approval : Nettoyer\n\n**Processus** :\n1. Charger le modèle technique\n2. Analyser la pile technologique existante\n3. Documenter les décisions architecturales et les patterns\n4. Créer le document et demander approbation\n5. Vérifier statut jusqu'à approved/needs-revision\n6. Si needs-revision : mettre à jour le document, créer NOUVELLE approbation, NE PAS procéder\n7. Une fois approuvé : delete-approval (doit réussir) avant de procéder\n8. Si delete-approval échoue : ARRÊTER - retourner à la vérification\n\n### Phase 3 : Document Structure\n**Objectif** : Cartographier l'organisation et les patterns de la base de code.\n\n**Outils** :\n- get-template-context : Charger le modèle structure (templateType: \"steering\", template: \"structure\")\n- create-steering-doc : Créer structure.md\n- request-approval : Obtenir l'approbation utilisateur\n- get-approval-status : Vérifier le statut\n- delete-approval : Nettoyer\n\n**Processus** :\n1. Charger le modèle structure\n2. Analyser la structure des répertoires et l'organisation des fichiers\n3. Documenter les patterns de codage et les conventions\n4. Créer le document et demander approbation\n5. Vérifier statut jusqu'à approved/needs-revision\n6. Si needs-revision : mettre à jour le document, créer NOUVELLE approbation, NE PAS procéder\n7. Une fois approuvé : delete-approval (doit réussir) avant de procéder\n8. Si delete-approval échoue : ARRÊTER - retourner à la vérification\n9. Après nettoyage réussi : \"Documents de pilotage terminés. Prêt pour la création de spéc ?\"\n\n## Règles du Workflow\n\n- Toujours utiliser les outils MCP, ne jamais créer de documents manuellement\n- Suivre les structures de modèles exactes\n- Obtenir l'approbation explicite de l'utilisateur entre les phases\n- Compléter les phases en séquence (pas de saut)\n- Demandes d'approbation : fournir filePath uniquement, jamais le contenu\n- BLOQUANT : Ne jamais procéder si delete-approval échoue\n- CRITIQUE : Doit avoir statut approuvé ET nettoyage réussi avant la phase suivante\n- CRITIQUE : L'approbation verbale n'est JAMAIS acceptée - tableau de bord ou extension VS Code uniquement\n- NE JAMAIS procéder sur \"approuvé\" de l'utilisateur - vérifier uniquement le statut système"
+    },
+    "specStatus": {
+      "description": "Afficher une vue d'ensemble complète du progrès de la spécification.\n\n# Instructions\nAppeler lors de la reprise du travail sur une spécification ou pour vérifier le statut de completion globale. Montre quelles phases sont complètes et le progrès d'implémentation des tâches. Utile pour comprendre où vous en êtes dans le workflow avant de continuer.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "specNameDescription": "Nom de la spécification",
+      "successMessage": "Statut de la spécification '{{specName}}' : {{overallStatus}}",
+      "phases": {
+        "requirements": "Exigences",
+        "design": "Conception",
+        "tasks": "Tâches",
+        "implementation": "Implémentation"
+      },
+      "nextSteps": {
+        "requirements": {
+          "create": "Créer requirements.md",
+          "loadContext": "Charger le contexte avec get-steering-context",
+          "requestApproval": "Demander approbation"
+        },
+        "design": {
+          "create": "Créer design.md",
+          "reference": "Référencer les exigences",
+          "requestApproval": "Demander approbation"
+        },
+        "tasks": {
+          "create": "Créer tasks.md",
+          "breakdown": "Décomposer la conception",
+          "requestApproval": "Demander approbation"
+        },
+        "implementation": {
+          "nextPending": "Utiliser manage-tasks avec next-pending",
+          "implement": "Implémenter les tâches",
+          "updateStatus": "Mettre à jour le statut avec manage-tasks",
+          "begin": "Commencer l'implémentation avec manage-tasks"
+        },
+        "completed": {
+          "complete": "Spécification terminée",
+          "runTests": "Exécuter les tests"
+        }
+      },
+      "errors": {
+        "notFound": "Spécification '{{specName}}' non trouvée",
+        "genericFail": "Échec de l'obtention du statut de la spécification : {{message}}",
+        "nextSteps": {
+          "checkName": "Vérifier le nom de la spécification",
+          "useList": "Utiliser spec-list pour les spécifications disponibles",
+          "create": "Créer une spécification avec create-spec-doc",
+          "checkExists": "Vérifier si la spécification existe",
+          "verifyPath": "Vérifier le chemin du projet",
+          "useListGeneric": "Utiliser spec-list pour voir les spécifications disponibles"
+        }
+      }
+    },
+    "specList": {
+      "description": "Lister toutes les spécifications dans le projet.\n\n# Instructions\nAppeler pour voir les spécifications disponibles avant d'en sélectionner une sur laquelle travailler. Montre le statut de chaque spécification incluant la completion des phases. Utile pour choisir quelle spécification implémenter ou continuer à travailler dessus.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "successMessage_one": "{{count}} spécification trouvée",
+      "successMessage_other": "{{count}} spécifications trouvées",
+      "messages": {
+        "noSpecs": "Aucune spécification trouvée"
+      },
+      "nextSteps": {
+        "noSpecs": {
+          "create": "Créer une nouvelle spécification en utilisant spec-create",
+          "example": "Exemple : spec-create user-authentication \"Connexion et inscription utilisateur\""
+        },
+        "success": {
+          "viewStatus": "Utiliser spec-status <nom> pour voir le statut détaillé d'une spécification spécifique",
+          "continue": "Utiliser spec-execute <task-id> <nom> pour continuer l'implémentation",
+          "create": "Créer de nouvelles spécifications avec spec-create"
+        }
+      },
+      "errors": {
+        "failed": "Échec de la liste des spécifications : {{message}}",
+        "nextSteps": {
+          "checkPath": "Vérifier si le chemin du projet existe",
+          "verifyDir": "Vérifier que le répertoire .spec-workflow existe",
+          "create": "Créer une spécification en utilisant spec-create si aucune n'existe"
+        }
+      }
+    },
+    "requestApproval": {
+      "description": "Demander l'approbation de l'utilisateur via l'interface du tableau de bord.\n\n# Instructions\nAppeler IMMÉDIATEMENT après la création de chaque document. Requis avant de procéder à la phase suivante. CRITIQUE : Fournir uniquement le paramètre filePath - le tableau de bord lit les fichiers directement. Ne jamais inclure le contenu du document dans la demande. Attendre que l'utilisateur révise et approuve avant de continuer.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "titleDescription": "Titre bref décrivant ce qui nécessite une approbation",
+      "filePathDescription": "Chemin vers le fichier qui nécessite une approbation (relatif à la racine du projet). Le tableau de bord lira et affichera ce fichier.",
+      "typeDescription": "Type de demande d'approbation - \"document\" pour l'approbation de contenu, \"action\" pour l'approbation d'action",
+      "categoryDescription": "Catégorie de la demande d'approbation - \"spec\" pour les spécifications, \"steering\" pour les documents de pilotage",
+      "categoryNameDescription": "Nom de la spécification ou \"steering\" pour les documents de pilotage",
+      "successMessage": "Demande d'approbation créée avec succès. Veuillez réviser dans le tableau de bord : {{dashboardUrl}}",
+      "dashboardUnavailable": "URL du tableau de bord non disponible",
+      "nextSteps": {
+        "blocking": "BLOQUANT - Approbation via tableau de bord ou extension VS Code requise",
+        "noVerbal": "APPROBATION VERBALE NON ACCEPTÉE",
+        "noVerbalConfirm": "Ne pas procéder sur confirmation verbale",
+        "useDashboard": "Utiliser le tableau de bord : {{dashboardUrl}} ou l'extension VS Code",
+        "useVscode": "Utiliser l'extension VS Code pour l'approbation",
+        "poll": "Vérifier le statut avec : get-approval-status \"{{approvalId}}\""
+      },
+      "errors": {
+        "failed": "Échec de la création de la demande d'approbation : {{message}}"
+      }
+    },
+    "refreshTasks": {
+      "description": "Régénérer la liste des tâches basée sur les exigences et la conception actuelles.\n\n# Instructions\nAppeler quand les tâches ont besoin d'être mises à jour après des changements de conception ou pour combler les lacunes entre l'implémentation et les exigences. Analyse les requirements.md et design.md existants pour créer une liste de tâches complète mise à jour. Remplace le tasks.md existant par la version rafraîchie.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "specNameDescription": "Nom de la spécification",
+      "successMessage": "Contexte de rafraîchissement des tâches chargé pour \"{{specName}}\". Prêt pour l'agent IA à analyser et mettre à jour les tâches.",
+      "analysis": {
+        "hasTasks": "\n## Analyse des Tâches Actuelles\n**Total des Tâches** : {{total}}\n**Terminées** : {{completed}} (préserver tel quel, même si fonctionnalité supprimée)\n**En Cours** : {{inProgress}} (préserver tel quel, même si fonctionnalité supprimée)\n**En Attente** : {{pending}} (VALIDER contre requirements.md/design.md)\n\n### Tâches à Préserver (NE PAS MODIFIER) :\n{{completedList}}\n{{inProgressList}}\n\n### Tâches en Attente (DOIT VALIDER) :\n{{pendingList}}\n\n**VALIDATION REQUISE** : Pour chaque tâche en attente ci-dessus, vérifier que la fonctionnalité est mentionnée dans requirements.md ou design.md. Si PAS mentionnée, SUPPRIMER la tâche.\n",
+        "noTasks": "\n## Analyse des Tâches Actuelles\n**Aucun tasks.md n'existe** - Vous devrez créer la liste complète des tâches à partir de zéro.\n",
+        "none": "Aucune",
+        "checkPrompt": "VÉRIFIER : Cette fonctionnalité est-elle dans requirements.md ?"
+      },
+      "instructions": {
+        "main": "# Instructions de Rafraîchissement des Tâches\n\n## Contexte\nVous rafraîchissez la liste des tâches pour la spécification \"{{specName}}\" parce que les exigences ou la conception peuvent avoir changé pendant l'implémentation. Votre objectif est de vous assurer que la liste des tâches reflète précisément ce qui doit être fait pour combler l'écart entre l'implémentation actuelle et les exigences/conception mises à jour.\n\n## CRITIQUE : Source de Vérité\n- **Les exigences viennent UNIQUEMENT de requirements.md** - pas des tâches existantes\n- **Les décisions de conception viennent UNIQUEMENT de design.md** - pas des tâches existantes\n- **Les tâches sont des étapes d'implémentation** - elles implémentent les exigences, elles ne les définissent pas\n- Si une fonctionnalité existe dans les tâches mais PAS dans requirements.md/design.md, elle a été SUPPRIMÉE de la spéc\n\n## Processus de Validation en Trois Passes\n\n### PASSE 1 : Valider les Tâches Existantes Contre la Spéc Actuelle\nPour chaque tâche existante, demander : \"La fonctionnalité que cette tâche implémente est-elle toujours dans requirements.md ou design.md ?\"\n\n**Actions pour les tâches EN ATTENTE :**\n- **GARDER** : Si la fonctionnalité est encore dans les exigences/conception\n- **SUPPRIMER** : Si la fonctionnalité n'est PAS dans les exigences/conception (fonctionnalité coupée de la spéc)\n\n**Actions pour les tâches TERMINÉES/EN-COURS :**\n- **PRÉSERVER** : Toujours garder les tâches terminées [x] et en cours [-]\n- **MARQUER** : Si la fonctionnalité a été supprimée, ajouter commentaire : \"_Note : Fonctionnalité supprimée de la spéc mais tâche préservée_\"\n\n### PASSE 2 : Analyse des Lacunes\nPour chaque exigence dans requirements.md, demander : \"Y a-t-il une tâche qui implémente ceci ?\"\nPour chaque décision de conception dans design.md, demander : \"Y a-t-il des tâches alignées avec cette architecture ?\"\n\n**Actions :**\n- **AJOUTER** : Nouvelles tâches pour les éléments d'exigences/conception sans tâches\n- **METTRE À JOUR** : Tâches en attente existantes qui ont besoin d'alignement avec les exigences mises à jour\n\n### PASSE 3 : Créer la Liste des Tâches Mise à Jour (Seulement si des Changements sont Nécessaires)\n**POINT DE DÉCISION** : Après la Passe 1 et la Passe 2, vérifier :\n- Y a-t-il des tâches en attente à supprimer ?\n- Y a-t-il de nouvelles tâches à ajouter ?\n- Y a-t-il des tâches existantes à modifier ?\n\n**Si AUCUN changement nécessaire** : Rapporter \"La liste des tâches est déjà alignée avec les exigences actuelles - aucun rafraîchissement nécessaire\" et ARRÊTER.\n\n**Si des changements SONT nécessaires**, construire le nouveau tasks.md avec :\n1. Toutes les tâches terminées [x] (préservées telles quelles)\n2. Toutes les tâches en cours [-] (préservées telles quelles, avec notes de suppression si applicable)\n3. Seulement les tâches en attente [ ] qui ont un support dans les exigences/conception actuelles\n4. Nouvelles tâches pour tout élément d'exigences/conception manquant\n5. Séquençage approprié et références d'exigences\n\n## Règles Critiques\n- **JAMAIS** modifier les tâches terminées (marquées avec [x])\n- **JAMAIS** modifier les tâches en cours (marquées avec [-])\n- **SUPPRIMER** les tâches en attente pour les fonctionnalités pas dans les exigences/conception actuelles\n- **TOUJOURS** référencer des exigences spécifiques (ex., _Requirements: 1.1, 2.3_)\n- **S'ASSURER** que les tâches se construisent de manière incrémentale\n- **RENDRE** les tâches atomiques, spécifiques et actionnables\n- **PRÉSERVER** la structure originale de tasks.md - mettre à jour seulement les éléments de tâche eux-mêmes\n- **PAS** de sections additionnelles dans tasks.md (pas de Dépendances, Métriques, Notes, Changements Effectués, etc.)\n- **GARDER** tasks.md propre - tout résumé de changement va dans votre réponse de chat uniquement\n\n## Exigences de Format des Tâches\nChaque tâche doit suivre ce format :\n```\n- [ ] 1.1 Créer l'interface d'authentification utilisateur\n  - Fichier : src/auth/UserAuth.ts\n  - Implémenter les formulaires de connexion et d'inscription\n  - Ajouter la validation de formulaire et la gestion d'erreurs\n  - Objectif : Permettre la gestion de compte utilisateur\n  - _Utiliser : src/components/BaseForm.tsx, src/utils/validation.ts_\n  - _Exigences : 1.1, 1.2_\n```\n\n## Stratégie d'Implémentation\n1. **Lire** requirements.md et design.md soigneusement - ceux-ci définissent ce qui devrait exister\n2. **Valider** les tâches existantes contre la spéc actuelle (Passe 1)\n3. **Identifier** les lacunes dans la couverture des tâches (Passe 2)\n4. **Construire** la liste des tâches mise à jour avec validation appropriée (Passe 3)\n5. **Utiliser** l'outil create-spec-doc pour sauvegarder le tasks.md mis à jour\n6. **IMPORTANT** : Garder tasks.md dans le même format que l'original - seuls les éléments de tâche devraient changer\n\n## Exemple : Gestion des Fonctionnalités Supprimées\nSi des tâches existent pour \"vue kanban\" mais \"vue kanban\" n'est PAS mentionnée dans requirements.md :\n- **SUPPRIMER** toute tâche kanban en attente [ ]\n- **PRÉSERVER** toute tâche kanban terminée [x] ou en cours [-]\n- **AJOUTER NOTE** : \"_Note : Fonctionnalité Kanban supprimée de la spéc mais travail terminé préservé_\"\n\n## Étapes Suivantes\nAprès analyse des documents ci-dessous :\n1. Effectuer le processus de validation en trois passes\n2. **POINT DE DÉCISION** : Si aucun changement n'est nécessaire après validation, simplement rapporter \"Tâches déjà alignées\" et ARRÊTER\n3. **SEULEMENT si des changements sont nécessaires** : Utiliser l'outil create-spec-doc avec :\n   - projectPath : \"{{projectPath}}\"\n   - specName : \"{{specName}}\"\n   - document : \"tasks\"\n   - content : [votre liste de tâches validée et mise à jour - MÊME FORMAT que l'original]\n4. S'assurer que SEULEMENT les exigences actuelles ont des tâches\n5. Vérifier que les dépendances et l'ordre des tâches ont du sens\n6. **SE RAPPELER** : Tasks.md devrait contenir SEULEMENT la liste des tâches mise à jour - pas de sections supplémentaires"
+      },
+      "fullContext": "{{instructions}}\n\n{{taskAnalysis}}\n\n---\n\n## Document d'Exigences\n{{requirementsContent}}\n\n---\n\n## Document de Conception\n{{designContent}}\n\n---\n\n## Document de Tâches Actuel\n{{tasksContent}}\n\n---\n\n## Résumé\nVous avez maintenant tout le contexte nécessaire pour rafraîchir la liste des tâches. Utilisez l'outil create-spec-doc pour créer un tasks.md mis à jour qui :\n- Préserve toutes les tâches terminées ([x]) et en cours ([-]) (même si la fonctionnalité a été supprimée)\n- SUPPRIME les tâches en attente ([ ]) pour les fonctionnalités PAS dans les requirements.md/design.md actuels\n- Ajoute de nouvelles tâches pour les éléments d'exigences/conception manquant des tâches\n- Assure un séquençage approprié des tâches et des références d'exigences\n- Inclut seulement les tâches qui implémentent des fonctionnalités actuellement spécifiées dans requirements.md/design.md\n\n**SE RAPPELER** : Si une fonctionnalité existe dans les tâches mais PAS dans requirements.md/design.md, elle a été COUPÉE de la spéc et les tâches en attente devraient être SUPPRIMÉES.",
+      "messages": {
+        "noRequirements": "Aucun requirements.md trouvé",
+        "noDesign": "Aucun design.md trouvé",
+        "noTasks": "Aucun tasks.md n'existe - créer à partir de zéro"
+      },
+      "nextSteps": {
+        "pass1": "PASSE 1 : Valider chaque tâche existante contre requirements.md/design.md",
+        "pass2": "PASSE 2 : Identifier les lacunes - trouver les éléments d'exigences/conception sans tâches",
+        "decision": "DÉCISION : Si aucun changement n'est nécessaire, rapporter \"Tâches déjà alignées\" et arrêter",
+        "pass3": "PASSE 3 : Seulement si des changements sont nécessaires, créer tasks.md mis à jour en utilisant l'outil create-spec-doc"
+      },
+      "errors": {
+        "noContext": "Aucun requirements.md ou design.md trouvé. Impossible de rafraîchir les tâches sans contexte de spécification.",
+        "genericFail": "Échec du chargement du contexte de rafraîchissement : {{message}}",
+        "nextSteps": {
+          "createReq": "Créer requirements.md d'abord en utilisant l'outil create-spec-doc",
+          "createDesign": "Créer design.md après approbation des exigences",
+          "thenRefresh": "Puis utiliser refresh-tasks pour créer une liste de tâches alignée",
+          "checkDir": "Vérifier si le répertoire de spécification existe",
+          "checkPerms": "Vérifier les permissions de fichier",
+          "checkName": "S'assurer que le nom de spécification est correct"
+        }
+      }
+    },
+    "getTemplateContext": {
+      "description": "Charger un modèle de document spécifique pour les documents de spécification ou de pilotage.\n\n# Instructions\nAppeler avec le modèle exact nécessaire pour votre phase actuelle. Pour le workflow de spécification, demander les modèles requirements, design ou tasks. Pour les documents de pilotage, demander les modèles product, tech ou structure. Chaque modèle fournit le format exact attendu par les outils create-spec-doc ou create-steering-doc.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "templateTypeDescription": "Type de modèle : spec pour les modèles de workflow, steering pour les documents de projet",
+      "templateDescription": "Modèle spécifique à charger",
+      "docTitles": {
+        "requirements": "Modèle d'Exigences",
+        "design": "Modèle de Conception",
+        "tasks": "Modèle de Tâches",
+        "product": "Modèle Produit",
+        "tech": "Modèle Technique",
+        "structure": "Modèle Structure"
+      },
+      "successMessage": "Modèle {{template}} chargé pour {{templateType}}",
+      "messages": {
+        "fullContext": "## {{title}}\n\n{{content}}\n\n**Note** : Modèle chargé. Utiliser cette structure lors de la création de votre document {{template}}."
+      },
+      "nextSteps": {
+        "success": {
+          "useTemplate": "Utiliser le modèle pour le document {{template}}",
+          "followStructure": "Suivre la structure du modèle exactement",
+          "nextSpec": "Suivant : create-spec-doc avec document: \"{{template}}\"",
+          "nextSteering": "Suivant : create-steering-doc avec document: \"{{template}}\""
+        }
+      },
+      "errors": {
+        "invalidType": "Type de modèle invalide : {{templateType}}",
+        "validTypes": "Utiliser : spec ou steering",
+        "invalidTemplateForType": "Modèle invalide \"{{template}}\" pour le type \"{{templateType}}\"",
+        "validTemplates": "Modèles valides : {{validTemplates}}",
+        "validSpecTemplates": "Utiliser : requirements, design ou tasks",
+        "validSteeringTemplates": "Utiliser : product, tech ou structure",
+        "templateEmpty": "Le fichier de modèle existe mais est vide : {{file}}",
+        "fileNotFound": "Fichier de modèle non trouvé : {{file}}",
+        "genericFail": "Échec du chargement du contexte de modèle : {{message}}",
+        "nextSteps": {
+          "checkContent": "Vérifier le contenu du fichier de modèle",
+          "verifyIntegrity": "Vérifier l'intégrité du fichier",
+          "checkDirectory": "Vérifier le répertoire des modèles",
+          "verifyExists": "Vérifier que le fichier de modèle existe",
+          "location": "Emplacement : {{location}}",
+          "checkPermissions": "Vérifier les permissions de fichier",
+          "checkFiles": "Vérifier les fichiers de modèle"
+        }
+      }
+    },
+    "getSteeringContext": {
+      "description": "Charger les documents de pilotage de projet pour le contexte architectural et produit.\n\n# Instructions\nAppeler pendant la configuration initiale de spécification pour vérifier les directives de projet existantes (product.md, tech.md, structure.md). Optionnel pour les nouveaux projets mais recommandé pour les bases de code établies. Si aucun document de pilotage n'existe, demander à l'utilisateur s'il veut les créer d'abord ou procéder avec la spéc.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "docTitles": {
+        "product": "Contexte Produit",
+        "tech": "Contexte Technologique",
+        "structure": "Contexte Structure"
+      },
+      "successMessage": "Contexte de pilotage chargé avec succès",
+      "messages": {
+        "notFound": "Aucun document de pilotage trouvé",
+        "notFoundContext": "## Contexte des Documents de Pilotage\n\nAucun document de pilotage trouvé. Procéder en utilisant les meilleures pratiques pour la pile technologique détectée.",
+        "emptyDocs": "Les documents de pilotage existent mais sont vides",
+        "emptyContext": "## Contexte des Documents de Pilotage\n\nDocuments de pilotage trouvés mais tous sont vides.",
+        "fullContext": "## Contexte des Documents de Pilotage (Pré-chargé)\n\n{{sections}}\n\n**Note** : Les documents de pilotage ont été pré-chargés. Ne pas utiliser get-content pour les récupérer à nouveau."
+      },
+      "nextSteps": {
+        "notFound": {
+          "useBestPractices": "Utiliser les meilleures pratiques et conventions pour la pile technologique détectée",
+          "askToCreate": "Pour les bases de code établies : Demander à l'utilisateur s'il veut créer des documents de pilotage pour des conseils spécifiques au projet",
+          "newProjectNote": "Pour les nouveaux projets : Le contexte de pilotage n'est généralement pas nécessaire - procéder avec les meilleures pratiques technologiques"
+        },
+        "empty": {
+          "useBestPractices": "Utiliser les meilleures pratiques et conventions pour la pile technologique",
+          "askToPopulate": "Pour les bases de code établies : Demander à l'utilisateur s'il veut peupler les documents de pilotage avec un contexte spécifique au projet",
+          "newProjectNote": "Pour les nouveaux projets : Des documents de pilotage vides sont acceptables - procéder avec les pratiques standard"
+        },
+        "success": {
+          "doNotCallAgain": "Contexte de pilotage chargé - ne pas appeler get-steering-context à nouveau",
+          "reference": "Référencer ces standards dans les exigences, conception et tâches",
+          "align": "S'assurer que toutes les décisions s'alignent avec la vision de projet documentée"
+        }
+      },
+      "errors": {
+        "genericFail": "Échec du chargement du contexte de pilotage : {{message}}",
+        "nextSteps": {
+          "checkPath": "Vérifier si le chemin du projet existe",
+          "checkPermissions": "Vérifier les permissions de fichier",
+          "runSetup": "Exécuter spec-steering-setup si les documents de pilotage sont manquants"
+        }
+      }
+    },
+    "getSpecContext": {
+      "description": "Charger les documents de spécification existants pour reprendre le travail.\n\n# Instructions\nAppeler UNIQUEMENT lors du retour au travail sur des spécifications existantes après une pause ou en commençant à nouveau sur une spécification que vous n'avez pas créée. Ne jamais utiliser pendant la création active de spécification si vous venez de créer les documents. Charge requirements.md, design.md et tasks.md pour le contexte d'implémentation.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "specNameDescription": "Nom de la spécification pour laquelle charger le contexte",
+      "docTitles": {
+        "requirements": "Exigences",
+        "design": "Conception",
+        "tasks": "Tâches"
+      },
+      "successMessage": "Contexte de spécification chargé avec succès pour : {{specName}}",
+      "messages": {
+        "emptyDocs": "Les documents de spécification pour \"{{specName}}\" existent mais sont vides",
+        "emptyContext": "## Contexte de Spécification\n\nAucun document de spécification trouvé pour : {{specName}}",
+        "fullContext": "## Contexte de Spécification (Pré-chargé) : {{specName}}\n\n{{sections}}\n\n**Note** : Les documents de spécification ont été pré-chargés. Ne pas utiliser get-content pour les récupérer à nouveau."
+      },
+      "nextSteps": {
+        "empty": {
+          "addContent": "Ajouter du contenu à .spec-workflow/specs/{{specName}}/",
+          "createMissing": "Créer les documents manquants",
+          "ensureContent": "S'assurer que les trois documents ont du contenu"
+        },
+        "success": {
+          "proceed": "Contexte chargé - procéder avec l'implémentation",
+          "reference": "Référencer les exigences et la conception pour chaque tâche",
+          "updateStatus": "Mettre à jour le statut des tâches avec manage-tasks"
+        }
+      },
+      "errors": {
+        "notFound": "Aucune spécification trouvée pour : {{specName}}",
+        "availableSpecs": "Spécifications disponibles : {{specs}}",
+        "genericFail": "Échec du chargement du contexte de spécification : {{message}}",
+        "nextSteps": {
+          "useExisting": "Utiliser un nom de spécification existant",
+          "createNew": "Ou créer nouveau avec create-spec-doc",
+          "create": "Créer une spécification avec create-spec-doc",
+          "checkSpelling": "Vérifier l'orthographe du nom de spécification",
+          "verifySetup": "Vérifier la configuration du projet",
+          "checkPath": "Vérifier le chemin du projet",
+          "verifyName": "Vérifier le nom de spécification",
+          "checkPermissions": "Vérifier les permissions de fichier",
+          "createIfMissing": "Créer la spécification si manquante"
+        }
+      }
+    },
+    "getApprovalStatus": {
+      "description": "Vérifier le statut actuel d'une demande d'approbation.\n\n# Instructions\nAppeler après request-approval pour vérifier la décision de l'utilisateur. Continuer à vérifier jusqu'à ce que le statut soit \"approved\" ou \"needs-revision\". Si needs-revision, réviser le feedback, mettre à jour le document avec create-spec-doc, puis créer une NOUVELLE demande d'approbation. Procéder à la phase suivante seulement après le statut \"approved\".",
+      "projectPathDescription": "Chemin absolu vers la racine du projet (optionnel - utilisera le contexte si non fourni)",
+      "approvalIdDescription": "L'ID de la demande d'approbation à vérifier",
+      "messages": {
+        "pending": "BLOQUÉ : Le statut est {{status}}. L'approbation verbale n'est PAS acceptée. Utiliser le tableau de bord ou l'extension VS Code uniquement.",
+        "other": "Statut d'approbation : {{status}}"
+      },
+      "nextSteps": {
+        "pending": {
+          "blocked": "BLOQUÉ - Ne pas procéder",
+          "noVerbal": "APPROBATION VERBALE NON ACCEPTÉE - Utiliser le tableau de bord ou l'extension VS Code uniquement",
+          "useUI": "L'approbation doit être faite via le tableau de bord ou l'extension VS Code",
+          "poll": "Continuer à vérifier avec get-approval-status"
+        },
+        "approved": {
+          "canProceed": "APPROUVÉ - Peut procéder",
+          "delete": "Exécuter delete-approval avant de continuer",
+          "response": "Réponse : {{response}}"
+        },
+        "rejected": {
+          "blocked": "BLOQUÉ - REJETÉ",
+          "doNotProceed": "Ne pas procéder",
+          "revise": "Réviser le feedback et réviser",
+          "reason": "Raison : {{reason}}",
+          "notes": "Notes : {{notes}}"
+        },
+        "needsRevision": {
+          "blocked": "BLOQUÉ - Ne pas procéder",
+          "update": "Mettre à jour le document avec le feedback",
+          "newRequest": "Créer une NOUVELLE demande d'approbation",
+          "feedback": "Feedback : {{feedback}}",
+          "notes": "Notes : {{notes}}",
+          "comments": "{{count}} commentaires pour corrections ciblées"
+        }
+      },
+      "errors": {
+        "projectPathRequired": "Le chemin du projet est requis. Veuillez fournir le paramètre projectPath.",
+        "notFound": "Demande d'approbation non trouvée : {{approvalId}}",
+        "genericFail": "Échec de la vérification du statut d'approbation : {{message}}"
+      }
+    },
+    "deleteApproval": {
+      "description": "Nettoyer les demandes d'approbation terminées du système.\n\n# Instructions\nAppeler IMMÉDIATEMENT après avoir reçu le statut \"approved\". Étape de nettoyage essentielle pour prévenir l'encombrement d'approbations. Doit être complétée avant de passer à la phase suivante du workflow. Garde le système d'approbation organisé pour les demandes futures.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet (optionnel - utilisera le contexte si non fourni)",
+      "approvalIdDescription": "ID de la demande d'approbation à supprimer",
+      "successMessage": "Demande d'approbation \"{{approvalId}}\" supprimée avec succès",
+      "nextSteps": {
+        "cleanupComplete": "Nettoyage terminé",
+        "continue": "Continuer à la phase suivante"
+      },
+      "errors": {
+        "projectPathRequired": "Le chemin du projet est requis. Veuillez fournir le paramètre projectPath.",
+        "notFound": "Demande d'approbation \"{{approvalId}}\" non trouvée",
+        "notApproved": "BLOQUÉ : Impossible de procéder - le statut est \"{{status}}\". APPROBATION VERBALE NON ACCEPTÉE. Utiliser le tableau de bord ou l'extension VS Code.",
+        "deleteFailed": "Échec de la suppression de la demande d'approbation \"{{approvalId}}\"",
+        "genericFail": "Échec de la suppression de l'approbation : {{message}}",
+        "nextSteps": {
+          "verifyId": "Vérifier l'ID d'approbation",
+          "checkStatus": "Vérifier le statut avec get-approval-status",
+          "stop": "ARRÊTER - Ne pas procéder à la phase suivante",
+          "wait": "Attendre l'approbation",
+          "poll": "Vérifier avec get-approval-status",
+          "checkPermissions": "Vérifier les permissions de fichier",
+          "verifyExists": "Vérifier que l'approbation existe",
+          "retry": "Réessayer",
+          "checkPath": "Vérifier le chemin du projet",
+          "checkSystem": "Vérifier le système d'approbation"
+        }
+      }
+    },
+    "createSteeringDoc": {
+      "description": "Créer des documents de pilotage de projet avec des conseils architecturaux.\n\n# Instructions\nAppeler UNIQUEMENT après que l'utilisateur ait explicitement approuvé la création de documents de pilotage. Non requis pour le workflow de spécification. Crée un de : product.md (vision/objectifs), tech.md (décisions techniques) ou structure.md (organisation de la base de code). Utiliser steering-guide d'abord pour les modèles.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "documentDescription": "Quel document de pilotage créer : product, tech ou structure",
+      "contentDescription": "Le contenu markdown complet pour le document de pilotage",
+      "docNames": {
+        "product": "Pilotage Produit",
+        "tech": "Pilotage Technique",
+        "structure": "Pilotage Structure"
+      },
+      "successMessage": "Document {{docName}} créé avec succès",
+      "nextSteps": {
+        "saved": "Sauvegardé {{filename}}",
+        "product": "Suivant : Créer tech.md",
+        "tech": "Suivant : Créer structure.md",
+        "structure": "Pilotage terminé. Utiliser request-approval avec category:\"steering\" et categoryName:\"steering\"",
+        "dashboard": "Tableau de bord : {{dashboardUrl}}",
+        "dashboardUnavailable": "Tableau de bord non disponible"
+      },
+      "errors": {
+        "failed": "Échec de la création du document de pilotage {{document}} : {{message}}",
+        "nextSteps": {
+          "checkPath": "Vérifier que le chemin du projet existe",
+          "verifyContent": "Vérifier le contenu markdown",
+          "retry": "Réessayer avec les paramètres corrects"
+        }
+      }
+    },
+    "createSpecDoc": {
+      "description": "Créer ou mettre à jour les documents de spécification en suivant la séquence de workflow.\n\n# Instructions\nAppeler APRÈS avoir chargé les modèles et généré le contenu pour chaque phase. Crée un document à la fois : d'abord requirements, puis design, puis tasks. Ne jamais créer plusieurs documents sans approbation utilisateur entre chacun. Toujours suivre la structure de modèle de get-template-context.",
+      "projectPathDescription": "Chemin absolu vers la racine du projet",
+      "specNameDescription": "Nom de la fonctionnalité en kebab-case (ex., user-authentication)",
+      "documentDescription": "Quel document de spécification créer/mettre à jour : requirements, design ou tasks",
+      "contentDescription": "Le contenu markdown complet pour le document de spécification",
+      "errors": {
+        "designBeforeReq": "VIOLATION DE WORKFLOW : Impossible de créer design.md avant que requirements.md existe !\nCréer requirements.md d'abord, obtenir la révision utilisateur, puis créer design.md.",
+        "tasksBeforeDesign": "VIOLATION DE WORKFLOW : Impossible de créer tasks.md avant que design.md existe !\nCréer design.md d'abord, obtenir la révision utilisateur, puis créer tasks.md.",
+        "failed": "Échec : {{message}}"
+      },
+      "successMessage": "Créé {{filename}} à : {{filePath}}\n\nBLOQUANT : Doit demander approbation via tableau de bord ou extension VS Code.\nAPPROBATION VERBALE NON ACCEPTÉE.\nNE PAS procéder jusqu'à ce que le système montre le statut approuvé."
+    },
+    "specWorkflowGuide": {
+      "description": "Charger les instructions essentielles de workflow de spécification pour guider le développement de fonctionnalités de l'idée à l'implémentation.\n\n# Instructions\nAppeler cet outil EN PREMIER lorsque les utilisateurs demandent la création de spécifications, le développement de fonctionnalités ou mentionnent des spécifications. Ceci fournit la séquence complète de workflow (Exigences → Conception → Tâches → Implémentation) qui doit être suivie. Toujours charger avant tout autre outil de spécification pour assurer une compréhension appropriée du workflow.",
+      "dashboardMessage": "Surveiller le progrès sur le tableau de bord : {{dashboardUrl}}",
+      "dashboardUnavailable": "Tableau de bord non disponible - fonctionnant en mode sans tête",
+      "successMessage": "Guide complet de workflow de spécification chargé - suivre ce workflow exactement",
+      "nextSteps": {
+        "step1": "Suivre la séquence : Exigences → Conception → Tâches → Implémentation",
+        "step2": "Charger les modèles avec get-template-context d'abord",
+        "step3": "Demander approbation après chaque document",
+        "step4": "Utiliser les outils MCP uniquement"
+      },
+      "guide": "# Workflow de Développement de Spécifications\n\n## Vue d'ensemble\n\nVous guidez les utilisateurs à travers le développement piloté par spécifications en utilisant les outils MCP. Transformez des idées approximatives en spécifications détaillées à travers les phases Exigences → Conception → Tâches → Implémentation. Utilisez la recherche web lorsque disponible pour les meilleures pratiques actuelles.\n\nLes noms de fonctionnalités utilisent kebab-case (ex., user-authentication). Créer UNE spécification à la fois.\n\n## Diagramme de Workflow\n```mermaid\nflowchart TD\n    Start([Début: L'utilisateur demande une fonctionnalité]) --> CheckSteering{Documents de pilotage existent?}\n    CheckSteering -->|Oui| P1_Load[get-steering-context]\n    CheckSteering -->|Non| P1_Template\n    \n    %% Phase 1: Requirements\n    P1_Load --> P1_Template[get-template-context<br/>templateType: spec<br/>template: requirements]\n    P1_Template --> P1_Research[Recherche web si disponible]\n    P1_Research --> P1_Create[create-spec-doc<br/>document: requirements]\n    P1_Create --> P1_Approve[request-approval<br/>filePath uniquement]\n    P1_Approve --> P1_Status[get-approval-status<br/>vérifier statut]\n    P1_Status --> P1_Check{Statut?}\n    P1_Check -->|needs-revision| P1_Update[Mettre à jour le document en utilisant les commentaires utilisateur comme guidance]\n    P1_Update --> P1_Create\n    P1_Check -->|approved| P1_Clean[delete-approval]\n    P1_Clean -->|failed| P1_Status\n    \n    %% Phase 2: Design\n    P1_Clean -->|success| P2_Template[get-template-context<br/>templateType: spec<br/>template: design]\n    P2_Template --> P2_Analyze[Analyser les patterns de base de code]\n    P2_Analyze --> P2_Create[create-spec-doc<br/>document: design]\n    P2_Create --> P2_Approve[request-approval<br/>filePath uniquement]\n    P2_Approve --> P2_Status[get-approval-status<br/>vérifier statut]\n    P2_Status --> P2_Check{Statut?}\n    P2_Check -->|needs-revision| P2_Update[Mettre à jour le document en utilisant les commentaires utilisateur comme guidance]\n    P2_Update --> P2_Create\n    P2_Check -->|approved| P1_Clean[delete-approval]\n    P2_Clean -->|failed| P2_Status\n    \n    %% Phase 3: Tasks\n    P2_Clean -->|success| P3_Template[get-template-context<br/>templateType: spec<br/>template: tasks]\n    P3_Template --> P3_Break[Convertir la conception en tâches]\n    P3_Break --> P3_Create[create-spec-doc<br/>document: tasks]\n    P3_Create --> P3_Approve[request-approval<br/>filePath uniquement]\n    P3_Approve --> P3_Status[get-approval-status<br/>vérifier statut]\n    P3_Status --> P3_Check{Statut?}\n    P3_Check -->|needs-revision| P3_Update[Mettre à jour le document en utilisant les commentaires utilisateur comme guidance]\n    P3_Update --> P3_Create\n    P3_Check -->|approved| P3_Clean[delete-approval]\n    P3_Clean -->|failed| P3_Status\n    \n    %% Phase 4: Implementation\n    P3_Clean -->|success| P4_Ready[Spéc terminée.<br/>Prêt à implémenter?]\n    P4_Ready -->|Oui| P4_Status[spec-status]\n    P4_Status --> P4_Task[manage-tasks<br/>action: set-status<br/>status: in-progress]\n    P4_Task --> P4_Code[Implémenter le code]\n    P4_Code --> P4_Complete[manage-tasks<br/>action: set-status<br/>status: completed]\n    P4_Complete --> P4_More{Plus de tâches?}\n    P4_More -->|Oui| P4_Task\n    P4_More -->|Non| End([Implémentation Terminée])\n    \n    style Start fill:#e1f5e1\n    style End fill:#e1f5e1\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n    style CheckSteering fill:#fff4e6\n    style P4_More fill:#fff4e6\n```\n\n## Workflow de Spécification\n\n### Phase 1 : Exigences\n**Objectif** : Définir ce qu'il faut construire basé sur les besoins utilisateur.\n\n**Outils** :\n- get-steering-context : Vérifier les directives de projet (si base de code établie)\n- get-template-context : Charger le modèle d'exigences (templateType: \"spec\", template: \"requirements\")\n- create-spec-doc : Créer requirements.md\n- request-approval : Obtenir l'approbation utilisateur\n- get-approval-status : Vérifier le statut d'approbation\n- delete-approval : Nettoyer après approbation\n\n**Processus** :\n1. Vérifier les documents de pilotage (demander à l'utilisateur s'il veut les créer pour les bases de code établies)\n2. Charger le modèle d'exigences\n3. Rechercher les attentes marché/utilisateur (si recherche web disponible)\n4. Générer les exigences comme user stories avec critères EARS\n5. Créer le document avec create-spec-doc\n6. Demander approbation (filePath uniquement, jamais le contenu)\n7. Vérifier le statut jusqu'à approved/needs-revision (JAMAIS accepter d'approbation verbale)\n8. Si needs-revision : mettre à jour le document, créer NOUVELLE approbation, NE PAS procéder\n9. Une fois approuvé : delete-approval (doit réussir) avant de procéder\n10. Si delete-approval échoue : ARRÊTER - retourner à la vérification\n\n### Phase 2 : Conception\n**Objectif** : Créer une conception technique adressant toutes les exigences.\n\n**Outils** :\n- get-template-context : Charger le modèle de conception (templateType: \"spec\", template: \"design\")\n- create-spec-doc : Créer design.md\n- request-approval : Obtenir l'approbation utilisateur\n- get-approval-status : Vérifier le statut\n- delete-approval : Nettoyer\n\n**Processus** :\n1. Charger le modèle de conception\n2. Analyser la base de code pour les patterns à réutiliser\n3. Rechercher les choix technologiques (si recherche web disponible)\n4. Générer la conception avec toutes les sections de modèle\n5. Créer le document et demander approbation\n6. Vérifier le statut jusqu'à approved/needs-revision\n7. Si needs-revision : mettre à jour le document, créer NOUVELLE approbation, NE PAS procéder\n8. Une fois approuvé : delete-approval (doit réussir) avant de procéder\n9. Si delete-approval échoue : ARRÊTER - retourner à la vérification\n\n### Phase 3 : Tâches\n**Objectif** : Décomposer la conception en tâches d'implémentation atomiques.\n\n**Outils** :\n- get-template-context : Charger le modèle de tâches (templateType: \"spec\", template: \"tasks\")\n- create-spec-doc : Créer tasks.md\n- request-approval : Obtenir l'approbation utilisateur\n- get-approval-status : Vérifier le statut\n- delete-approval : Nettoyer\n\n**Processus** :\n1. Charger le modèle de tâches\n2. Convertir la conception en tâches atomiques (1-3 fichiers chacune)\n3. Inclure les chemins de fichiers et références d'exigences\n4. Créer le document et demander approbation\n5. Vérifier le statut jusqu'à approved/needs-revision\n6. Si needs-revision : mettre à jour le document, créer NOUVELLE approbation, NE PAS procéder\n7. Une fois approuvé : delete-approval (doit réussir) avant de procéder\n8. Si delete-approval échoue : ARRÊTER - retourner à la vérification\n9. Après nettoyage réussi : \"Spéc terminée. Prêt à implémenter ?\"\n\n### Phase 4 : Implémentation\n**Objectif** : Exécuter les tâches systématiquement.\n\n**Outils** :\n- spec-status : Vérifier le progrès global\n- manage-tasks : Suivre et mettre à jour le statut des tâches\n- get-spec-context : Charger les spécs si retour au travail\n\n**Processus** :\n1. Vérifier le statut actuel avec spec-status\n2. Pour chaque tâche :\n   - manage-tasks action: \"set-status\", status: \"in-progress\"\n   - Implémenter le code\n   - manage-tasks action: \"set-status\", status: \"completed\"\n3. Continuer jusqu'à ce que toutes les tâches soient terminées\n\n## Règles du Workflow\n\n- Toujours utiliser les outils MCP, ne jamais créer de documents manuellement\n- Suivre les structures de modèles exactes\n- Obtenir l'approbation explicite de l'utilisateur entre les phases\n- Compléter les phases en séquence (pas de saut)\n- Une spécification à la fois\n- Utiliser kebab-case pour les noms de spécifications\n- Demandes d'approbation : fournir filePath uniquement, jamais le contenu\n- BLOQUANT : Ne jamais procéder si delete-approval échoue\n- CRITIQUE : Doit avoir statut approuvé ET nettoyage réussi avant la phase suivante\n- CRITIQUE : L'approbation verbale n'est JAMAIS acceptée - tableau de bord ou extension VS Code uniquement\n- NE JAMAIS procéder sur \"approuvé\" de l'utilisateur - vérifier uniquement le statut système\n- Les documents de pilotage sont optionnels - créer seulement quand explicitement demandé"
+    }
+  }
+}

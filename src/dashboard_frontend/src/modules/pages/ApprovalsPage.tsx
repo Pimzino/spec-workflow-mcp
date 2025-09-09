@@ -5,9 +5,10 @@ import { ApprovalsAnnotator, ApprovalComment } from '../approvals/ApprovalsAnnot
 import { NotificationProvider } from '../notifications/NotificationProvider';
 import { TextInputModal } from '../modals/TextInputModal';
 import { AlertModal } from '../modals/AlertModal';
+import { useTranslation } from 'react-i18next';
 
-function formatDate(dateStr?: string) {
-  if (!dateStr) return 'Unknown';
+function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
+  if (!dateStr) return t ? t('common.unknown') : 'Unknown';
   return new Date(dateStr).toLocaleDateString(undefined, { 
     month: 'short', 
     day: 'numeric', 
@@ -23,6 +24,7 @@ function getApprovalPreview(approval: any) {
 
 function ApprovalItem({ a }: { a: any }) {
   const { approvalsAction, getApprovalContent } = useApi();
+  const { t } = useTranslation();
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
@@ -70,7 +72,7 @@ function ApprovalItem({ a }: { a: any }) {
     }
     setActionLoading('approve');
     try {
-      await approvalsAction(a.id, 'approve', { response: 'Approved via dashboard' });
+      await approvalsAction(a.id, 'approve', { response: t('approvalsPage.messages.approvedViaDashboard') });
       setOpen(false);
     } catch (error) {
       console.error('Failed to approve:', error);
@@ -186,14 +188,14 @@ function ApprovalItem({ a }: { a: any }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   )}
                 </svg>
-                {a.status === 'needs-revision' ? 'needs revision' : a.status}
+                {a.status === 'needs-revision' ? t('approvals.status.needsRevision') : t(`approvals.status.${a.status}`)}
               </span>
 
               <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-6 0h6M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2" />
                 </svg>
-                {formatDate(a.createdAt)}
+                {formatDate(a.createdAt, t)}
               </span>
 
               {a.type && (
@@ -216,11 +218,11 @@ function ApprovalItem({ a }: { a: any }) {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span className="text-xs sm:text-sm">Loading content...</span>
+                      <span className="text-xs sm:text-sm">{t('common.loadingContent')}</span>
                     </div>
                   ) : (
                     <div className="text-xs leading-relaxed break-words overflow-hidden">
-                      {content ? (content.length > 250 ? content.slice(0, 250) + '...' : content) : 'No content available'}
+                      {content ? (content.length > 250 ? content.slice(0, 250) + '...' : content) : t('common.noContentAvailable')}
                     </div>
                   )}
                 </div>
@@ -240,8 +242,8 @@ function ApprovalItem({ a }: { a: any }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   )}
                 </svg>
-                <span className="hidden sm:inline">{open ? 'Close Review' : 'Review & Annotate'}</span>
-                <span className="sm:hidden">{open ? 'Close' : 'Review'}</span>
+                <span className="hidden sm:inline">{open ? t('approvalsPage.actions.closeReview') : t('approvalsPage.actions.openReview')}</span>
+                <span className="sm:hidden">{open ? t('common.close') : t('approvalsPage.actions.reviewShort')}</span>
               </button>
 
               <button
@@ -259,8 +261,8 @@ function ApprovalItem({ a }: { a: any }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
-                <span className="hidden sm:inline">Quick Approve</span>
-                <span className="sm:hidden">Approve</span>
+                <span className="hidden sm:inline">{t('approvalsPage.actions.quickApprove')}</span>
+                <span className="sm:hidden">{t('approvalsPage.actions.approve')}</span>
               </button>
 
               <button
@@ -278,8 +280,8 @@ function ApprovalItem({ a }: { a: any }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 )}
-                <span className="hidden sm:inline">Quick Reject</span>
-                <span className="sm:hidden">Reject</span>
+                <span className="hidden sm:inline">{t('approvalsPage.actions.quickReject')}</span>
+                <span className="sm:hidden">{t('approvalsPage.actions.reject')}</span>
               </button>
 
               {open && (
@@ -298,8 +300,8 @@ function ApprovalItem({ a }: { a: any }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   )}
-                  <span className="hidden sm:inline">Request Revisions</span>
-                  <span className="sm:hidden">Revisions</span>
+                  <span className="hidden sm:inline">{t('approvalsPage.actions.requestRevisions')}</span>
+                  <span className="sm:hidden">{t('approvalsPage.actions.revisions')}</span>
                   {comments.length > 0 && (
                     <span className="ml-1 text-xs opacity-75">({comments.length})</span>
                   )}
@@ -327,7 +329,7 @@ function ApprovalItem({ a }: { a: any }) {
               <button
                 onClick={scrollToAnnotations}
                 className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg transition-colors flex items-center justify-center"
-                title="Go to annotations"
+                title={t('approvalsPage.tooltips.goToAnnotations')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -338,7 +340,7 @@ function ApprovalItem({ a }: { a: any }) {
               <button
                 onClick={scrollToComments}
                 className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg transition-colors flex items-center justify-center"
-                title="Go to comments"
+                title={t('approvalsPage.tooltips.goToComments')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -354,9 +356,9 @@ function ApprovalItem({ a }: { a: any }) {
         isOpen={rejectModalOpen}
         onClose={() => setRejectModalOpen(false)}
         onSubmit={handleRejectWithFeedback}
-        title="Reject Approval"
-        placeholder="Please provide feedback explaining why this is being rejected..."
-        submitText="Reject"
+        title={t('approvalsPage.reject.title')}
+        placeholder={t('approvalsPage.reject.placeholder')}
+        submitText={t('approvalsPage.reject.submit')}
         multiline={true}
       />
 
@@ -364,8 +366,8 @@ function ApprovalItem({ a }: { a: any }) {
       <AlertModal
         isOpen={approvalWarningModalOpen}
         onClose={() => setApprovalWarningModalOpen(false)}
-        title="Cannot Approve"
-        message='Cannot approve when comments exist. Use "Request Revisions" to send feedback.'
+        title={t('approvalsPage.approvalWarning.title')}
+        message={t('approvalsPage.approvalWarning.message')}
         variant="warning"
       />
 
@@ -373,8 +375,8 @@ function ApprovalItem({ a }: { a: any }) {
       <AlertModal
         isOpen={revisionWarningModalOpen}
         onClose={() => setRevisionWarningModalOpen(false)}
-        title="No Comments Added"
-        message="Please add at least one comment before requesting revisions."
+        title={t('approvalsPage.revision.noCommentsTitle')}
+        message={t('approvalsPage.revision.noCommentsMessage')}
         variant="warning"
       />
     </div>
@@ -384,6 +386,7 @@ function ApprovalItem({ a }: { a: any }) {
 function Content() {
   const { approvals } = useApi();
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const { t } = useTranslation();
   
   // Get unique categories from approvals
   const categories = useMemo(() => {
@@ -416,9 +419,9 @@ function Content() {
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 md:p-8 max-w-full">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">Approvals</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">{t('approvalsPage.header.title')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Review and manage pending approval requests
+            {t('approvalsPage.header.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -427,7 +430,7 @@ function Content() {
               ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
               : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
           }`}>
-            {pendingCount} pending
+            {t('approvalsPage.pendingCount', { count: pendingCount })}
           </span>
         </div>
         </div>
@@ -437,7 +440,7 @@ function Content() {
       {categories.length > 1 && (
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by:</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('approvalsPage.filter.label')}</label>
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
@@ -445,8 +448,8 @@ function Content() {
             >
               {categories.map(cat => (
                 <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Documents' : 
-                   cat === 'steering' ? 'Steering Documents' : 
+                  {cat === 'all' ? t('approvalsPage.filter.options.all') : 
+                   cat === 'steering' ? t('approvalsPage.filter.options.steering') : 
                    cat}
                 </option>
               ))}
@@ -462,8 +465,8 @@ function Content() {
             <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3 sm:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-1 sm:mb-2">No Pending Approvals</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">All approvals have been processed. New approval requests will appear here.</p>
+            <p className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-1 sm:mb-2">{t('approvalsPage.empty.title')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">{t('approvalsPage.empty.description')}</p>
           </div>
         </div>
       ) : (

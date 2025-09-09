@@ -1,0 +1,370 @@
+{
+  "documentTitle": "{{projectName}} Panel de Control",
+  "projectNameDefault": "Spec Workflow",
+  "projectDescription": "Panel de flujo de trabajo de desarrollo",
+  "nav": {
+    "statistics": "Estadísticas",
+    "steering": "Dirección",
+    "specs": "Especificaciones",
+    "tasks": "Tareas",
+    "approvals": "Aprobaciones"
+  },
+  "connectionStatus": {
+    "connected": "Conectado",
+    "disconnected": "Desconectado"
+  },
+  "theme": {
+    "toggle": "Cambiar tema",
+    "dark": "Oscuro",
+    "light": "Claro"
+  },
+  "support": {
+    "me": "Apóyame",
+    "project": "Apoya el proyecto"
+  },
+  "mobile": {
+    "menu": "Menú",
+    "closeMenu": "Cerrar menú",
+    "notificationVolume": "Volumen de Notificaciones",
+    "theme": "Tema"
+  },
+  "stats": {
+    "specifications": {
+      "title": "Especificaciones",
+      "label": "Especificaciones activas"
+    },
+    "taskProgress": {
+      "title": "Progreso de Tareas",
+      "summary_one": "{{count}} tarea en {{specs}} especificación",
+      "summary_other": "{{count}} tareas en {{specs}} especificaciones",
+      "noActiveSpecs": "No hay especificaciones activas"
+    },
+    "approvals": {
+      "title": "Aprobaciones",
+      "awaiting": "En espera de revisión",
+      "allClear": "Todo despejado"
+    }
+  },
+  "comingSoon": {
+    "title": "Más Funciones Próximamente",
+    "description": "Estamos trabajando en análisis e información adicional para su flujo de trabajo de desarrollo. ¡Manténgase atento a las actualizaciones!"
+  },
+  "links": {
+    "npm": "paquete npm",
+    "github": "GitHub"
+  },
+  "editor": {
+    "markdown": {
+      "title": "Editor Markdown",
+      "saving": "Guardando...",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "error": "Error",
+      "unsavedChanges": "Cambios sin guardar",
+      "hints": "Ctrl+S para guardar • Tab para indentar",
+      "placeholder": "Comienza a escribir tu contenido markdown...",
+      "lines": "Líneas",
+      "characters": "Caracteres"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "Documentos de Especificación" },
+    "tooltips": { "viewRendered": "Ver documento renderizado", "viewSource": "Ver markdown fuente" },
+    "empty": { "docNotCreated": "Este documento {{doc}} aún no ha sido creado." }
+  },
+  "language": {
+    "select": "Seleccionar idioma"
+  },
+  "common": {
+    "viewMode": {
+      "rendered": "Renderizado",
+      "source": "Fuente",
+      "editor": "Editor"
+    },
+    "loadingContent": "Cargando contenido...",
+    "noContentAvailable": "No hay contenido disponible",
+    "percentComplete": "{{percent}}% completo",
+    "lastModified": "Última modificación {{date}}",
+    "never": "Nunca",
+    "unknown": "Desconocido",
+    "close": "Cerrar",
+    "keepEditing": "Seguir Editando",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "closeModalAria": "Cerrar modal"
+  },
+  "tasksPage": {
+    "header": {
+      "title": "Gestión de Tareas",
+      "subtitle": {
+        "selected": "Gestionar y seguir la finalización de tareas",
+        "unselected": "Selecciona una especificación para ver y gestionar sus tareas"
+      }
+    },
+    "taskDetails": "Detalles de la Tarea",
+    "status": "Estado",
+    "noTasksFound": "No se encontraron tareas",
+    "showAllTasks": "Mostrar todas las tareas",
+    "noTasksWithStatus": "No se encontraron tareas con estado \"{{status}}\".",
+    "noTasksAvailable": "No hay tareas disponibles para esta especificación",
+    "showingTasksWithStatus": "Mostrando {{count}} tareas con estado \"{{status}}\"",
+    "filters": {
+      "all": "Todas",
+      "pending": "Pendientes",
+      "inProgress": "En Progreso",
+      "completed": "Completadas",
+      "filterByTooltip": "Filtrar por tareas {{status}}"
+    },
+    "sort": {
+      "label": "Ordenar",
+      "defaultOrder": "Orden Predeterminado",
+      "defaultOrderDesc": "Orden original de tareas",
+      "status": "Estado",
+      "statusDesc": "Agrupar por estado de tarea",
+      "taskId": "ID de Tarea",
+      "taskIdDesc": "Ordenar por identificador de tarea",
+      "description": "Descripción",
+      "descriptionDesc": "Ordenar alfabéticamente por descripción",
+      "byStatus": "Por Estado",
+      "byTaskId": "Por ID de Tarea",
+      "byDescription": "Por Descripción",
+      "changeSortOrder": "Cambiar orden de clasificación",
+      "sortOrder": "Orden de Clasificación",
+      "ascending": "Ascendente",
+      "descending": "Descendente",
+      "sortAscending": "Ordenar ascendente",
+      "sortDescending": "Ordenar descendente"
+    },
+    "statusPill": {
+      "pending": "Pendiente",
+      "inProgress": "En Progreso",
+      "completed": "Completada",
+      "clickToChange": "Hacer clic para cambiar estado"
+    },
+    "dropdown": {
+      "selectPlaceholder": "Selecciona una especificación...",
+      "completedOutOfTotal": "{{completed}} / {{total}} tareas completadas",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} tareas"
+    },
+    "search": {
+      "placeholder": "Buscar especificaciones...",
+      "noSpecsFound": "No se encontraron especificaciones",
+      "tryAdjusting": "Intenta ajustar tu búsqueda"
+    },
+    "loading": "Cargando progreso de tareas…",
+    "overallProgress": "Progreso General",
+    "item": {
+      "section": "Sección",
+      "task": "Tarea",
+      "groupBadge": "Grupo de Tareas"
+    },
+    "files": { "label": "Archivos:" },
+    "implementation": { "label": "Implementación:" },
+    "labels": { "spec": "Especificación:" },
+    "noSpecsFound": {
+      "title": "No se encontraron especificaciones",
+      "noMatch": "Ninguna especificación coincide con \"{{query}}\"",
+      "noSpecsAvailable": "No hay especificaciones disponibles para gestionar tareas."
+    },
+    "copyFailed": {
+      "title": "Falló la Copia",
+      "message": "Falló la copia. Por favor copia este texto manualmente:"
+    },
+    "copyPrompt": {
+      "tooltip": "Copiar prompt para agente de IA",
+      "copied": "¡Copiado!",
+      "copyPrompt": "Copiar Prompt",
+      "copy": "Copiar"
+    },
+    "notifications": {
+      "statusUpdated": "Tarea {{taskId}} marcada como {{status}}",
+      "updateFailed": "Falló al actualizar el estado de la tarea {{taskId}}",
+      "updateError": "Error al actualizar el estado de la tarea {{taskId}}"
+    },
+    "noTaskData": "No hay datos de tarea disponibles",
+    "stats": {
+      "total": "Total",
+      "totalDesc": "Todas las tareas",
+      "done": "Hechas",
+      "doneDesc": "Completadas",
+      "left": "Restantes",
+      "leftDesc": "Pendientes",
+      "progress": "Progreso",
+      "progressDesc": "Completo"
+    }
+  },
+  "specsPage": {
+    "header": {
+      "title": "Especificaciones",
+      "subtitle": {
+        "active": "Ver y gestionar documentos activos de requerimientos, diseño y tareas",
+        "archived": "Ver especificaciones archivadas"
+      }
+    },
+    "modal": {
+      "archivedBadge": "Archivado",
+      "archivedNotice": "Especificación archivada (edición habilitada)",
+      "closeAria": "Cerrar visor de especificaciones",
+      "docLabel": "Doc:",
+      "docSelectAria": "Seleccionar tipo de documento"
+    },
+    "documents": {
+      "requirements": "Requerimientos",
+      "design": "Diseño",
+      "tasks": "Tareas"
+    },
+    "search": {
+      "placeholder": {
+        "active": "Buscar especificaciones activas...",
+        "archived": "Buscar especificaciones archivadas..."
+      }
+    },
+    "empty": {
+      "title": "No Hay Documentos Disponibles",
+      "description": "Esta especificación aún no tiene documentos creados."
+    },
+    "tabs": {
+      "active": "Activas",
+      "archived": "Archivo"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "Documentos de Dirección",
+      "subtitle": "Ver y gestionar documentos de dirección del proyecto para guía del producto, arquitectura técnica y estructura"
+    },
+    "table": {
+      "document": "Documento",
+      "status": "Estado",
+      "lastModified": "Última Modificación",
+      "actions": "Acciones"
+    },
+    "badge": {
+      "available": "Disponible",
+      "notCreated": "No Creado"
+    },
+    "modal": {
+      "title": "Documento de Dirección {{name}}",
+      "closeAria": "Cerrar documento de dirección"
+    },
+    "controls": {
+      "documentLabel": "Documento:"
+    },
+    "empty": {
+      "title": "No Hay Documentos de Dirección",
+      "description": "Los documentos de dirección proporcionan contexto y guía del proyecto. Haz clic en cualquier documento arriba para crear o verlo."
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "pendiente",
+      "needsRevision": "necesita revisión",
+      "approved": "aprobado",
+      "rejected": "rechazado"
+    },
+    "annotator": {
+      "instructions": {
+        "title": "Cómo anotar:",
+        "mobile": "Selecciona texto → doble toque en selección → aparece diálogo de comentario. Toca texto resaltado para editar comentarios.",
+        "step1": "• Selecciona cualquier texto para agregar un comentario - aparecerá un diálogo automáticamente",
+        "step2": "• Haz clic en resaltados existentes (texto coloreado) para ver o editar comentarios",
+        "step3": "• Usa el botón \"Agregar Comentario General\" para comentarios del documento completo"
+      },
+      "editCommentTitle": "Editar Comentario",
+      "addCommentTitle": "Agregar Comentario",
+      "subtitle": "Comenta el texto resaltado abajo",
+      "highlightedText": "Texto Resaltado:",
+      "chooseHighlightColor": "Elegir Color de Resaltado:",
+      "pickColorTooltip": "Elegir color de resaltado",
+      "yourComment": "Tu Comentario:",
+      "commentPlaceholder": "Ingresa tu comentario aquí...",
+      "hints": {
+        "desktop": "Presiona Ctrl/Cmd + Enter para guardar, o Escape para cancelar",
+        "mobile": "Toca Guardar para confirmar"
+      },
+      "updateCommentButton": "Actualizar Comentario",
+      "addCommentButton": "Agregar Comentario",
+      "updateShort": "Actualizar",
+      "saveShort": "Guardar",
+      "tooltips": {
+        "viewEditComment": "Haz clic para ver/editar comentario",
+        "deleteComment": "Eliminar comentario"
+      },
+      "badge": {
+        "textSelection": "Selección de Texto",
+        "generalComment": "Comentario General"
+      },
+      "colorHighlight": "resaltado {{color}}",
+      "addGeneralComment": {
+        "title": "Agregar Comentario General",
+        "placeholder": "Ingresa un comentario general...",
+        "submit": "Agregar Comentario",
+        "button": "Agregar Comentario General"
+      },
+      "addCommentShort": "Agregar Comentario",
+      "empty": {
+        "title": "Aún no hay comentarios",
+        "description": "Selecciona texto o agrega un comentario general"
+      },
+      "switchHelp": "Cambia al modo Anotar para agregar comentarios seleccionando texto o agregar comentarios generales.",
+      "viewMode": {
+        "preview": "Vista previa",
+        "annotate": "Anotar"
+      },
+      "delete": {
+        "title": "Eliminar Comentario",
+        "message": "¿Estás seguro de que quieres eliminar este comentario? Esta acción no se puede deshacer."
+      }
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "Aprobaciones",
+      "subtitle": "Revisar y gestionar solicitudes de aprobación pendientes"
+    },
+    "pendingCount_one": "{{count}} pendiente",
+    "pendingCount_other": "{{count}} pendientes",
+    "messages": {
+      "approvedViaDashboard": "Aprobado vía panel de control"
+    },
+    "actions": {
+      "openReview": "Revisar y Anotar",
+      "closeReview": "Cerrar Revisión",
+      "reviewShort": "Revisar",
+      "quickApprove": "Aprobación Rápida",
+      "approve": "Aprobar",
+      "quickReject": "Rechazo Rápido",
+      "reject": "Rechazar",
+      "requestRevisions": "Solicitar Revisiones",
+      "revisions": "Revisiones"
+    },
+    "tooltips": {
+      "goToAnnotations": "Ir a anotaciones",
+      "goToComments": "Ir a comentarios"
+    },
+    "filter": {
+      "label": "Filtrar por:",
+      "options": {
+        "all": "Todos los Documentos",
+        "steering": "Documentos de Dirección"
+      }
+    },
+    "empty": {
+      "title": "No Hay Aprobaciones Pendientes",
+      "description": "Todas las aprobaciones han sido procesadas. Las nuevas solicitudes de aprobación aparecerán aquí."
+    },
+    "reject": {
+      "title": "Rechazar Aprobación",
+      "placeholder": "Por favor proporciona comentarios explicando por qué esto está siendo rechazado...",
+      "submit": "Rechazar"
+    },
+    "approvalWarning": {
+      "title": "No Se Puede Aprobar",
+      "message": "No se puede aprobar cuando existen comentarios. Usa \"Solicitar Revisiones\" para enviar comentarios."
+    },
+    "revision": {
+      "noCommentsTitle": "No Se Agregaron Comentarios",
+      "noCommentsMessage": "Por favor agrega al menos un comentario antes de solicitar revisiones."
+    }
+  }
+}

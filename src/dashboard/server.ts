@@ -636,11 +636,11 @@ export class DashboardServer {
       // Validate and check custom port availability
       await validateAndCheckPort(this.options.port);
       this.actualPort = this.options.port;
-      console.log(`Using custom port: ${this.actualPort}`);
+      console.error(`Using custom port: ${this.actualPort}`);
     } else {
       // Find available ephemeral port
       this.actualPort = await findAvailablePort();
-      console.log(`Using ephemeral port: ${this.actualPort}`);
+      console.error(`Using ephemeral port: ${this.actualPort}`);
     }
 
     // Start server

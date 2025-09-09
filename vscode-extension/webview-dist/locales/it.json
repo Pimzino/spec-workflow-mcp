@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Spec Workflow MCP",
+    "support": "Supporta questo progetto"
+  },
+  "tabs": {
+    "overview": "Panoramica Progetto",
+    "steering": "Documenti Direzione",
+    "specs": "Documenti Specifica",
+    "tasks": "Gestione Task",
+    "approvals": "Richieste Approvazione"
+  },
+  "overview": {
+    "projectTitle": "Panoramica Progetto",
+    "activeSpecs": "Spec Attive",
+    "archivedSpecs": "Spec Archiviate",
+    "totalSpecs": "Spec Totali",
+    "tasks": "Task",
+    "overallProgress": "Progresso Complessivo",
+    "recentActivity": "Attività Recente",
+    "modified": "{{time}}",
+    "noSpecs": "Nessuna spec trovata"
+  },
+  "tasks": {
+    "specLabel": "Specifica",
+    "specPlaceholder": "Seleziona una specifica",
+    "stats": {
+      "total": "Totale",
+      "done": "Fatto",
+      "left": "Rimanenti",
+      "progress": "Progresso"
+    },
+    "overallProgress": "Progresso Complessivo",
+    "section": "Sezione",
+    "task": "Task",
+    "copied": "Copiato!",
+    "copyPromptTitle": "Copia prompt per agente AI",
+    "copyPromptAI": "Copia prompt AI per task {{taskId}}",
+    "copyPromptDefault": "Copia prompt predefinito per task {{taskId}}",
+    "copyPrompt": "Lavora sul task {{taskId}} per spec \"{{specName}}\"",
+    "promptAvailable": "Prompt AI disponibile",
+    "promptPreview": "Anteprima Prompt AI",
+    "usingDefaultPrompt": "Usando prompt predefinito",
+    "status": {
+      "pending": "In Attesa",
+      "inProgress": "In Corso",
+      "completed": "Completato"
+    },
+    "taskGroup": "Gruppo Task",
+    "meta": {
+      "files": "File",
+      "implementation": "Implementazione",
+      "purposes": "Scopi",
+      "requirements": "Requisiti",
+      "leverage": "Sfrutta"
+    },
+    "loading": "Caricamento task...",
+    "noSpecs": "Nessuna specifica trovata",
+    "selectSpec": "Seleziona una specifica sopra per visualizzare i task"
+  },
+  "approvals": {
+    "docLabel": "Documento",
+    "categoryPlaceholder": "Seleziona una categoria",
+    "status": {
+      "pending": "In Attesa"
+    },
+    "created": "Creato: {{time}}",
+    "response": {
+      "approved": "Approvato",
+      "rejected": "Rifiutato",
+      "needsRevision": "Necessita revisione"
+    },
+    "processing": "Elaborazione...",
+    "approve": "Approva",
+    "reject": "Rifiuta",
+    "requestRevision": "Richiedi Revisione",
+    "openInEditor": "Apri nell'Editor",
+    "noPending": "Nessuna approvazione in attesa per questa specifica",
+    "noPendingDocuments": "Nessun documento con approvazioni in attesa trovato",
+    "selectCategory": "Seleziona una categoria sopra per visualizzare approvazioni in attesa"
+  },
+  "specs": {
+    "active": "Attive",
+    "archived": "Archiviate",
+    "specLabel": "Specifica",
+    "specPlaceholder": "Seleziona una specifica",
+    "archive": "Archivia",
+    "unarchive": "Desarchivia",
+    "docsTitle": "Documenti Specifica",
+    "modified": "Modificato {{time}}",
+    "fileNotFound": "File non trovato",
+    "open": "Apri",
+    "noDocs": "Nessun documento trovato per questa specifica",
+    "noActiveSpecs": "Nessuna specifica attiva trovata",
+    "noArchivedSpecs": "Nessuna specifica archiviata trovata",
+    "selectSpec": "Seleziona una specifica sopra per visualizzare i documenti"
+  },
+  "steering": {
+    "title": "Documenti Direzione",
+    "modified": "Modificato {{time}}",
+    "fileNotFound": "File non trovato",
+    "open": "Apri",
+    "noDocs": "Nessun documento direzione trovato",
+    "copyInstructions": "Copia Istruzioni",
+    "copied": "Copiato!"
+  },
+  "common": {
+    "scrollToTop": "Scorri in alto"
+  },
+  "language": {
+    "selector": "Lingua",
+    "changed": "Lingua cambiata con successo",
+    "auto": "Automatico",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "german": "Deutsch",
+    "french": "Français",
+    "russian": "Русский",
+    "italian": "Italiano",
+    "korean": "한국어",
+    "arabic": "العربية"
+  }
+}

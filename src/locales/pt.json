@@ -1,0 +1,414 @@
+{
+  "tools": {
+    "steeringGuide": {
+      "description": "Carregar guia para criar documentos de direcionamento do projeto.\n\n# Instruções\nChamar APENAS quando o usuário solicitar explicitamente a criação de documentos de direcionamento ou perguntar sobre documentos de arquitetura do projeto. Não faz parte do fluxo de trabalho de especificações padrão. Fornece modelos e orientação para criação de product.md, tech.md e structure.md.",
+      "successMessage": "Guia de fluxo de trabalho de direcionamento carregado - siga este fluxo de trabalho exatamente",
+      "dashboardMessage": "Painel: {{dashboardUrl}}",
+      "dashboardUnavailable": "Painel não disponível",
+      "nextSteps": {
+        "proceedIfRequested": "Apenas prossiga se o usuário solicitou documentos de direcionamento",
+        "createProduct": "Criar product.md primeiro",
+        "createTechAndStructure": "Depois tech.md e structure.md",
+        "reference": "Referenciar em futuras especificações"
+      },
+      "guide": "# Fluxo de Trabalho de Direcionamento\n\n## Visão Geral\n\nCriar documentos de orientação a nível de projeto quando explicitamente solicitado. Documentos de direcionamento estabelecem visão, arquitetura e convenções para bases de código estabelecidas.\n\n## Diagrama do Fluxo de Trabalho\n\n```mermaid\nflowchart TD\n    Start([Início: Configurar documentos de direcionamento]) --> Guide[steering-guide<br/>Carregar instruções do fluxo de trabalho]\n    \n    %% Fase 1: Produto\n    Guide --> P1_Template[get-template-context<br/>templateType: steering<br/>template: product]\n    P1_Template --> P1_Generate[Gerar visão e objetivos]\n    P1_Generate --> P1_Create[create-steering-doc<br/>document: product]\n    P1_Create --> P1_Approve[request-approval<br/>apenas filePath]\n    P1_Approve --> P1_Status[get-approval-status<br/>consultar status]\n    P1_Status --> P1_Check{Status?}\n    P1_Check -->|precisa-revisão| P1_Update[Atualizar documento usando comentários do usuário como orientação]\n    P1_Update --> P1_Create\n    P1_Check -->|aprovado| P1_Clean[delete-approval]\n    P1_Clean -->|falhou| P1_Status\n    \n    %% Fase 2: Tecnologia\n    P1_Clean -->|sucesso| P2_Template[get-template-context<br/>templateType: steering<br/>template: tech]\n    P2_Template --> P2_Analyze[Analisar stack tecnológico]\n    P2_Analyze --> P2_Create[create-steering-doc<br/>document: tech]\n    P2_Create --> P2_Approve[request-approval<br/>apenas filePath]\n    P2_Approve --> P2_Status[get-approval-status<br/>consultar status]\n    P2_Status --> P2_Check{Status?}\n    P2_Check -->|precisa-revisão| P2_Update[Atualizar documento usando comentários do usuário como orientação]\n    P2_Update --> P2_Create\n    P2_Check -->|aprovado| P2_Clean[delete-approval]\n    P2_Clean -->|falhou| P2_Status\n    \n    %% Fase 3: Estrutura\n    P2_Clean -->|sucesso| P3_Template[get-template-context<br/>templateType: steering<br/>template: structure]\n    P3_Template --> P3_Analyze[Analisar estrutura do código base]\n    P3_Analyze --> P3_Create[create-steering-doc<br/>document: structure]\n    P3_Create --> P3_Approve[request-approval<br/>apenas filePath]\n    P3_Approve --> P3_Status[get-approval-status<br/>consultar status]\n    P3_Status --> P3_Check{Status?}\n    P3_Check -->|precisa-revisão| P3_Update[Atualizar documento usando comentários do usuário como orientação]\n    P3_Update --> P3_Create\n    P3_Check -->|aprovado| P3_Clean[delete-approval]\n    P3_Clean -->|falhou| P3_Status\n    \n    P3_Clean -->|sucesso| Complete([Documentos de direcionamento completos])\n    \n    style Start fill:#e6f3ff\n    style Complete fill:#e6f3ff\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n```\n\n## Fases do Fluxo de Trabalho de Direcionamento\n\n### Fase 1: Documento do Produto\n**Propósito**: Definir visão, objetivos e resultados do usuário.\n\n**Ferramentas**:\n- steering-guide: Carregar instruções do fluxo de trabalho\n- get-template-context: Carregar modelo do produto (templateType: \"steering\", template: \"product\")\n- create-steering-doc: Criar product.md\n- request-approval: Obter aprovação do usuário\n- get-approval-status: Verificar status de aprovação\n- delete-approval: Limpar após aprovação\n\n**Processo**:\n1. Carregar guia de direcionamento para visão geral do fluxo de trabalho\n2. Carregar modelo do produto\n3. Gerar visão e objetivos do produto\n4. Criar documento com create-steering-doc\n5. Solicitar aprovação (apenas filePath)\n6. Consultar status até aprovado/precisa-revisão (NUNCA aceitar aprovação verbal)\n7. Se precisa-revisão: atualizar documento, criar NOVA aprovação, NÃO prosseguir\n8. Uma vez aprovado: delete-approval (deve ter sucesso) antes de prosseguir\n9. Se delete-approval falhar: PARAR - retornar à consulta\n\n### Fase 2: Documento Técnico\n**Propósito**: Documentar decisões tecnológicas e arquitetura.\n\n**Ferramentas**:\n- get-template-context: Carregar modelo técnico (templateType: \"steering\", template: \"tech\")\n- create-steering-doc: Criar tech.md\n- request-approval: Obter aprovação do usuário\n- get-approval-status: Verificar status\n- delete-approval: Limpar\n\n**Processo**:\n1. Carregar modelo técnico\n2. Analisar stack tecnológico existente\n3. Documentar decisões arquiteturais e padrões\n4. Criar documento e solicitar aprovação\n5. Consultar status até aprovado/precisa-revisão\n6. Se precisa-revisão: atualizar documento, criar NOVA aprovação, NÃO prosseguir\n7. Uma vez aprovado: delete-approval (deve ter sucesso) antes de prosseguir\n8. Se delete-approval falhar: PARAR - retornar à consulta\n\n### Fase 3: Documento de Estrutura\n**Propósito**: Mapear organização e padrões do código base.\n\n**Ferramentas**:\n- get-template-context: Carregar modelo de estrutura (templateType: \"steering\", template: \"structure\")\n- create-steering-doc: Criar structure.md\n- request-approval: Obter aprovação do usuário\n- get-approval-status: Verificar status\n- delete-approval: Limpar\n\n**Processo**:\n1. Carregar modelo de estrutura\n2. Analisar estrutura de diretórios e organização de arquivos\n3. Documentar padrões de codificação e convenções\n4. Criar documento e solicitar aprovação\n5. Consultar status até aprovado/precisa-revisão\n6. Se precisa-revisão: atualizar documento, criar NOVA aprovação, NÃO prosseguir\n7. Uma vez aprovado: delete-approval (deve ter sucesso) antes de prosseguir\n8. Se delete-approval falhar: PARAR - retornar à consulta\n9. Após limpeza bem-sucedida: \"Documentos de direcionamento completos. Pronto para criar especificações?\"\n\n## Regras do Fluxo de Trabalho\n\n- Sempre usar ferramentas MCP, nunca criar documentos manualmente\n- Seguir estruturas exatas dos modelos\n- Obter aprovação explícita do usuário entre fases\n- Completar fases em sequência (sem pular)\n- Solicitações de aprovação: fornecer apenas filePath, nunca conteúdo\n- BLOQUEANTE: Nunca prosseguir se delete-approval falhar\n- CRÍTICO: Deve ter status aprovado E limpeza bem-sucedida antes da próxima fase\n- CRÍTICO: Aprovação verbal NUNCA é aceita - apenas painel ou extensão VS Code\n- NUNCA prosseguir quando o usuário disser \"aprovado\" - verificar apenas o status do sistema"
+    },
+    "specStatus": {
+      "description": "Exibir visão geral abrangente do progresso da especificação.\n\n# Instruções\nChamar ao retomar trabalho em uma especificação ou verificar status geral de conclusão. Mostra quais fases estão completas e progresso de implementação de tarefas. Útil para entender onde você está no fluxo de trabalho antes de continuar.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "specNameDescription": "Nome da especificação",
+      "successMessage": "Status da especificação '{{specName}}': {{overallStatus}}",
+      "phases": {
+        "requirements": "Requisitos",
+        "design": "Design",
+        "tasks": "Tarefas",
+        "implementation": "Implementação"
+      },
+      "nextSteps": {
+        "requirements": {
+          "create": "Criar requirements.md",
+          "loadContext": "Carregar contexto com get-steering-context",
+          "requestApproval": "Solicitar aprovação"
+        },
+        "design": {
+          "create": "Criar design.md",
+          "reference": "Referenciar requisitos",
+          "requestApproval": "Solicitar aprovação"
+        },
+        "tasks": {
+          "create": "Criar tasks.md",
+          "breakdown": "Decompor design",
+          "requestApproval": "Solicitar aprovação"
+        },
+        "implementation": {
+          "nextPending": "Usar manage-tasks com next-pending",
+          "implement": "Implementar tarefas",
+          "updateStatus": "Atualizar status com manage-tasks",
+          "begin": "Começar implementação com manage-tasks"
+        },
+        "completed": {
+          "complete": "Especificação completa",
+          "runTests": "Executar testes"
+        }
+      },
+      "errors": {
+        "notFound": "Especificação '{{specName}}' não encontrada",
+        "genericFail": "Falha ao obter status da especificação: {{message}}",
+        "nextSteps": {
+          "checkName": "Verificar nome da especificação",
+          "useList": "Usar spec-list para especificações disponíveis",
+          "create": "Criar especificação com create-spec-doc",
+          "checkExists": "Verificar se a especificação existe",
+          "verifyPath": "Verificar o caminho do projeto",
+          "useListGeneric": "Usar spec-list para ver especificações disponíveis"
+        }
+      }
+    },
+    "specList": {
+      "description": "Listar todas as especificações no projeto.\n\n# Instruções\nChamar para ver especificações disponíveis antes de selecionar uma para trabalhar. Mostra status de cada especificação incluindo conclusão de fases. Útil para escolher qual especificação implementar ou continuar trabalhando.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "successMessage_one": "Encontrada {{count}} especificação",
+      "successMessage_other": "Encontradas {{count}} especificações",
+      "messages": {
+        "noSpecs": "Nenhuma especificação encontrada"
+      },
+      "nextSteps": {
+        "noSpecs": {
+          "create": "Criar uma nova especificação usando spec-create",
+          "example": "Exemplo: spec-create user-authentication \"Login e registro de usuário\""
+        },
+        "success": {
+          "viewStatus": "Usar spec-status <nome> para ver status detalhado de uma especificação específica",
+          "continue": "Usar spec-execute <task-id> <nome> para continuar implementação",
+          "create": "Criar novas especificações com spec-create"
+        }
+      },
+      "errors": {
+        "failed": "Falha ao listar especificações: {{message}}",
+        "nextSteps": {
+          "checkPath": "Verificar se o caminho do projeto existe",
+          "verifyDir": "Verificar se o diretório .spec-workflow existe",
+          "create": "Criar uma especificação usando spec-create se nenhuma existir"
+        }
+      }
+    },
+    "requestApproval": {
+      "description": "Solicitar aprovação do usuário através da interface do painel.\n\n# Instruções\nChamar IMEDIATAMENTE após criar cada documento. Obrigatório antes de prosseguir para a próxima fase. CRÍTICO: Fornecer apenas o parâmetro filePath - o painel lê arquivos diretamente. Nunca incluir conteúdo do documento na solicitação. Aguardar o usuário revisar e aprovar antes de continuar.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "titleDescription": "Título breve descrevendo o que precisa de aprovação",
+      "filePathDescription": "Caminho para o arquivo que precisa de aprovação (relativo à raiz do projeto). O painel lerá e exibirá este arquivo.",
+      "typeDescription": "Tipo de solicitação de aprovação - \"document\" para aprovação de conteúdo, \"action\" para aprovação de ação",
+      "categoryDescription": "Categoria da solicitação de aprovação - \"spec\" para especificações, \"steering\" para documentos de direcionamento",
+      "categoryNameDescription": "Nome da especificação ou \"steering\" para documentos de direcionamento",
+      "successMessage": "Solicitação de aprovação criada com sucesso. Por favor, revise no painel: {{dashboardUrl}}",
+      "dashboardUnavailable": "URL do painel não disponível",
+      "nextSteps": {
+        "blocking": "BLOQUEANTE - Aprovação do painel ou extensão VS Code necessária",
+        "noVerbal": "APROVAÇÃO VERBAL NÃO ACEITA",
+        "noVerbalConfirm": "Não prosseguir com confirmação verbal",
+        "useDashboard": "Usar painel: {{dashboardUrl}} ou extensão VS Code",
+        "useVscode": "Usar extensão VS Code para aprovação",
+        "poll": "Consultar status com: get-approval-status \"{{approvalId}}\""
+      },
+      "errors": {
+        "failed": "Falha ao criar solicitação de aprovação: {{message}}"
+      }
+    },
+    "refreshTasks": {
+      "description": "Regenerar lista de tarefas baseada em requisitos e design atuais.\n\n# Instruções\nChamar quando tarefas precisarem de atualização após mudanças no design ou para preencher lacunas entre implementação e requisitos. Analisa requirements.md e design.md existentes para criar lista de tarefas abrangente atualizada. Substitui tasks.md existente por versão atualizada.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "specNameDescription": "Nome da especificação",
+      "successMessage": "Contexto de atualização de tarefas carregado para \"{{specName}}\". Pronto para agente IA analisar e atualizar tarefas.",
+      "analysis": {
+        "hasTasks": "\n## Análise de Tarefas Atual\n**Total de Tarefas**: {{total}}\n**Concluídas**: {{completed}} (preservar como estão, mesmo que funcionalidade removida)\n**Em Progresso**: {{inProgress}} (preservar como estão, mesmo que funcionalidade removida)\n**Pendentes**: {{pending}} (VALIDAR contra requirements.md/design.md)\n\n### Tarefas a Preservar (NÃO MODIFICAR):\n{{completedList}}\n{{inProgressList}}\n\n### Tarefas Pendentes (DEVE VALIDAR):\n{{pendingList}}\n\n**VALIDAÇÃO NECESSÁRIA**: Para cada tarefa pendente acima, verificar se a funcionalidade está mencionada em requirements.md ou design.md. Se NÃO mencionada, REMOVER a tarefa.\n",
+        "noTasks": "\n## Análise de Tarefas Atual\n**Nenhum tasks.md existe** - Você precisará criar a lista completa de tarefas do zero.\n",
+        "none": "Nenhuma",
+        "checkPrompt": "VERIFICAR: Esta funcionalidade está em requirements.md?"
+      },
+      "instructions": {
+        "main": "# Instruções de Atualização de Tarefas\n\n## Contexto\nVocê está atualizando a lista de tarefas para a especificação \"{{specName}}\" porque requisitos ou design podem ter mudado durante a implementação. Seu objetivo é garantir que a lista de tarefas reflita com precisão o que precisa ser feito para preencher a lacuna entre implementação atual e requisitos/design atualizados.\n\n## CRÍTICO: Fonte da Verdade\n- **Requisitos vêm APENAS de requirements.md** - não de tarefas existentes\n- **Decisões de design vêm APENAS de design.md** - não de tarefas existentes\n- **Tarefas são passos de implementação** - elas implementam requisitos, não os definem\n- Se uma funcionalidade existe em tarefas mas NÃO em requirements.md/design.md, foi REMOVIDA da especificação\n\n## Processo de Validação de Três Passadas\n\n### PASSADA 1: Validar Tarefas Existentes Contra Especificação Atual\nPara cada tarefa existente, perguntar: \"A funcionalidade que esta tarefa implementa ainda está em requirements.md ou design.md?\"\n\n**Ações para tarefas PENDENTES:**\n- **MANTER**: Se funcionalidade ainda está em requisitos/design\n- **REMOVER**: Se funcionalidade NÃO está em requisitos/design (funcionalidade foi cortada da especificação)\n\n**Ações para tarefas CONCLUÍDAS/EM-PROGRESSO:**\n- **PRESERVAR**: Sempre manter tarefas concluídas [x] e em progresso [-]\n- **SINALIZAR**: Se funcionalidade foi removida, adicionar comentário: \"_Nota: Funcionalidade removida da especificação mas tarefa preservada_\"\n\n### PASSADA 2: Análise de Lacunas\nPara cada requisito em requirements.md, perguntar: \"Há uma tarefa que implemente isso?\"\nPara cada decisão de design em design.md, perguntar: \"Há tarefas alinhadas com esta arquitetura?\"\n\n**Ações:**\n- **ADICIONAR**: Novas tarefas para elementos de requisitos/design sem tarefas\n- **ATUALIZAR**: Tarefas pendentes existentes que precisam de alinhamento com requisitos atualizados\n\n### PASSADA 3: Criar Lista de Tarefas Atualizada (Apenas se Mudanças Necessárias)\n**PONTO DE DECISÃO**: Após Passada 1 e Passada 2, verificar:\n- Há tarefas pendentes para remover?\n- Há novas tarefas para adicionar?\n- Há tarefas existentes para modificar?\n\n**Se NÃO há mudanças necessárias**: Relatar \"Lista de tarefas já está alinhada com requisitos atuais - nenhuma atualização necessária\" e PARAR.\n\n**Se mudanças SÃO necessárias**, construir o novo tasks.md com:\n1. Todas as tarefas concluídas [x] (preservadas como estão)\n2. Todas as tarefas em progresso [-] (preservadas como estão, com notas de remoção se aplicável)\n3. Apenas tarefas pendentes [ ] que têm respaldo em requisitos/design atuais\n4. Novas tarefas para quaisquer elementos de requisitos/design ausentes\n5. Sequenciamento adequado e referências de requisitos\n\n## Regras Críticas\n- **NUNCA** modificar tarefas concluídas (marcadas com [x])\n- **NUNCA** modificar tarefas em progresso (marcadas com [-])\n- **REMOVER** tarefas pendentes para funcionalidades não em requisitos/design atuais\n- **SEMPRE** referenciar requisitos específicos (ex., _Requisitos: 1.1, 2.3_)\n- **GARANTIR** que tarefas sejam construídas incrementalmente\n- **TORNAR** tarefas atômicas, específicas e acionáveis\n- **PRESERVAR** a estrutura original de tasks.md - atualizar apenas os itens de tarefa\n- **SEM** seções adicionais em tasks.md (sem Dependências, Métricas, Notas, Alterações Feitas, etc.)\n- **MANTER** tasks.md limpo - qualquer resumo de alterações vai apenas em sua resposta de chat\n\n## Requisitos de Formato de Tarefa\nCada tarefa deve seguir este formato:\n```\n- [ ] 1.1 Criar interface de autenticação de usuário\n  - Arquivo: src/auth/UserAuth.ts\n  - Implementar formulários de login e registro\n  - Adicionar validação de formulário e tratamento de erros\n  - Propósito: Habilitar gerenciamento de contas de usuário\n  - _Aproveitar: src/components/BaseForm.tsx, src/utils/validation.ts_\n  - _Requisitos: 1.1, 1.2_\n```\n\n## Estratégia de Implementação\n1. **Ler** requirements.md e design.md cuidadosamente - estes definem o que deve existir\n2. **Validar** tarefas existentes contra especificação atual (Passada 1)\n3. **Identificar** lacunas na cobertura de tarefas (Passada 2)\n4. **Construir** lista de tarefas atualizada com validação adequada (Passada 3)\n5. **Usar** ferramenta create-spec-doc para salvar o tasks.md atualizado\n6. **IMPORTANTE**: Manter tasks.md no mesmo formato do original - apenas os itens de tarefa devem mudar\n\n## Exemplo: Lidando com Funcionalidades Removidas\nSe tarefas existem para \"visualização kanban\" mas \"visualização kanban\" NÃO está mencionada em requirements.md:\n- **REMOVER** qualquer tarefa kanban pendente [ ]\n- **PRESERVAR** qualquer tarefa kanban concluída [x] ou em progresso [-]\n- **ADICIONAR NOTA**: \"_Nota: Funcionalidade kanban removida da especificação mas trabalho concluído preservado_\"\n\n## Próximos Passos\nApós analisar os documentos abaixo:\n1. Realizar o processo de validação de três passadas\n2. **PONTO DE DECISÃO**: Se nenhuma mudança é necessária após validação, simplesmente relatar \"Tarefas já alinhadas\" e PARAR\n3. **APENAS se mudanças necessárias**: Usar ferramenta create-spec-doc com:\n   - projectPath: \"{{projectPath}}\"\n   - specName: \"{{specName}}\"\n   - document: \"tasks\"\n   - content: [seu markdown de tarefas validado e atualizado - MESMO FORMATO do original]\n4. Garantir que APENAS requisitos atuais tenham tarefas\n5. Verificar se dependências e ordem das tarefas fazem sentido\n6. **LEMBRAR**: Tasks.md deve conter APENAS a lista de tarefas atualizada - sem seções extras"
+      },
+      "fullContext": "{{instructions}}\n\n{{taskAnalysis}}\n\n---\n\n## Documento de Requisitos\n{{requirementsContent}}\n\n---\n\n## Documento de Design\n{{designContent}}\n\n---\n\n## Documento de Tarefas Atual\n{{tasksContent}}\n\n---\n\n## Resumo\nAgora você tem todo o contexto necessário para atualizar a lista de tarefas. Use a ferramenta create-spec-doc para criar um tasks.md atualizado que:\n- Preserve todas as tarefas concluídas ([x]) e em progresso ([-]) (mesmo que funcionalidade foi removida)\n- REMOVA tarefas pendentes ([ ]) para funcionalidades NÃO em requirements.md/design.md atuais\n- Adicione novas tarefas para elementos de requisitos/design sem tarefas\n- Garanta sequenciamento adequado de tarefas e referências de requisitos\n- Inclua apenas tarefas que implementem funcionalidades realmente especificadas em requirements.md/design.md\n\n**LEMBRAR**: Se uma funcionalidade existe em tarefas mas NÃO em requirements.md/design.md, foi CORTADA da especificação e tarefas pendentes devem ser REMOVIDAS.",
+      "messages": {
+        "noRequirements": "Nenhum requirements.md encontrado",
+        "noDesign": "Nenhum design.md encontrado",
+        "noTasks": "Nenhum tasks.md existe - criar do zero"
+      },
+      "nextSteps": {
+        "pass1": "PASSADA 1: Validar cada tarefa existente contra requirements.md/design.md",
+        "pass2": "PASSADA 2: Identificar lacunas - encontrar elementos de requisitos/design sem tarefas",
+        "decision": "DECISÃO: Se nenhuma mudança é necessária, relatar \"Tarefas já alinhadas\" e parar",
+        "pass3": "PASSADA 3: Apenas se mudanças necessárias, criar tasks.md atualizado usando ferramenta create-spec-doc"
+      },
+      "errors": {
+        "noContext": "Nenhum requirements.md ou design.md encontrado. Não é possível atualizar tarefas sem contexto de especificação.",
+        "genericFail": "Falha ao carregar contexto de atualização: {{message}}",
+        "nextSteps": {
+          "createReq": "Criar requirements.md primeiro usando ferramenta create-spec-doc",
+          "createDesign": "Criar design.md após requisitos serem aprovados",
+          "thenRefresh": "Então usar refresh-tasks para criar lista de tarefas alinhada",
+          "checkDir": "Verificar se o diretório de especificação existe",
+          "checkPerms": "Verificar permissões de arquivo",
+          "checkName": "Garantir que o nome da especificação está correto"
+        }
+      }
+    },
+    "getTemplateContext": {
+      "description": "Carregar um modelo de documento específico para documentos de especificação ou direcionamento.\n\n# Instruções\nChamar com o modelo exato necessário para sua fase atual. Para fluxo de trabalho de especificação, solicitar modelos de requisitos, design ou tarefas. Para documentos de direcionamento, solicitar modelos de produto, tecnologia ou estrutura. Cada modelo fornece o formato exato esperado pelas ferramentas create-spec-doc ou create-steering-doc.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "templateTypeDescription": "Tipo de modelo: spec para modelos de fluxo de trabalho, steering para documentos de projeto",
+      "templateDescription": "Modelo específico a carregar",
+      "docTitles": {
+        "requirements": "Modelo de Requisitos",
+        "design": "Modelo de Design",
+        "tasks": "Modelo de Tarefas",
+        "product": "Modelo de Produto",
+        "tech": "Modelo Técnico",
+        "structure": "Modelo de Estrutura"
+      },
+      "successMessage": "Modelo {{template}} carregado para {{templateType}}",
+      "messages": {
+        "fullContext": "## {{title}}\n\n{{content}}\n\n**Nota**: Modelo carregado. Use esta estrutura ao criar seu documento {{template}}."
+      },
+      "nextSteps": {
+        "success": {
+          "useTemplate": "Usar modelo para documento {{template}}",
+          "followStructure": "Seguir estrutura do modelo exatamente",
+          "nextSpec": "Próximo: create-spec-doc com document: \"{{template}}\"",
+          "nextSteering": "Próximo: create-steering-doc com document: \"{{template}}\""
+        }
+      },
+      "errors": {
+        "invalidType": "Tipo de modelo inválido: {{templateType}}",
+        "validTypes": "Usar: spec ou steering",
+        "invalidTemplateForType": "Modelo inválido \"{{template}}\" para tipo \"{{templateType}}\"",
+        "validTemplates": "Modelos válidos: {{validTemplates}}",
+        "validSpecTemplates": "Usar: requirements, design ou tasks",
+        "validSteeringTemplates": "Usar: product, tech ou structure",
+        "templateEmpty": "Arquivo de modelo existe mas está vazio: {{file}}",
+        "fileNotFound": "Arquivo de modelo não encontrado: {{file}}",
+        "genericFail": "Falha ao carregar contexto do modelo: {{message}}",
+        "nextSteps": {
+          "checkContent": "Verificar conteúdo do arquivo de modelo",
+          "verifyIntegrity": "Verificar integridade do arquivo",
+          "checkDirectory": "Verificar diretório de modelos",
+          "verifyExists": "Verificar se arquivo de modelo existe",
+          "location": "Localização: {{location}}",
+          "checkPermissions": "Verificar permissões de arquivo",
+          "checkFiles": "Verificar arquivos de modelo"
+        }
+      }
+    },
+    "getSteeringContext": {
+      "description": "Carregar documentos de direcionamento do projeto para contexto arquitetural e de produto.\n\n# Instruções\nChamar durante configuração inicial de especificação para verificar diretrizes de projeto existentes (product.md, tech.md, structure.md). Opcional para projetos novos mas recomendado para bases de código estabelecidas. Se não existem documentos de direcionamento, perguntar ao usuário se quer criá-los primeiro ou prosseguir com especificação.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "docTitles": {
+        "product": "Contexto do Produto",
+        "tech": "Contexto Tecnológico",
+        "structure": "Contexto de Estrutura"
+      },
+      "successMessage": "Contexto de direcionamento carregado com sucesso",
+      "messages": {
+        "notFound": "Nenhum documento de direcionamento encontrado",
+        "notFoundContext": "## Contexto de Documentos de Direcionamento\n\nNenhum documento de direcionamento encontrado. Prosseguir usando melhores práticas para o stack tecnológico detectado.",
+        "emptyDocs": "Documentos de direcionamento existem mas estão vazios",
+        "emptyContext": "## Contexto de Documentos de Direcionamento\n\nDocumentos de direcionamento encontrados mas todos estão vazios.",
+        "fullContext": "## Contexto de Documentos de Direcionamento (Pré-carregado)\n\n{{sections}}\n\n**Nota**: Documentos de direcionamento foram pré-carregados. Não usar get-content para buscá-los novamente."
+      },
+      "nextSteps": {
+        "notFound": {
+          "useBestPractices": "Usar melhores práticas e convenções para o stack tecnológico detectado",
+          "askToCreate": "Para bases de código estabelecidas: Perguntar ao usuário se quer criar documentos de direcionamento para orientação específica do projeto",
+          "newProjectNote": "Para projetos novos: Contexto de direcionamento tipicamente não é necessário - prosseguir com melhores práticas tecnológicas"
+        },
+        "empty": {
+          "useBestPractices": "Usar melhores práticas e convenções para o stack tecnológico",
+          "askToPopulate": "Para bases de código estabelecidas: Perguntar ao usuário se quer popular documentos de direcionamento com contexto específico do projeto",
+          "newProjectNote": "Para projetos novos: Documentos de direcionamento vazios estão bem - prosseguir com práticas padrão"
+        },
+        "success": {
+          "doNotCallAgain": "Contexto de direcionamento carregado - não chamar get-steering-context novamente",
+          "reference": "Referenciar estes padrões em requisitos, design e tarefas",
+          "align": "Garantir que todas as decisões se alinhem com visão documentada do projeto"
+        }
+      },
+      "errors": {
+        "genericFail": "Falha ao carregar contexto de direcionamento: {{message}}",
+        "nextSteps": {
+          "checkPath": "Verificar se o caminho do projeto existe",
+          "checkPermissions": "Verificar permissões de arquivo",
+          "runSetup": "Executar spec-steering-setup se documentos de direcionamento estão faltando"
+        }
+      }
+    },
+    "getSpecContext": {
+      "description": "Carregar documentos de especificação existentes para trabalho retomado.\n\n# Instruções\nChamar APENAS ao retornar ao trabalho em especificações existentes após uma pausa ou começar do zero em uma especificação que não criou. Nunca usar durante criação ativa de especificação se acabou de criar os documentos. Carrega requirements.md, design.md e tasks.md para contexto de implementação.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "specNameDescription": "Nome da especificação para carregar contexto",
+      "docTitles": {
+        "requirements": "Requisitos",
+        "design": "Design",
+        "tasks": "Tarefas"
+      },
+      "successMessage": "Contexto de especificação carregado com sucesso para: {{specName}}",
+      "messages": {
+        "emptyDocs": "Documentos de especificação para \"{{specName}}\" existem mas estão vazios",
+        "emptyContext": "## Contexto de Especificação\n\nNenhum documento de especificação encontrado para: {{specName}}",
+        "fullContext": "## Contexto de Especificação (Pré-carregado): {{specName}}\n\n{{sections}}\n\n**Nota**: Documentos de especificação foram pré-carregados. Não usar get-content para buscá-los novamente."
+      },
+      "nextSteps": {
+        "empty": {
+          "addContent": "Adicionar conteúdo a .spec-workflow/specs/{{specName}}/",
+          "createMissing": "Criar documentos em falta",
+          "ensureContent": "Garantir que todos os três documentos tenham conteúdo"
+        },
+        "success": {
+          "proceed": "Contexto carregado - prosseguir com implementação",
+          "reference": "Referenciar requisitos e design para cada tarefa",
+          "updateStatus": "Atualizar status da tarefa com manage-tasks"
+        }
+      },
+      "errors": {
+        "notFound": "Nenhuma especificação encontrada para: {{specName}}",
+        "availableSpecs": "Especificações disponíveis: {{specs}}",
+        "genericFail": "Falha ao carregar contexto de especificação: {{message}}",
+        "nextSteps": {
+          "useExisting": "Usar um nome de especificação existente",
+          "createNew": "Ou criar nova com create-spec-doc",
+          "create": "Criar especificação com create-spec-doc",
+          "checkSpelling": "Verificar ortografia do nome da especificação",
+          "verifySetup": "Verificar configuração do projeto",
+          "checkPath": "Verificar caminho do projeto",
+          "verifyName": "Verificar nome da especificação",
+          "checkPermissions": "Verificar permissões de arquivo",
+          "createIfMissing": "Criar especificação se estiver faltando"
+        }
+      }
+    },
+    "getApprovalStatus": {
+      "description": "Verificar o status atual de uma solicitação de aprovação.\n\n# Instruções\nChamar após request-approval para consultar decisão do usuário. Continuar verificando até que status seja \"aprovado\" ou \"precisa-revisão\". Se precisa-revisão, revisar feedback, atualizar documento com create-spec-doc, então criar NOVA solicitação de aprovação. Apenas prosseguir para próxima fase após status \"aprovado\".",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto (opcional - usará contexto se não fornecido)",
+      "approvalIdDescription": "O ID da solicitação de aprovação a verificar",
+      "messages": {
+        "pending": "BLOQUEADO: Status é {{status}}. Aprovação verbal NÃO é aceita. Usar apenas painel ou extensão VS Code.",
+        "other": "Status de aprovação: {{status}}"
+      },
+      "nextSteps": {
+        "pending": {
+          "blocked": "BLOQUEADO - Não prosseguir",
+          "noVerbal": "APROVAÇÃO VERBAL NÃO ACEITA - Usar apenas painel ou extensão VS Code",
+          "useUI": "Aprovação deve ser feita via painel ou extensão VS Code",
+          "poll": "Continuar consultando com get-approval-status"
+        },
+        "approved": {
+          "canProceed": "APROVADO - Pode prosseguir",
+          "delete": "Executar delete-approval antes de continuar",
+          "response": "Resposta: {{response}}"
+        },
+        "rejected": {
+          "blocked": "BLOQUEADO - REJEITADO",
+          "doNotProceed": "Não prosseguir",
+          "revise": "Revisar feedback e revisar",
+          "reason": "Razão: {{reason}}",
+          "notes": "Notas: {{notes}}"
+        },
+        "needsRevision": {
+          "blocked": "BLOQUEADO - Não prosseguir",
+          "update": "Atualizar documento com feedback",
+          "newRequest": "Criar NOVA solicitação de aprovação",
+          "feedback": "Feedback: {{feedback}}",
+          "notes": "Notas: {{notes}}",
+          "comments": "{{count}} comentários para correções direcionadas"
+        }
+      },
+      "errors": {
+        "projectPathRequired": "Caminho do projeto é obrigatório. Por favor, forneça o parâmetro projectPath.",
+        "notFound": "Solicitação de aprovação não encontrada: {{approvalId}}",
+        "genericFail": "Falha ao verificar status de aprovação: {{message}}"
+      }
+    },
+    "deleteApproval": {
+      "description": "Limpar solicitações de aprovação completadas do sistema.\n\n# Instruções\nChamar IMEDIATAMENTE após receber status \"aprovado\". Passo de limpeza essencial para prevenir desordem de aprovações. Deve completar antes de mover para próxima fase do fluxo de trabalho. Mantém o sistema de aprovação organizado para futuras solicitações.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto (opcional - usará contexto se não fornecido)",
+      "approvalIdDescription": "ID da solicitação de aprovação a deletar",
+      "successMessage": "Solicitação de aprovação \"{{approvalId}}\" deletada com sucesso",
+      "nextSteps": {
+        "cleanupComplete": "Limpeza completa",
+        "continue": "Continuar para próxima fase"
+      },
+      "errors": {
+        "projectPathRequired": "Caminho do projeto é obrigatório. Por favor, forneça o parâmetro projectPath.",
+        "notFound": "Solicitação de aprovação \"{{approvalId}}\" não encontrada",
+        "notApproved": "BLOQUEADO: Não é possível prosseguir - status é \"{{status}}\". APROVAÇÃO VERBAL NÃO ACEITA. Usar painel ou extensão VS Code.",
+        "deleteFailed": "Falha ao deletar solicitação de aprovação \"{{approvalId}}\"",
+        "genericFail": "Falha ao deletar aprovação: {{message}}",
+        "nextSteps": {
+          "verifyId": "Verificar ID de aprovação",
+          "checkStatus": "Verificar status com get-approval-status",
+          "stop": "PARAR - Não prosseguir para próxima fase",
+          "wait": "Aguardar aprovação",
+          "poll": "Consultar com get-approval-status",
+          "checkPermissions": "Verificar permissões de arquivo",
+          "verifyExists": "Verificar se aprovação existe",
+          "retry": "Tentar novamente",
+          "checkPath": "Verificar caminho do projeto",
+          "checkSystem": "Verificar sistema de aprovação"
+        }
+      }
+    },
+    "createSteeringDoc": {
+      "description": "Criar documentos de direcionamento do projeto com orientação arquitetural.\n\n# Instruções\nChamar APENAS após usuário aprovar explicitamente criação de documentos de direcionamento. Não obrigatório para fluxo de trabalho de especificação. Cria um de: product.md (visão/objetivos), tech.md (decisões técnicas), ou structure.md (organização do código base). Usar steering-guide primeiro para modelos.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "documentDescription": "Qual documento de direcionamento criar: product, tech ou structure",
+      "contentDescription": "O conteúdo markdown completo para o documento de direcionamento",
+      "docNames": {
+        "product": "Direcionamento do Produto",
+        "tech": "Direcionamento Técnico",
+        "structure": "Direcionamento de Estrutura"
+      },
+      "successMessage": "Documento {{docName}} criado com sucesso",
+      "nextSteps": {
+        "saved": "Salvo {{filename}}",
+        "product": "Próximo: Criar tech.md",
+        "tech": "Próximo: Criar structure.md",
+        "structure": "Direcionamento completo. Usar request-approval com category:\"steering\" e categoryName:\"steering\"",
+        "dashboard": "Painel: {{dashboardUrl}}",
+        "dashboardUnavailable": "Painel não disponível"
+      },
+      "errors": {
+        "failed": "Falha ao criar documento de direcionamento {{document}}: {{message}}",
+        "nextSteps": {
+          "checkPath": "Verificar se caminho do projeto existe",
+          "verifyContent": "Verificar conteúdo markdown",
+          "retry": "Tentar novamente com parâmetros corretos"
+        }
+      }
+    },
+    "createSpecDoc": {
+      "description": "Criar ou atualizar documentos de especificação seguindo a sequência do fluxo de trabalho.\n\n# Instruções\nChamar APÓS carregar modelos e gerar conteúdo para cada fase. Cria um documento por vez: primeiro requisitos, depois design, depois tarefas. Nunca criar múltiplos documentos sem aprovação do usuário entre cada um. Sempre seguir estrutura do modelo de get-template-context.",
+      "projectPathDescription": "Caminho absoluto para a raiz do projeto",
+      "specNameDescription": "Nome da funcionalidade em kebab-case (ex., user-authentication)",
+      "documentDescription": "Qual documento de especificação criar/atualizar: requirements, design ou tasks",
+      "contentDescription": "O conteúdo markdown completo para o documento de especificação",
+      "errors": {
+        "designBeforeReq": "VIOLAÇÃO DO FLUXO DE TRABALHO: Não é possível criar design.md antes de requirements.md existir!\nCriar requirements.md primeiro, obter revisão do usuário, depois criar design.md.",
+        "tasksBeforeDesign": "VIOLAÇÃO DO FLUXO DE TRABALHO: Não é possível criar tasks.md antes de design.md existir!\nCriar design.md primeiro, obter revisão do usuário, depois criar tasks.md.",
+        "failed": "Falha: {{message}}"
+      },
+      "successMessage": "Criado {{filename}} em: {{filePath}}\n\nBLOQUEANTE: Deve solicitar aprovação via painel ou extensão VS Code.\nAPROVAÇÃO VERBAL NÃO ACEITA.\nNÃO prosseguir até sistema mostrar status aprovado."
+    },
+    "specWorkflowGuide": {
+      "description": "Carregar instruções essenciais do fluxo de trabalho de especificação para guiar desenvolvimento de funcionalidade da ideia à implementação.\n\n# Instruções\nChamar esta ferramenta PRIMEIRO quando usuários solicitarem criação de especificação, desenvolvimento de funcionalidade ou mencionarem especificações. Isso fornece a sequência completa do fluxo de trabalho (Requisitos → Design → Tarefas → Implementação) que deve ser seguida. Sempre carregar antes de qualquer outras ferramentas de especificação para garantir entendimento adequado do fluxo de trabalho.",
+      "dashboardMessage": "Monitorar progresso no painel: {{dashboardUrl}}",
+      "dashboardUnavailable": "Painel não disponível - executando em modo sem interface",
+      "successMessage": "Guia completo de fluxo de trabalho de especificação carregado - siga este fluxo de trabalho exatamente",
+      "nextSteps": {
+        "step1": "Seguir sequência: Requisitos → Design → Tarefas → Implementação",
+        "step2": "Carregar modelos com get-template-context primeiro",
+        "step3": "Solicitar aprovação após cada documento",
+        "step4": "Usar apenas ferramentas MCP"
+      },
+      "guide": "# Fluxo de Trabalho de Desenvolvimento de Especificação\n\n## Visão Geral\n\nVocê guia usuários através de desenvolvimento dirigido por especificação usando ferramentas MCP. Transforma ideias aproximadas em especificações detalhadas através das fases Requisitos → Design → Tarefas → Implementação. Use busca web quando disponível para melhores práticas atuais.\n\nNomes de funcionalidades usam kebab-case (ex., user-authentication). Criar UMA especificação por vez.\n\n## Diagrama do Fluxo de Trabalho\n```mermaid\nflowchart TD\n    Start([Início: Usuário solicita funcionalidade]) --> CheckSteering{Documentos de direcionamento existem?}\n    CheckSteering -->|Sim| P1_Load[get-steering-context]\n    CheckSteering -->|Não| P1_Template\n    \n    %% Fase 1: Requisitos\n    P1_Load --> P1_Template[get-template-context<br/>templateType: spec<br/>template: requirements]\n    P1_Template --> P1_Research[Busca web se disponível]\n    P1_Research --> P1_Create[create-spec-doc<br/>document: requirements]\n    P1_Create --> P1_Approve[request-approval<br/>apenas filePath]\n    P1_Approve --> P1_Status[get-approval-status<br/>consultar status]\n    P1_Status --> P1_Check{Status?}\n    P1_Check -->|precisa-revisão| P1_Update[Atualizar documento usando comentários do usuário como orientação]\n    P1_Update --> P1_Create\n    P1_Check -->|aprovado| P1_Clean[delete-approval]\n    P1_Clean -->|falhou| P1_Status\n    \n    %% Fase 2: Design\n    P1_Clean -->|sucesso| P2_Template[get-template-context<br/>templateType: spec<br/>template: design]\n    P2_Template --> P2_Analyze[Analisar padrões do código base]\n    P2_Analyze --> P2_Create[create-spec-doc<br/>document: design]\n    P2_Create --> P2_Approve[request-approval<br/>apenas filePath]\n    P2_Approve --> P2_Status[get-approval-status<br/>consultar status]\n    P2_Status --> P2_Check{Status?}\n    P2_Check -->|precisa-revisão| P2_Update[Atualizar documento usando comentários do usuário como orientação]\n    P2_Update --> P2_Create\n    P2_Check -->|aprovado| P2_Clean[delete-approval]\n    P2_Clean -->|falhou| P2_Status\n    \n    %% Fase 3: Tarefas\n    P2_Clean -->|sucesso| P3_Template[get-template-context<br/>templateType: spec<br/>template: tasks]\n    P3_Template --> P3_Break[Converter design em tarefas]\n    P3_Break --> P3_Create[create-spec-doc<br/>document: tasks]\n    P3_Create --> P3_Approve[request-approval<br/>apenas filePath]\n    P3_Approve --> P3_Status[get-approval-status<br/>consultar status]\n    P3_Status --> P3_Check{Status?}\n    P3_Check -->|precisa-revisão| P3_Update[Atualizar documento usando comentários do usuário como orientação]\n    P3_Update --> P3_Create\n    P3_Check -->|aprovado| P3_Clean[delete-approval]\n    P3_Clean -->|falhou| P3_Status\n    \n    %% Fase 4: Implementação\n    P3_Clean -->|sucesso| P4_Ready[Especificação completa.<br/>Pronto para implementar?]\n    P4_Ready -->|Sim| P4_Status[spec-status]\n    P4_Status --> P4_Task[manage-tasks<br/>action: set-status<br/>status: in-progress]\n    P4_Task --> P4_Code[Implementar código]\n    P4_Code --> P4_Complete[manage-tasks<br/>action: set-status<br/>status: completed]\n    P4_Complete --> P4_More{Mais tarefas?}\n    P4_More -->|Sim| P4_Task\n    P4_More -->|Não| End([Implementação Completa])\n    \n    style Start fill:#e1f5e1\n    style End fill:#e1f5e1\n    style P1_Check fill:#ffe6e6\n    style P2_Check fill:#ffe6e6\n    style P3_Check fill:#ffe6e6\n    style CheckSteering fill:#fff4e6\n    style P4_More fill:#fff4e6\n```\n\n## Fluxo de Trabalho de Especificação\n\n### Fase 1: Requisitos\n**Propósito**: Definir o que construir baseado em necessidades do usuário.\n\n**Ferramentas**:\n- get-steering-context: Verificar diretrizes do projeto (se base de código estabelecida)\n- get-template-context: Carregar modelo de requisitos (templateType: \"spec\", template: \"requirements\")\n- create-spec-doc: Criar requirements.md\n- request-approval: Obter aprovação do usuário\n- get-approval-status: Verificar status de aprovação\n- delete-approval: Limpar após aprovação\n\n**Processo**:\n1. Verificar documentos de direcionamento (perguntar ao usuário se quer criá-los para bases de código estabelecidas)\n2. Carregar modelo de requisitos\n3. Pesquisar expectativas de mercado/usuário (se busca web disponível)\n4. Gerar requisitos como histórias de usuário com critérios EARS\n5. Criar documento com create-spec-doc\n6. Solicitar aprovação (apenas filePath, nunca conteúdo)\n7. Consultar status até aprovado/precisa-revisão (NUNCA aceitar aprovação verbal)\n8. Se precisa-revisão: atualizar documento, criar NOVA aprovação, NÃO prosseguir\n9. Uma vez aprovado: delete-approval (deve ter sucesso) antes de prosseguir\n10. Se delete-approval falhar: PARAR - retornar à consulta\n\n### Fase 2: Design\n**Propósito**: Criar design técnico abordando todos os requisitos.\n\n**Ferramentas**:\n- get-template-context: Carregar modelo de design (templateType: \"spec\", template: \"design\")\n- create-spec-doc: Criar design.md\n- request-approval: Obter aprovação do usuário\n- get-approval-status: Verificar status\n- delete-approval: Limpar\n\n**Processo**:\n1. Carregar modelo de design\n2. Analisar base de código para padrões a reutilizar\n3. Pesquisar escolhas tecnológicas (se busca web disponível)\n4. Gerar design com todas as seções do modelo\n5. Criar documento e solicitar aprovação\n6. Consultar status até aprovado/precisa-revisão\n7. Se precisa-revisão: atualizar documento, criar NOVA aprovação, NÃO prosseguir\n8. Uma vez aprovado: delete-approval (deve ter sucesso) antes de prosseguir\n9. Se delete-approval falhar: PARAR - retornar à consulta\n\n### Fase 3: Tarefas\n**Propósito**: Quebrar design em tarefas de implementação atômicas.\n\n**Ferramentas**:\n- get-template-context: Carregar modelo de tarefas (templateType: \"spec\", template: \"tasks\")\n- create-spec-doc: Criar tasks.md\n- request-approval: Obter aprovação do usuário\n- get-approval-status: Verificar status\n- delete-approval: Limpar\n\n**Processo**:\n1. Carregar modelo de tarefas\n2. Converter design em tarefas atômicas (1-3 arquivos cada)\n3. Incluir caminhos de arquivo e referências de requisitos\n4. Criar documento e solicitar aprovação\n5. Consultar status até aprovado/precisa-revisão\n6. Se precisa-revisão: atualizar documento, criar NOVA aprovação, NÃO prosseguir\n7. Uma vez aprovado: delete-approval (deve ter sucesso) antes de prosseguir\n8. Se delete-approval falhar: PARAR - retornar à consulta\n9. Após limpeza bem-sucedida: \"Especificação completa. Pronto para implementar?\"\n\n### Fase 4: Implementação\n**Propósito**: Executar tarefas sistematicamente.\n\n**Ferramentas**:\n- spec-status: Verificar progresso geral\n- manage-tasks: Rastrear e atualizar status de tarefa\n- get-spec-context: Carregar especificações se retornando ao trabalho\n\n**Processo**:\n1. Verificar status atual com spec-status\n2. Para cada tarefa:\n   - manage-tasks action: \"set-status\", status: \"in-progress\"\n   - Implementar o código\n   - manage-tasks action: \"set-status\", status: \"completed\"\n3. Continuar até todas as tarefas completas\n\n## Regras do Fluxo de Trabalho\n\n- Sempre usar ferramentas MCP, nunca criar documentos manualmente\n- Seguir estruturas exatas dos modelos\n- Obter aprovação explícita do usuário entre fases\n- Completar fases em sequência (sem pular)\n- Uma especificação por vez\n- Usar kebab-case para nomes de especificação\n- Solicitações de aprovação: fornecer apenas filePath, nunca conteúdo\n- BLOQUEANTE: Nunca prosseguir se delete-approval falhar\n- CRÍTICO: Deve ter status aprovado E limpeza bem-sucedida antes da próxima fase\n- CRÍTICO: Aprovação verbal NUNCA é aceita - apenas painel ou extensão VS Code\n- NUNCA prosseguir quando usuário disser \"aprovado\" - verificar apenas status do sistema\n- Documentos de direcionamento são opcionais - criar apenas quando explicitamente solicitado"
+    }
+  }
+}

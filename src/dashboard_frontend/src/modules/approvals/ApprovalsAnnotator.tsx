@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { hexToColorObject, isValidHex } from './colors';
 import { Markdown } from '../markdown/Markdown';
 import { TextInputModal } from '../modals/TextInputModal';
@@ -31,6 +32,7 @@ function CommentModal({
   initialComment?: string;
   isEditing?: boolean;
 }) {
+  const { t } = useTranslation();
   const [comment, setComment] = useState(initialComment);
   const [selectedColorHex, setSelectedColorHex] = useState(highlightColor.name || '#FFEB3B');
   const selectedColor = useMemo(() => hexToColorObject(selectedColorHex), [selectedColorHex]);
@@ -66,10 +68,10 @@ function CommentModal({
         <div className="flex items-center justify-between p-4 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex-1 min-w-0">
             <h3 className="text-lg sm:text-lg font-semibold text-gray-900 dark:text-white">
-              {isEditing ? 'Edit Comment' : 'Add Comment'}
+              {isEditing ? t('approvals.annotator.editCommentTitle') : t('approvals.annotator.addCommentTitle')}
             </h3>
             <p className="text-sm sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-1">
-              Comment on the highlighted text below
+              {t('approvals.annotator.subtitle')}
             </p>
           </div>
           <button
@@ -85,7 +87,7 @@ function CommentModal({
         {/* Highlighted Text Preview */}
         <div className="p-4 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 min-w-0 flex-shrink-0">
           <label className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-2">
-            Highlighted Text:
+            {t('approvals.annotator.highlightedText')}
           </label>
           <div 
             className="p-3 sm:p-3 rounded-lg border text-sm sm:text-sm leading-relaxed max-h-32 sm:max-h-32 overflow-y-auto min-w-0"
@@ -104,7 +106,7 @@ function CommentModal({
         {/* Color Picker */}
         <div className="p-4 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 min-w-0 flex-shrink-0">
           <label className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-2">
-            Choose Highlight Color:
+            {t('approvals.annotator.chooseHighlightColor')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -115,7 +117,7 @@ function CommentModal({
                 if (isValidHex(v)) setSelectedColorHex(v.toUpperCase()); 
               }}
               className="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
-              title="Pick highlight color"
+              title={t('approvals.annotator.pickColorTooltip')}
             />
             <input
               type="text"
@@ -135,19 +137,19 @@ function CommentModal({
         {/* Comment Input */}
         <div className="p-4 sm:p-4 lg:p-6 min-w-0 flex-1 flex flex-col">
           <label className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-2">
-            Your Comment:
+            {t('approvals.annotator.yourComment')}
           </label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Enter your comment here..."
+            placeholder={t('approvals.annotator.commentPlaceholder')}
             className="w-full min-w-0 px-3 sm:px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-base leading-relaxed flex-1 min-h-[120px]"
             autoFocus
           />
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 sm:mt-2 break-words">
-            <span className="hidden sm:inline">Press Ctrl/Cmd + Enter to save, or Escape to cancel</span>
-            <span className="sm:hidden">Tap Save to confirm</span>
+            <span className="hidden sm:inline">{t('approvals.annotator.hints.desktop')}</span>
+            <span className="sm:hidden">{t('approvals.annotator.hints.mobile')}</span>
           </p>
         </div>
 
@@ -157,7 +159,7 @@ function CommentModal({
             onClick={onClose}
             className="px-4 sm:px-4 py-3 text-base text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors touch-manipulation"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleSave}
@@ -167,8 +169,8 @@ function CommentModal({
             <svg className="w-4 h-4 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
-            <span className="hidden sm:inline">{isEditing ? 'Update Comment' : 'Add Comment'}</span>
-            <span className="sm:hidden">{isEditing ? 'Update' : 'Save'}</span>
+            <span className="hidden sm:inline">{isEditing ? t('approvals.annotator.updateCommentButton') : t('approvals.annotator.addCommentButton')}</span>
+            <span className="sm:hidden">{isEditing ? t('approvals.annotator.updateShort') : t('approvals.annotator.saveShort')}</span>
           </button>
         </div>
       </div>
@@ -176,7 +178,7 @@ function CommentModal({
   );
 }
 
-export function renderContentWithAnnotations(content: string, comments: ApprovalComment[], onHighlightClick?: (commentId: string) => void) {
+export function renderContentWithAnnotations(content: string, comments: ApprovalComment[], onHighlightClick?: (commentId: string) => void, tooltip?: string) {
   let processedContent = (content ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -195,13 +197,15 @@ export function renderContentWithAnnotations(content: string, comments: Approval
     const regex = new RegExp(escaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
     const style = `background-color: ${c.highlightColor.bg}; border-bottom: 2px solid ${c.highlightColor.border}; padding: 1px 2px; border-radius: 2px; cursor: pointer;`;
     const clickHandler = onHighlightClick ? `data-comment-id="${c.id || ''}"` : '';
-    processedContent = processedContent.replace(regex, `<span style="${style}" class="highlight-${c.highlightColor.name} highlight-clickable" ${clickHandler} title="Click to view/edit comment">${escaped}</span>`);
+    const titleAttr = tooltip || 'Click to view/edit comment';
+    processedContent = processedContent.replace(regex, `<span style="${style}" class="highlight-${c.highlightColor.name} highlight-clickable" ${clickHandler} title="${titleAttr}">${escaped}</span>`);
   }
   return processedContent;
 }
 
 export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMode, setViewMode }:
   { content: string; comments: ApprovalComment[]; onCommentsChange: (c: ApprovalComment[]) => void; viewMode: 'preview' | 'annotate'; setViewMode: (m: 'preview' | 'annotate') => void; }) {
+  const { t } = useTranslation();
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     selectedText: string;
@@ -294,7 +298,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
     onCommentsChange(dup);
   }
 
-  const annotatedHtml = useMemo(() => renderContentWithAnnotations(content || '', comments, handleHighlightClick), [content, comments]);
+  const annotatedHtml = useMemo(() => renderContentWithAnnotations(content || '', comments, handleHighlightClick, t('approvals.annotator.tooltips.viewEditComment')), [content, comments, t]);
 
   // Handle clicks on highlighted text
   function handleContentClick(e: React.MouseEvent) {
@@ -327,7 +331,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              <span className="hidden sm:inline">Preview</span>
+              <span className="hidden sm:inline">{t('approvals.annotator.viewMode.preview')}</span>
             </button>
             <button
               onClick={() => setViewMode('annotate')}
@@ -340,7 +344,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              <span className="hidden sm:inline">Annotate</span>
+              <span className="hidden sm:inline">{t('approvals.annotator.viewMode.annotate')}</span>
             </button>
           </div>
         </div>
@@ -362,11 +366,11 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span className="leading-relaxed break-words">
-                    <strong>How to annotate:</strong><br className="hidden sm:block" />
-                    <span className="block sm:hidden">Select text → double tap selection → comment dialog appears. Tap highlighted text to edit comments.</span>
-                    <span className="hidden sm:block">• Select any text to add a comment - a dialog will appear automatically</span><br className="hidden sm:block" />
-                    <span className="hidden sm:block">• Click on existing highlights (colored text) to view or edit comments</span><br className="hidden sm:block" />
-                    <span className="hidden sm:block">• Use the "Add General Comment" button for document-wide feedback</span>
+                    <strong>{t('approvals.annotator.instructions.title')}</strong><br className="hidden sm:block" />
+                    <span className="block sm:hidden">{t('approvals.annotator.instructions.mobile')}</span>
+                    <span className="hidden sm:block">{t('approvals.annotator.instructions.step1')}</span><br className="hidden sm:block" />
+                    <span className="hidden sm:block">{t('approvals.annotator.instructions.step2')}</span><br className="hidden sm:block" />
+                    <span className="hidden sm:block">{t('approvals.annotator.instructions.step3')}</span>
                   </span>
                 </p>
               </div>
@@ -401,7 +405,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
               <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 inline flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Switch to <strong>Annotate</strong> mode to add comments by selecting text or add general feedback.
+            {t('approvals.annotator.switchHelp')}
             </div>
           )}
 
@@ -414,8 +418,8 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
               <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              <span className="hidden sm:inline">Add General Comment</span>
-              <span className="sm:hidden">Add Comment</span>
+              <span className="hidden sm:inline">{t('approvals.annotator.addGeneralComment.button')}</span>
+              <span className="sm:hidden">{t('approvals.annotator.addCommentShort')}</span>
             </button>
           )}
 
@@ -428,8 +432,8 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
               <svg className="mx-auto w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
-              <p className="text-xs sm:text-sm font-medium">No comments yet</p>
-              <p className="text-xs mt-1">Select text or add a general comment</p>
+              <p className="text-xs sm:text-sm font-medium">{t('approvals.annotator.empty.title')}</p>
+              <p className="text-xs mt-1">{t('approvals.annotator.empty.description')}</p>
             </div>
           ) : (
             comments.map((c, idx) => (
@@ -452,20 +456,20 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                           backgroundColor: c.highlightColor.bg, 
                           borderColor: c.highlightColor.border 
                         }}
-                        title={c.highlightColor.name + ' highlight'}
+                        title={t('approvals.annotator.colorHighlight', { color: c.highlightColor.name })}
                       />
                     )}
                     <span className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 truncate">
                       <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
-                      <span className="truncate">{c.type === 'selection' ? 'Text Selection' : 'General Comment'}</span>
+                      <span className="truncate">{c.type === 'selection' ? t('approvals.annotator.badge.textSelection') : t('approvals.annotator.badge.generalComment')}</span>
                     </span>
                   </div>
                   <button
                     onClick={() => remove(idx)}
                     className="text-gray-400 hover:text-red-500 text-xs p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors touch-manipulation flex-shrink-0 ml-2"
-                    title="Delete comment"
+                    title={t('approvals.annotator.tooltips.deleteComment')}
                   >
                     <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -511,9 +515,9 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         isOpen={generalCommentModalOpen}
         onClose={() => setGeneralCommentModalOpen(false)}
         onSubmit={handleGeneralCommentSubmit}
-        title="Add General Comment"
-        placeholder="Enter a general comment..."
-        submitText="Add Comment"
+        title={t('approvals.annotator.addGeneralComment.title')}
+        placeholder={t('approvals.annotator.addGeneralComment.placeholder')}
+        submitText={t('approvals.annotator.addGeneralComment.submit')}
         multiline={true}
       />
 
@@ -522,10 +526,10 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         isOpen={deleteModalState.isOpen}
         onClose={() => setDeleteModalState({ isOpen: false, commentIndex: -1 })}
         onConfirm={handleDeleteConfirm}
-        title="Delete Comment"
-        message="Are you sure you want to remove this comment? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('approvals.annotator.delete.title')}
+        message={t('approvals.annotator.delete.message')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         variant="danger"
       />
     </div>

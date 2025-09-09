@@ -48,6 +48,24 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 - **Template System** - Pre-built templates for all document types
 - **Cross-Platform** - Works on Windows, macOS, and Linux
 
+## 🌍 Supported Languages
+
+The entire interface (dashboard, VSCode extension, and MCP tools) is available in:
+
+- 🇺🇸 **English** (en)
+- 🇯🇵 **Japanese** (ja) - 日本語
+- 🇨🇳 **Chinese** (zh) - 中文
+- 🇪🇸 **Spanish** (es) - Español
+- 🇧🇷 **Portuguese** (pt) - Português
+- 🇩🇪 **German** (de) - Deutsch
+- 🇫🇷 **French** (fr) - Français
+- 🇷🇺 **Russian** (ru) - Русский
+- 🇮🇹 **Italian** (it) - Italiano
+- 🇰🇷 **Korean** (ko) - 한국어
+- 🇸🇦 **Arabic** (ar) - العربية
+
+Language selection is available in both the dashboard and VSCode extension settings.
+
 ## Quick Start
 
 1. **Add to your AI tool configuration** (see MCP Client Setup below):

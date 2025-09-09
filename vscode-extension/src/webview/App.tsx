@@ -542,6 +542,54 @@ Review the existing steering documents (if any) and help me improve or complete 
                   >
                     {t('language.chinese')}
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('es')}
+                    className={cn(currentLanguage === 'es' && "bg-accent")}
+                  >
+                    {t('language.spanish')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('pt')}
+                    className={cn(currentLanguage === 'pt' && "bg-accent")}
+                  >
+                    {t('language.portuguese')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('de')}
+                    className={cn(currentLanguage === 'de' && "bg-accent")}
+                  >
+                    {t('language.german')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('fr')}
+                    className={cn(currentLanguage === 'fr' && "bg-accent")}
+                  >
+                    {t('language.french')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('ru')}
+                    className={cn(currentLanguage === 'ru' && "bg-accent")}
+                  >
+                    {t('language.russian')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('it')}
+                    className={cn(currentLanguage === 'it' && "bg-accent")}
+                  >
+                    {t('language.italian')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('ko')}
+                    className={cn(currentLanguage === 'ko' && "bg-accent")}
+                  >
+                    {t('language.korean')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleLanguageChange('ar')}
+                    className={cn(currentLanguage === 'ar' && "bg-accent")}
+                  >
+                    {t('language.arabic')}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button

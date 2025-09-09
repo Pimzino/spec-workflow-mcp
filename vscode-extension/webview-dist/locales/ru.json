@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Spec Workflow MCP",
+    "support": "Поддержать этот проект"
+  },
+  "tabs": {
+    "overview": "Обзор проекта",
+    "steering": "Управляющие документы",
+    "specs": "Документы спецификаций",
+    "tasks": "Управление задачами",
+    "approvals": "Запросы на одобрение"
+  },
+  "overview": {
+    "projectTitle": "Обзор проекта",
+    "activeSpecs": "Активные спецификации",
+    "archivedSpecs": "Архивированные спецификации",
+    "totalSpecs": "Всего спецификаций",
+    "tasks": "Задачи",
+    "overallProgress": "Общий прогресс",
+    "recentActivity": "Недавняя активность",
+    "modified": "{{time}}",
+    "noSpecs": "Спецификации не найдены"
+  },
+  "tasks": {
+    "specLabel": "Спецификация",
+    "specPlaceholder": "Выберите спецификацию",
+    "stats": {
+      "total": "Всего",
+      "done": "Готово",
+      "left": "Осталось",
+      "progress": "Прогресс"
+    },
+    "overallProgress": "Общий прогресс",
+    "section": "Раздел",
+    "task": "Задача",
+    "copied": "Скопировано!",
+    "copyPromptTitle": "Скопировать подсказку для AI агента",
+    "copyPromptAI": "Скопировать AI подсказку для задачи {{taskId}}",
+    "copyPromptDefault": "Скопировать стандартную подсказку для задачи {{taskId}}",
+    "copyPrompt": "Пожалуйста, работайте над задачей {{taskId}} для спецификации \"{{specName}}\"",
+    "promptAvailable": "AI подсказка доступна",
+    "promptPreview": "Предварительный просмотр AI подсказки",
+    "usingDefaultPrompt": "Используется стандартная подсказка",
+    "status": {
+      "pending": "Ожидает",
+      "inProgress": "В процессе",
+      "completed": "Завершено"
+    },
+    "taskGroup": "Группа задач",
+    "meta": {
+      "files": "Файлы",
+      "implementation": "Реализация",
+      "purposes": "Цели",
+      "requirements": "Требования",
+      "leverage": "Использовать"
+    },
+    "loading": "Загрузка задач...",
+    "noSpecs": "Спецификации не найдены",
+    "selectSpec": "Выберите спецификацию выше для просмотра задач"
+  },
+  "approvals": {
+    "docLabel": "Документ",
+    "categoryPlaceholder": "Выберите категорию",
+    "status": {
+      "pending": "Ожидает"
+    },
+    "created": "Создано: {{time}}",
+    "response": {
+      "approved": "Одобрено",
+      "rejected": "Отклонено",
+      "needsRevision": "Требует доработки"
+    },
+    "processing": "Обработка...",
+    "approve": "Одобрить",
+    "reject": "Отклонить",
+    "requestRevision": "Запросить доработку",
+    "openInEditor": "Открыть в редакторе",
+    "noPending": "Нет ожидающих одобрений для этой спецификации",
+    "noPendingDocuments": "Документы с ожидающими одобрениями не найдены",
+    "selectCategory": "Выберите категорию выше для просмотра ожидающих одобрений"
+  },
+  "specs": {
+    "active": "Активные",
+    "archived": "Архивированные",
+    "specLabel": "Спецификация",
+    "specPlaceholder": "Выберите спецификацию",
+    "archive": "Архивировать",
+    "unarchive": "Разархивировать",
+    "docsTitle": "Документы спецификации",
+    "modified": "Изменено {{time}}",
+    "fileNotFound": "Файл не найден",
+    "open": "Открыть",
+    "noDocs": "Документы не найдены для этой спецификации",
+    "noActiveSpecs": "Активные спецификации не найдены",
+    "noArchivedSpecs": "Архивированные спецификации не найдены",
+    "selectSpec": "Выберите спецификацию выше для просмотра документов"
+  },
+  "steering": {
+    "title": "Управляющие документы",
+    "modified": "Изменено {{time}}",
+    "fileNotFound": "Файл не найден",
+    "open": "Открыть",
+    "noDocs": "Управляющие документы не найдены",
+    "copyInstructions": "Скопировать инструкции",
+    "copied": "Скопировано!"
+  },
+  "common": {
+    "scrollToTop": "Прокрутить вверх"
+  },
+  "language": {
+    "selector": "Язык",
+    "changed": "Язык успешно изменен",
+    "auto": "Авто",
+    "english": "English",
+    "japanese": "日本語",
+    "chinese": "中文",
+    "spanish": "Español",
+    "portuguese": "Português",
+    "german": "Deutsch",
+    "french": "Français",
+    "russian": "Русский",
+    "italian": "Italiano",
+    "korean": "한국어",
+    "arabic": "العربية"
+  }
+}
