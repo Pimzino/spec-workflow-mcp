@@ -61,6 +61,10 @@ type ApiContextType = {
   unarchiveSpec: (name: string) => Promise<{ ok: boolean; status: number }>;
   getSteeringDocument: (name: string) => Promise<{ content: string; lastModified: string }>;
   saveSteeringDocument: (name: string, content: string) => Promise<{ ok: boolean; status: number }>;
+  listCustomDocuments: () => Promise<string[]>;
+  getCustomDocument: (path: string) => Promise<{ content: string; lastModified: string | null }>;
+  saveCustomDocument: (path: string, content: string) => Promise<{ ok: boolean; status: number }>;
+  saveTaskPrompt: (specName: string, taskId: string, prompt: string) => Promise<{ ok: boolean; status: number }>;
 };
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -149,6 +153,10 @@ export function ApiProvider({ initial, children }: { initial?: { specs?: SpecSum
     unarchiveSpec: (name: string) => postJson(`/api/specs/${encodeURIComponent(name)}/unarchive`, {}),
     getSteeringDocument: (name: string) => getJson(`/api/steering/${encodeURIComponent(name)}`),
     saveSteeringDocument: (name: string, content: string) => putJson(`/api/steering/${encodeURIComponent(name)}`, { content }),
+    listCustomDocuments: () => getJson('/api/documents'),
+    getCustomDocument: (path: string) => getJson(`/api/documents/${path}`),
+    saveCustomDocument: (path: string, content: string) => postJson(`/api/documents/${path}`, { content }),
+    saveTaskPrompt: (specName: string, taskId: string, prompt: string) => postJson(`/api/specs/${encodeURIComponent(specName)}/tasks/${encodeURIComponent(taskId)}/prompt`, { prompt }),
   }), [specs, archivedSpecs, approvals, info, steeringDocuments, reloadAll]);
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;

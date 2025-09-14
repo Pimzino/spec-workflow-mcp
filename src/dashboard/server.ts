@@ -236,6 +236,83 @@ export class DashboardServer {
       };
     });
 
+    // --- Custom Document Endpoints ---
+
+    const documentsDir = join(this.options.projectPath, '.spec-workflow', 'documents');
+    await fs.mkdir(documentsDir, { recursive: true });
+
+    async function getFilesRecursive(dir: string): Promise<string[]> {
+        const dirents = await fs.readdir(dir, { withFileTypes: true });
+        const files = await Promise.all(dirents.map(async (dirent) => {
+            const res = resolve(dir, dirent.name);
+            if (dirent.isDirectory()) {
+                return getFilesRecursive(res);
+            } else {
+                return res.substring(documentsDir.length + 1);
+            }
+        }));
+        return Array.prototype.concat(...files);
+    }
+
+    // List all custom documents
+    this.app.get('/api/documents', async (request, reply) => {
+      try {
+        const files = await getFilesRecursive(documentsDir);
+        return files;
+      } catch (error: any) {
+        if (error.code === 'ENOENT') {
+          return []; // If directory doesn't exist, return empty array
+        }
+        reply.code(500).send({ error: 'Failed to list custom documents' });
+      }
+    });
+
+    // Get a specific custom document
+    this.app.get('/api/documents/*', async (request, reply) => {
+      const docPath = (request.params as any)['*'];
+      const fullPath = join(documentsDir, docPath);
+
+      // Security check: ensure the path is within the documents directory
+      if (!fullPath.startsWith(documentsDir)) {
+        return reply.code(400).send({ error: 'Invalid document path' });
+      }
+
+      try {
+        const content = await fs.readFile(fullPath, 'utf-8');
+        const stats = await fs.stat(fullPath);
+        return { content, lastModified: stats.mtime.toISOString() };
+      } catch (error: any) {
+        if (error.code === 'ENOENT') {
+          return { content: '', lastModified: null }; // Return empty for creation
+        }
+        reply.code(500).send({ error: `Failed to read document: ${error.message}` });
+      }
+    });
+
+    // Save a specific custom document
+    this.app.post('/api/documents/*', async (request, reply) => {
+      const docPath = (request.params as any)['*'];
+      const { content } = request.body as { content: string };
+      const fullPath = join(documentsDir, docPath);
+
+      // Security check
+      if (!fullPath.startsWith(documentsDir)) {
+        return reply.code(400).send({ error: 'Invalid document path' });
+      }
+      if (typeof content !== 'string') {
+        return reply.code(400).send({ error: 'Content must be a string' });
+      }
+
+      try {
+        await fs.mkdir(dirname(fullPath), { recursive: true });
+        await fs.writeFile(fullPath, content, 'utf-8');
+        return { success: true, message: 'Document saved successfully' };
+      } catch (error: any) {
+        reply.code(500).send({ error: `Failed to save document: ${error.message}` });
+      }
+    });
+
+
     this.app.get('/api/specs/:name', async (request, reply) => {
       const { name } = request.params as { name: string };
       const spec = await this.parser.getSpec(name);
@@ -526,6 +603,60 @@ export class DashboardServer {
         };
       } catch (error: any) {
         reply.code(500).send({ error: `Failed to update task status: ${error.message}` });
+      }
+    });
+
+    this.app.post('/api/specs/:name/tasks/:taskId/prompt', async (request, reply) => {
+      const { name, taskId } = request.params as { name: string; taskId: string };
+      const { prompt } = request.body as { prompt: string };
+
+      if (typeof prompt !== 'string') {
+        return reply.code(400).send({ error: 'Prompt must be a string' });
+      }
+
+      try {
+        const tasksPath = join(this.options.projectPath, '.spec-workflow', 'specs', name, 'tasks.md');
+        const tasksContent = await readFile(tasksPath, 'utf-8');
+        const lines = tasksContent.split('\n');
+
+        const parseResult = parseTasksFromMarkdown(tasksContent);
+        const taskIndex = parseResult.tasks.findIndex(t => t.id === taskId);
+
+        if (taskIndex === -1) {
+          return reply.code(404).send({ error: `Task ${taskId} not found` });
+        }
+
+        const task = parseResult.tasks[taskIndex];
+        const nextTask = parseResult.tasks[taskIndex + 1];
+        const taskStartLine = task.lineNumber;
+        const taskEndLine = nextTask ? nextTask.lineNumber : lines.length;
+
+        let promptLineIndex = -1;
+        for (let i = taskStartLine + 1; i < taskEndLine; i++) {
+          if (lines[i].includes('_Prompt:')) {
+            promptLineIndex = i;
+            break;
+          }
+        }
+
+        const newPromptLine = `    _Prompt: ${prompt}_`;
+
+        if (promptLineIndex !== -1) {
+          // Found existing prompt, replace it
+          lines[promptLineIndex] = newPromptLine;
+        } else {
+          // No existing prompt, add a new one after the task line
+          lines.splice(taskStartLine + 1, 0, newPromptLine);
+        }
+
+        const updatedContent = lines.join('\n');
+        await fs.writeFile(tasksPath, updatedContent, 'utf-8');
+
+        this.broadcastTaskUpdate(name);
+
+        return { success: true, message: `Prompt for task ${taskId} updated.` };
+      } catch (error: any) {
+        reply.code(500).send({ error: `Failed to update prompt: ${error.message}` });
       }
     });
 

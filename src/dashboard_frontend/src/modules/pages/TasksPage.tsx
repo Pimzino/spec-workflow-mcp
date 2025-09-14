@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useNotifications } from '../notifications/NotificationProvider';
 import { AlertModal } from '../modals/AlertModal';
 import { useTranslation } from 'react-i18next';
+import { PromptEditorModal } from '../modals/PromptEditorModal';
 
 function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
   if (!dateStr) return t ? t('common.never') : 'Never';
@@ -131,24 +132,6 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
       )}
     </div>
   );
-}
-
-function copyTaskPrompt(specName: string, task: any, onSuccess?: () => void, onFailure?: (text: string) => void) {
-  // Use custom prompt if available, otherwise fallback to default
-  const command = task.prompt || `Please work on task ${task.id} for spec "${specName}"`;
-  
-  // Try modern clipboard API first
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(command).then(() => {
-      onSuccess?.();
-    }).catch(() => {
-      // If clipboard API fails, fall back to legacy method
-      fallbackCopy(command, onSuccess, onFailure);
-    });
-  } else {
-    // Clipboard API not available (HTTP over LAN, older browsers, etc.)
-    fallbackCopy(command, onSuccess, onFailure);
-  }
 }
 
 function fallbackCopy(text: string, onSuccess?: () => void, onFailure?: (text: string) => void) {
@@ -427,7 +410,8 @@ function SpecCard({ spec, onSelect, isSelected }: { spec: any; onSelect: (spec: 
 
 function TaskList({ specName }: { specName: string }) {
   const { t } = useTranslation();
-  const { getSpecTasksProgress } = useApi();
+  const { getSpecTasksProgress, saveTaskPrompt } = useApi();
+  const { showNotification } = useNotifications();
   const { subscribe, unsubscribe } = useWs();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any | null>(null);
@@ -435,6 +419,7 @@ function TaskList({ specName }: { specName: string }) {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [copiedTaskId, setCopiedTaskId] = useState<string | null>(null);
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set());
+  const [editingTask, setEditingTask] = useState<any | null>(null);
   
   // Filter and sort state
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
@@ -910,31 +895,18 @@ function TaskList({ specName }: { specName: string }) {
                         </span>
                         {!task.isHeader && (
                           <button
-                            onClick={() => copyTaskPrompt(specName, task, () => {
-                              setCopiedTaskId(task.id);
-                              setTimeout(() => setCopiedTaskId(null), 2000);
-                            })}
-                            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs rounded transition-colors flex items-center gap-1 min-h-[32px] sm:min-h-[36px] ${
-                              copiedTaskId === task.id 
-                                ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' 
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                            }`}
-                            title={t('tasksPage.copyPrompt.tooltip')}
+                            onClick={() => setEditingTask(task)}
+                            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs rounded transition-colors flex items-center gap-1 min-h-[32px] sm:min-h-[36px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600`}
+                            title={t('tasksPage.editPrompt.tooltip')}
                           >
-                            {copiedTaskId === task.id ? (
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                              </svg>
-                            ) : (
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                            )}
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z" />
+                            </svg>
                             <span className="hidden sm:inline">
-                              {copiedTaskId === task.id ? t('tasksPage.copyPrompt.copied') : t('tasksPage.copyPrompt.copyPrompt')}
+                              {t('tasksPage.editPrompt.editPrompt', 'Edit Prompt')}
                             </span>
                             <span className="sm:hidden">
-                              {copiedTaskId === task.id ? t('tasksPage.copyPrompt.copied') : t('tasksPage.copyPrompt.copy')}
+                              {t('tasksPage.editPrompt.edit', 'Edit')}
                             </span>
                           </button>
                         )}
@@ -1082,6 +1054,34 @@ function TaskList({ specName }: { specName: string }) {
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-40">
+        {editingTask && (
+          <PromptEditorModal
+            isOpen={!!editingTask}
+            onClose={() => setEditingTask(null)}
+            title={t('tasksPage.editPrompt.modalTitle', { taskId: editingTask.id })}
+            initialValue={editingTask.prompt || `Please work on task ${editingTask.id} for spec "${specName}"`}
+            onSave={async (newPrompt) => {
+              await saveTaskPrompt(specName, editingTask.id, newPrompt);
+              showNotification(t('tasksPage.notifications.promptSaved', { taskId: editingTask.id }), 'success');
+              setEditingTask(null);
+              // Optimistically update the task in local data
+              setData((prevData: any) => {
+                if (!prevData) return prevData;
+                const updatedTaskList = prevData.taskList.map((t: any) =>
+                  t.id === editingTask.id ? { ...t, prompt: newPrompt } : t
+                );
+                return { ...prevData, taskList: updatedTaskList };
+              });
+            }}
+            onCopy={(promptToCopy) => {
+              fallbackCopy(promptToCopy, () => {
+                showNotification(t('tasksPage.notifications.promptCopied', { taskId: editingTask.id }), 'success');
+              }, () => {
+                showNotification(t('tasksPage.notifications.copyFailed', { taskId: editingTask.id }), 'error');
+              });
+            }}
+          />
+        )}
         {/* Scroll to Top Button */}
         {showScrollToTop && (
           <button
