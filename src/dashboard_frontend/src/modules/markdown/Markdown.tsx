@@ -14,8 +14,9 @@ function createMd(): MarkdownIt {
     typographer: true,
     highlight(str, lang) {
       if (lang === 'mermaid') {
+        const key = `mermaid-${Date.now()}-${Math.random()}`;
         // Render as mermaid container; actual rendering happens in useEffect
-        return `<div class="mermaid">${str}</div>`;
+        return `<div class="mermaid" key="${key}">${str}</div>`;
       }
       if (lang && hljs.getLanguage(lang)) {
         try {
@@ -35,7 +36,8 @@ function createMd(): MarkdownIt {
     const token = tokens[idx];
     const langInfo = token.info ? token.info.trim() : '';
     if (langInfo === 'mermaid') {
-      return `<div class="mermaid">${token.content}</div>`;
+      const key = `mermaid-fence-${Date.now()}-${Math.random()}`;
+      return `<div class="mermaid" key="${key}">${token.content}</div>`;
     }
     return fence ? fence(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
   };
