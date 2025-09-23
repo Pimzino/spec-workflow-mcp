@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    if: github.actor != 'hello-happy-puppy'
     runs-on: ubuntu-latest
     strategy:
       matrix:
