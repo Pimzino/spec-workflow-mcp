@@ -8,10 +8,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export class WorkspaceInitializer {
   private projectPath: string;
   private version: string;
+  private language: string;
   
-  constructor(projectPath: string, version: string) {
+  constructor(projectPath: string, version: string, language: string = 'en') {
     this.projectPath = projectPath;
     this.version = version;
+    this.language = language;
   }
   
   async initializeWorkspace(): Promise<void> {
@@ -64,11 +66,31 @@ export class WorkspaceInitializer {
   }
   
   private async copyTemplate(templateName: string, targetDir: string): Promise<void> {
-    // Use simple filename without version
     const targetFileName = `${templateName}.md`;
     const targetPath = join(targetDir, targetFileName);
     
-    const sourcePath = join(__dirname, '..', 'markdown', 'templates', `${templateName}.md`);
+    // 基础模板路径
+    const baseTemplateDir = join(__dirname, '..', 'markdown', 'templates');
+    
+    let sourcePath: string;
+    
+    if (this.language === 'en') {
+      // 英文模板直接使用根目录下的文件
+      sourcePath = join(baseTemplateDir, `${templateName}.md`);
+    } else {
+      // 其他语言使用对应的子目录
+      const langTemplatePath = join(baseTemplateDir, this.language, `${templateName}.md`);
+      const defaultTemplatePath = join(baseTemplateDir, `${templateName}.md`);
+      
+      try {
+        // 首先尝试语言特定模板
+        await fs.access(langTemplatePath);
+        sourcePath = langTemplatePath;
+      } catch {
+        // 语言特定模板不存在，使用英文模板
+        sourcePath = defaultTemplatePath;
+      }
+    }
     
     try {
       const content = await fs.readFile(sourcePath, 'utf-8');

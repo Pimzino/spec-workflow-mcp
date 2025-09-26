@@ -67,6 +67,30 @@ With auto-started dashboard:
 }
 ```
 
+With Chinese language templates:
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--language", "zh"]
+    }
+  }
+}
+```
+
+**中文用户快速开始：**
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/你的项目路径", "--language", "zh", "--AutoStartDashboard"]
+    }
+  }
+}
+```
+
 ### Step 2: Choose your interface
 
 **Option A: Web Dashboard** (Required for CLI users)
@@ -78,6 +102,30 @@ npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard
 
 Install [Spec Workflow MCP Extension](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp) from the VSCode marketplace.
 
+## 🌏 Language Support
+
+Spec Workflow supports multiple languages for templates. Use the `--language` flag to specify your preferred language:
+
+```bash
+# Use Chinese templates
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --language zh
+
+# Use Japanese templates  
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --language ja
+
+# Use English templates (default)
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --language en
+```
+
+**Supported Languages:**
+- `en` - English (default)
+- `zh` - 中文 (Chinese)
+
+When you specify a language, the system will:
+1. Look for templates in the language-specific subdirectory (e.g., `templates/zh/` for Chinese)
+2. Fall back to English templates if language-specific templates don't exist
+3. Apply the language setting to both the MCP server and dashboard interface
+
 ## 📝 How to Use
 
 Simply mention spec-workflow in your conversation:
@@ -85,6 +133,11 @@ Simply mention spec-workflow in your conversation:
 - **"Create a spec for user authentication"** - Creates complete spec workflow
 - **"List my specs"** - Shows all specs and their status
 - **"Execute task 1.2 in spec user-auth"** - Runs a specific task
+
+**中文使用示例：**
+- **"创建一个用户认证功能的规格说明"** - 创建完整的中文规格工作流
+- **"列出我的所有规格文档"** - 显示所有规格文档及其状态
+- **"执行用户认证规格中的任务1.2"** - 运行特定任务
 
 [See more examples →](docs/PROMPTING-GUIDE.md)
 
@@ -147,6 +200,18 @@ Or with auto-started dashboard:
     "spec-workflow": {
       "command": "npx",
       "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+    }
+  }
+}
+```
+
+Or with Chinese language templates:
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--language", "zh"]
     }
   }
 }
