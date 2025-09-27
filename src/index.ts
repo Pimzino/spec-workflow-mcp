@@ -30,6 +30,8 @@ OPTIONS:
                          If not specified, uses an ephemeral port
   --config <path>         Use custom config file instead of default location
                          Supports both relative and absolute paths
+  --language <code>       Set language for internationalization (e.g., zh, en, ja)
+                         Supported languages: en, zh, ja, es, fr, de, it, ko, ar
 
 CONFIGURATION:
   Default config: <project-dir>/.spec-workflow/config.toml
@@ -81,11 +83,19 @@ EXAMPLES:
   # Custom config with dashboard
   spec-workflow-mcp --config ./dev-config.toml --dashboard --port 3000
 
+  # Set language to Chinese
+  spec-workflow-mcp --language zh
+
+  # Chinese language with dashboard
+  spec-workflow-mcp --language zh --AutoStartDashboard
+
 PARAMETER FORMATS:
   --port 3456             Space-separated format
   --port=3456             Equals format
   --config path           Space-separated format
   --config=path           Equals format
+  --language zh           Space-separated format
+  --language=zh           Equals format
 
 For more information, visit: https://github.com/Pimzino/spec-workflow-mcp
 `);
@@ -110,18 +120,21 @@ function parseArguments(args: string[]): {
   const autoStartDashboard = args.includes('--AutoStartDashboard');
   let customPort: number | undefined;
   let configPath: string | undefined;
+  let customLang: string | undefined;
   
   // Check for invalid flags
-  const validFlags = ['--dashboard', '--AutoStartDashboard', '--port', '--config', '--help', '-h'];
+  const validFlags = ['--dashboard', '--AutoStartDashboard', '--port', '--config', '--language', '--help', '-h'];
   for (const arg of args) {
     if (arg.startsWith('--') && !arg.includes('=')) {
       if (!validFlags.includes(arg)) {
-        throw new Error(`Unknown option: ${arg}\nUse --help to see available options.`);
+        throw new Error(`Unknown option: ${arg}
+Use --help to see available options.`);
       }
     } else if (arg.startsWith('--') && arg.includes('=')) {
       const flagName = arg.split('=')[0];
       if (!validFlags.includes(flagName)) {
-        throw new Error(`Unknown option: ${flagName}\nUse --help to see available options.`);
+        throw new Error(`Unknown option: ${flagName}
+Use --help to see available options.`);
       }
     }
   }
@@ -181,6 +194,25 @@ function parseArguments(args: string[]): {
     }
   }
   
+  // Parse --language parameter (supports --language zh and --language=zh formats)
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    
+    if (arg.startsWith('--language=')) {
+      // Handle --language=zh format
+      customLang = arg.split('=')[1];
+      if (!customLang) {
+        throw new Error('--language parameter requires a value (e.g., --language=zh)');
+      }
+    } else if (arg === '--language' && i + 1 < args.length) {
+      // Handle --language zh format
+      customLang = args[i + 1];
+      i++; // Skip the next argument as it's the language code
+    } else if (arg === '--language') {
+      throw new Error('--language parameter requires a value (e.g., --language zh)');
+    }
+  }
+  
   // Get project path (filter out flags and their values)
   const filteredArgs = args.filter((arg, index) => {
     if (arg === '--dashboard') return false;
@@ -189,8 +221,10 @@ function parseArguments(args: string[]): {
     if (arg === '--port') return false;
     if (arg.startsWith('--config=')) return false;
     if (arg === '--config') return false;
-    // Check if this arg is a value following --port or --config
-    if (index > 0 && (args[index - 1] === '--port' || args[index - 1] === '--config')) return false;
+    if (arg.startsWith('--language=')) return false;
+    if (arg === '--language') return false;
+    // Check if this arg is a value following --port, --config, or --language
+    if (index > 0 && (args[index - 1] === '--port' || args[index - 1] === '--config' || args[index - 1] === '--language')) return false;
     return true;
   });
   
@@ -203,7 +237,7 @@ function parseArguments(args: string[]): {
     console.warn('Consider specifying an explicit path for better clarity.');
   }
   
-  return { projectPath, isDashboardMode, autoStartDashboard, port: customPort, lang: undefined, configPath };
+  return { projectPath, isDashboardMode, autoStartDashboard, port: customPort, lang: customLang, configPath };
 }
 
 async function main() {

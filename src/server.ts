@@ -73,7 +73,7 @@ export class SpecWorkflowMCPServer {
       const __dirname = dirname(fileURLToPath(import.meta.url));
       const packageJsonPath = join(__dirname, '..', 'package.json');
       const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-      const workspaceInitializer = new WorkspaceInitializer(this.projectPath, packageJson.version);
+      const workspaceInitializer = new WorkspaceInitializer(this.projectPath, packageJson.version, this.lang);
       await workspaceInitializer.initializeWorkspace();
       
       // Initialize session manager
