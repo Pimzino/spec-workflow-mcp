@@ -219,6 +219,22 @@ Add to your `opencode.json` configuration file:
 ```
 </details>
 
+<details>
+<summary><strong>Windsurf</strong></summary>
+
+Add to your `~/.codeium/windsurf/mcp_config.json` configuration file:
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+    }
+  }
+}
+```
+</details>
+
 ## 📚 Documentation
 
 - [Configuration Guide](docs/CONFIGURATION.md) - Command-line options, config files
