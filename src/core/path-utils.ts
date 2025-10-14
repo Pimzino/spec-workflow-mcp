@@ -4,7 +4,7 @@ import { constants } from 'fs';
 
 export class PathUtils {
   /**
-   * Safely join paths ensuring no directory traversal
+   * Safely join paths ensuring no directory traversal 安全地连接路径，确保没有目录遍历
    */
   private static safeJoin(basePath: string, ...paths: string[]): string {
     // Validate base path

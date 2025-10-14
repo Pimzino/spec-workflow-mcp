@@ -3,36 +3,41 @@
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * 复制目录
+ * @param src 源目录
+ * @param dest 目标目录
+ */
 function copyDir(src, dest) {
-  if (!fs.existsSync(dest)) {
+  if (!fs.existsSync(dest)) { // 如果目标目录不存在，创建它
     fs.mkdirSync(dest, { recursive: true });
   }
 
-  const entries = fs.readdirSync(src, { withFileTypes: true });
+  const entries = fs.readdirSync(src, { withFileTypes: true }); // 读取源目录中的所有文件和目录
 
   for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
+    const srcPath = path.join(src, entry.name); // 源路径
+    const destPath = path.join(dest, entry.name); // 目标路径
 
     if (entry.isDirectory()) {
-      copyDir(srcPath, destPath);
+      copyDir(srcPath, destPath); // 如果entry是目录，递归复制
     } else {
-      fs.copyFileSync(srcPath, destPath);
+      fs.copyFileSync(srcPath, destPath); // 如果entry是文件，复制文件
     }
   }
 }
 
 // Copy markdown directory
-const markdownSrc = path.join(__dirname, '..', 'src', 'markdown');
-const markdownDest = path.join(__dirname, '..', 'dist', 'markdown');
+const markdownSrc = path.join(__dirname, '..', 'src', 'markdown'); // 源目录
+const markdownDest = path.join(__dirname, '..', 'dist', 'markdown'); // 目标目录
 
 if (fs.existsSync(markdownSrc)) {
-  copyDir(markdownSrc, markdownDest);
-  console.log('✓ Copied markdown files');
+  copyDir(markdownSrc, markdownDest); // 复制markdown文件
+  console.log('✓ Copied markdown files'); // 复制markdown文件
 }
 
 // Copy locales directory
-const localesSrc = path.join(__dirname, '..', 'src', 'locales');
+const localesSrc = path.join(__dirname, '..', 'src', 'locales'); 
 const localesDest = path.join(__dirname, '..', 'dist', 'locales');
 
 if (fs.existsSync(localesSrc)) {

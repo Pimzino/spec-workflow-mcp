@@ -93,11 +93,16 @@ For more information, visit: https://github.com/Pimzino/spec-workflow-mcp
 
 function expandTildePath(path: string): string {
   if (path.startsWith('~/') || path === '~') {
-    return path.replace('~', homedir());
+    return path.replace('~', homedir()); // 替换~为家目录
   }
   return path;
 }
 
+/**
+ * 解析命令行参数
+ * @param args - 命令行参数
+ * @returns 解析后的参数
+ */
 function parseArguments(args: string[]): { 
   projectPath: string; 
   isDashboardMode: boolean; 
@@ -106,12 +111,12 @@ function parseArguments(args: string[]): {
   lang?: string;
   configPath?: string;
 } {
-  const isDashboardMode = args.includes('--dashboard');
-  const autoStartDashboard = args.includes('--AutoStartDashboard');
-  let customPort: number | undefined;
-  let configPath: string | undefined;
+  const isDashboardMode = args.includes('--dashboard'); // 是否为仪表盘模式
+  const autoStartDashboard = args.includes('--AutoStartDashboard'); // 是否自动启动仪表盘
+  let customPort: number | undefined; // 自定义端口
+  let configPath: string | undefined; // 自定义配置路径
   
-  // Check for invalid flags
+  // Check for invalid flags 检查无效的标志
   const validFlags = ['--dashboard', '--AutoStartDashboard', '--port', '--config', '--help', '-h'];
   for (const arg of args) {
     if (arg.startsWith('--') && !arg.includes('=')) {
@@ -136,29 +141,29 @@ function parseArguments(args: string[]): {
       if (portStr) {
         const parsed = parseInt(portStr, 10);
         if (isNaN(parsed)) {
-          throw new Error(`Invalid port number: ${portStr}. Port must be a number.`);
+          throw new Error(`Invalid port number: ${portStr}. Port must be a number.`); // 无效的端口号
         }
         if (parsed < 1024 || parsed > 65535) {
-          throw new Error(`Port ${parsed} is out of range. Port must be between 1024 and 65535.`);
+          throw new Error(`Port ${parsed} is out of range. Port must be between 1024 and 65535.`); // 端口号范围错误
         }
         customPort = parsed;
       } else {
-        throw new Error('--port parameter requires a value (e.g., --port=3000)');
+        throw new Error('--port parameter requires a value (e.g., --port=3000)'); // --port参数需要一个值
       }
     } else if (arg === '--port' && i + 1 < args.length) {
-      // Handle --port 3000 format
+      // Handle --port 3000 format 处理--port 3000格式
       const portStr = args[i + 1];
       const parsed = parseInt(portStr, 10);
       if (isNaN(parsed)) {
-        throw new Error(`Invalid port number: ${portStr}. Port must be a number.`);
+        throw new Error(`Invalid port number: ${portStr}. Port must be a number.`); // 无效的端口号
       }
       if (parsed < 1024 || parsed > 65535) {
-        throw new Error(`Port ${parsed} is out of range. Port must be between 1024 and 65535.`);
+        throw new Error(`Port ${parsed} is out of range. Port must be between 1024 and 65535.`); // 端口号范围错误
       }
       customPort = parsed;
       i++; // Skip the next argument as it's the port value
     } else if (arg === '--port') {
-      throw new Error('--port parameter requires a value (e.g., --port 3000)');
+      throw new Error('--port parameter requires a value (e.g., --port 3000)'); // --port参数需要一个值
     }
   }
   
@@ -170,7 +175,7 @@ function parseArguments(args: string[]): {
       // Handle --config=path format
       configPath = arg.split('=')[1];
       if (!configPath) {
-        throw new Error('--config parameter requires a value (e.g., --config=./config.toml)');
+        throw new Error('--config parameter requires a value (e.g., --config=./config.toml)'); // --config参数需要一个值
       }
     } else if (arg === '--config' && i + 1 < args.length) {
       // Handle --config path format
@@ -181,7 +186,7 @@ function parseArguments(args: string[]): {
     }
   }
   
-  // Get project path (filter out flags and their values)
+  // Get project path (filter out flags and their values) 获取项目路径（过滤掉标志和它们的值）
   const filteredArgs = args.filter((arg, index) => {
     if (arg === '--dashboard') return false;
     if (arg === '--AutoStartDashboard') return false;
@@ -194,13 +199,13 @@ function parseArguments(args: string[]): {
     return true;
   });
   
-  const rawProjectPath = filteredArgs[0] || process.cwd();
+  const rawProjectPath = filteredArgs[0] || process.cwd(); // 原始项目路径
   const projectPath = expandTildePath(rawProjectPath);
   
-  // Warn if no explicit path was provided and we're using cwd
+  // Warn if no explicit path was provided and we're using cwd 警告如果没有显式路径并且我们使用cwd
   if (!filteredArgs[0] && !isDashboardMode) {
-    console.warn(`Warning: No project path specified, using current directory: ${projectPath}`);
-    console.warn('Consider specifying an explicit path for better clarity.');
+    console.warn(`Warning: No project path specified, using current directory: ${projectPath}`); // 警告如果没有显式路径并且我们使用cwd
+    console.warn('Consider specifying an explicit path for better clarity.'); // 考虑指定一个显式路径以提高清晰度
   }
   
   return { projectPath, isDashboardMode, autoStartDashboard, port: customPort, lang: undefined, configPath };
@@ -216,27 +221,27 @@ async function main() {
       process.exit(0);
     }
     
-    // Parse command-line arguments first to get initial project path
+    // Parse command-line arguments first to get initial project path 解析命令行参数以获取初始项目路径
     const cliArgs = parseArguments(args);
     let projectPath = cliArgs.projectPath;
     
-    // Load config file (custom path or default location)
+    // Load config file (custom path or default location) 加载配置文件（自定义路径或默认位置）
     const configResult = loadConfigFile(projectPath, cliArgs.configPath);
     
     if (configResult.error) {
-      // If custom config was specified but failed, this is fatal
-      if (cliArgs.configPath) {
+      // If custom config was specified but failed, this is fatal 如果自定义配置失败，则这是致命的
+      if (cliArgs.configPath) { // 如果自定义配置路径失败，则这是致命的
         console.error(`Error: ${configResult.error}`);
-        process.exit(1);
+        process.exit(1); // 退出程序
       }
       // For default config location, just warn and continue
-      console.error(`Config file error: ${configResult.error}`);
-      console.error('Continuing with command-line arguments only...');
+      console.error(`Config file error: ${configResult.error}`); // 配置文件错误
+      console.error('Continuing with command-line arguments only...'); // 继续使用命令行参数
     } else if (configResult.config && configResult.configPath) {
       console.error(`Loaded config from: ${configResult.configPath}`);
     }
     
-    // Convert CLI args to config format
+    // Convert CLI args to config format 将命令行参数转换为配置格式
     const cliConfig: SpecWorkflowConfig = {
       projectDir: cliArgs.projectPath !== process.cwd() ? cliArgs.projectPath : undefined,
       dashboardOnly: cliArgs.isDashboardMode || undefined,
@@ -245,7 +250,7 @@ async function main() {
       lang: cliArgs.lang
     };
     
-    // Merge configs (CLI overrides file config)
+    // Merge configs (CLI overrides file config) 合并配置（命令行参数覆盖配置文件）
     const finalConfig = mergeConfigs(configResult.config, cliConfig);
     
     // Apply final configuration
@@ -268,8 +273,8 @@ async function main() {
       const __dirname = dirname(fileURLToPath(import.meta.url));
       const packageJsonPath = join(__dirname, '..', 'package.json');
       const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-      const workspaceInitializer = new WorkspaceInitializer(projectPath, packageJson.version);
-      await workspaceInitializer.initializeWorkspace();
+      const workspaceInitializer = new WorkspaceInitializer(projectPath, packageJson.version); // 初始化工作区目录和模板
+      await workspaceInitializer.initializeWorkspace(); // 初始化工作区目录和模板
       
       const dashboardServer = new DashboardServer({
         projectPath,

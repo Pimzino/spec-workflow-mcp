@@ -186,7 +186,12 @@
         },
         "specWorkflow.language": {
           "type": "string",
-          "enum": ["auto", "en", "ja", "zh"],
+          "enum": [
+            "auto",
+            "en",
+            "ja",
+            "zh"
+          ],
           "enumDescriptions": [
             "%config.language.auto.description%",
             "%config.language.en.description%",
@@ -207,7 +212,9 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc -b --watch",
     "watch:webview": "npm run build:webview -- --watch",
-    "package": "npm run check-types && npm run lint && npm run build:webview && node esbuild.js --production",
+    "package": "npm run check-types && npm run lint && npm run build:webview && node esbuild.js --production && vsce package",
+    "package:vsix": "vsce package",
+    "publish": "vsce publish",
     "build:webview": "vite build --emptyOutDir",
     "dev:webview": "vite",
     "compile-tests": "tsc -p . --outDir out",
@@ -229,6 +236,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.6.2",
     "esbuild": "^0.25.0",
     "eslint": "^9.21.0",
     "npm-run-all": "^4.1.5",

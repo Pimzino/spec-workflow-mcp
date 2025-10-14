@@ -1,16 +1,48 @@
+# 开发和构建文件
 .vscode/**
 .vscode-test/**
-out/**
-node_modules/**
 src/**
-.gitignore
-.yarnrc
+node_modules/**
+out/test/**
+
+# 源代码文件（已编译到 dist/）
+*.ts
+!*.d.ts
+tsconfig*.json
+*.tsbuildinfo
+
+# 构建工具配置
 esbuild.js
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/eslint.config.mjs
-**/*.map
-**/*.ts
-**/.vscode-test.*
+vite.config.ts
+tailwind.config.js
+eslint.config.mjs
+components.json
+
+# Webview 源文件（已编译到 webview-dist/）
+src/webview/**
 !webview-dist/**
-!package.nls.*.json
+
+# 测试文件
+**/*.test.*
+**/*.spec.*
+
+# 开发文档
+.editorconfig
+.prettierrc*
+.eslintrc*
+
+# Git 相关
+.git
+.gitignore
+.gitattributes
+
+# NPM 相关
+.npmignore
+package-lock.json
+npm-debug.log*
+yarn.lock
+
+# 其他
+*.vsix
+.DS_Store
+*.map

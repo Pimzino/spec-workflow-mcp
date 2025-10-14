@@ -16,16 +16,16 @@ export class WorkspaceInitializer {
   
   async initializeWorkspace(): Promise<void> {
     // Create all necessary directories
-    await this.initializeDirectories();
+    await this.initializeDirectories(); // 创建所有必要的目录
     
     // Copy template files
-    await this.initializeTemplates();
+    await this.initializeTemplates(); // 复制模板文件
     
     // Create config example
-    await this.createConfigExample();
+    await this.createConfigExample(); // 创建配置示例
     
     // Create user templates README
-    await this.createUserTemplatesReadme();
+    await this.createUserTemplatesReadme(); // 创建用户模板README
   }
   
   private async initializeDirectories(): Promise<void> {
@@ -42,7 +42,7 @@ export class WorkspaceInitializer {
     
     for (const dir of directories) {
       const dirPath = join(workflowRoot, dir);
-      await fs.mkdir(dirPath, { recursive: true });
+      await fs.mkdir(dirPath, { recursive: true }); // 创建目录recursive: true 递归创建目录
     }
   }
   
@@ -68,7 +68,7 @@ export class WorkspaceInitializer {
     const targetFileName = `${templateName}.md`;
     const targetPath = join(targetDir, targetFileName);
     
-    const sourcePath = join(__dirname, '..', 'markdown', 'templates', `${templateName}.md`);
+    const sourcePath = join(__dirname, '..', 'markdown', 'templates', `${templateName}-zh.md`);
     
     try {
       const content = await fs.readFile(sourcePath, 'utf-8');
@@ -159,9 +159,9 @@ export class WorkspaceInitializer {
     
     try {
       // Only create if it doesn't exist to avoid overwriting user's example
-      await fs.access(configPath);
+      await fs.access(configPath); // 仅在不存在时创建，避免覆盖用户示例
     } catch {
-      // File doesn't exist, create it
+      // File doesn't exist, create it 文件不存在，创建它
       await fs.writeFile(configPath, configContent, 'utf-8');
     }
   }
