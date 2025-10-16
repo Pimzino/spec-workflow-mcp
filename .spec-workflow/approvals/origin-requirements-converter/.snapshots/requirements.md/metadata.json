@@ -1,0 +1,14 @@
+{
+  "filePath": ".spec-workflow/specs/origin-requirements-converter/requirements.md",
+  "currentVersion": 1,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2025-10-16T05:11:11.916Z",
+      "trigger": "initial",
+      "approvalId": "approval_1760591471914_y97zec2o7",
+      "approvalTitle": "需求文档审批 - 原始需求文档转换器"
+    }
+  ]
+}

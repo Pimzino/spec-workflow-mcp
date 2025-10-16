@@ -1,0 +1,10 @@
+{
+  "id": "approval_1760591471914_y97zec2o7",
+  "title": "需求文档审批 - 原始需求文档转换器",
+  "filePath": ".spec-workflow/specs/origin-requirements-converter/requirements.md",
+  "type": "document",
+  "status": "pending",
+  "createdAt": "2025-10-16T05:11:11.914Z",
+  "category": "spec",
+  "categoryName": "origin-requirements-converter"
+}
