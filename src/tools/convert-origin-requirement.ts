@@ -17,19 +17,28 @@ import {
   getExtension,
   SUPPORTED_EXTENSIONS,
 } from "../utils/file-utils.js";
-import { join, basename } from "path";
+import { join, basename, dirname } from "path";
 import { SpecWorkflowConfig } from "../config.js";
 
 export const convertOriginRequirementTool: Tool = {
   name: "convert-origin-requirement",
-  description: `Convert origin requirement document to spec-workflow format.
+  description: `Convert origin requirement document to Markdown format.
 
 # Instructions
-Parse filename (remove # prefix if present), locate file in origin-requirements/ directory, determine format, convert if needed using DocumentConverter, read/parse Markdown content, transform to spec-workflow requirements.md format, and save to .spec-workflow/specs/{spec-name}/requirements.md.
+Parse filename (remove # prefix if present), locate file in .spec-workflow/origin-requirements/ directory, determine format, convert if needed using DocumentConverter (Pandoc), and save to .spec-workflow/origin-requirements/.temp/{filename}/ directory.
+
+Workflow:
+1. Locate file in .spec-workflow/origin-requirements/
+2. Convert Word to Markdown (if needed) using Pandoc
+3. Save to .spec-workflow/origin-requirements/.temp/{filename}/
+   - {filename}.md - Markdown content
+   - media/ - Extracted images
+4. Return success with markdownPath for next step
+5. Next: Use spec-workflow-guide tool to create standard requirements document
 
 Supports:
-- Direct Markdown files (.md) - processed directly
-- Word documents (.docx, .doc) - converted to Markdown first
+- Direct Markdown files (.md) - copied to .temp directory
+- Word documents (.docx, .doc) - converted to Markdown with media extraction
 - Filename with # prefix (e.g., #myfile.docx)`,
   inputSchema: {
     type: "object",
@@ -141,28 +150,28 @@ export async function convertOriginRequirementHandler(
 
       // 创建文档转换器
       const converterConfig = {
-        tempDir: join(projectPath, ".temp"),
         pandocPath: config?.pandocPath,
         converterApiUrl: config?.converterApiUrl,
         apiTimeout: 30000,
-        ...(context as any).config, // 从 context 获取配置
       };
 
       const converter = createDocumentConverter(converterConfig);
 
-      // 准备输出路径（临时目录）
-      const tempDir = join(projectPath, ".temp", "origin-conversions");
+      // 直接指定输出路径到 .temp/{filename}/ 目录下
+      const baseName = basename(cleanFilename, fileExtension);
+      const originReqPath = PathUtils.getOriginRequirementsPath(projectPath);
+      const tempDir = join(originReqPath, ".temp", baseName);
       await ensureDirectoryExists(tempDir);
 
-      const baseName = basename(cleanFilename, fileExtension);
-      const tempOutputPath = join(tempDir, `${baseName}.md`);
+      const outputPath = join(tempDir, `${baseName}.md`);
 
       // 执行转换
       console.error("  开始转换...");
+      console.error("  输出路径:", outputPath);
       const conversionResult = await converter.convert(
         ConversionType.WORD_TO_MD,
         inputFilePath,
-        tempOutputPath
+        outputPath
       );
 
       if (!conversionResult.success) {
@@ -195,11 +204,7 @@ export async function convertOriginRequirementHandler(
       };
     }
 
-    // 5. 读取 Markdown 内容
-    console.error("  读取 Markdown 内容...");
-    const markdownContent = await readTextFile(markdownPath);
-
-    // 6. 确定 spec 名称
+    // 5. 确定 spec 名称
     const finalSpecName =
       specName ||
       basename(cleanFilename, getExtension(cleanFilename))
@@ -207,39 +212,24 @@ export async function convertOriginRequirementHandler(
         .replace(/[^a-z0-9]+/g, "-");
 
     console.error(`  目标 spec 名称: ${finalSpecName}`);
+    console.error(`  转换后的 Markdown: ${markdownPath}`);
 
-    // 7. 创建 spec 目录
-    const specDir = PathUtils.getSpecPath(projectPath, finalSpecName);
-    await ensureDirectoryExists(specDir);
-
-    // 8. 转换为 spec-workflow 规范格式
-    // 这里简化处理，保留原始内容，添加必要的元数据
-    const requirementsContent = transformToSpecFormat(
-      markdownContent,
-      finalSpecName,
-      cleanFilename
-    );
-
-    // 9. 保存到 requirements.md
-    const requirementsPath = join(specDir, "requirements.md");
-    await writeTextFile(requirementsPath, requirementsContent);
-
-    console.error(`  需求文档已保存: ${requirementsPath}`);
-
+    // 6. 返回成功结果，提示下一步使用 spec-workflow-guide 创建规范文档
     return {
       success: true,
-      message: `成功将原始需求文档转换为 spec-workflow 规范格式`,
+      message: `成功将原始需求文档转换为 Markdown 格式`,
       data: {
         specName: finalSpecName,
-        requirementsPath,
+        markdownPath,
+        tempDir: dirname(markdownPath),
         originFile: inputFilePath,
         converted: conversionPerformed,
         conversionMethod: conversionPerformed ? "pandoc/api" : "direct",
       },
       nextSteps: [
-        `查看需求文档: ${requirementsPath}`,
-        "继续 spec-workflow 流程：设计 → 任务 → 实施",
-        `运行 spec-status 检查进度: projectPath="${projectPath}" specName="${finalSpecName}"`,
+        `查看转换后的 Markdown: ${markdownPath}`,
+        `使用 spec-workflow-guide 工具创建规范需求文档`,
+        `提示：调用 spec-workflow-guide 工具，它会读取转换后的 Markdown 并生成符合规范的需求文档`,
       ],
       projectContext: {
         projectPath,

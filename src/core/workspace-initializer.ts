@@ -9,33 +9,33 @@ export class WorkspaceInitializer {
   private projectPath: string;
   private version: string;
   private templateLang: string; // 模板语言
-
+  
   constructor(projectPath: string, version: string, templateLang: string) {
     this.projectPath = projectPath;
     this.version = version;
     this.templateLang = templateLang; // 默认为英文
   }
-
+  
   async initializeWorkspace(): Promise<void> {
     // Create all necessary directories
     await this.initializeDirectories(); // 创建所有必要的目录
-
+    
     // Copy template files
     await this.initializeTemplates(); // 复制模板文件
-
+    
     // Create config example
     await this.createConfigExample(); // 创建配置示例
-
+    
     // Create user templates README
     await this.createUserTemplatesReadme(); // 创建用户模板README
 
     // Create origin requirements README
     await this.createOriginRequirementsReadme(); // 创建原始需求文档说明
   }
-
+  
   private async initializeDirectories(): Promise<void> {
     const workflowRoot = PathUtils.getWorkflowRoot(this.projectPath);
-
+    
     const directories = [
       "approvals",
       "archive",
@@ -45,19 +45,19 @@ export class WorkspaceInitializer {
       "user-templates",
       "origin-requirements", // 原始需求文档目录
     ];
-
+    
     for (const dir of directories) {
       const dirPath = join(workflowRoot, dir);
       await fs.mkdir(dirPath, { recursive: true }); // 创建目录recursive: true 递归创建目录
     }
   }
-
+  
   private async initializeTemplates(): Promise<void> {
     const templatesDir = join(
       PathUtils.getWorkflowRoot(this.projectPath),
       "templates"
     );
-
+    
     const templates = [
       "requirements-template",
       "design-template",
@@ -66,12 +66,12 @@ export class WorkspaceInitializer {
       "tech-template",
       "structure-template",
     ];
-
+    
     for (const template of templates) {
       await this.copyTemplate(template, templatesDir);
     }
   }
-
+  
   private async copyTemplate(
     templateName: string,
     targetDir: string
@@ -79,7 +79,7 @@ export class WorkspaceInitializer {
     // Use simple filename without version
     const targetFileName = `${templateName}.md`;
     const targetPath = join(targetDir, targetFileName);
-
+    
     // 根据 templateLang 选择对应语言的模板文件
     const sourcePath = join(
       __dirname,
@@ -92,7 +92,7 @@ export class WorkspaceInitializer {
 
     try {
       const content = await fs.readFile(sourcePath, "utf-8");
-
+      
       // Always overwrite to ensure latest template version is used
       await fs.writeFile(targetPath, content, "utf-8");
     } catch (error) {
@@ -101,23 +101,23 @@ export class WorkspaceInitializer {
       console.error(`Failed to copy template ${templateName}: ${errorMessage}`);
     }
   }
-
+  
   private async createConfigExample(): Promise<void> {
     const configPath = join(
       PathUtils.getWorkflowRoot(this.projectPath),
       "config.example.toml"
     );
-
+    
     const configContent =
       this.templateLang === "zh"
         ? this.getConfigContentZh()
         : this.getConfigContentEn();
-
+    
     // Always overwrite to ensure language matches current templateLang setting
     // 始终覆盖以确保语言匹配当前的 templateLang 设置
     await fs.writeFile(configPath, configContent, "utf-8");
   }
-
+  
   private getConfigContentEn(): string {
     return `# Spec Workflow MCP Server Configuration File
 # ============================================
@@ -197,7 +197,7 @@ export class WorkspaceInitializer {
 # templateLang = "zh"
 # autoStartDashboard = true`;
   }
-
+  
   private getConfigContentZh(): string {
     return `# Spec Workflow MCP 服务器配置文件
 # ============================================
@@ -283,7 +283,7 @@ export class WorkspaceInitializer {
 # templateLang = "zh"
 # autoStartDashboard = true`;
   }
-
+  
   private async createUserTemplatesReadme(): Promise<void> {
     const readmePath = join(
       PathUtils.getWorkflowRoot(this.projectPath),
@@ -295,12 +295,12 @@ export class WorkspaceInitializer {
       this.templateLang === "zh"
         ? this.getReadmeContentZh()
         : this.getReadmeContentEn();
-
+    
     // Always overwrite to ensure language matches current templateLang setting
     // 始终覆盖以确保语言匹配当前的 templateLang 设置
     await fs.writeFile(readmePath, readmeContent, "utf-8");
   }
-
+  
   private getReadmeContentEn(): string {
     return `# User Templates
 
@@ -368,7 +368,7 @@ Templates can include placeholders that will be replaced when documents are crea
 - If a custom template has errors, the system will fall back to the default template
 `;
   }
-
+  
   private getReadmeContentZh(): string {
     return `# 用户自定义模板
 

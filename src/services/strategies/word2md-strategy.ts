@@ -82,20 +82,14 @@ export class Word2MdStrategy implements IConversionStrategy {
       const outputDir = dirname(outputPath);
       await ensureDirectoryExists(outputDir);
 
-      // 获取文件名（不含扩展名）
-      const filename = basename(inputPath, extname(inputPath));
-
-      // 创建临时目录结构 .temp/{filename}/
-      const tempDir = getTempDirectory(outputDir, filename);
-      await ensureDirectoryExists(tempDir);
-
-      // 设置媒体目录
-      const extractMedia = options?.extractMedia !== false; // 默认提取媒体
-      const mediaDir = options?.mediaDir || "media";
-      const mediaPath = extractMedia ? join(tempDir, mediaDir) : undefined;
-
-      // 输出文件路径（在临时目录中）
-      const tempOutputPath = join(tempDir, `${filename}.md`);
+      // 直接使用传入的 outputPath，不再自动创建子目录
+      console.error(
+        "[Word2MdStrategy] 🎯 使用简化路径逻辑 - 不创建 .temp 子目录"
+      );
+      console.error("[Word2MdStrategy] outputPath:", outputPath);
+      console.error("[Word2MdStrategy] outputDir:", outputDir);
+      const tempOutputPath = outputPath;
+      const tempDir = outputDir;
 
       // 构建 Pandoc 命令参数
       const args = [
@@ -103,33 +97,33 @@ export class Word2MdStrategy implements IConversionStrategy {
         "docx", // 输入格式
         "-t",
         "gfm", // GitHub Flavored Markdown
+        "--extract-media=./",
         "--wrap=none", // 不自动换行
+        "--markdown-headings=atx", // 使用 ATX 样式标题
+        "--reference-links",
       ];
-
-      // 如果提取媒体文件
-      if (mediaPath) {
-        args.push(`--extract-media=${tempDir}`);
-        // Pandoc 会自动创建 media 子目录
-      }
 
       // 添加自定义 Pandoc 参数
       if (options?.pandocArgs) {
         args.push(...options.pandocArgs);
       }
 
-      // 输出文件
-      args.push("-o", tempOutputPath);
+      // 输出文件（使用相对路径，相对于工作目录）
+      const outputFilename = basename(tempOutputPath);
+      args.push("-o", outputFilename);
 
-      // 输入文件
+      // 输入文件（绝对路径）
       args.push(inputPath);
 
-      // 执行转换
+      // 执行转换，设置工作目录为输出目录，使图片路径为相对路径
       console.error(
         `[Word2MdStrategy] 执行 Pandoc: ${pandocPath} ${args.join(" ")}`
       );
+      console.error(`[Word2MdStrategy] 工作目录: ${tempDir}`);
       const result = await executor.execute({
         executable: pandocPath,
         args,
+        cwd: tempDir, // 🎯 关键：设置工作目录，让 --extract-media=./ 生成相对路径
       });
 
       if (!result.success) {
@@ -153,6 +147,7 @@ export class Word2MdStrategy implements IConversionStrategy {
 
       // 收集媒体文件信息
       let mediaFiles: string[] = [];
+      const mediaPath = join(tempDir, "media");
       if (mediaPath && (await fileExists(mediaPath))) {
         mediaFiles = await getFilesInDirectory(mediaPath, { recursive: true });
         console.error(
@@ -244,12 +239,9 @@ export class Word2MdStrategy implements IConversionStrategy {
       const outputDir = dirname(outputPath);
       await ensureDirectoryExists(outputDir);
 
-      // 获取文件名
-      const filename = basename(inputPath, extname(inputPath));
-
-      // 创建临时目录
-      const tempDir = getTempDirectory(outputDir, filename);
-      await ensureDirectoryExists(tempDir);
+      // 直接使用传入的 outputPath，不再自动创建子目录
+      const tempDir = outputDir;
+      const filename = basename(outputPath, ".md");
 
       // 读取文件内容
       const { readFile } = await import("fs/promises");
