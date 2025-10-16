@@ -14,6 +14,11 @@ RUN npm ci && npm run build
 FROM node:24-alpine
 WORKDIR /app
 
+# Install Pandoc for document conversion
+RUN apk add --no-cache pandoc && \
+    pandoc --version && \
+    echo "Pandoc installed successfully"
+
 # Copy only production files
 COPY --from=builder /app/package*.json ./
 RUN npm ci --only=production

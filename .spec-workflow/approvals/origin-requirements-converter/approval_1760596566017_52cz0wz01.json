@@ -3,8 +3,10 @@
   "title": "任务拆分文档审批 - 原始需求文档转换器",
   "filePath": ".spec-workflow/specs/origin-requirements-converter/tasks.md",
   "type": "document",
-  "status": "pending",
+  "status": "approved",
   "createdAt": "2025-10-16T06:36:06.017Z",
   "category": "spec",
-  "categoryName": "origin-requirements-converter"
+  "categoryName": "origin-requirements-converter",
+  "response": "通过仪表板批准",
+  "respondedAt": "2025-10-16T06:55:45.037Z"
 }
