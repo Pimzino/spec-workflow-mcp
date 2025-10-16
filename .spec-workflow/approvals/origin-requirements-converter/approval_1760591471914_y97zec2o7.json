@@ -3,8 +3,25 @@
   "title": "需求文档审批 - 原始需求文档转换器",
   "filePath": ".spec-workflow/specs/origin-requirements-converter/requirements.md",
   "type": "document",
-  "status": "pending",
+  "status": "needs-revision",
   "createdAt": "2025-10-16T05:11:11.914Z",
   "category": "spec",
-  "categoryName": "origin-requirements-converter"
+  "categoryName": "origin-requirements-converter",
+  "response": "Feedback Summary (1 comments):\n\nSpecific Text Comments:\n1. \"1. 当用户在配置文件（`.spec-workflow/config.toml`）中设置 `conv...\": 这里我希望转换工具是基于pandoc实现的，需要环境变量支持配置pandoc命令的可执行路径，如果未配置尝试直接使用pandoc命令，如果本地没有安装pandoc提供降级方案使用API请求实现(API服务也是基于pandoc实现的)，这里目前只实现word转md，API参数里面需要提供原始需求文件，请求处理成功会返回一个文件流存放在.tem文件夹，有同名就覆盖。目前仅需要维护转化类型word2md,保留其他类型的定义如xlsx2md但本次不用实现，可以考虑使用策略模式实现各类型转化\n",
+  "annotations": "{\n  \"decision\": \"needs-revision\",\n  \"comments\": [\n    {\n      \"type\": \"selection\",\n      \"comment\": \"这里我希望转换工具是基于pandoc实现的，需要环境变量支持配置pandoc命令的可执行路径，如果未配置尝试直接使用pandoc命令，如果本地没有安装pandoc提供降级方案使用API请求实现(API服务也是基于pandoc实现的)，这里目前只实现word转md，API参数里面需要提供原始需求文件，请求处理成功会返回一个文件流存放在.tem文件夹，有同名就覆盖。目前仅需要维护转化类型word2md,保留其他类型的定义如xlsx2md但本次不用实现，可以考虑使用策略模式实现各类型转化\",\n      \"timestamp\": \"2025-10-16T05:48:56.793Z\",\n      \"selectedText\": \"1. 当用户在配置文件（`.spec-workflow/config.toml`）中设置 `converterPath` 参数时，系统应该读取并使用该路径作为转换工具\\n2. 当用户在命令行启动时使用 `--converterPath=/path/to/pandoc` 参数时，系统应该优先使用命令行参数\\n3. 当未配置转换工具路径时，系统应该尝试在系统 PATH 中查找 `pandoc` 命令\\n4. 如果所有本地工具查找失败，系统应该使用配置的 `converterApiUrl` 作为兜底 API 接口\\n5. 当配置文件示例（`config.example.toml`）应该包含转换工具配置的说明和示例\",\n      \"highlightColor\": {\n        \"bg\": \"rgba(255, 235, 59, 0.3)\",\n        \"border\": \"#ffeb3b\",\n        \"name\": \"#ffeb3b\"\n      },\n      \"id\": \"comment_1760593650361_5zx402kiv\"\n    }\n  ],\n  \"summary\": \"Feedback Summary (1 comments):\\n\\nSpecific Text Comments:\\n1. \\\"1. 当用户在配置文件（`.spec-workflow/config.toml`）中设置 `conv...\\\": 这里我希望转换工具是基于pandoc实现的，需要环境变量支持配置pandoc命令的可执行路径，如果未配置尝试直接使用pandoc命令，如果本地没有安装pandoc提供降级方案使用API请求实现(API服务也是基于pandoc实现的)，这里目前只实现word转md，API参数里面需要提供原始需求文件，请求处理成功会返回一个文件流存放在.tem文件夹，有同名就覆盖。目前仅需要维护转化类型word2md,保留其他类型的定义如xlsx2md但本次不用实现，可以考虑使用策略模式实现各类型转化\\n\",\n  \"timestamp\": \"2025-10-16T05:49:06.232Z\"\n}",
+  "respondedAt": "2025-10-16T05:49:06.244Z",
+  "comments": [
+    {
+      "type": "selection",
+      "comment": "这里我希望转换工具是基于pandoc实现的，需要环境变量支持配置pandoc命令的可执行路径，如果未配置尝试直接使用pandoc命令，如果本地没有安装pandoc提供降级方案使用API请求实现(API服务也是基于pandoc实现的)，这里目前只实现word转md，API参数里面需要提供原始需求文件，请求处理成功会返回一个文件流存放在.tem文件夹，有同名就覆盖。目前仅需要维护转化类型word2md,保留其他类型的定义如xlsx2md但本次不用实现，可以考虑使用策略模式实现各类型转化",
+      "timestamp": "2025-10-16T05:48:56.793Z",
+      "selectedText": "1. 当用户在配置文件（`.spec-workflow/config.toml`）中设置 `converterPath` 参数时，系统应该读取并使用该路径作为转换工具\n2. 当用户在命令行启动时使用 `--converterPath=/path/to/pandoc` 参数时，系统应该优先使用命令行参数\n3. 当未配置转换工具路径时，系统应该尝试在系统 PATH 中查找 `pandoc` 命令\n4. 如果所有本地工具查找失败，系统应该使用配置的 `converterApiUrl` 作为兜底 API 接口\n5. 当配置文件示例（`config.example.toml`）应该包含转换工具配置的说明和示例",
+      "highlightColor": {
+        "bg": "rgba(255, 235, 59, 0.3)",
+        "border": "#ffeb3b",
+        "name": "#ffeb3b"
+      },
+      "id": "comment_1760593650361_5zx402kiv"
+    }
+  ]
 }

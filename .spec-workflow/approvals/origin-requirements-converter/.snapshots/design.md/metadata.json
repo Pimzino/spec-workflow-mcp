@@ -1,0 +1,22 @@
+{
+  "filePath": ".spec-workflow/specs/origin-requirements-converter/design.md",
+  "currentVersion": 2,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2025-10-16T06:30:05.387Z",
+      "trigger": "initial",
+      "approvalId": "approval_1760596205386_pgoigyq2a",
+      "approvalTitle": "设计文档审批 - 原始需求文档转换器"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2025-10-16T06:32:27.846Z",
+      "trigger": "approved",
+      "approvalId": "approval_1760596205386_pgoigyq2a",
+      "approvalTitle": "设计文档审批 - 原始需求文档转换器"
+    }
+  ]
+}

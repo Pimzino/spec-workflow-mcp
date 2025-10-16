@@ -1,100 +1,99 @@
-# 技术栈
+# Technology Stack
 
-## 项目类型
-[描述这是什么类型的项目: Web 应用程序、CLI 工具、桌面应用程序、移动应用、库、API 服务、嵌入式系统、游戏等]
+## Project Type
+[Describe what kind of project this is: web application, CLI tool, desktop application, mobile app, library, API service, embedded system, game, etc.]
 
-## 核心技术
+## Core Technologies
 
-### 主要编程语言
-- **语言**: [例如: Python 3.11, Go 1.21, TypeScript, Rust, C++]
-- **运行时/编译器**: [如果适用]
-- **语言特定工具**: [包管理器、构建工具等]
+### Primary Language(s)
+- **Language**: [e.g., Python 3.11, Go 1.21, TypeScript, Rust, C++]
+- **Runtime/Compiler**: [if applicable]
+- **Language-specific tools**: [package managers, build tools, etc.]
 
-### 主要依赖/库
-[列出项目依赖的主要库和框架]
-- **[库/框架名称]**: [用途和版本]
-- **[库/框架名称]**: [用途和版本]
+### Key Dependencies/Libraries
+[List the main libraries and frameworks your project depends on]
+- **[Library/Framework name]**: [Purpose and version]
+- **[Library/Framework name]**: [Purpose and version]
 
-### 应用架构
-[描述应用程序的结构方式 - 可以是 MVC、事件驱动、基于插件、客户端-服务器、独立、微服务、单体等]
+### Application Architecture
+[Describe how your application is structured - this could be MVC, event-driven, plugin-based, client-server, standalone, microservices, monolithic, etc.]
 
-### 数据存储(如果适用)
-- **主要存储**: [例如: PostgreSQL, 文件, 内存, 云存储]
-- **缓存**: [例如: Redis, 内存, 磁盘缓存]
-- **数据格式**: [例如: JSON, Protocol Buffers, XML, 二进制]
+### Data Storage (if applicable)
+- **Primary storage**: [e.g., PostgreSQL, files, in-memory, cloud storage]
+- **Caching**: [e.g., Redis, in-memory, disk cache]
+- **Data formats**: [e.g., JSON, Protocol Buffers, XML, binary]
 
-### 外部集成(如果适用)
-- **APIs**: [集成的外部服务]
-- **协议**: [例如: HTTP/REST, gRPC, WebSocket, TCP/IP]
-- **身份验证**: [例如: OAuth, API 密钥, 证书]
+### External Integrations (if applicable)
+- **APIs**: [External services you integrate with]
+- **Protocols**: [e.g., HTTP/REST, gRPC, WebSocket, TCP/IP]
+- **Authentication**: [e.g., OAuth, API keys, certificates]
 
-### 监控和仪表板技术(如果适用)
-- **仪表板框架**: [例如: React, Vue, vanilla JS, 终端 UI]
-- **实时通信**: [例如: WebSocket, Server-Sent Events, 轮询]
-- **可视化库**: [例如: Chart.js, D3, 终端图表]
-- **状态管理**: [例如: Redux, Vuex, 文件系统作为真实来源]
+### Monitoring & Dashboard Technologies (if applicable)
+- **Dashboard Framework**: [e.g., React, Vue, vanilla JS, terminal UI]
+- **Real-time Communication**: [e.g., WebSocket, Server-Sent Events, polling]
+- **Visualization Libraries**: [e.g., Chart.js, D3, terminal graphs]
+- **State Management**: [e.g., Redux, Vuex, file system as source of truth]
 
-## 开发环境
+## Development Environment
 
-### 构建和开发工具
-- **构建系统**: [例如: Make, CMake, Gradle, npm scripts, cargo]
-- **包管理**: [例如: pip, npm, cargo, go mod, apt, brew]
-- **开发工作流**: [例如: 热重载, 监听模式, REPL]
+### Build & Development Tools
+- **Build System**: [e.g., Make, CMake, Gradle, npm scripts, cargo]
+- **Package Management**: [e.g., pip, npm, cargo, go mod, apt, brew]
+- **Development workflow**: [e.g., hot reload, watch mode, REPL]
 
-### 代码质量工具
-- **静态分析**: [代码质量和正确性工具]
-- **格式化**: [代码风格强制工具]
-- **测试框架**: [单元、集成和/或端到端测试工具]
-- **文档**: [文档生成工具]
+### Code Quality Tools
+- **Static Analysis**: [Tools for code quality and correctness]
+- **Formatting**: [Code style enforcement tools]
+- **Testing Framework**: [Unit, integration, and/or end-to-end testing tools]
+- **Documentation**: [Documentation generation tools]
 
-### 版本控制与协作
-- **VCS**: [例如: Git, Mercurial, SVN]
-- **分支策略**: [例如: Git Flow, GitHub Flow, 基于主干]
-- **代码审查流程**: [如何进行代码审查]
+### Version Control & Collaboration
+- **VCS**: [e.g., Git, Mercurial, SVN]
+- **Branching Strategy**: [e.g., Git Flow, GitHub Flow, trunk-based]
+- **Code Review Process**: [How code reviews are conducted]
 
-### 仪表板开发(如果适用)
-- **实时重载**: [例如: 热模块替换, 文件监听器]
-- **端口管理**: [例如: 动态分配, 可配置端口]
-- **多实例支持**: [例如: 同时运行多个仪表板]
+### Dashboard Development (if applicable)
+- **Live Reload**: [e.g., Hot module replacement, file watchers]
+- **Port Management**: [e.g., Dynamic allocation, configurable ports]
+- **Multi-Instance Support**: [e.g., Running multiple dashboards simultaneously]
 
-## 部署和分发(如果适用)
-- **目标平台**: [项目运行的位置/方式: 云、本地、桌面、移动、嵌入式]
-- **分发方法**: [用户如何获取软件: 下载、包管理器、应用商店、SaaS]
-- **安装要求**: [先决条件、系统要求]
-- **更新机制**: [如何交付更新]
+## Deployment & Distribution (if applicable)
+- **Target Platform(s)**: [Where/how the project runs: cloud, on-premise, desktop, mobile, embedded]
+- **Distribution Method**: [How users get your software: download, package manager, app store, SaaS]
+- **Installation Requirements**: [Prerequisites, system requirements]
+- **Update Mechanism**: [How updates are delivered]
 
-## 技术要求与约束
+## Technical Requirements & Constraints
 
-### 性能要求
-- [例如: 响应时间、吞吐量、内存使用、启动时间]
-- [具体基准或目标]
+### Performance Requirements
+- [e.g., response time, throughput, memory usage, startup time]
+- [Specific benchmarks or targets]
 
-### 兼容性要求
-- **平台支持**: [操作系统、架构、版本]
-- **依赖版本**: [依赖项的最低/最高版本]
-- **标准合规性**: [行业标准、协议、规范]
+### Compatibility Requirements  
+- **Platform Support**: [Operating systems, architectures, versions]
+- **Dependency Versions**: [Minimum/maximum versions of dependencies]
+- **Standards Compliance**: [Industry standards, protocols, specifications]
 
-### 安全与合规
-- **安全要求**: [身份验证、加密、数据保护]
-- **合规标准**: [GDPR、HIPAA、SOC2 等(如果适用)]
-- **威胁模型**: [关键安全考虑因素]
+### Security & Compliance
+- **Security Requirements**: [Authentication, encryption, data protection]
+- **Compliance Standards**: [GDPR, HIPAA, SOC2, etc. if applicable]
+- **Threat Model**: [Key security considerations]
 
-### 可扩展性与可靠性
-- **预期负载**: [用户、请求、数据量]
-- **可用性要求**: [正常运行时间目标、灾难恢复]
-- **增长预测**: [系统需要如何扩展]
+### Scalability & Reliability
+- **Expected Load**: [Users, requests, data volume]
+- **Availability Requirements**: [Uptime targets, disaster recovery]
+- **Growth Projections**: [How the system needs to scale]
 
-## 技术决策与理由
-[记录关键架构和技术选择]
+## Technical Decisions & Rationale
+[Document key architectural and technology choices]
 
-### 决策日志
-1. **[技术/模式选择]**: [为什么选择这个、考虑的替代方案]
-2. **[架构决策]**: [理由、接受的权衡]
-3. **[工具/库选择]**: [推理、评估标准]
+### Decision Log
+1. **[Technology/Pattern Choice]**: [Why this was chosen, alternatives considered]
+2. **[Architecture Decision]**: [Rationale, trade-offs accepted]
+3. **[Tool/Library Selection]**: [Reasoning, evaluation criteria]
 
-## 已知限制
-[记录任何技术债务、限制或改进领域]
+## Known Limitations
+[Document any technical debt, limitations, or areas for improvement]
 
-- [限制 1]: [影响和潜在的未来解决方案]
-- [限制 2]: [为什么存在以及何时可能解决]
-
+- [Limitation 1]: [Impact and potential future solutions]
+- [Limitation 2]: [Why it exists and when it might be addressed]

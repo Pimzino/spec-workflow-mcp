@@ -1,51 +1,50 @@
-# 需求文档
+# Requirements Document
 
-## 介绍
+## Introduction
 
-[简要概述功能、其目的及其对用户的价值]
+[Provide a brief overview of the feature, its purpose, and its value to users]
 
-## 与产品愿景的一致性
+## Alignment with Product Vision
 
-[解释此功能如何支持 product.md 中概述的目标]
+[Explain how this feature supports the goals outlined in product.md]
 
-## 需求
+## Requirements
 
-### 需求 1
+### Requirement 1
 
-**用户故事:** 作为一个 [角色],我想要 [功能],以便 [收益]
+**User Story:** As a [role], I want [feature], so that [benefit]
 
-#### 验收标准
+#### Acceptance Criteria
 
-1. 当 [事件] 那么 [系统] 应该 [响应]
-2. 如果 [前提条件] 那么 [系统] 应该 [响应]
-3. 当 [事件] 并且 [条件] 那么 [系统] 应该 [响应]
+1. WHEN [event] THEN [system] SHALL [response]
+2. IF [precondition] THEN [system] SHALL [response]
+3. WHEN [event] AND [condition] THEN [system] SHALL [response]
 
-### 需求 2
+### Requirement 2
 
-**用户故事:** 作为一个 [角色],我想要 [功能],以便 [收益]
+**User Story:** As a [role], I want [feature], so that [benefit]
 
-#### 验收标准
+#### Acceptance Criteria
 
-1. 当 [事件] 那么 [系统] 应该 [响应]
-2. 如果 [前提条件] 那么 [系统] 应该 [响应]
+1. WHEN [event] THEN [system] SHALL [response]
+2. IF [precondition] THEN [system] SHALL [response]
 
-## 非功能性需求
+## Non-Functional Requirements
 
-### 代码架构和模块化
-- **单一职责原则**: 每个文件应该有一个单一的、明确定义的目的
-- **模块化设计**: 组件、工具和服务应该隔离和可重用
-- **依赖管理**: 最小化模块之间的相互依赖
-- **清晰的接口**: 在组件和层之间定义清晰的契约
+### Code Architecture and Modularity
+- **Single Responsibility Principle**: Each file should have a single, well-defined purpose
+- **Modular Design**: Components, utilities, and services should be isolated and reusable
+- **Dependency Management**: Minimize interdependencies between modules
+- **Clear Interfaces**: Define clean contracts between components and layers
 
-### 性能
-- [性能要求]
+### Performance
+- [Performance requirements]
 
-### 安全性
-- [安全要求]
+### Security
+- [Security requirements]
 
-### 可靠性
-- [可靠性要求]
+### Reliability
+- [Reliability requirements]
 
-### 可用性
-- [可用性要求]
-
+### Usability
+- [Usability requirements]

@@ -1,97 +1,96 @@
-# 设计文档
+# Design Document
 
-## 概述
+## Overview
 
-[功能的高层描述及其在整体系统中的位置]
+[High-level description of the feature and its place in the overall system]
 
-## 指导文档对齐
+## Steering Document Alignment
 
-### 技术标准(tech.md)
-[设计如何遵循记录的技术模式和标准]
+### Technical Standards (tech.md)
+[How the design follows documented technical patterns and standards]
 
-### 项目结构(structure.md)
-[实现将如何遵循项目组织约定]
+### Project Structure (structure.md)
+[How the implementation will follow project organization conventions]
 
-## 代码重用分析
-[此功能将利用、扩展或集成哪些现有代码]
+## Code Reuse Analysis
+[What existing code will be leveraged, extended, or integrated with this feature]
 
-### 要利用的现有组件
-- **[组件/工具名称]**: [如何使用]
-- **[服务/辅助名称]**: [如何扩展]
+### Existing Components to Leverage
+- **[Component/Utility Name]**: [How it will be used]
+- **[Service/Helper Name]**: [How it will be extended]
 
-### 集成点
-- **[现有系统/API]**: [新功能将如何集成]
-- **[数据库/存储]**: [数据将如何连接到现有模式]
+### Integration Points
+- **[Existing System/API]**: [How the new feature will integrate]
+- **[Database/Storage]**: [How data will connect to existing schemas]
 
-## 架构
+## Architecture
 
-[描述使用的整体架构和设计模式]
+[Describe the overall architecture and design patterns used]
 
-### 模块化设计原则
-- **单文件职责**: 每个文件应处理一个特定的关注点或领域
-- **组件隔离**: 创建小型、专注的组件,而不是大型单体文件
-- **服务层分离**: 分离数据访问、业务逻辑和表示层
-- **工具模块化**: 将工具分解为专注的单用途模块
+### Modular Design Principles
+- **Single File Responsibility**: Each file should handle one specific concern or domain
+- **Component Isolation**: Create small, focused components rather than large monolithic files
+- **Service Layer Separation**: Separate data access, business logic, and presentation layers
+- **Utility Modularity**: Break utilities into focused, single-purpose modules
 
 ```mermaid
 graph TD
-    A[组件 A] --> B[组件 B]
-    B --> C[组件 C]
+    A[Component A] --> B[Component B]
+    B --> C[Component C]
 ```
 
-## 组件和接口
+## Components and Interfaces
 
-### 组件 1
-- **目的:** [此组件的作用]
-- **接口:** [公共方法/APIs]
-- **依赖项:** [它依赖什么]
-- **重用:** [它构建在哪些现有组件/工具之上]
+### Component 1
+- **Purpose:** [What this component does]
+- **Interfaces:** [Public methods/APIs]
+- **Dependencies:** [What it depends on]
+- **Reuses:** [Existing components/utilities it builds upon]
 
-### 组件 2
-- **目的:** [此组件的作用]
-- **接口:** [公共方法/APIs]
-- **依赖项:** [它依赖什么]
-- **重用:** [它构建在哪些现有组件/工具之上]
+### Component 2
+- **Purpose:** [What this component does]
+- **Interfaces:** [Public methods/APIs]
+- **Dependencies:** [What it depends on]
+- **Reuses:** [Existing components/utilities it builds upon]
 
-## 数据模型
+## Data Models
 
-### 模型 1
+### Model 1
 ```
-[用您的语言定义 Model1 的结构]
-- id: [唯一标识符类型]
-- name: [字符串/文本类型]
-- [根据需要添加其他属性]
-```
-
-### 模型 2
-```
-[用您的语言定义 Model2 的结构]
-- id: [唯一标识符类型]
-- [根据需要添加其他属性]
+[Define the structure of Model1 in your language]
+- id: [unique identifier type]
+- name: [string/text type]
+- [Additional properties as needed]
 ```
 
-## 错误处理
+### Model 2
+```
+[Define the structure of Model2 in your language]
+- id: [unique identifier type]
+- [Additional properties as needed]
+```
 
-### 错误场景
-1. **场景 1:** [描述]
-   - **处理:** [如何处理]
-   - **用户影响:** [用户看到什么]
+## Error Handling
 
-2. **场景 2:** [描述]
-   - **处理:** [如何处理]
-   - **用户影响:** [用户看到什么]
+### Error Scenarios
+1. **Scenario 1:** [Description]
+   - **Handling:** [How to handle]
+   - **User Impact:** [What user sees]
 
-## 测试策略
+2. **Scenario 2:** [Description]
+   - **Handling:** [How to handle]
+   - **User Impact:** [What user sees]
 
-### 单元测试
-- [单元测试方法]
-- [要测试的关键组件]
+## Testing Strategy
 
-### 集成测试
-- [集成测试方法]
-- [要测试的关键流程]
+### Unit Testing
+- [Unit testing approach]
+- [Key components to test]
 
-### 端到端测试
-- [E2E 测试方法]
-- [要测试的用户场景]
+### Integration Testing
+- [Integration testing approach]
+- [Key flows to test]
 
+### End-to-End Testing
+- [E2E testing approach]
+- [User scenarios to test]

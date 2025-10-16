@@ -25,7 +25,7 @@
 
 ## 需求
 
-### 需求 1：原始需求文档存储目录
+### 需求 1：原始需求文档存储目录与文件组织
 
 **用户故事：** 作为一个项目管理者，我想要有一个专门的目录存放各种格式的原始需求文档，以便统一管理和引用这些文档。
 
@@ -33,8 +33,10 @@
 
 1. 当用户在项目根目录创建 `origin-requirements/` 文件夹时，系统应该识别并支持该目录作为原始需求文档存储位置
 2. 当用户在 `origin-requirements/` 目录下放置文档文件（`.docx`, `.pdf`, `.md` 等）时，系统应该能够扫描和识别这些文件
-3. 当系统进行文档转换时，应该在 `origin-requirements/.temp/` 目录下存储转换后的中间文件
-4. 当转换完成后，系统应该保留 `.temp/` 目录中的文件以便用户查看和调试
+3. 当系统进行文档转换时，应该在 `origin-requirements/.temp/{filename}/` 目录下存储转换结果，其中 `{filename}` 是不含扩展名的原始文件名
+4. 当 Pandoc 转换生成多个文件时（如 `.md` 文件和 `media/` 文件夹），应该都存放在同一个 `.temp/{filename}/` 目录下
+5. 例如：转换 `test.docx` 时，应该创建 `.temp/test/` 目录，包含 `test.md` 和 `media/` 文件夹
+6. 当转换完成后，系统应该保留 `.temp/` 目录中的文件以便用户查看和调试
 
 ### 需求 2：文档引用语法支持
 
@@ -58,29 +60,37 @@
 3. 当解析完成后，系统应该将内容转换为符合 spec-workflow 规范的 `requirements.md` 格式
 4. 当生成的需求文档应该保持原始 Markdown 中的关键信息（标题、列表、表格等）
 
-### 需求 4：Word 文档转换支持
+### 需求 4：Word 文档 Pandoc 转换支持（本次实现）
 
-**用户故事：** 作为一个用户，我想要系统能够自动将 Word 格式的需求文档转换为 Markdown，以便我可以继续使用熟悉的 Word 编辑原始需求。
-
-#### 验收标准
-
-1. 当用户引用的文件是 `.docx` 或 `.doc` 格式时，系统应该触发 Word 转 Markdown 转换流程
-2. 当系统配置了本地转换工具（如 Pandoc）路径时，应该优先使用本地工具进行转换
-3. 当转换命令执行时，应该将转换后的 Markdown 文件保存到 `origin-requirements/.temp/` 目录，文件名与原文件同名但扩展名改为 `.md`
-4. 当本地工具转换失败或未配置时，系统应该自动降级到 API 接口进行转换
-5. 当转换成功后，系统应该读取 `.temp/` 目录下的 Markdown 文件继续处理
-
-### 需求 5：转换工具配置
-
-**用户故事：** 作为一个用户，我想要能够配置文档转换工具的路径，以便使用本地安装的 Pandoc 等工具或自定义的转换服务。
+**用户故事：** 作为一个用户，我想要系统能够使用 Pandoc 自动将 Word 格式的需求文档转换为 Markdown，以便我可以继续使用熟悉的 Word 编辑原始需求。
 
 #### 验收标准
 
-1. 当用户在配置文件（`.spec-workflow/config.toml`）中设置 `converterPath` 参数时，系统应该读取并使用该路径作为转换工具
-2. 当用户在命令行启动时使用 `--converterPath=/path/to/pandoc` 参数时，系统应该优先使用命令行参数
-3. 当未配置转换工具路径时，系统应该尝试在系统 PATH 中查找 `pandoc` 命令
-4. 如果所有本地工具查找失败，系统应该使用配置的 `converterApiUrl` 作为兜底 API 接口
-5. 当配置文件示例（`config.example.toml`）应该包含转换工具配置的说明和示例
+1. 当用户引用的文件是 `.docx` 或 `.doc` 格式时，系统应该触发 Word 转 Markdown 转换流程（**本次只实现 word2md 转换类型**）
+2. 当本地 Pandoc 可用时（通过命令行参数 `--pandocPath` 或配置文件中的 `pandocPath` 参数指定，或系统 PATH），应该优先使用 Pandoc 本地工具进行转换
+3. 当使用本地 Pandoc 转换时，应该先创建输出目录 `.temp/{filename}/`，然后执行命令：`pandoc input.docx -f docx -t gfm --extract-media=./origin-requirements/.temp/{filename}/media --wrap=none -o .temp/{filename}/{filename}.md`
+4. 当转换命令执行时，所有输出文件（Markdown 和媒体资源）应该组织在 `.temp/{filename}/` 目录下，如有同名目录直接覆盖
+5. 当本地 Pandoc 不可用时，系统应该自动降级到 API 接口进行转换
+6. 当使用 API 转换时，应该将原始需求文件作为参数发送到 API 服务（API 服务也是基于 Pandoc 实现的）
+7. 当 API 请求成功时，应该接收返回的**压缩包**（包含 .md 文件和 media 文件夹），解压到 `.temp/{filename}/` 目录
+8. 当压缩包解压后，应该验证目录结构：`.temp/{filename}/{filename}.md` 和可选的 `.temp/{filename}/media/`
+9. 当转换成功后，系统应该读取 `.temp/{filename}/{filename}.md` 文件继续处理
+
+### 需求 5：Pandoc 转换工具配置
+
+**用户故事：** 作为一个用户，我想要能够通过命令行参数或配置文件配置 Pandoc 可执行文件路径，以便使用本地安装的 Pandoc 工具进行文档转换，如果本地没有安装则自动降级到 API 服务。
+
+#### 验收标准
+
+1. 当用户通过命令行参数 `--pandocPath` 指定 Pandoc 路径时，系统应该优先使用该路径的 Pandoc 可执行文件
+2. 当未指定 `--pandocPath` 参数时，系统应该从配置文件（`.spec-workflow/config.toml`）读取 `pandocPath` 配置项
+3. 当命令行参数和配置文件都未设置时，系统应该尝试直接使用 `pandoc` 命令（假设 Pandoc 已在系统 PATH 中）
+4. 当执行 `pandoc --version` 命令成功时，系统应该判定本地 Pandoc 可用并使用本地转换
+5. 当本地 Pandoc 不可用（命令执行失败）时，系统应该自动降级到 API 服务进行转换
+6. 当使用 API 服务时，系统应该从配置文件（`.spec-workflow/config.toml`）读取 `converterApiUrl` 配置项
+7. 当 API 服务也是基于 Pandoc 实现的，应该确保转换质量和格式一致性
+8. 当配置文件示例（`config.example.toml`）应该包含 `pandocPath` 和 `converterApiUrl` 的配置说明和示例
+9. **配置优先级**：命令行参数 `--pandocPath` > 配置文件 `pandocPath` > 系统 PATH 中的 `pandoc` > API 服务
 
 ### 需求 6：新 MCP Tool - convert-origin-requirement
 
@@ -100,19 +110,34 @@
 4. 当工具执行成功时，应该返回生成的需求文档路径和摘要信息
 5. 当工具执行失败时，应该返回详细的错误信息和建议的解决方案
 
-### 需求 7：文件转换服务模块
+### 需求 7：文件转换服务模块（策略模式）
 
-**用户故事：** 作为一个开发者，我想要有一个独立的文件转换服务模块，以便在项目中复用转换逻辑并便于扩展其他格式支持。
+**用户故事：** 作为一个开发者，我想要有一个基于策略模式的文件转换服务模块，以便在项目中复用转换逻辑并便于扩展其他格式支持。
 
 #### 验收标准
 
-1. 当创建转换服务时，应该定义 `DocumentConverter` 类或接口
-2. 当转换服务初始化时，应该加载配置中的转换工具路径和 API 配置
-3. 当调用 `convert()` 方法时，应该接受输入文件路径、输出路径和目标格式参数
-4. 当转换 Word 文档时，应该实现 `convertWordToMarkdown()` 方法
-5. 当使用 Pandoc 本地工具时，应该构建正确的命令行参数（`-f docx -t gfm --extract-media --wrap=none`）
-6. 当使用 API 接口时，应该实现 HTTP 请求逻辑，上传文件并接收转换后的内容流
-7. 当转换服务设计时，应该为其他格式（PDF、HTML 等）预留扩展接口
+1. 当创建转换服务时，应该定义 `DocumentConverter` 类，使用**策略模式**设计支持多种转换类型
+2. 当定义转换策略时，应该创建 `IConversionStrategy` 接口，包含 `convert()` 方法
+3. 当实现具体策略时，应该创建 `Word2MdStrategy` 类（**本次实现**），实现 word2md 转换逻辑
+4. 当实现具体策略时，应该创建 `Md2WordStrategy` 类（**本次实现**），实现 md2word 转换逻辑
+5. 当定义其他转换类型时，应该预留 `Excel2MdStrategy`（xlsx2md）、`Pdf2MdStrategy` 等策略类定义，但**本次不实现**
+6. 当转换服务初始化时，应该加载命令行参数 `--pandocPath` 或配置文件中的 `pandocPath` 和 `converterApiUrl`
+7. 当调用 `convert()` 方法时，应该根据转换类型选择对应的策略执行转换
+8. 当使用 Pandoc 本地工具时，`Word2MdStrategy` 应该：
+   - 创建输出目录：`.temp/{filename}/`
+   - 构建命令：`pandoc -f docx -t gfm --extract-media=.temp/{filename}/media --wrap=none -o .temp/{filename}/{filename}.md {input}`
+   - 验证输出文件和媒体目录是否生成
+9. 当使用 Pandoc 本地工具时，`Md2WordStrategy` 应该：
+   - 构建命令：`pandoc -f gfm -t docx -o {output_dir}/{filename}.docx {input}`
+   - 生成的 Word 文件应该放在输入文件的同级目录
+   - 验证输出文件是否生成
+10. 当使用 API 接口时，应该：
+    - 发送原始需求文件到 API 服务
+    - 接收返回的**压缩包**（zip 格式，word2md）或文件流（md2word）
+    - word2md：解压到 `.temp/{filename}/` 目录
+    - md2word：保存到输入文件同级目录
+    - 验证输出文件结构
+11. 当目录已存在时（word2md），应该先删除旧目录再创建新目录（确保干净的转换环境）
 
 ### 需求 8：错误处理和用户反馈
 
@@ -120,12 +145,16 @@
 
 #### 验收标准
 
-1. 当原始文件不存在时，系统应该提示："未找到文件 '{filename}'，请检查 origin-requirements/ 目录"
+1. 当原始文件不存在时，系统应该提示："未找到文件 '{filename}'，请检查文件路径"
 2. 当文件格式不支持时，系统应该提示："不支持的文件格式 '{extension}'，当前支持: .md, .docx, .doc"
-3. 当转换工具执行失败时，系统应该捕获错误输出并显示："转换失败: {error_message}"
-4. 当 API 接口调用失败时，系统应该提示："API 转换服务不可用，请检查网络连接或配置本地转换工具"
-5. 当生成的 Markdown 文件为空时，系统应该提示："转换后的文件为空，请检查原始文档内容"
-6. 当所有错误信息应该同时记录到日志文件中，便于问题排查
+3. 当命令行参数 `--pandocPath` 或配置文件 `pandocPath` 指向的路径无效时，系统应该提示："pandocPath 配置的路径无效: {path}，将尝试使用系统 PATH 中的 pandoc"
+4. 当本地 Pandoc 不可用时，系统应该提示："本地 Pandoc 不可用，正在降级到 API 服务..."
+5. 当 Pandoc 命令执行失败时，应该捕获错误输出并显示："Pandoc 转换失败: {error_message}"
+6. 当 API 接口调用失败时，系统应该提示："API 转换服务不可用（HTTP {status_code}），请检查网络连接或配置 pandocPath 参数"
+7. 当 API 返回的压缩包为空或格式错误时，系统应该提示："API 返回的转换结果无效，请检查 API 服务或原始文档内容"
+8. 当解压缩失败时，系统应该提示："解压转换结果失败: {error_message}"
+9. 当转换后的文件不存在时，系统应该提示文件未找到和预期路径
+10. 当所有错误信息应该同时记录到日志文件中，包含详细的执行上下文和堆栈信息
 
 ### 需求 9：文档转换质量优化
 
@@ -140,17 +169,50 @@
 5. 当转换包含代码块的文档时，应该使用 Markdown 代码块语法
 6. 当转换完成后，系统应该进行基本的 Markdown 语法校验
 
-### 需求 10：转换历史和临时文件管理
+### 需求 10：新 MCP Tool - md2word（Markdown 转 Word）
 
-**用户故事：** 作为一个用户，我想要查看转换历史和临时文件，以便验证转换结果或调试转换问题。
+**用户故事：** 作为一个用户，我想要有一个工具能够将 Markdown 文件高还原转换为 Word 格式，以便分享给使用 Word 的同事或客户。
 
 #### 验收标准
 
-1. 当文件转换成功时，系统应该在 `.temp/` 目录保留转换后的 Markdown 文件
-2. 当同一文件多次转换时，系统应该覆盖之前的临时文件（可选：添加时间戳保留历史）
-3. 当用户可以在 `.temp/` 目录中查看所有转换后的中间文件
-4. 当系统应该提供清理临时文件的命令或选项（如 `--cleanTemp`）
-5. 当 `.temp/` 目录应该被 `.gitignore` 忽略，不提交到 Git 仓库
+1. 当系统注册 MCP tool 时，应该包含名为 `md2word` 的新工具
+2. 当调用该工具时，应该接受 `filePath` 参数，指定要转换的 Markdown 文件完整路径
+3. 当工具执行时，应该使用 Pandoc 进行转换，命令格式：`pandoc -f gfm -t docx -o {output} {input}`
+4. 当转换成功时，生成的 Word 文件应该保存在输入文件的同级目录，文件名与输入文件同名但扩展名改为 `.docx`
+5. 例如：输入 `/path/to/document.md`，输出应为 `/path/to/document.docx`
+6. 当输出文件已存在时，应该直接覆盖
+7. 当转换时，应该尽可能保留 Markdown 的格式：
+   - 标题层级（H1-H6）
+   - 列表（有序和无序）
+   - 表格
+   - 代码块
+   - 粗体、斜体、链接等
+   - 图片引用（如果路径有效）
+8. 当转换成功后，工具应该返回生成的 Word 文件路径
+9. 当转换失败时，应该返回详细的错误信息
+10. 当使用本地 Pandoc 不可用时，应该自动降级到 API 服务进行转换
+
+### 需求 11：转换临时文件管理
+
+**用户故事：** 作为一个用户，我想要查看转换后的临时文件，以便验证转换结果或调试转换问题。
+
+#### 验收标准
+
+1. 当文件转换成功时，系统应该在 `origin-requirements/.temp/{filename}/` 目录保留所有转换结果
+2. 当转换 `test.docx` 时，目录结构应该是：
+   ```
+   origin-requirements/.temp/test/
+   ├── test.md           # 转换后的 Markdown 文件
+   └── media/            # 提取的图片和资源（如有）
+       ├── image1.png
+       └── image2.png
+   ```
+3. 当同一文件多次转换时，系统应该先删除旧的 `.temp/{filename}/` 目录，再创建新目录（确保干净状态）
+4. 当 Pandoc 本地转换时，媒体文件应该直接提取到 `.temp/{filename}/media/` 目录
+5. 当 API 服务返回压缩包时，应该解压到 `.temp/{filename}/` 目录，保持相同的文件组织结构
+6. 当用户可以在 `.temp/{filename}/` 目录中查看完整的转换结果，包括 Markdown 文件和所有媒体资源
+7. 当系统应该在 `.gitignore` 中添加 `origin-requirements/.temp/` 规则，不提交到 Git 仓库
+8. 当系统可选提供清理临时文件的功能（本次不强制实现）
 
 ## 非功能性需求
 
@@ -210,10 +272,11 @@
 
 ### 可扩展性
 
-- 设计支持未来添加 PDF、HTML、Markdown 变体等格式
-- 转换器采用策略模式，易于扩展
-- 配置支持自定义转换命令和参数
-- 支持用户自定义转换脚本
+- **策略模式设计**：支持未来添加 Excel（xlsx2md）、PDF、HTML 等转换类型
+- **本次实现范围**：实现 `Word2MdStrategy`（word2md）和 `Md2WordStrategy`（md2word）
+- **预留扩展接口**：定义但不实现 `Excel2MdStrategy`、`Pdf2MdStrategy` 等策略类
+- 转换器架构支持插拔式添加新的转换策略
+- 配置参数支持其他转换工具路径扩展（如命令行参数 `--excelConverterPath`）
 
 ## 技术约束
 
@@ -223,11 +286,82 @@
 - MCP tool 遵循 MCP SDK 规范
 - 文件操作使用 Node.js fs/promises API
 - HTTP 请求使用 fetch API（Node.js 18+内置）
+- **必须使用 Pandoc** 作为核心转换工具（本地或 API）
+- **本次实现 word2md 和 md2word 两种转换类型**
 
 ## 依赖和集成
 
-- 可选依赖 Pandoc（用户本地安装）
-- 可选依赖文档转换 API 服务（兜底方案）
+- **核心依赖**：Pandoc（通过命令行参数 `--pandocPath` 或配置文件 `pandocPath` 配置，或系统 PATH）
+- **降级方案**：基于 Pandoc 的文档转换 API 服务（word2md 返回 zip 压缩包，md2word 返回文件流）
+- **Docker 支持**：Dockerfile 中应包含 Pandoc 安装，确保容器化部署时可直接使用
 - 集成到现有的 spec-workflow 流程中
 - 与 Dashboard 集成显示转换状态
 - 与审批流程集成
+
+## Docker 部署要求
+
+### Dockerfile 配置
+
+当项目使用 Docker 部署时，应该在 Dockerfile 中安装 Pandoc：
+
+```dockerfile
+# 安装 Pandoc
+RUN apt-get update && \
+    apt-get install -y pandoc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 验证 Pandoc 安装
+RUN pandoc --version
+```
+
+### 验收标准
+
+1. 当使用 Docker 构建镜像时，应该自动安装 Pandoc
+2. 当容器启动后，应该可以直接使用 `pandoc` 命令，无需配置 `--pandocPath` 参数
+3. 当 Pandoc 安装失败时，Docker 构建应该失败并提示错误
+4. 当应该在 Docker 文档中说明 Pandoc 的安装和验证步骤
+
+## 配置参数说明
+
+### 命令行参数
+
+#### --pandocPath
+
+- **用途**：指定 Pandoc 可执行文件的完整路径
+- **示例**：
+  - macOS/Linux: `node dist/index.js --pandocPath=/usr/local/bin/pandoc`
+  - Windows: `node dist/index.js --pandocPath="C:\Program Files\Pandoc\pandoc.exe"`
+- **优先级**：最高（优先于配置文件和系统 PATH）
+
+### 配置文件参数
+
+在 `.spec-workflow/config.toml` 中配置：
+
+```toml
+# Pandoc 可执行文件路径（可选）
+pandocPath = "/usr/local/bin/pandoc"
+
+# 文档转换 API 服务地址（降级方案）
+converterApiUrl = "https://converter-api.example.com/convert"
+```
+
+#### pandocPath
+
+- **用途**：指定 Pandoc 可执行文件的完整路径
+- **优先级**：中等（低于命令行参数，高于系统 PATH）
+- **示例**：
+  - macOS/Linux: `pandocPath = "/usr/local/bin/pandoc"`
+  - Windows: `pandocPath = "C:\\Program Files\\Pandoc\\pandoc.exe"`
+
+#### converterApiUrl
+
+- **用途**：指定文档转换 API 服务地址（当本地 Pandoc 不可用时使用）
+- **示例**：`converterApiUrl = "https://converter-api.example.com/convert"`
+
+### 配置优先级总结
+
+1. **命令行参数** `--pandocPath`（最高优先级）
+2. **配置文件** `pandocPath`
+3. **系统 PATH** 中的 `pandoc` 命令
+4. **API 服务** `converterApiUrl`（降级方案）

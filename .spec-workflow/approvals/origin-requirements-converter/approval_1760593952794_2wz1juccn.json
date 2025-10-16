@@ -1,0 +1,27 @@
+{
+  "id": "approval_1760593952794_2wz1juccn",
+  "title": "需求文档审批（修订版）- 原始需求文档转换器",
+  "filePath": ".spec-workflow/specs/origin-requirements-converter/requirements.md",
+  "type": "document",
+  "status": "needs-revision",
+  "createdAt": "2025-10-16T05:52:32.794Z",
+  "category": "spec",
+  "categoryName": "origin-requirements-converter",
+  "response": "Feedback Summary (2 comments):\n\nGeneral Comments:\n1. 需要考虑pandoc转化后生成多个文件例如test.docx转化后生成media文件夹存放资源和test.md，因此存放在.tem里应该是一个test文件用来存放media文件夹和test.md,接口也应该是返回一个压缩包然后解压到.tem/test文件夹下，这里test是输入的文件名，你觉得对不对\n2. 使用docker的情形也需要将pandoc构建到镜像里，这样直接就可以调用了\n\n",
+  "annotations": "{\n  \"decision\": \"needs-revision\",\n  \"comments\": [\n    {\n      \"type\": \"general\",\n      \"comment\": \"需要考虑pandoc转化后生成多个文件例如test.docx转化后生成media文件夹存放资源和test.md，因此存放在.tem里应该是一个test文件用来存放media文件夹和test.md,接口也应该是返回一个压缩包然后解压到.tem/test文件夹下，这里test是输入的文件名，你觉得对不对\",\n      \"timestamp\": \"2025-10-16T06:09:49.447Z\",\n      \"id\": \"comment_1760594989447_c2w8bltw5\"\n    },\n    {\n      \"type\": \"general\",\n      \"comment\": \"使用docker的情形也需要将pandoc构建到镜像里，这样直接就可以调用了\",\n      \"timestamp\": \"2025-10-16T06:10:44.389Z\",\n      \"id\": \"comment_1760595044389_5ajptieq8\"\n    }\n  ],\n  \"summary\": \"Feedback Summary (2 comments):\\n\\nGeneral Comments:\\n1. 需要考虑pandoc转化后生成多个文件例如test.docx转化后生成media文件夹存放资源和test.md，因此存放在.tem里应该是一个test文件用来存放media文件夹和test.md,接口也应该是返回一个压缩包然后解压到.tem/test文件夹下，这里test是输入的文件名，你觉得对不对\\n2. 使用docker的情形也需要将pandoc构建到镜像里，这样直接就可以调用了\\n\\n\",\n  \"timestamp\": \"2025-10-16T06:10:46.989Z\"\n}",
+  "respondedAt": "2025-10-16T06:10:47.006Z",
+  "comments": [
+    {
+      "type": "general",
+      "comment": "需要考虑pandoc转化后生成多个文件例如test.docx转化后生成media文件夹存放资源和test.md，因此存放在.tem里应该是一个test文件用来存放media文件夹和test.md,接口也应该是返回一个压缩包然后解压到.tem/test文件夹下，这里test是输入的文件名，你觉得对不对",
+      "timestamp": "2025-10-16T06:09:49.447Z",
+      "id": "comment_1760594989447_c2w8bltw5"
+    },
+    {
+      "type": "general",
+      "comment": "使用docker的情形也需要将pandoc构建到镜像里，这样直接就可以调用了",
+      "timestamp": "2025-10-16T06:10:44.389Z",
+      "id": "comment_1760595044389_5ajptieq8"
+    }
+  ]
+}

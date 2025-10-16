@@ -1,0 +1,10 @@
+{
+  "id": "approval_1760596566017_52cz0wz01",
+  "title": "任务拆分文档审批 - 原始需求文档转换器",
+  "filePath": ".spec-workflow/specs/origin-requirements-converter/tasks.md",
+  "type": "document",
+  "status": "pending",
+  "createdAt": "2025-10-16T06:36:06.017Z",
+  "category": "spec",
+  "categoryName": "origin-requirements-converter"
+}

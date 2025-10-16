@@ -1,0 +1,33 @@
+{
+  "id": "approval_1760595172417_3bjc6aw0p",
+  "title": "需求文档审批（修订版3）- 原始需求文档转换器",
+  "filePath": ".spec-workflow/specs/origin-requirements-converter/requirements.md",
+  "type": "document",
+  "status": "needs-revision",
+  "createdAt": "2025-10-16T06:12:52.417Z",
+  "category": "spec",
+  "categoryName": "origin-requirements-converter",
+  "response": "Feedback Summary (2 comments):\n\nGeneral Comments:\n1. 还需要写一个tool支持md转word,将指定的md文件通过pandoc工具高还原转化word,命令不变格式转为docx，在生成文件需要再给定文件的同级目录下\n\nSpecific Text Comments:\n1. \"当本地 Pandoc 可用时（通过环境变量 `PANDOC_PATH` 或系统 PATH），应该优先...\": 这里的环境变量应该是命令行的变量--pandocPath 或者配置文件--pandocPath,而不是电脑系统的环境变量\n",
+  "annotations": "{\n  \"decision\": \"needs-revision\",\n  \"comments\": [\n    {\n      \"type\": \"selection\",\n      \"comment\": \"这里的环境变量应该是命令行的变量--pandocPath 或者配置文件--pandocPath,而不是电脑系统的环境变量\",\n      \"timestamp\": \"2025-10-16T06:17:46.130Z\",\n      \"selectedText\": \"当本地 Pandoc 可用时（通过环境变量 `PANDOC_PATH` 或系统 PATH），应该优先使用 Pandoc 本地工具进行转换\\n3. 当使用本地 Pandoc 转换时，应该先创建输出目录 `.temp/{filename}/`，然后执行命令：`pandoc input.docx -f docx -t gfm --extract-media=./origin-requirements/.temp/{filename}/media --wrap=none -o .temp/{filename}/{filename}.md`\\n4. 当转换命令执行时，所有输出文件（Markdown 和媒体资源）应该组织在 `.temp/{filename}/` 目录下，如有同名目录直接覆盖\\n5. 当本地 Pandoc 不可用时，系统应该自动降级到 API 接口进行转换\\n6. 当使用 API 转换时，应该将原始需求文件作为参数发送到 API 服务（API 服务也是基于 Pandoc 实现的）\\n7. 当 API 请求成功时，应该接收返回的**压缩包**（包含 .md 文件和 media 文件夹），解压到 `.temp/{filename}/` 目录\\n8. 当压缩包解压后，应该验证目录结构：`.temp/{filename}/{filename}.md` 和可选的 `.temp/{filename}/media/`\\n9. 当转换成功后，系统应该读取 `.temp/{filename}/{filename}.md` 文件继续处理\",\n      \"highlightColor\": {\n        \"bg\": \"rgba(255, 235, 59, 0.3)\",\n        \"border\": \"#FFEB3B\",\n        \"name\": \"#ffeb3b\"\n      },\n      \"id\": \"comment_1760595466130_6olxdxnps\"\n    },\n    {\n      \"type\": \"general\",\n      \"comment\": \"还需要写一个tool支持md转word,将指定的md文件通过pandoc工具高还原转化word,命令不变格式转为docx，在生成文件需要再给定文件的同级目录下\",\n      \"timestamp\": \"2025-10-16T06:21:00.913Z\",\n      \"id\": \"comment_1760595660913_jbznavbe4\"\n    }\n  ],\n  \"summary\": \"Feedback Summary (2 comments):\\n\\nGeneral Comments:\\n1. 还需要写一个tool支持md转word,将指定的md文件通过pandoc工具高还原转化word,命令不变格式转为docx，在生成文件需要再给定文件的同级目录下\\n\\nSpecific Text Comments:\\n1. \\\"当本地 Pandoc 可用时（通过环境变量 `PANDOC_PATH` 或系统 PATH），应该优先...\\\": 这里的环境变量应该是命令行的变量--pandocPath 或者配置文件--pandocPath,而不是电脑系统的环境变量\\n\",\n  \"timestamp\": \"2025-10-16T06:22:44.679Z\"\n}",
+  "respondedAt": "2025-10-16T06:22:44.690Z",
+  "comments": [
+    {
+      "type": "selection",
+      "comment": "这里的环境变量应该是命令行的变量--pandocPath 或者配置文件--pandocPath,而不是电脑系统的环境变量",
+      "timestamp": "2025-10-16T06:17:46.130Z",
+      "selectedText": "当本地 Pandoc 可用时（通过环境变量 `PANDOC_PATH` 或系统 PATH），应该优先使用 Pandoc 本地工具进行转换\n3. 当使用本地 Pandoc 转换时，应该先创建输出目录 `.temp/{filename}/`，然后执行命令：`pandoc input.docx -f docx -t gfm --extract-media=./origin-requirements/.temp/{filename}/media --wrap=none -o .temp/{filename}/{filename}.md`\n4. 当转换命令执行时，所有输出文件（Markdown 和媒体资源）应该组织在 `.temp/{filename}/` 目录下，如有同名目录直接覆盖\n5. 当本地 Pandoc 不可用时，系统应该自动降级到 API 接口进行转换\n6. 当使用 API 转换时，应该将原始需求文件作为参数发送到 API 服务（API 服务也是基于 Pandoc 实现的）\n7. 当 API 请求成功时，应该接收返回的**压缩包**（包含 .md 文件和 media 文件夹），解压到 `.temp/{filename}/` 目录\n8. 当压缩包解压后，应该验证目录结构：`.temp/{filename}/{filename}.md` 和可选的 `.temp/{filename}/media/`\n9. 当转换成功后，系统应该读取 `.temp/{filename}/{filename}.md` 文件继续处理",
+      "highlightColor": {
+        "bg": "rgba(255, 235, 59, 0.3)",
+        "border": "#FFEB3B",
+        "name": "#ffeb3b"
+      },
+      "id": "comment_1760595466130_6olxdxnps"
+    },
+    {
+      "type": "general",
+      "comment": "还需要写一个tool支持md转word,将指定的md文件通过pandoc工具高还原转化word,命令不变格式转为docx，在生成文件需要再给定文件的同级目录下",
+      "timestamp": "2025-10-16T06:21:00.913Z",
+      "id": "comment_1760595660913_jbznavbe4"
+    }
+  ]
+}

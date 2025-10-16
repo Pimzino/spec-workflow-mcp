@@ -1,6 +1,6 @@
 {
   "filePath": ".spec-workflow/specs/origin-requirements-converter/requirements.md",
-  "currentVersion": 1,
+  "currentVersion": 5,
   "snapshots": [
     {
       "version": 1,
@@ -9,6 +9,38 @@
       "trigger": "initial",
       "approvalId": "approval_1760591471914_y97zec2o7",
       "approvalTitle": "需求文档审批 - 原始需求文档转换器"
+    },
+    {
+      "version": 2,
+      "filename": "snapshot-002.json",
+      "timestamp": "2025-10-16T05:49:06.243Z",
+      "trigger": "revision_requested",
+      "approvalId": "approval_1760591471914_y97zec2o7",
+      "approvalTitle": "需求文档审批 - 原始需求文档转换器"
+    },
+    {
+      "version": 3,
+      "filename": "snapshot-003.json",
+      "timestamp": "2025-10-16T06:10:47.004Z",
+      "trigger": "revision_requested",
+      "approvalId": "approval_1760593952794_2wz1juccn",
+      "approvalTitle": "需求文档审批（修订版）- 原始需求文档转换器"
+    },
+    {
+      "version": 4,
+      "filename": "snapshot-004.json",
+      "timestamp": "2025-10-16T06:22:44.689Z",
+      "trigger": "revision_requested",
+      "approvalId": "approval_1760595172417_3bjc6aw0p",
+      "approvalTitle": "需求文档审批（修订版3）- 原始需求文档转换器"
+    },
+    {
+      "version": 5,
+      "filename": "snapshot-005.json",
+      "timestamp": "2025-10-16T06:27:23.563Z",
+      "trigger": "approved",
+      "approvalId": "approval_1760595901399_bo8jtl4io",
+      "approvalTitle": "需求文档审批（修订版4）- 原始需求文档转换器"
     }
   ]
 }

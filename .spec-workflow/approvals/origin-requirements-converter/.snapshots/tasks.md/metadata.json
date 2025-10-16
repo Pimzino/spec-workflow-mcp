@@ -1,0 +1,14 @@
+{
+  "filePath": ".spec-workflow/specs/origin-requirements-converter/tasks.md",
+  "currentVersion": 1,
+  "snapshots": [
+    {
+      "version": 1,
+      "filename": "snapshot-001.json",
+      "timestamp": "2025-10-16T06:36:06.020Z",
+      "trigger": "initial",
+      "approvalId": "approval_1760596566017_52cz0wz01",
+      "approvalTitle": "任务拆分文档审批 - 原始需求文档转换器"
+    }
+  ]
+}
