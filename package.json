@@ -1,6 +1,6 @@
 {
   "name": "@gavenxia/spec-workflow-mcp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "main": "dist/index.js",
   "type": "module",
