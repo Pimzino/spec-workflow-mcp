@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "yoavbls.pretty-ts-errors",
+    "usernamehw.errorlens",
+    "christian-kohler.npm-intellisense",
+    "eg2.vscode-npm-script",
+    "ZixuanChen.vitest-explorer"
+  ]
+}

@@ -1,145 +1,146 @@
-# Project Structure
+# 项目结构
 
-## Directory Organization
+## 目录组织
 
 ```
-[Define your project's directory structure. Examples below - adapt to your project type]
+[定义项目的目录结构。下面的示例 - 适应您的项目类型]
 
-Example for a library/package:
+库/包示例:
 project-root/
-├── src/                    # Source code
-├── tests/                  # Test files  
-├── docs/                   # Documentation
-├── examples/               # Usage examples
-└── [build/dist/out]        # Build output
+├── src/                    # 源代码
+├── tests/                  # 测试文件
+├── docs/                   # 文档
+├── examples/               # 使用示例
+└── [build/dist/out]        # 构建输出
 
-Example for an application:
+应用程序示例:
 project-root/
-├── [src/app/lib]           # Main source code
-├── [assets/resources]      # Static resources
-├── [config/settings]       # Configuration
-├── [scripts/tools]         # Build/utility scripts
-└── [tests/spec]            # Test files
+├── [src/app/lib]           # 主源代码
+├── [assets/resources]      # 静态资源
+├── [config/settings]       # 配置
+├── [scripts/tools]         # 构建/工具脚本
+└── [tests/spec]            # 测试文件
 
-Common patterns:
-- Group by feature/module
-- Group by layer (UI, business logic, data)
-- Group by type (models, controllers, views)
-- Flat structure for simple projects
+常见模式:
+- 按功能/模块分组
+- 按层分组(UI、业务逻辑、数据)
+- 按类型分组(模型、控制器、视图)
+- 简单项目的扁平结构
 ```
 
-## Naming Conventions
+## 命名约定
 
-### Files
-- **Components/Modules**: [e.g., `PascalCase`, `snake_case`, `kebab-case`]
-- **Services/Handlers**: [e.g., `UserService`, `user_service`, `user-service`]
-- **Utilities/Helpers**: [e.g., `dateUtils`, `date_utils`, `date-utils`]
-- **Tests**: [e.g., `[filename]_test`, `[filename].test`, `[filename]Test`]
+### 文件
+- **组件/模块**: [例如: `PascalCase`、`snake_case`、`kebab-case`]
+- **服务/处理器**: [例如: `UserService`、`user_service`、`user-service`]
+- **工具/辅助**: [例如: `dateUtils`、`date_utils`、`date-utils`]
+- **测试**: [例如: `[filename]_test`、`[filename].test`、`[filename]Test`]
 
-### Code
-- **Classes/Types**: [e.g., `PascalCase`, `CamelCase`, `snake_case`]
-- **Functions/Methods**: [e.g., `camelCase`, `snake_case`, `PascalCase`]
-- **Constants**: [e.g., `UPPER_SNAKE_CASE`, `SCREAMING_CASE`, `PascalCase`]
-- **Variables**: [e.g., `camelCase`, `snake_case`, `lowercase`]
+### 代码
+- **类/类型**: [例如: `PascalCase`、`CamelCase`、`snake_case`]
+- **函数/方法**: [例如: `camelCase`、`snake_case`、`PascalCase`]
+- **常量**: [例如: `UPPER_SNAKE_CASE`、`SCREAMING_CASE`、`PascalCase`]
+- **变量**: [例如: `camelCase`、`snake_case`、`lowercase`]
 
-## Import Patterns
+## 导入模式
 
-### Import Order
-1. External dependencies
-2. Internal modules
-3. Relative imports
-4. Style imports
+### 导入顺序
+1. 外部依赖
+2. 内部模块
+3. 相对导入
+4. 样式导入
 
-### Module/Package Organization
+### 模块/包组织
 ```
-[Describe your project's import/include patterns]
-Examples:
-- Absolute imports from project root
-- Relative imports within modules
-- Package/namespace organization
-- Dependency management approach
-```
-
-## Code Structure Patterns
-
-[Define common patterns for organizing code within files. Below are examples - choose what applies to your project]
-
-### Module/Class Organization
-```
-Example patterns:
-1. Imports/includes/dependencies
-2. Constants and configuration
-3. Type/interface definitions
-4. Main implementation
-5. Helper/utility functions
-6. Exports/public API
+[描述项目的导入/包含模式]
+示例:
+- 从项目根目录的绝对导入
+- 模块内的相对导入
+- 包/命名空间组织
+- 依赖管理方法
 ```
 
-### Function/Method Organization
-```
-Example patterns:
-- Input validation first
-- Core logic in the middle
-- Error handling throughout
-- Clear return points
-```
+## 代码结构模式
 
-### File Organization Principles
+[定义在文件中组织代码的常见模式。下面是示例 - 选择适用于您项目的内容]
+
+### 模块/类组织
 ```
-Choose what works for your project:
-- One class/module per file
-- Related functionality grouped together
-- Public API at the top/bottom
-- Implementation details hidden
+示例模式:
+1. 导入/包含/依赖项
+2. 常量和配置
+3. 类型/接口定义
+4. 主要实现
+5. 辅助/工具函数
+6. 导出/公共 API
 ```
 
-## Code Organization Principles
+### 函数/方法组织
+```
+示例模式:
+- 首先进行输入验证
+- 中间的核心逻辑
+- 贯穿始终的错误处理
+- 清晰的返回点
+```
 
-1. **Single Responsibility**: Each file should have one clear purpose
-2. **Modularity**: Code should be organized into reusable modules
-3. **Testability**: Structure code to be easily testable
-4. **Consistency**: Follow patterns established in the codebase
+### 文件组织原则
+```
+选择适合您项目的内容:
+- 每个文件一个类/模块
+- 相关功能分组在一起
+- 公共 API 在顶部/底部
+- 隐藏实现细节
+```
 
-## Module Boundaries
-[Define how different parts of your project interact and maintain separation of concerns]
+## 代码组织原则
 
-Examples of boundary patterns:
-- **Core vs Plugins**: Core functionality vs extensible plugins
-- **Public API vs Internal**: What's exposed vs implementation details  
-- **Platform-specific vs Cross-platform**: OS-specific code isolation
-- **Stable vs Experimental**: Production code vs experimental features
-- **Dependencies direction**: Which modules can depend on which
+1. **单一职责**: 每个文件应该有一个明确的目的
+2. **模块化**: 代码应该组织成可重用的模块
+3. **可测试性**: 结构化代码以便于测试
+4. **一致性**: 遵循代码库中建立的模式
 
-## Code Size Guidelines
-[Define your project's guidelines for file and function sizes]
+## 模块边界
+[定义项目的不同部分如何交互并保持关注点分离]
 
-Suggested guidelines:
-- **File size**: [Define maximum lines per file]
-- **Function/Method size**: [Define maximum lines per function]
-- **Class/Module complexity**: [Define complexity limits]
-- **Nesting depth**: [Maximum nesting levels]
+边界模式示例:
+- **核心 vs 插件**: 核心功能 vs 可扩展插件
+- **公共 API vs 内部**: 暴露的内容 vs 实现细节
+- **平台特定 vs 跨平台**: OS 特定代码隔离
+- **稳定 vs 实验性**: 生产代码 vs 实验性功能
+- **依赖方向**: 哪些模块可以依赖哪些模块
 
-## Dashboard/Monitoring Structure (if applicable)
-[How dashboard or monitoring components are organized]
+## 代码大小指南
+[定义项目的文件和函数大小指南]
 
-### Example Structure:
+建议指南:
+- **文件大小**: [定义每个文件的最大行数]
+- **函数/方法大小**: [定义每个函数的最大行数]
+- **类/模块复杂度**: [定义复杂度限制]
+- **嵌套深度**: [最大嵌套级别]
+
+## 仪表板/监控结构(如果适用)
+[仪表板或监控组件的组织方式]
+
+### 示例结构:
 ```
 src/
-└── dashboard/          # Self-contained dashboard subsystem
-    ├── server/        # Backend server components
-    ├── client/        # Frontend assets
-    ├── shared/        # Shared types/utilities
-    └── public/        # Static assets
+└── dashboard/          # 自包含仪表板子系统
+    ├── server/        # 后端服务器组件
+    ├── client/        # 前端资源
+    ├── shared/        # 共享类型/工具
+    └── public/        # 静态资源
 ```
 
-### Separation of Concerns
-- Dashboard isolated from core business logic
-- Own CLI entry point for independent operation
-- Minimal dependencies on main application
-- Can be disabled without affecting core functionality
+### 关注点分离
+- 仪表板与核心业务逻辑隔离
+- 独立操作的自己的 CLI 入口点
+- 对主应用程序的最小依赖
+- 可以在不影响核心功能的情况下禁用
 
-## Documentation Standards
-- All public APIs must have documentation
-- Complex logic should include inline comments
-- README files for major modules
-- Follow language-specific documentation conventions
+## 文档标准
+- 所有公共 API 必须有文档
+- 复杂逻辑应包含内联注释
+- 主要模块的 README 文件
+- 遵循特定于语言的文档约定
+

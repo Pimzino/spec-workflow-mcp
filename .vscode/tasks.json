@@ -1,0 +1,71 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm: build",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": ["$tsc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "npm: dev",
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "npm: dev:dashboard",
+      "type": "npm",
+      "script": "dev:dashboard",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "清理并重新编译",
+      "type": "shell",
+      "command": "npm run clean && npm run build",
+      "problemMatcher": ["$tsc"],
+      "group": "build"
+    },
+    {
+      "label": "运行测试",
+      "type": "npm",
+      "script": "test",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "运行测试 (监听模式)",
+      "type": "npm",
+      "script": "test:watch",
+      "problemMatcher": [],
+      "isBackground": true,
+      "group": "test"
+    },
+    {
+      "label": "验证 i18n",
+      "type": "npm",
+      "script": "validate:i18n",
+      "problemMatcher": []
+    },
+    {
+      "label": "启动 MCP Server (生产模式)",
+      "type": "shell",
+      "command": "npm run build && npm start",
+      "problemMatcher": []
+    }
+  ]
+}

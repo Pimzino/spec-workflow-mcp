@@ -1,51 +1,52 @@
-# Product Overview
+# 产品概述
 
-## Product Purpose
-[Describe the core purpose of this product/project. What problem does it solve?]
+## 产品目的
+[描述此产品/项目的核心目的。它解决什么问题?]
 
-## Target Users
-[Who are the primary users of this product? What are their needs and pain points?]
+## 目标用户
+[此产品的主要用户是谁?他们的需求和痛点是什么?]
 
-## Key Features
-[List the main features that deliver value to users]
+## 关键功能
+[列出为用户提供价值的主要功能]
 
-1. **Feature 1**: [Description]
-2. **Feature 2**: [Description]
-3. **Feature 3**: [Description]
+1. **功能 1**: [描述]
+2. **功能 2**: [描述]
+3. **功能 3**: [描述]
 
-## Business Objectives
-[What are the business goals this product aims to achieve?]
+## 业务目标
+[此产品旨在实现的业务目标是什么?]
 
-- [Objective 1]
-- [Objective 2]
-- [Objective 3]
+- [目标 1]
+- [目标 2]
+- [目标 3]
 
-## Success Metrics
-[How will we measure the success of this product?]
+## 成功指标
+[我们将如何衡量此产品的成功?]
 
-- [Metric 1]: [Target]
-- [Metric 2]: [Target]
-- [Metric 3]: [Target]
+- [指标 1]: [目标]
+- [指标 2]: [目标]
+- [指标 3]: [目标]
 
-## Product Principles
-[Core principles that guide product decisions]
+## 产品原则
+[指导产品决策的核心原则]
 
-1. **[Principle 1]**: [Explanation]
-2. **[Principle 2]**: [Explanation]
-3. **[Principle 3]**: [Explanation]
+1. **[原则 1]**: [解释]
+2. **[原则 2]**: [解释]
+3. **[原则 3]**: [解释]
 
-## Monitoring & Visibility (if applicable)
-[How do users track progress and monitor the system?]
+## 监控与可见性(如果适用)
+[用户如何跟踪进度和监控系统?]
 
-- **Dashboard Type**: [e.g., Web-based, CLI, Desktop app]
-- **Real-time Updates**: [e.g., WebSocket, polling, push notifications]
-- **Key Metrics Displayed**: [What information is most important to surface]
-- **Sharing Capabilities**: [e.g., read-only links, exports, reports]
+- **仪表板类型**: [例如: 基于 Web、CLI、桌面应用]
+- **实时更新**: [例如: WebSocket、轮询、推送通知]
+- **显示的关键指标**: [最重要的信息是什么]
+- **共享功能**: [例如: 只读链接、导出、报告]
 
-## Future Vision
-[Where do we see this product evolving in the future?]
+## 未来愿景
+[我们看到此产品在未来如何发展?]
 
-### Potential Enhancements
-- **Remote Access**: [e.g., Tunnel features for sharing dashboards with stakeholders]
-- **Analytics**: [e.g., Historical trends, performance metrics]
-- **Collaboration**: [e.g., Multi-user support, commenting]
+### 潜在增强
+- **远程访问**: [例如: 用于与利益相关者共享仪表板的隧道功能]
+- **分析**: [例如: 历史趋势、性能指标]
+- **协作**: [例如: 多用户支持、评论]
+

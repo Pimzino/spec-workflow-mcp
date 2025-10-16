@@ -1,0 +1,55 @@
+{
+  // TypeScript 设置
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // 编辑器设置
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // 文件关联
+  "files.associations": {
+    "*.md": "markdown",
+    "*.toml": "toml"
+  },
+
+  // 排除文件
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/dist": true
+  },
+
+  // 搜索排除
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/*.log": true
+  },
+
+  // 调试设置
+  "debug.javascript.autoAttachFilter": "onlyWithFlag",
+  "debug.node.autoAttach": "on",
+
+  // 终端设置
+  "terminal.integrated.env.osx": {
+    "NODE_ENV": "development"
+  },
+  "terminal.integrated.env.linux": {
+    "NODE_ENV": "development"
+  },
+  "terminal.integrated.env.windows": {
+    "NODE_ENV": "development"
+  },
+
+  // NPM 脚本
+  "npm.enableRunFromFolder": true,
+  "npm.packageManager": "npm",
+
+  // 推荐扩展提示
+  "extensions.ignoreRecommendations": false
+}
