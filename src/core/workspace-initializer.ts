@@ -9,33 +9,33 @@ export class WorkspaceInitializer {
   private projectPath: string;
   private version: string;
   private templateLang: string; // 模板语言
-  
+
   constructor(projectPath: string, version: string, templateLang: string) {
     this.projectPath = projectPath;
     this.version = version;
     this.templateLang = templateLang; // 默认为英文
   }
-  
+
   async initializeWorkspace(): Promise<void> {
     // Create all necessary directories
     await this.initializeDirectories(); // 创建所有必要的目录
-    
+
     // Copy template files
     await this.initializeTemplates(); // 复制模板文件
-    
+
     // Create config example
     await this.createConfigExample(); // 创建配置示例
-    
+
     // Create user templates README
     await this.createUserTemplatesReadme(); // 创建用户模板README
 
     // Create origin requirements README
     await this.createOriginRequirementsReadme(); // 创建原始需求文档说明
   }
-  
+
   private async initializeDirectories(): Promise<void> {
     const workflowRoot = PathUtils.getWorkflowRoot(this.projectPath);
-    
+
     const directories = [
       "approvals",
       "archive",
@@ -45,19 +45,19 @@ export class WorkspaceInitializer {
       "user-templates",
       "origin-requirements", // 原始需求文档目录
     ];
-    
+
     for (const dir of directories) {
       const dirPath = join(workflowRoot, dir);
       await fs.mkdir(dirPath, { recursive: true }); // 创建目录recursive: true 递归创建目录
     }
   }
-  
+
   private async initializeTemplates(): Promise<void> {
     const templatesDir = join(
       PathUtils.getWorkflowRoot(this.projectPath),
       "templates"
     );
-    
+
     const templates = [
       "requirements-template",
       "design-template",
@@ -66,12 +66,12 @@ export class WorkspaceInitializer {
       "tech-template",
       "structure-template",
     ];
-    
+
     for (const template of templates) {
       await this.copyTemplate(template, templatesDir);
     }
   }
-  
+
   private async copyTemplate(
     templateName: string,
     targetDir: string
@@ -79,7 +79,7 @@ export class WorkspaceInitializer {
     // Use simple filename without version
     const targetFileName = `${templateName}.md`;
     const targetPath = join(targetDir, targetFileName);
-    
+
     // 根据 templateLang 选择对应语言的模板文件
     const sourcePath = join(
       __dirname,
@@ -92,7 +92,7 @@ export class WorkspaceInitializer {
 
     try {
       const content = await fs.readFile(sourcePath, "utf-8");
-      
+
       // Always overwrite to ensure latest template version is used
       await fs.writeFile(targetPath, content, "utf-8");
     } catch (error) {
@@ -101,23 +101,23 @@ export class WorkspaceInitializer {
       console.error(`Failed to copy template ${templateName}: ${errorMessage}`);
     }
   }
-  
+
   private async createConfigExample(): Promise<void> {
     const configPath = join(
       PathUtils.getWorkflowRoot(this.projectPath),
       "config.example.toml"
     );
-    
+
     const configContent =
       this.templateLang === "zh"
         ? this.getConfigContentZh()
         : this.getConfigContentEn();
-    
+
     // Always overwrite to ensure language matches current templateLang setting
     // 始终覆盖以确保语言匹配当前的 templateLang 设置
     await fs.writeFile(configPath, configContent, "utf-8");
   }
-  
+
   private getConfigContentEn(): string {
     return `# Spec Workflow MCP Server Configuration File
 # ============================================
@@ -167,6 +167,34 @@ export class WorkspaceInitializer {
 # Default: system language or "en"
 # lang = "en"
 
+# Template Language
+# Set the language for generated template files.
+# Available values: "en" (English), "zh" (Chinese)
+# Default: "en"
+# templateLang = "en"
+
+# Document Converter Configuration
+# ==================================
+
+# Pandoc executable path
+# Path to the Pandoc executable for Word to Markdown conversion.
+# If not specified, the system will try to find Pandoc in PATH.
+# Required for converting Word documents (.docx, .doc) to Markdown.
+# Default: searches in system PATH
+# pandocPath = "/usr/local/bin/pandoc"
+# pandocPath = "C:\\Program Files\\Pandoc\\pandoc.exe"  # Windows example
+
+# Converter API URL
+# Fallback API endpoint for document conversion when Pandoc is unavailable.
+# The API should accept POST requests with multipart/form-data.
+# Optional: if not set, only local Pandoc conversion is available.
+# converterApiUrl = "https://your-converter-api.com/convert"
+
+# API timeout (milliseconds)
+# Maximum time to wait for API responses during document conversion.
+# Default: 30000 (30 seconds)
+# apiTimeout = 30000
+
 # Example configurations:
 # =====================
 
@@ -195,9 +223,15 @@ export class WorkspaceInitializer {
 # Example 5: Chinese template language
 # -------------------------------------
 # templateLang = "zh"
-# autoStartDashboard = true`;
+# autoStartDashboard = true
+
+# Example 6: Document conversion with custom Pandoc
+# --------------------------------------------------
+# pandocPath = "/opt/homebrew/bin/pandoc"
+# converterApiUrl = "https://converter.example.com/api"
+# apiTimeout = 60000`;
   }
-  
+
   private getConfigContentZh(): string {
     return `# Spec Workflow MCP 服务器配置文件
 # ============================================
@@ -253,6 +287,29 @@ export class WorkspaceInitializer {
 # 默认："en"
 # templateLang = "en"
 
+# 文档转换器配置
+# ==================================
+
+# Pandoc 可执行文件路径
+# 用于 Word 到 Markdown 转换的 Pandoc 可执行文件路径。
+# 如果未指定，系统将尝试在 PATH 中查找 Pandoc。
+# 转换 Word 文档（.docx、.doc）为 Markdown 时需要。
+# 默认：在系统 PATH 中搜索
+# pandocPath = "/usr/local/bin/pandoc"
+# pandocPath = "/opt/homebrew/bin/pandoc"  # macOS Homebrew 示例
+# pandocPath = "C:\\Program Files\\Pandoc\\pandoc.exe"  # Windows 示例
+
+# 转换器 API URL
+# 当 Pandoc 不可用时用于文档转换的备用 API 端点。
+# API 应接受带有 multipart/form-data 的 POST 请求。
+# 可选：如果未设置，仅可使用本地 Pandoc 转换。
+# converterApiUrl = "https://your-converter-api.com/convert"
+
+# API 超时时间（毫秒）
+# 文档转换期间等待 API 响应的最长时间。
+# 默认：30000（30 秒）
+# apiTimeout = 30000
+
 # 配置示例：
 # =====================
 
@@ -281,9 +338,15 @@ export class WorkspaceInitializer {
 # 示例 5：使用中文模板
 # -------------------------------------
 # templateLang = "zh"
-# autoStartDashboard = true`;
+# autoStartDashboard = true
+
+# 示例 6：自定义 Pandoc 路径的文档转换
+# --------------------------------------------------
+# pandocPath = "/opt/homebrew/bin/pandoc"
+# converterApiUrl = "https://converter.example.com/api"
+# apiTimeout = 60000`;
   }
-  
+
   private async createUserTemplatesReadme(): Promise<void> {
     const readmePath = join(
       PathUtils.getWorkflowRoot(this.projectPath),
@@ -295,12 +358,12 @@ export class WorkspaceInitializer {
       this.templateLang === "zh"
         ? this.getReadmeContentZh()
         : this.getReadmeContentEn();
-    
+
     // Always overwrite to ensure language matches current templateLang setting
     // 始终覆盖以确保语言匹配当前的 templateLang 设置
     await fs.writeFile(readmePath, readmeContent, "utf-8");
   }
-  
+
   private getReadmeContentEn(): string {
     return `# User Templates
 
@@ -368,7 +431,7 @@ Templates can include placeholders that will be replaced when documents are crea
 - If a custom template has errors, the system will fall back to the default template
 `;
   }
-  
+
   private getReadmeContentZh(): string {
     return `# 用户自定义模板
 
@@ -584,13 +647,48 @@ You can configure the conversion process in \`.spec-workflow/config.toml\`:
 
 \`\`\`toml
 # Pandoc executable path (optional)
+# The system will try to find Pandoc in PATH if not specified
+# macOS/Linux examples:
 pandocPath = "/usr/local/bin/pandoc"
+pandocPath = "/opt/homebrew/bin/pandoc"  # Homebrew on Apple Silicon
+# Windows example:
+# pandocPath = "C:\\\\Program Files\\\\Pandoc\\\\pandoc.exe"
 
 # Converter API URL (optional, for fallback)
-converterApiUrl = "https://your-converter-api.com"
+# Used when Pandoc is not available or conversion fails
+# The API should accept POST requests with multipart/form-data
+converterApiUrl = "https://your-converter-api.com/convert"
 
-# API timeout in milliseconds
+# API timeout in milliseconds (default: 30000)
+# Maximum time to wait for API responses
 apiTimeout = 30000
+\`\`\`
+
+### Configuration Priority
+
+The conversion system tries methods in this order:
+
+1. **Local Pandoc** (if \`pandocPath\` is configured or found in PATH)
+   - Fastest and most reliable
+   - Works offline
+   - Recommended for regular use
+
+2. **Converter API** (if \`converterApiUrl\` is configured)
+   - Fallback when Pandoc is unavailable
+   - Requires internet connection
+   - Subject to API timeout limits
+
+### Checking Pandoc Installation
+
+To verify Pandoc is installed and accessible:
+
+\`\`\`bash
+# Check if Pandoc is installed
+pandoc --version
+
+# Find Pandoc location
+which pandoc       # macOS/Linux
+where pandoc       # Windows
 \`\`\`
 
 ## Related Tools
@@ -781,13 +879,48 @@ origin-requirements/
 
 \`\`\`toml
 # Pandoc 可执行文件路径（可选）
+# 如果未指定，系统会尝试在 PATH 中查找 Pandoc
+# macOS/Linux 示例：
 pandocPath = "/usr/local/bin/pandoc"
+pandocPath = "/opt/homebrew/bin/pandoc"  # Apple Silicon 上的 Homebrew
+# Windows 示例：
+# pandocPath = "C:\\\\Program Files\\\\Pandoc\\\\pandoc.exe"
 
-# 转换器 API URL（可选，用于降级）
-converterApiUrl = "https://your-converter-api.com"
+# 转换器 API URL（可选，用于备用）
+# 当 Pandoc 不可用或转换失败时使用
+# API 应接受带有 multipart/form-data 的 POST 请求
+converterApiUrl = "https://your-converter-api.com/convert"
 
-# API 超时时间（毫秒）
+# API 超时时间（毫秒，默认：30000）
+# 等待 API 响应的最长时间
 apiTimeout = 30000
+\`\`\`
+
+### 配置优先级
+
+转换系统按以下顺序尝试方法：
+
+1. **本地 Pandoc**（如果配置了 \`pandocPath\` 或在 PATH 中找到）
+   - 最快且最可靠
+   - 离线工作
+   - 推荐日常使用
+
+2. **转换器 API**（如果配置了 \`converterApiUrl\`）
+   - Pandoc 不可用时的备用方案
+   - 需要互联网连接
+   - 受 API 超时限制
+
+### 检查 Pandoc 安装
+
+验证 Pandoc 是否已安装并可访问：
+
+\`\`\`bash
+# 检查 Pandoc 是否已安装
+pandoc --version
+
+# 查找 Pandoc 位置
+which pandoc       # macOS/Linux
+where pandoc       # Windows
 \`\`\`
 
 ## 相关工具

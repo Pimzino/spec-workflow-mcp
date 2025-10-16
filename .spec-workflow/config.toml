@@ -1,0 +1,27 @@
+# Spec Workflow MCP 服务器配置文件（测试配置）
+# ============================================
+
+# 项目目录
+projectDir = "."
+
+# 仪表板配置
+port = 3001
+autoStartDashboard = true
+
+# 语言配置
+lang = "zh"
+templateLang = "zh"
+
+# ============================================
+# 文档转换器配置（测试用）
+# ============================================
+
+# Pandoc 路径配置
+# 取消注释下面的行来测试自定义 Pandoc 路径
+pandocPath = "/opt/homebrew/bin/pandoc"
+
+# API 服务配置（可选）
+# 取消注释下面的行来测试 API 服务
+# converterApiUrl = "http://localhost:3000"
+# apiTimeout = 30000
+

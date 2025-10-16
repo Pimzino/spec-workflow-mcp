@@ -148,20 +148,21 @@ export async function convertOriginRequirementHandler(
       // Word 文件，需要转换
       console.error("  Word 文件，需要转换为 Markdown");
 
-      // 创建文档转换器
-      const converterConfig = {
-        pandocPath: config?.pandocPath,
-        converterApiUrl: config?.converterApiUrl,
-        apiTimeout: 30000,
-      };
-
-      const converter = createDocumentConverter(converterConfig);
-
       // 直接指定输出路径到 .temp/{filename}/ 目录下
       const baseName = basename(cleanFilename, fileExtension);
       const originReqPath = PathUtils.getOriginRequirementsPath(projectPath);
       const tempDir = join(originReqPath, ".temp", baseName);
       await ensureDirectoryExists(tempDir);
+
+      // 创建文档转换器
+      const converterConfig = {
+        pandocPath: config?.pandocPath,
+        converterApiUrl: config?.converterApiUrl,
+        apiTimeout: 30000,
+        tempDir: tempDir,
+      };
+
+      const converter = createDocumentConverter(converterConfig);
 
       const outputPath = join(tempDir, `${baseName}.md`);
 
