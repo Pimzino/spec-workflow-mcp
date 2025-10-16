@@ -1,6 +1,6 @@
 {
-  "name": "@pimzino/spec-workflow-mcp",
-  "version": "1.0.1",
+  "name": "@gavenxia/spec-workflow-mcp",
+  "version": "0.0.1",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "main": "dist/index.js",
   "type": "module",
@@ -12,6 +12,14 @@
     "README.md",
     "LICENSE"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GavenXia/lls-spec-mcp.git"
+  },
+  "homepage": "https://github.com/GavenXia/lls-spec-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/GavenXia/lls-spec-mcp/issues"
+  },
   "scripts": {
     "build": "npm run validate:i18n && npm run clean && tsc && npm run build:dashboard && npm run copy-static",
     "copy-static": "node scripts/copy-static.cjs",
@@ -24,7 +32,10 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "release:patch": "npm version patch && npm publish --access public && git push && git push --tags",
+    "release:minor": "npm version minor && npm publish --access public && git push && git push --tags",
+    "release:major": "npm version major && npm publish --access public && git push && git push --tags"
   },
   "keywords": [
     "mcp",
@@ -36,7 +47,7 @@
     "development-workflow",
     "project-management"
   ],
-  "author": "",
+  "author": "gavenxia",
   "license": "GPL-3.0",
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

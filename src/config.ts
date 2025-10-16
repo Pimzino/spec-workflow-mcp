@@ -9,6 +9,7 @@ export interface SpecWorkflowConfig {
   autoStartDashboard?: boolean;
   dashboardOnly?: boolean;
   lang?: string;
+  templateLang?: string; // 模板语言: 'en' | 'zh'
 }
 
 export interface ConfigLoadResult {
@@ -66,6 +67,21 @@ function validateConfig(config: any): { valid: boolean; error?: string } {
     };
   }
 
+  if (config.templateLang !== undefined) {
+    if (typeof config.templateLang !== 'string') {
+      return { 
+        valid: false, 
+        error: `Invalid templateLang: must be a string.` 
+        };
+    }
+    if (!['en', 'zh'].includes(config.templateLang)) {
+      return { 
+        valid: false, 
+        error: `Invalid templateLang: must be 'en' or 'zh'.` 
+      };
+    }
+  }
+
   return { valid: true };
 }
 
@@ -113,6 +129,10 @@ export function loadConfigFromPath(configPath: string): ConfigLoadResult {
     
     if (parsedConfig.lang !== undefined) {
       config.lang = parsedConfig.lang;
+    }
+    
+    if (parsedConfig.templateLang !== undefined) {
+      config.templateLang = parsedConfig.templateLang;
     }
 
     return { 

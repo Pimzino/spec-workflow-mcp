@@ -30,6 +30,8 @@ OPTIONS:
                          If not specified, uses an ephemeral port
   --config <path>         Use custom config file instead of default location
                          Supports both relative and absolute paths
+  --templateLang <lang>   Template language: 'en' or 'zh' (default: 'en')
+                         Controls the language of generated template files
 
 CONFIGURATION:
   Default config: <project-dir>/.spec-workflow/config.toml
@@ -81,11 +83,19 @@ EXAMPLES:
   # Custom config with dashboard
   spec-workflow-mcp --config ./dev-config.toml --dashboard --port 3000
 
+  # Use Chinese templates
+  spec-workflow-mcp --templateLang zh
+
+  # Use Chinese templates with specific project
+  spec-workflow-mcp ~/my-project --templateLang zh --AutoStartDashboard
+
 PARAMETER FORMATS:
   --port 3456             Space-separated format
   --port=3456             Equals format
   --config path           Space-separated format
   --config=path           Equals format
+  --templateLang en       Space-separated format
+  --templateLang=zh       Equals format
 
 For more information, visit: https://github.com/Pimzino/spec-workflow-mcp
 `);
@@ -109,15 +119,17 @@ function parseArguments(args: string[]): {
   autoStartDashboard: boolean;
   port?: number;
   lang?: string;
+  templateLang?: string;
   configPath?: string;
 } {
   const isDashboardMode = args.includes('--dashboard'); // 是否为仪表盘模式
   const autoStartDashboard = args.includes('--AutoStartDashboard'); // 是否自动启动仪表盘
   let customPort: number | undefined; // 自定义端口
+  let templateLang: string | undefined; // 模板语言
   let configPath: string | undefined; // 自定义配置路径
   
   // Check for invalid flags 检查无效的标志
-  const validFlags = ['--dashboard', '--AutoStartDashboard', '--port', '--config', '--help', '-h'];
+  const validFlags = ['--dashboard', '--AutoStartDashboard', '--port', '--config', '--templateLang', '--help', '-h'];
   for (const arg of args) {
     if (arg.startsWith('--') && !arg.includes('=')) {
       if (!validFlags.includes(arg)) {
@@ -186,6 +198,33 @@ function parseArguments(args: string[]): {
     }
   }
   
+  // Parse --templateLang parameter (supports --templateLang en and --templateLang=en formats)
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    
+    if (arg.startsWith('--templateLang=')) {
+      // Handle --templateLang=en format
+      const langValue = arg.split('=')[1];
+      if (!langValue) {
+        throw new Error('--templateLang parameter requires a value (e.g., --templateLang=en)'); // --templateLang参数需要一个值
+      }
+      if (!['en', 'zh'].includes(langValue)) {
+        throw new Error(`Invalid templateLang: ${langValue}. Must be 'en' or 'zh'.`); // 无效的模板语言
+      }
+      templateLang = langValue;
+    } else if (arg === '--templateLang' && i + 1 < args.length) {
+      // Handle --templateLang en format
+      const langValue = args[i + 1];
+      if (!['en', 'zh'].includes(langValue)) {
+        throw new Error(`Invalid templateLang: ${langValue}. Must be 'en' or 'zh'.`); // 无效的模板语言
+      }
+      templateLang = langValue;
+      i++; // Skip the next argument as it's the templateLang value
+    } else if (arg === '--templateLang') {
+      throw new Error('--templateLang parameter requires a value (e.g., --templateLang en)'); // --templateLang参数需要一个值
+    }
+  }
+  
   // Get project path (filter out flags and their values) 获取项目路径（过滤掉标志和它们的值）
   const filteredArgs = args.filter((arg, index) => {
     if (arg === '--dashboard') return false;
@@ -194,8 +233,10 @@ function parseArguments(args: string[]): {
     if (arg === '--port') return false;
     if (arg.startsWith('--config=')) return false;
     if (arg === '--config') return false;
-    // Check if this arg is a value following --port or --config
-    if (index > 0 && (args[index - 1] === '--port' || args[index - 1] === '--config')) return false;
+    if (arg.startsWith('--templateLang=')) return false;
+    if (arg === '--templateLang') return false;
+    // Check if this arg is a value following --port, --config, or --templateLang
+    if (index > 0 && (args[index - 1] === '--port' || args[index - 1] === '--config' || args[index - 1] === '--templateLang')) return false;
     return true;
   });
   
@@ -208,7 +249,7 @@ function parseArguments(args: string[]): {
     console.warn('Consider specifying an explicit path for better clarity.'); // 考虑指定一个显式路径以提高清晰度
   }
   
-  return { projectPath, isDashboardMode, autoStartDashboard, port: customPort, lang: undefined, configPath };
+  return { projectPath, isDashboardMode, autoStartDashboard, port: customPort, lang: undefined, templateLang, configPath };
 }
 
 async function main() {
@@ -247,7 +288,8 @@ async function main() {
       dashboardOnly: cliArgs.isDashboardMode || undefined,
       autoStartDashboard: cliArgs.autoStartDashboard || undefined,
       port: cliArgs.port,
-      lang: cliArgs.lang
+      lang: cliArgs.lang,
+      templateLang: cliArgs.templateLang
     };
     
     // Merge configs (CLI overrides file config) 合并配置（命令行参数覆盖配置文件）
@@ -261,6 +303,7 @@ async function main() {
     const autoStartDashboard = finalConfig.autoStartDashboard || false;
     const port = finalConfig.port;
     const lang = finalConfig.lang;
+    const templateLang = finalConfig.templateLang || 'en'; // 默认为英文
     
     if (isDashboardMode) {
       // Dashboard only mode
@@ -273,7 +316,7 @@ async function main() {
       const __dirname = dirname(fileURLToPath(import.meta.url));
       const packageJsonPath = join(__dirname, '..', 'package.json');
       const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-      const workspaceInitializer = new WorkspaceInitializer(projectPath, packageJson.version); // 初始化工作区目录和模板
+      const workspaceInitializer = new WorkspaceInitializer(projectPath, packageJson.version, templateLang as 'en' | 'zh'); // 初始化工作区目录和模板
       await workspaceInitializer.initializeWorkspace(); // 初始化工作区目录和模板
       
       const dashboardServer = new DashboardServer({
