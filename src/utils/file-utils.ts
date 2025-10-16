@@ -17,9 +17,9 @@ import {
 } from "../types/converter-types.js";
 
 /**
- * 文件大小限制（10MB）
+ * 文件大小限制（50MB）
  */
-export const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 /**
  * 支持的文件扩展名

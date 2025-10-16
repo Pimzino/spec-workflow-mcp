@@ -85,8 +85,9 @@ export async function convertOriginRequirementHandler(
 
     console.error(`  清理后文件名: ${cleanFilename}`);
 
-    // 2. 在 origin-requirements/ 目录中查找文件
-    const originReqDir = join(projectPath, "origin-requirements");
+    // 2. 在 .spec-workflow/origin-requirements/ 目录中查找文件
+    const workflowRoot = PathUtils.getWorkflowRoot(projectPath);
+    const originReqDir = join(workflowRoot, "origin-requirements");
     const inputFilePath = join(originReqDir, cleanFilename);
 
     console.error(`  查找文件: ${inputFilePath}`);

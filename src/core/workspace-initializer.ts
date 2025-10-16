@@ -8,13 +8,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export class WorkspaceInitializer {
   private projectPath: string;
   private version: string;
-  private templateLang: "en" | "zh"; // 模板语言
+  private templateLang: string; // 模板语言
 
-  constructor(
-    projectPath: string,
-    version: string,
-    templateLang: "en" | "zh" = "en"
-  ) {
+  constructor(projectPath: string, version: string, templateLang: string) {
     this.projectPath = projectPath;
     this.version = version;
     this.templateLang = templateLang; // 默认为英文
@@ -41,13 +37,13 @@ export class WorkspaceInitializer {
     const workflowRoot = PathUtils.getWorkflowRoot(this.projectPath);
 
     const directories = [
-      "origin-requirements",
       "approvals",
       "archive",
       "specs",
       "steering",
       "templates",
       "user-templates",
+      "origin-requirements", // 原始需求文档目录
     ];
 
     for (const dir of directories) {
@@ -443,7 +439,7 @@ Templates can include placeholders that will be replaced when documents are crea
 
   private async createOriginRequirementsReadme(): Promise<void> {
     const readmePath = join(
-      this.projectPath,
+      PathUtils.getWorkflowRoot(this.projectPath),
       "origin-requirements",
       "README.md"
     );

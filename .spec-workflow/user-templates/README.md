@@ -1,64 +1,64 @@
-# User Templates
+# 用户自定义模板
 
-This directory allows you to create custom templates that override the default Spec Workflow templates.
+此目录允许您创建自定义模板来覆盖默认的 Spec Workflow 模板。
 
-## How to Use Custom Templates
+## 如何使用自定义模板
 
-1. **Create your custom template file** in this directory with the exact same name as the default template you want to override:
-   - `requirements-template.md` - Override requirements document template
-   - `design-template.md` - Override design document template  
-   - `tasks-template.md` - Override tasks document template
-   - `product-template.md` - Override product steering template
-   - `tech-template.md` - Override tech steering template
-   - `structure-template.md` - Override structure steering template
+1. **在此目录中创建自定义模板文件**，文件名必须与要覆盖的默认模板完全相同：
+   - `requirements-template.md` - 覆盖需求文档模板
+   - `design-template.md` - 覆盖设计文档模板
+   - `tasks-template.md` - 覆盖任务文档模板
+   - `product-template.md` - 覆盖产品指导模板
+   - `tech-template.md` - 覆盖技术指导模板
+   - `structure-template.md` - 覆盖结构指导模板
 
-2. **Template Loading Priority**:
-   - The system first checks this `user-templates/` directory
-   - If a matching template is found here, it will be used
-   - Otherwise, the default template from `templates/` will be used
+2. **模板加载优先级**：
+   - 系统首先检查此 `user-templates/` 目录
+   - 如果在此找到匹配的模板，将使用它
+   - 否则，将使用 `templates/` 中的默认模板
 
-## Example Custom Template
+## 自定义模板示例
 
-To create a custom requirements template:
+创建自定义需求模板：
 
-1. Create a file named `requirements-template.md` in this directory
-2. Add your custom structure, for example:
+1. 在此目录中创建名为 `requirements-template.md` 的文件
+2. 添加您的自定义结构，例如：
 
 ```markdown
-# Requirements Document
+# 需求文档
 
-## Executive Summary
-[Your custom section]
+## 执行摘要
+[您的自定义章节]
 
-## Business Requirements
-[Your custom structure]
+## 业务需求
+[您的自定义结构]
 
-## Technical Requirements
-[Your custom fields]
+## 技术需求
+[您的自定义字段]
 
-## Custom Sections
-[Add any sections specific to your workflow]
+## 自定义章节
+[添加任何特定于您的工作流的章节]
 ```
 
-## Template Variables
+## 模板变量
 
-Templates can include placeholders that will be replaced when documents are created:
-- `{{projectName}}` - The name of your project
-- `{{featureName}}` - The name of the feature being specified
-- `{{date}}` - The current date
-- `{{author}}` - The document author
+模板可以包含在创建文档时将被替换的占位符：
+- `{{projectName}}` - 您的项目名称
+- `{{featureName}}` - 正在规范的功能名称
+- `{{date}}` - 当前日期
+- `{{author}}` - 文档作者
 
-## Best Practices
+## 最佳实践
 
-1. **Start from defaults**: Copy a default template from `../templates/` as a starting point
-2. **Keep structure consistent**: Maintain similar section headers for tool compatibility
-3. **Document changes**: Add comments explaining why sections were added/modified
-4. **Version control**: Track your custom templates in version control
-5. **Test thoroughly**: Ensure custom templates work with the spec workflow tools
+1. **从默认开始**：从 `../templates/` 复制默认模板作为起点
+2. **保持结构一致**：维护相似的章节标题以保持工具兼容性
+3. **记录更改**：添加注释说明为什么添加/修改了章节
+4. **版本控制**：在版本控制中跟踪您的自定义模板
+5. **充分测试**：确保自定义模板能与规范工作流工具正常工作
 
-## Notes
+## 注意事项
 
-- Custom templates are project-specific and not included in the package distribution
-- The `templates/` directory contains the default templates which are updated with each version
-- Your custom templates in this directory are preserved during updates
-- If a custom template has errors, the system will fall back to the default template
+- 自定义模板是项目特定的，不包含在包分发中
+- `templates/` 目录包含随每个版本更新的默认模板
+- 此目录中的自定义模板在更新期间会被保留
+- 如果自定义模板有错误，系统将回退到默认模板

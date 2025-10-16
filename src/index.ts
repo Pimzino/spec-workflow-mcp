@@ -374,7 +374,7 @@ async function main() {
       const workspaceInitializer = new WorkspaceInitializer(
         projectPath,
         packageJson.version,
-        templateLang as "en" | "zh"
+        templateLang
       ); // 初始化工作区目录和模板
       await workspaceInitializer.initializeWorkspace(); // 初始化工作区目录和模板
 
@@ -458,9 +458,9 @@ async function main() {
 
       await server.initialize(
         projectPath,
+        templateLang,
         dashboardOptions,
-        lang,
-        templateLang
+        lang
       );
 
       // Start monitoring for dashboard session

@@ -1,77 +1,83 @@
-# Spec Workflow MCP Server Configuration File
+# Spec Workflow MCP 服务器配置文件
 # ============================================
 #
-# This is an example configuration file for the Spec Workflow MCP Server.
-# Copy this file to 'config.toml' in the same directory to use it.
+# 这是 Spec Workflow MCP 服务器的示例配置文件。
+# 将此文件复制为同目录下的 'config.toml' 以使用它。
 #
-# Configuration Precedence:
-# 1. Command-line arguments (highest priority)
-# 2. Config file settings
-# 3. Built-in defaults (lowest priority)
+# 配置优先级：
+# 1. 命令行参数（最高优先级）
+# 2. 配置文件设置
+# 3. 内置默认值（最低优先级）
 #
-# All settings are optional. Uncomment and modify as needed.
-# Please note that not all MCP clients will support loading this config file due to the nature of where they are running from.
+# 所有设置都是可选的。根据需要取消注释并修改。
+# 请注意，由于某些 MCP 客户端运行环境的原因，不是所有客户端都支持加载此配置文件。
 
-# Project directory path
-# The root directory of your project where spec files are located.
-# Note: You may have to use double slashes (\\) instead of single slashes (/) on Windows or for certain clients.
-# Supports tilde (~) expansion for home directory.
-# Default: current working directory
+# 项目目录路径
+# 项目的根目录，规范文件所在位置。
+# 注意：在 Windows 或某些客户端上，您可能需要使用双反斜杠(\\)而不是单斜杠(/)。
+# 支持波浪号(~)展开为主目录。
+# 默认：当前工作目录
 # projectDir = "."
 # projectDir = "~/my-project"
 # projectDir = "/absolute/path/to/project"
 
-# Dashboard port
-# The port number for the web dashboard.
-# Must be between 1024 and 65535.
-# Default: ephemeral port (automatically assigned)
+# 仪表板端口
+# Web 仪表板的端口号。
+# 必须在 1024 到 65535 之间。
+# 默认：临时端口（自动分配）
 # port = 3000
 
-# Auto-start dashboard
-# Automatically launch the dashboard when the MCP server starts.
-# The dashboard will open in your default browser.
-# Default: false
+# 自动启动仪表板
+# 当 MCP 服务器启动时自动启动仪表板。
+# 仪表板将在默认浏览器中打开。
+# 默认：false
 # autoStartDashboard = false
 
-# Dashboard-only mode
-# Run only the web dashboard without the MCP server.
-# Useful for standalone dashboard usage.
-# Default: false
+# 仅仪表板模式
+# 仅运行 Web 仪表板，不启动 MCP 服务器。
+# 适用于独立仪表板使用。
+# 默认：false
 # dashboardOnly = false
 
-# Language
-# Set the interface language for internationalization (i18n).
-# Available languages depend on your installation.
-# Common values: "en" (English), "ja" (Japanese), etc.
-# Default: system language or "en"
+# 界面语言
+# 设置国际化(i18n)的界面语言。
+# 可用语言取决于您的安装。
+# 常用值："en"（英语）、"ja"（日语）、"zh"（中文）等。
+# 默认：系统语言或 "en"
 # lang = "en"
 
-# Example configurations:
+# 模板语言
+# 设置生成模板文件的语言。
+# 可用值："en"（英语）、"zh"（中文）
+# 默认："en"
+# templateLang = "en"
+
+# 配置示例：
 # =====================
 
-# Example 1: Development setup with auto-started dashboard
+# 示例 1：开发环境设置，自动启动仪表板
 # ----------------------------------------------------------
 # projectDir = "~/dev/my-project"
 # autoStartDashboard = true
 # port = 3456
 
-# Example 2: Production MCP server without dashboard
+# 示例 2：生产环境 MCP 服务器，不启动仪表板
 # ---------------------------------------------------
 # projectDir = "/var/projects/production"
 # autoStartDashboard = false
 
-# Example 3: Dashboard-only mode for viewing specs
+# 示例 3：仅仪表板模式，用于查看规范
 # -------------------------------------------------
 # projectDir = "."
 # dashboardOnly = true
 # port = 8080
 
-# Example 4: Japanese language interface
+# 示例 4：中文界面
 # ---------------------------------------
-# lang = "ja"
+# lang = "zh"
 # autoStartDashboard = true
 
-# Example 5: Chinese template language
+# 示例 5：使用中文模板
 # -------------------------------------
 # templateLang = "zh"
 # autoStartDashboard = true

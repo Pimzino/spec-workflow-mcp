@@ -35,7 +35,7 @@ export class SpecWorkflowMCPServer {
   private dashboardUrl?: string;
   private sessionManager?: SessionManager;
   private lang?: string;
-  private templateLang?: "en" | "zh";
+  private templateLang?: string;
   private dashboardMonitoringInterval?: NodeJS.Timeout;
 
   constructor() {
@@ -72,9 +72,9 @@ export class SpecWorkflowMCPServer {
 
   async initialize(
     projectPath: string,
+    templateLang: string,
     dashboardOptions?: DashboardStartOptions,
-    lang?: string,
-    templateLang?: "zh" | "en"
+    lang?: string
   ) {
     this.projectPath = projectPath;
     this.lang = lang;
