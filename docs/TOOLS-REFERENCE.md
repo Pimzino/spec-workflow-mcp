@@ -436,7 +436,7 @@ Spec Workflow MCP provides specialized tools for structured software development
 
 ### delete-approval
 
-**Purpose**: Removes completed approval requests to clean up the approval queue.
+**Purpose**: Removes completed, rejected, or needs-revision approval requests to clean up the approval queue. Cannot delete pending approvals.
 
 **Parameters**:
 
