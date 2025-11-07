@@ -66,7 +66,7 @@ If you prefer to configure manually, create or update the `.mcp.json` file in yo
 
 ### Path Mapping Requirements
 
-The container requires the entire project directory to be mounted at the **exact same path** inside the container as it exists on the host system. This is so the MCP server can reliably create and manage the `.spec-workflow` directory
+The container requires the entire project directory to be mounted at the **exact same path** inside the container as it exists on the host system. This is so the MCP server can reliably create and manage the `.spec-workflow` directory.
 
 
 **Example:** If your project is at `/home/steev/myproject`, your configuration would mount:
