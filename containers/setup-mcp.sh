@@ -298,6 +298,7 @@ parse_arguments() {
         case $1 in
             -h|--help)
                 show_help
+                shift
                 exit $EXIT_SUCCESS
                 ;;
             *)
