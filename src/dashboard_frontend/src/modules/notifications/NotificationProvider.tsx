@@ -194,23 +194,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     prevApprovalsRef.current = approvals;
   }, [approvals, playNotificationSound, showNotification]);
 
-  // Listen for WebSocket task updates and trigger detailed fetch
+  // Initialize task data on mount only
   useEffect(() => {
     if (isInitialLoadRef.current) {
       // Initialize task data for all specs on first load
       specs.forEach(spec => {
         handleTaskUpdate(spec.name, spec.displayName);
       });
-      return;
+      isInitialLoadRef.current = false;
     }
-    
-    // Since we can't directly listen to WebSocket messages from here,
-    // we'll use the specs array changes as a trigger
-    // But optimize by only checking when there are actual changes
-    specs.forEach(spec => {
-      handleTaskUpdate(spec.name, spec.displayName);
-    });
-  }, [specs, handleTaskUpdate]);
+  }, []); // Empty dependency array - only run on mount
 
   const value = {
     showNotification,

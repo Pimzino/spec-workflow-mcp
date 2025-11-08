@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { 
-  Activity, 
-  CheckSquare, 
-  AlertCircle, 
+import {
+  Activity,
+  CheckSquare,
+  AlertCircle,
   RefreshCw,
   BookOpen,
   Settings,
@@ -20,12 +20,14 @@ import {
   Globe,
   ChevronDown,
   ChevronRight,
-  Bot
+  Bot,
+  FileText
 } from 'lucide-react';
 import { vscodeApi, type SpecData, type TaskProgressData, type ApprovalData, type SteeringStatus, type DocumentInfo, type SoundNotificationConfig } from '@/lib/vscode-api';
 import { cn, formatDistanceToNow } from '@/lib/utils';
 import { useVSCodeTheme } from '@/hooks/useVSCodeTheme';
 import { useSoundNotifications } from '@/hooks/useSoundNotifications';
+import { LogsPage } from '@/pages/LogsPage';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -613,7 +615,7 @@ Review the existing steering documents (if any) and help me improve or complete 
           </div>
 
           {/* Navigation Tabs */}
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview" className="text-xs" title={t('tabs.overview')}>
               <Activity className="h-3 w-3" />
             </TabsTrigger>
@@ -626,11 +628,14 @@ Review the existing steering documents (if any) and help me improve or complete 
             <TabsTrigger value="tasks" className="text-xs" title={t('tabs.tasks')}>
               <CheckSquare className="h-3 w-3" />
             </TabsTrigger>
+            <TabsTrigger value="logs" className="text-xs" title={t('tabs.logs')}>
+              <FileText className="h-3 w-3" />
+            </TabsTrigger>
             <TabsTrigger value="approvals" className="text-xs relative" title={t('tabs.approvals')}>
               <AlertCircle className="h-3 w-3" />
               {pendingApprovalsCount > 0 && (
-                <Badge 
-                  variant="destructive" 
+                <Badge
+                  variant="destructive"
                   className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center rounded-full min-w-[16px]"
                 >
                   {pendingApprovalsCount}
@@ -992,6 +997,18 @@ Review the existing steering documents (if any) and help me improve or complete 
               {specs.length === 0 ? t('tasks.noSpecs') : t('tasks.selectSpec')}
             </div>
           )}
+        </TabsContent>
+
+        {/* Logs Tab */}
+        <TabsContent value="logs" className="space-y-3">
+          <LogsPage
+            specs={specs}
+            selectedSpec={selectedSpec}
+            onSpecChange={(spec) => {
+              setSelectedSpec(spec);
+              vscodeApi.setSelectedSpec(spec);
+            }}
+          />
         </TabsContent>
 
         {/* Approvals Tab */}

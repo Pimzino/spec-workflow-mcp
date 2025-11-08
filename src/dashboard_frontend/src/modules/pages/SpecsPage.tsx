@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { ApiProvider, useApi } from '../api/api';
-import { useWs } from '../ws/WebSocketProvider';
+import { useApi } from '../api/api';
 import { Markdown } from '../markdown/Markdown';
 import { MarkdownEditor } from '../editor/MarkdownEditor';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
@@ -133,14 +132,30 @@ function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: b
   // Check for unsaved changes before closing
   const handleClose = useCallback(() => {
     const hasUnsaved = editContent !== content && viewMode === 'editor';
-    
+
     if (hasUnsaved) {
       setConfirmCloseModalOpen(true);
       return;
     }
-    
+
     onClose();
   }, [editContent, content, viewMode, onClose]);
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handleClose]);
 
   const handleConfirmClose = () => {
     onClose();
@@ -723,6 +738,7 @@ function Content() {
                 currentOrder={sortOrder}
                 onSortChange={handleSortChange}
                 sortOptions={specSortOptions}
+                align="right"
               />
             </div>
           </div>
@@ -799,12 +815,7 @@ function Content() {
 }
 
 export function SpecsPage() {
-  const { initial } = useWs();
-  return (
-    <ApiProvider initial={initial}>
-      <Content />
-    </ApiProvider>
-  );
+  return <Content />;
 }
 
 

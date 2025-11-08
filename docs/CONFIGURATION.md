@@ -1,6 +1,6 @@
 # Configuration Guide
 
-This guide covers all configuration options for Spec Workflow MCP, including command-line arguments, configuration files, and environment settings.
+This guide covers all configuration options for Spec Workflow MCP.
 
 ## Command-Line Options
 
@@ -15,47 +15,87 @@ npx -y @pimzino/spec-workflow-mcp@latest [project-path] [options]
 | Option | Description | Example |
 |--------|-------------|---------|
 | `--help` | Show comprehensive usage information | `npx -y @pimzino/spec-workflow-mcp@latest --help` |
-| `--dashboard` | Run dashboard-only mode (no MCP server) | `npx -y @pimzino/spec-workflow-mcp@latest --dashboard` |
-| `--AutoStartDashboard` | Auto-start dashboard with MCP server | `npx -y @pimzino/spec-workflow-mcp@latest --AutoStartDashboard` |
-| `--port <number>` | Specify dashboard port (1024-65535) | `npx -y @pimzino/spec-workflow-mcp@latest --port 3456` |
-| `--config <path>` | Use custom config file | `npx -y @pimzino/spec-workflow-mcp@latest --config ./my-config.toml` |
+| `--dashboard` | Run dashboard-only mode (default port: 5000) | `npx -y @pimzino/spec-workflow-mcp@latest --dashboard` |
+| `--port <number>` | Specify custom dashboard port (1024-65535) | `npx -y @pimzino/spec-workflow-mcp@latest --dashboard --port 8080` |
 
-### Usage Examples
+### Important Notes
 
-#### Dashboard Only Mode
+- **Single Dashboard Instance**: Only one dashboard runs at a time. All MCP servers connect to the same dashboard.
+- **Default Port**: Dashboard uses port 5000 by default. Use `--port` only if 5000 is unavailable.
+- **Separate Dashboard**: Always run the dashboard separately from MCP servers.
+
+## Usage Examples
+
+### Typical Workflow
+
+1. **Start the Dashboard** (do this first, only once):
 ```bash
-# Uses ephemeral port
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard
-
-# With custom port
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 3000
+# Uses default port 5000
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
 ```
 
-#### MCP Server with Auto-Started Dashboard
+2. **Start MCP Servers** (one per project, in separate terminals):
 ```bash
-# Default port
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard
+# Project 1
+npx -y @pimzino/spec-workflow-mcp@latest ~/projects/app1
 
-# Custom port
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard --port 3456
+# Project 2
+npx -y @pimzino/spec-workflow-mcp@latest ~/projects/app2
+
+# Project 3
+npx -y @pimzino/spec-workflow-mcp@latest ~/projects/app3
 ```
 
-#### Using Custom Configuration
+All projects will appear in the dashboard at http://localhost:5000
+
+### Dashboard with Custom Port
+
+Only use a custom port if port 5000 is unavailable:
+
 ```bash
-# Relative path
-npx -y @pimzino/spec-workflow-mcp@latest --config ./dev-config.toml
-
-# Absolute path
-npx -y @pimzino/spec-workflow-mcp@latest --config ~/configs/spec-workflow.toml
-
-# Custom config with dashboard
-npx -y @pimzino/spec-workflow-mcp@latest --config ./config.toml --dashboard
-
-# CLI args override config values
-npx -y @pimzino/spec-workflow-mcp@latest --config ./config.toml --port 4000
+# Start dashboard on port 8080
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard --port 8080
 ```
 
-## Configuration File
+## Dashboard Session Management
+
+The dashboard stores its session information in `~/.spec-workflow-mcp/activeSession.json`. This file:
+- Enforces single dashboard instance
+- Allows MCP servers to discover the running dashboard
+- Automatically cleans up when dashboard stops
+
+### Single Instance Enforcement
+
+Only one dashboard can run at any time. If you try to start a second dashboard:
+
+```
+Dashboard is already running at: http://localhost:5000
+
+You can:
+  1. Use the existing dashboard at: http://localhost:5000
+  2. Stop it first (Ctrl+C or kill PID), then start a new one
+
+Note: Only one dashboard instance is needed for all your projects.
+```
+
+## Port Management
+
+**Default Port**: 5000
+**Custom Port**: Use `--port <number>` only if port 5000 is unavailable
+
+### Port Conflicts
+
+If port 5000 is already in use by another service:
+
+```bash
+Failed to start dashboard: Port 5000 is already in use.
+
+This might be another service using port 5000.
+To use a different port:
+  spec-workflow-mcp --dashboard --port 8080
+```
+
+## Configuration File (Deprecated)
 
 ### Default Location
 
@@ -71,9 +111,6 @@ projectDir = "/path/to/your/project"
 
 # Dashboard port (1024-65535)
 port = 3456
-
-# Auto-start dashboard with MCP server
-autoStartDashboard = true
 
 # Run dashboard-only mode
 dashboardOnly = false
@@ -106,9 +143,10 @@ debounceMs = 300
 |--------|------|---------|-------------|
 | `projectDir` | string | Current directory | Project directory path |
 | `port` | number | Ephemeral | Dashboard port (1024-65535) |
-| `autoStartDashboard` | boolean | false | Auto-start dashboard with MCP |
 | `dashboardOnly` | boolean | false | Run dashboard without MCP server |
 | `lang` | string | "en" | Interface language |
+
+> **Note**: The `autoStartDashboard` option was removed in v2.0.0. The dashboard now uses a unified multi-project mode accessible via `--dashboard` flag.
 
 #### Language Options
 
@@ -136,7 +174,6 @@ cp .spec-workflow/config.example.toml .spec-workflow/config.toml
 # My project configuration
 projectDir = "/Users/myname/projects/myapp"
 port = 3000
-autoStartDashboard = true
 lang = "en"
 ```
 
@@ -163,7 +200,6 @@ Configuration values are applied in this order (highest to lowest priority):
 ```toml
 # config.toml
 port = 3000
-autoStartDashboard = true
 ```
 
 ```bash
@@ -180,7 +216,6 @@ npx -y @pimzino/spec-workflow-mcp@latest --config config.toml --port 4000
 # dev-config.toml
 projectDir = "./src"
 port = 3000
-autoStartDashboard = true
 lang = "en"
 
 [advanced]
@@ -199,7 +234,6 @@ npx -y @pimzino/spec-workflow-mcp@latest --config dev-config.toml
 # prod-config.toml
 projectDir = "/var/app"
 port = 8080
-autoStartDashboard = false
 lang = "en"
 
 [advanced]

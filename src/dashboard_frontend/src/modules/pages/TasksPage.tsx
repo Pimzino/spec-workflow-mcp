@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
-import { ApiProvider, useApi } from '../api/api';
+import { useApi } from '../api/api';
 import { useWs } from '../ws/WebSocketProvider';
 import { useSearchParams } from 'react-router-dom';
 import { useNotifications } from '../notifications/NotificationProvider';
@@ -17,7 +17,7 @@ function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
   });
 }
 
-function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; selected: string; onSelect: (value: string) => void }) {
+function SearchableSpecDropdown({ specs, selected, onSelect, align = 'left' }: { specs: any[]; selected: string; onSelect: (value: string) => void; align?: 'left' | 'right' }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -42,12 +42,22 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsOpen(false);
+        setSearch('');
+      }
+    };
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
@@ -77,7 +87,7 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 w-full sm:w-80 md:w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+        <div className={`absolute top-full mt-1 w-full sm:w-80 md:w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}>
           {/* Search Input */}
           <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-600">
             <input
@@ -252,12 +262,21 @@ function StatusPill({
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsOpen(false);
+      }
+    };
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
@@ -1368,6 +1387,7 @@ function Content() {
               specs={specs}
               selected={selected}
               onSelect={handleSelectSpec}
+              align="right"
             />
           </div>
         </div>
@@ -1432,12 +1452,7 @@ function Content() {
 }
 
 export function TasksPage() {
-  const { initial } = useWs();
-  return (
-    <ApiProvider initial={initial}>
-      <Content />
-    </ApiProvider>
-  );
+  return <Content />;
 }
 
 

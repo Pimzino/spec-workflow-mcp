@@ -15,23 +15,18 @@ Call this tool FIRST when users request spec creation, feature development, or m
 };
 
 export async function specWorkflowGuideHandler(args: any, context: ToolContext): Promise<ToolResponse> {
-  // Get dashboard URL from context or session
-  let dashboardUrl = context.dashboardUrl;
-  if (!dashboardUrl && context.sessionManager) {
-    dashboardUrl = await context.sessionManager.getDashboardUrl();
-  }
-
-  const dashboardMessage = dashboardUrl ?
-    `Monitor progress on dashboard: ${dashboardUrl}` :
-    'Please start the dashboard or use VS Code extension "Spec Workflow MCP"';
+  // Dashboard URL is populated from registry in server.ts
+  const dashboardMessage = context.dashboardUrl ?
+    `Monitor progress on dashboard: ${context.dashboardUrl}` :
+    'Please start the dashboard with: spec-workflow-mcp --dashboard';
 
   return {
     success: true,
     message: 'Complete spec workflow guide loaded - follow this workflow exactly',
     data: {
       guide: getSpecWorkflowGuide(),
-      dashboardUrl: dashboardUrl,
-      dashboardAvailable: !!dashboardUrl
+      dashboardUrl: context.dashboardUrl,
+      dashboardAvailable: !!context.dashboardUrl
     },
     nextSteps: [
       'Follow sequence: Requirements → Design → Tasks → Implementation',
@@ -100,7 +95,8 @@ flowchart TD
     P4_Ready -->|Yes| P4_Status[spec-status]
     P4_Status --> P4_Task[Edit tasks.md:<br/>Change [ ] to [-]<br/>for in-progress]
     P4_Task --> P4_Code[Implement code]
-    P4_Code --> P4_Complete[Edit tasks.md:<br/>Change [-] to [x]<br/>for completed]
+    P4_Code --> P4_Log[log-implementation<br/>Record implementation<br/>details]
+    P4_Log --> P4_Complete[Edit tasks.md:<br/>Change [-] to [x]<br/>for completed]
     P4_Complete --> P4_More{More tasks?}
     P4_More -->|Yes| P4_Task
     P4_More -->|No| End([Implementation Complete])
@@ -112,6 +108,7 @@ flowchart TD
     style P3_Check fill:#ffe6e6
     style CheckSteering fill:#fff4e6
     style P4_More fill:#fff4e6
+    style P4_Log fill:#e3f2fd
 \`\`\`
 
 ## Spec Workflow
@@ -186,7 +183,7 @@ flowchart TD
    - _Leverage: files/utilities to use
    - _Requirements: requirements that the task implements
    - Success: specific completion criteria
-   - Instructions related to setting the task in progress in tasks.md and then marking it as complete when the task is complete.
+   - Instructions related to setting the task in progress in tasks.md, logging the implementation with log-implementation tool after completion, and then marking it as complete when the task is complete.
    - Start the prompt with "Implement the task for spec {spec-name}, first run spec-workflow-guide to get the workflow guide then implement the task:"
 6. Create \`tasks.md\` at \`.spec-workflow/specs/{spec-name}/tasks.md\`
 7. Request approval using approvals tool with action:'request'
@@ -208,7 +205,9 @@ flowchart TD
 
 **Tools**:
 - spec-status: Check overall progress
+- get-implementation-logs: CRITICAL - Query existing code before implementing (step 3)
 - implement-task prompt: Guide for implementing tasks
+- log-implementation: Record implementation details with artifacts after task completion (step 5)
 - Direct editing: Mark tasks as in-progress [-] or complete [x] in tasks.md
 
 **Process**:
@@ -216,11 +215,35 @@ flowchart TD
 2. Read \`tasks.md\` to see all tasks
 3. For each task:
    - Edit tasks.md: Change \`[ ]\` to \`[-]\` for the task you're starting
+   - **CRITICAL: BEFORE implementing, use get-implementation-logs tool with REQUIRED filters**:
+     - NEVER call without filters - always provide keyword, taskId, or artifactType
+     - **Best practice: Call this tool 2-3 times with different single keywords to discover comprehensively**
+     - Recommended approach:
+       - \`keyword: "api"\` or \`artifactType: "apiEndpoints"\` - Find existing endpoints
+       - \`keyword: "component"\` or \`artifactType: "components"\` - Find UI components
+       - \`artifactType: "functions"\` or \`artifactType: "classes"\` - Find utility code
+       - \`keyword: "<specific-term>"\` - Search for specific patterns or names
+       - Multiple keywords: \`keyword: "api endpoint"\` uses AND logic (must match BOTH)
+     - If first search doesn't return what you need, call again with different keyword
+     - This prevents: duplicate endpoints, reimplemented components, broken integrations
+     - Reuse existing code that already solves part of the task
    - **Read the _Prompt field** for guidance on role, approach, and success criteria
    - Follow _Leverage fields to use existing code/utilities
    - Implement the code according to the task description
    - Test your implementation
-   - Edit tasks.md: Change \`[-]\` to \`[x]\` when completed
+   - **Log implementation with detailed artifacts** using log-implementation tool (CRITICAL):
+     - Provide taskId and clear summary of what was implemented (1-2 sentences)
+     - Include files modified/created and code statistics (lines added/removed)
+     - **REQUIRED: Include artifacts field with structured implementation data**:
+       - apiEndpoints: All API routes created/modified (method, path, purpose, formats, location)
+       - components: All UI components created (name, type, purpose, location, props)
+       - functions: All utility functions created (name, signature, location)
+       - classes: All classes created (name, methods, location)
+       - integrations: Frontend-backend connections with data flow description
+     - Example: "Created API GET /api/todos/:id endpoint and TodoDetail React component with WebSocket real-time updates"
+     - This creates a searchable knowledge base for future AI agents to discover existing code
+     - Prevents implementation details from being lost in chat history
+   - Edit tasks.md: Change \`[-]\` to \`[x]\` when completed and logged
 4. Continue until all tasks show \`[x]\`
 
 ## Workflow Rules

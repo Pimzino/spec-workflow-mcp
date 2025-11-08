@@ -127,7 +127,9 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
           let j = lineIdx + 1;
           while (j < endLine) {
             const nextTrim = lines[j].trim();
-            if (!nextTrim) break; // stop at blank line
+            if (!nextTrim) {
+              break; // stop at blank line
+            }
             // Stop if we hit another bullet/metadata marker or files/purpose sections
             if (
               /^-\s/.test(nextTrim) ||

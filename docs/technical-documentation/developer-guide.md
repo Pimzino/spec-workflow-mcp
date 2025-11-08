@@ -201,13 +201,18 @@ function App() {
 
 #### Adding Backend API Endpoint
 ```typescript
-// src/dashboard/server.ts
-export class DashboardServer {
+// src/dashboard/multi-server.ts
+export class MultiProjectDashboardServer {
   private async setupRoutes() {
-    // Add new endpoint
-    this.app.get('/api/my-endpoint', async (request, reply) => {
+    // Add new project-scoped endpoint
+    this.app.get('/api/projects/:projectId/my-endpoint', async (request, reply) => {
       try {
-        const data = await this.getMyData();
+        const { projectId } = request.params as { projectId: string };
+        const project = this.projectManager.getProject(projectId);
+        if (!project) {
+          return reply.code(404).send({ error: 'Project not found' });
+        }
+        const data = await this.getMyData(project);
         reply.send({ success: true, data });
       } catch (error) {
         reply.status(500).send({ success: false, error: error.message });
@@ -215,7 +220,7 @@ export class DashboardServer {
     });
   }
 
-  private async getMyData() {
+  private async getMyData(project: Project) {
     // Implementation
   }
 }

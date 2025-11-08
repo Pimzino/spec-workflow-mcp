@@ -7,7 +7,9 @@
     "steering": "Steuerung",
     "specs": "Spezifikationen",
     "tasks": "Aufgaben",
-    "approvals": "Genehmigungen"
+    "approvals": "Genehmigungen",
+    "settings": "Einstellungen",
+    "logs": "Implementierungsprotokolle"
   },
   "connectionStatus": {
     "connected": "Verbunden",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "Bitte fügen Sie mindestens einen Kommentar hinzu bevor Sie Überarbeitungen anfordern."
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "Implementierungsprotokolle"
+    },
+    "search": {
+      "placeholder": "Protokolle durchsuchen..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "Spezifikation auswählen",
+      "searchPlaceholder": "Spezifikationen durchsuchen...",
+      "noSpecsFound": "Keine Spezifikationen gefunden"
+    },
+    "filter": {
+      "label": "Nach Aufgabe filtern",
+      "all": "Alle",
+      "taskPrefix": "Aufgabe"
+    },
+    "sort": {
+      "timestamp": "Datum/Uhrzeit",
+      "timestampDesc": "Nach Log-Zeitstempel sortieren",
+      "taskId": "Aufgaben-ID",
+      "taskIdDesc": "Nach Aufgaben-ID sortieren",
+      "linesAdded": "Hinzugefügte Zeilen",
+      "linesAddedDesc": "Nach hinzugefügten Codezeilen sortieren",
+      "filesChanged": "Geänderte Dateien",
+      "filesChangedDesc": "Nach Anzahl der geänderten Dateien sortieren"
+    },
+    "stats": {
+      "title": "Code-Statistiken",
+      "linesAdded": "Hinzugefügte Zeilen",
+      "linesRemoved": "Entfernte Zeilen",
+      "filesChanged": "Geänderte Dateien",
+      "netChange": "Netto-Änderung",
+      "totalEntries": "Gesamteinträge"
+    },
+    "files": {
+      "modified": "Geänderte Dateien",
+      "created": "Erstellte Dateien"
+    },
+    "artifacts": {
+      "title": "Artefakte",
+      "apiEndpoints": "API-Endpunkte",
+      "components": "Komponenten",
+      "functions": "Funktionen",
+      "classes": "Klassen",
+      "integrations": "Integrationen",
+      "details": {
+        "request": "Anfrage:",
+        "response": "Antwort:",
+        "props": "Props:",
+        "exports": "Exporte:",
+        "exported": "Exportiert",
+        "private": "Privat",
+        "methods": "Methoden:",
+        "component": "Komponente:",
+        "endpoint": "Endpunkt:",
+        "flow": "Fluss:"
+      }
+    },
+    "empty": {
+      "selectSpec": "Wählen Sie eine Spezifikation aus, um Implementierungsprotokolle anzuzeigen",
+      "noResults": "Keine Protokolle stimmen mit Ihren Suchfiltern überein",
+      "noLogs": "Noch keine Implementierungsprotokolle für diese Spezifikation"
+    },
+    "loading": "Protokolle werden geladen...",
+    "taskBadge": "Aufgabe"
+  },
   "volumeControl": {
     "mute": "Benachrichtigungen stumm schalten",
     "enable": "Benachrichtigungstöne aktivieren",
     "volumeLevel": "Lautstärke: {{percentage}}%"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "description": "Verwalten Sie automatisierte Bereinigungsaufträge für alle verbundenen Projekte",
+    "section": {
+      "automatedCleanup": "Automatische Bereinigung",
+      "automatedCleanupDesc": "Automatisches Löschen alter Genehmigungsdatensätze, Spezifikationen und archivierter Spezifikationen basierend auf einem Zeitplan. Konfigurieren Sie Bereinigungsvorgänge so, dass sie regelmäßig über alle verbundenen Projekte hinweg ausgeführt werden."
+    },
+    "addJob": "Auftrag hinzufügen",
+    "loading": "Aufträge werden geladen...",
+    "noJobs": "Keine Automatisierungsaufträge",
+    "noJobsDesc": "Erstellen Sie Ihren ersten Automatisierungsauftrag",
+    "createFirst": "Ersten Auftrag erstellen",
+    "addNewJob": "Neuen Auftrag hinzufügen",
+    "editJob": "Auftrag bearbeiten",
+    "deleteJob": "Auftrag löschen",
+    "deleteConfirm": "Möchten Sie diesen Automatisierungsauftrag wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "lastRun": "Letzte Ausführung",
+    "schedule": "Zeitplan",
+    "runNow": "Jetzt ausführen",
+    "running": "Läuft...",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "jobDescription": "Löschen Sie Datensätze, die älter als {{days}} Tage sind, nach Zeitplan: {{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "Änderungsprotokoll anzeigen",
+    "modal": {
+      "title": "Änderungsprotokoll",
+      "version": "Version",
+      "loading": "Änderungsprotokoll wird geladen...",
+      "notFound": "Änderungsprotokoll für diese Version nicht gefunden"
+    }
   }
 }

@@ -6,7 +6,6 @@ import { homedir } from 'os';
 export interface SpecWorkflowConfig {
   projectDir?: string;
   port?: number;
-  autoStartDashboard?: boolean;
   dashboardOnly?: boolean;
   lang?: string;
 }
@@ -39,16 +38,9 @@ function validateConfig(config: any): { valid: boolean; error?: string } {
   }
 
   if (config.projectDir !== undefined && typeof config.projectDir !== 'string') {
-    return { 
-      valid: false, 
-      error: `Invalid projectDir: must be a string.` 
-    };
-  }
-
-  if (config.autoStartDashboard !== undefined && typeof config.autoStartDashboard !== 'boolean') {
-    return { 
-      valid: false, 
-      error: `Invalid autoStartDashboard: must be a boolean.` 
+    return {
+      valid: false,
+      error: `Invalid projectDir: must be a string.`
     };
   }
 
@@ -102,11 +94,7 @@ export function loadConfigFromPath(configPath: string): ConfigLoadResult {
     if (parsedConfig.port !== undefined) {
       config.port = parsedConfig.port;
     }
-    
-    if (parsedConfig.autoStartDashboard !== undefined) {
-      config.autoStartDashboard = parsedConfig.autoStartDashboard;
-    }
-    
+
     if (parsedConfig.dashboardOnly !== undefined) {
       config.dashboardOnly = parsedConfig.dashboardOnly;
     }

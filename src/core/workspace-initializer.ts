@@ -21,9 +21,6 @@ export class WorkspaceInitializer {
     // Copy template files
     await this.initializeTemplates();
     
-    // Create config example
-    await this.createConfigExample();
-    
     // Create user templates README
     await this.createUserTemplatesReadme();
   }
@@ -78,91 +75,6 @@ export class WorkspaceInitializer {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error(`Failed to copy template ${templateName}: ${errorMessage}`);
-    }
-  }
-  
-  private async createConfigExample(): Promise<void> {
-    const configPath = join(PathUtils.getWorkflowRoot(this.projectPath), 'config.example.toml');
-    
-    const configContent = `# Spec Workflow MCP Server Configuration File
-# ============================================
-#
-# This is an example configuration file for the Spec Workflow MCP Server.
-# Copy this file to 'config.toml' in the same directory to use it.
-#
-# Configuration Precedence:
-# 1. Command-line arguments (highest priority)
-# 2. Config file settings
-# 3. Built-in defaults (lowest priority)
-#
-# All settings are optional. Uncomment and modify as needed.
-# Please note that not all MCP clients will support loading this config file due to the nature of where they are running from.
-
-# Project directory path
-# The root directory of your project where spec files are located.
-# Note: You may have to use double slashes (\\\\) instead of single slashes (/) on Windows or for certain clients.
-# Supports tilde (~) expansion for home directory.
-# Default: current working directory
-# projectDir = "."
-# projectDir = "~/my-project"
-# projectDir = "/absolute/path/to/project"
-
-# Dashboard port
-# The port number for the web dashboard.
-# Must be between 1024 and 65535.
-# Default: ephemeral port (automatically assigned)
-# port = 3000
-
-# Auto-start dashboard
-# Automatically launch the dashboard when the MCP server starts.
-# The dashboard will open in your default browser.
-# Default: false
-# autoStartDashboard = false
-
-# Dashboard-only mode
-# Run only the web dashboard without the MCP server.
-# Useful for standalone dashboard usage.
-# Default: false
-# dashboardOnly = false
-
-# Language
-# Set the interface language for internationalization (i18n).
-# Available languages depend on your installation.
-# Common values: "en" (English), "ja" (Japanese), etc.
-# Default: system language or "en"
-# lang = "en"
-
-# Example configurations:
-# =====================
-
-# Example 1: Development setup with auto-started dashboard
-# ----------------------------------------------------------
-# projectDir = "~/dev/my-project"
-# autoStartDashboard = true
-# port = 3456
-
-# Example 2: Production MCP server without dashboard
-# ---------------------------------------------------
-# projectDir = "/var/projects/production"
-# autoStartDashboard = false
-
-# Example 3: Dashboard-only mode for viewing specs
-# -------------------------------------------------
-# projectDir = "."
-# dashboardOnly = true
-# port = 8080
-
-# Example 4: Japanese language interface
-# ---------------------------------------
-# lang = "ja"
-# autoStartDashboard = true`;
-    
-    try {
-      // Only create if it doesn't exist to avoid overwriting user's example
-      await fs.access(configPath);
-    } catch {
-      // File doesn't exist, create it
-      await fs.writeFile(configPath, configContent, 'utf-8');
     }
   }
   

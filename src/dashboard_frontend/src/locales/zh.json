@@ -7,7 +7,9 @@
     "steering": "指导",
     "specs": "规范",
     "tasks": "任务",
-    "approvals": "审批"
+    "approvals": "审批",
+    "settings": "设置",
+    "logs": "实现日志"
   },
   "connectionStatus": {
     "connected": "已连接",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "在请求修订之前，请至少添加一条评论。"
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "实现日志"
+    },
+    "search": {
+      "placeholder": "搜索日志..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "选择规范",
+      "searchPlaceholder": "搜索规范...",
+      "noSpecsFound": "未找到规范"
+    },
+    "filter": {
+      "label": "按任务过滤",
+      "all": "全部",
+      "taskPrefix": "任务"
+    },
+    "sort": {
+      "timestamp": "日期/时间",
+      "timestampDesc": "按日志时间戳排序",
+      "taskId": "任务ID",
+      "taskIdDesc": "按任务标识符排序",
+      "linesAdded": "添加的行数",
+      "linesAddedDesc": "按添加的代码行数排序",
+      "filesChanged": "更改的文件数",
+      "filesChangedDesc": "按修改的文件数排序"
+    },
+    "stats": {
+      "title": "代码统计",
+      "linesAdded": "添加的行数",
+      "linesRemoved": "删除的行数",
+      "filesChanged": "更改的文件数",
+      "netChange": "净变化",
+      "totalEntries": "总条目数"
+    },
+    "files": {
+      "modified": "修改的文件",
+      "created": "创建的文件"
+    },
+    "artifacts": {
+      "title": "工件",
+      "apiEndpoints": "API端点",
+      "components": "组件",
+      "functions": "函数",
+      "classes": "类",
+      "integrations": "集成",
+      "details": {
+        "request": "请求:",
+        "response": "响应:",
+        "props": "属性:",
+        "exports": "导出:",
+        "exported": "已导出",
+        "private": "私有",
+        "methods": "方法:",
+        "component": "组件:",
+        "endpoint": "端点:",
+        "flow": "流程:"
+      }
+    },
+    "empty": {
+      "selectSpec": "选择一个规范来查看实现日志",
+      "noResults": "没有日志与您的搜索过滤器匹配",
+      "noLogs": "该规范尚无实现日志"
+    },
+    "loading": "加载日志中...",
+    "taskBadge": "任务"
+  },
   "volumeControl": {
     "mute": "静音通知",
     "enable": "启用通知声音",
     "volumeLevel": "音量: {{percentage}}%"
+  },
+  "settings": {
+    "title": "设置",
+    "description": "管理在所有连接项目上运行的自动清理作业",
+    "section": {
+      "automatedCleanup": "自动清理",
+      "automatedCleanupDesc": "根据计划自动删除旧的批准记录、规范和存档的规范。配置清理作业在所有连接的项目中循环运行。"
+    },
+    "addJob": "添加作业",
+    "loading": "正在加载作业...",
+    "noJobs": "没有自动化作业",
+    "noJobsDesc": "创建您的第一个自动化作业以开始",
+    "createFirst": "创建第一个作业",
+    "addNewJob": "添加新作业",
+    "editJob": "编辑作业",
+    "deleteJob": "删除作业",
+    "deleteConfirm": "您确定要删除此自动化作业吗? 此操作无法撤消。",
+    "lastRun": "最后运行",
+    "schedule": "计划",
+    "runNow": "立即运行",
+    "running": "正在运行...",
+    "edit": "编辑",
+    "delete": "删除",
+    "cancel": "取消",
+    "close": "关闭",
+    "jobDescription": "删除超过{{days}}天的记录，按计划{{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "查看更改日志",
+    "modal": {
+      "title": "更改日志",
+      "version": "版本",
+      "loading": "正在加载更改日志...",
+      "notFound": "找不到此版本的更改日志"
+    }
   }
 }

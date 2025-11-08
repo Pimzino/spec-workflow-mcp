@@ -7,7 +7,9 @@
     "steering": "가이드",
     "specs": "스펙",
     "tasks": "태스크",
-    "approvals": "승인"
+    "approvals": "승인",
+    "settings": "설정",
+    "logs": "구현 로그"
   },
   "connectionStatus": {
     "connected": "연결됨",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "수정을 요청하기 전에 최소 하나의 코멘트를 추가해 주세요."
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "구현 로그"
+    },
+    "search": {
+      "placeholder": "로그 검색..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "사양 선택",
+      "searchPlaceholder": "사양 검색...",
+      "noSpecsFound": "사양을 찾을 수 없음"
+    },
+    "filter": {
+      "label": "작업으로 필터링",
+      "all": "모두",
+      "taskPrefix": "작업"
+    },
+    "sort": {
+      "timestamp": "날짜/시간",
+      "timestampDesc": "로그 타임스탬프로 정렬",
+      "taskId": "작업 ID",
+      "taskIdDesc": "작업 식별자로 정렬",
+      "linesAdded": "추가된 줄",
+      "linesAddedDesc": "추가된 코드 줄로 정렬",
+      "filesChanged": "변경된 파일",
+      "filesChangedDesc": "변경된 파일 수로 정렬"
+    },
+    "stats": {
+      "title": "코드 통계",
+      "linesAdded": "추가된 줄",
+      "linesRemoved": "제거된 줄",
+      "filesChanged": "변경된 파일",
+      "netChange": "순 변화",
+      "totalEntries": "총 항목"
+    },
+    "files": {
+      "modified": "수정된 파일",
+      "created": "생성된 파일"
+    },
+    "artifacts": {
+      "title": "아티팩트",
+      "apiEndpoints": "API 엔드포인트",
+      "components": "구성 요소",
+      "functions": "함수",
+      "classes": "클래스",
+      "integrations": "통합",
+      "details": {
+        "request": "요청:",
+        "response": "응답:",
+        "props": "Props:",
+        "exports": "내보내기:",
+        "exported": "내보냄",
+        "private": "비공개",
+        "methods": "메서드:",
+        "component": "구성 요소:",
+        "endpoint": "엔드포인트:",
+        "flow": "흐름:"
+      }
+    },
+    "empty": {
+      "selectSpec": "구현 로그를 보려면 사양을 선택하세요",
+      "noResults": "검색 필터와 일치하는 로그가 없습니다",
+      "noLogs": "이 사양에 대한 구현 로그가 아직 없습니다"
+    },
+    "loading": "로그 로딩 중...",
+    "taskBadge": "작업"
+  },
   "volumeControl": {
     "mute": "Mute notifications",
     "enable": "Enable notification sounds",
     "volumeLevel": "Volume: {{percentage}}%"
+  },
+  "settings": {
+    "title": "설정",
+    "section": {
+      "automatedCleanup": "자동 정리",
+      "automatedCleanupDesc": "일정에 따라 이전 승인 레코드, 사양 및 보관된 사양을 자동으로 삭제합니다. 연결된 모든 프로젝트 전체에서 반복적으로 실행되도록 정리 작업을 구성합니다."
+    },
+    "description": "연결된 모든 프로젝트에서 자동 정리 작업 관리",
+    "addJob": "작업 추가",
+    "loading": "작업 로드 중...",
+    "noJobs": "자동화 작업 없음",
+    "noJobsDesc": "첫 번째 자동화 작업을 만들어 시작하세요",
+    "createFirst": "첫 번째 작업 만들기",
+    "addNewJob": "새 작업 추가",
+    "editJob": "작업 편집",
+    "deleteJob": "작업 삭제",
+    "deleteConfirm": "이 자동화 작업을 삭제하시겠습니까? 이 작업은 실행 취소할 수 없습니다.",
+    "lastRun": "마지막 실행",
+    "schedule": "일정",
+    "runNow": "지금 실행",
+    "running": "실행 중...",
+    "edit": "편집",
+    "delete": "삭제",
+    "cancel": "취소",
+    "close": "닫기",
+    "jobDescription": "{{schedule}} 일정에 따라 {{days}}일 이상 된 레코드 삭제"
+  },
+  "changelog": {
+    "viewChangelog": "변경 로그 보기",
+    "modal": {
+      "title": "변경 로그",
+      "version": "버전",
+      "loading": "변경 로그를 로드 중...",
+      "notFound": "이 버전의 변경 로그를 찾을 수 없음"
+    }
   }
 }

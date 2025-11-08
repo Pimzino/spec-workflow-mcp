@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ApiProvider, useApi, DocumentSnapshot, DiffResult } from '../api/api';
-import { useWs } from '../ws/WebSocketProvider';
+import { useApi, DocumentSnapshot, DiffResult } from '../api/api';
 import { ApprovalsAnnotator, ApprovalComment } from '../approvals/ApprovalsAnnotator';
 import { NotificationProvider } from '../notifications/NotificationProvider';
 import { TextInputModal } from '../modals/TextInputModal';
@@ -587,12 +586,15 @@ function Content() {
     return Array.from(cats);
   }, [approvals]);
 
-  // Filter approvals based on selected category
+  // Filter approvals based on selected category and status (only show pending)
   const filteredApprovals = useMemo(() => {
-    if (filterCategory === 'all') {
-      return approvals;
+    let filtered = approvals.filter(a => a.status === 'pending');
+    
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(a => (a as any).categoryName === filterCategory);
     }
-    return approvals.filter(a => (a as any).categoryName === filterCategory);
+    
+    return filtered;
   }, [approvals, filterCategory]);
 
   // Calculate pending count for header display
@@ -668,12 +670,7 @@ function Content() {
 }
 
 export function ApprovalsPage() {
-  const { initial } = useWs();
-  return (
-    <ApiProvider initial={initial}>
-      <Content />
-    </ApiProvider>
-  );
+  return <Content />;
 }
 
 

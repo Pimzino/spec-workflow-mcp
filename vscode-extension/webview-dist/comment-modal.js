@@ -1,4 +1,4 @@
-import{r as R,I as ze,f as X,k as Ue,i as Fe,j as v,d as Xe,B as Y,C as Z,l as J,m as Q,n as ee,p as Ge,q as ve}from"./i18n.js";function Ve({i18n:t,defaultNS:r,children:n}){const e=R.useMemo(()=>({i18n:t,defaultNS:r}),[t,r]);return R.createElement(ze.Provider,{value:e},n)}/**
+import{r as R,I as ze,f as X,l as Ue,i as Fe,j as v,d as Xe,B as Y,C as Z,m as J,n as Q,k as ee,p as Ge,q as ve}from"./i18n.js";function Ve({i18n:t,defaultNS:r,children:n}){const e=R.useMemo(()=>({i18n:t,defaultNS:r}),[t,r]);return R.createElement(ze.Provider,{value:e},n)}/**
  * @license lucide-react v0.468.0 - ISC
  *
  * This source code is licensed under the ISC license.

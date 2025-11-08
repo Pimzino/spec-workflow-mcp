@@ -8,7 +8,8 @@
     "steering": "وثائق التوجيه",
     "specs": "وثائق المواصفات",
     "tasks": "إدارة المهام",
-    "approvals": "طلبات الموافقة"
+    "approvals": "طلبات الموافقة",
+    "logs": "سجلات التنفيذ"
   },
   "overview": {
     "projectTitle": "نظرة عامة على المشروع",
@@ -103,6 +104,53 @@
     "noDocs": "لم توجد وثائق توجيه",
     "copyInstructions": "نسخ التعليمات",
     "copied": "تم النسخ!"
+  },
+  "logs": {
+    "title": "سجلات التنفيذ",
+    "subtitle": "تتبع جميع تغييرات التنفيذ والمخرجات",
+    "selectSpec": "اختر مواصفة...",
+    "searchPlaceholder": "البحث في السجلات...",
+    "loading": "جاري تحميل السجلات...",
+    "selectSpecMessage": "اختر مواصفة لعرض سجلات التنفيذ",
+    "noSearchResults": "لا توجد سجلات تطابق بحثك",
+    "noLogs": "لم يتم العثور على سجلات تنفيذ لهذه المواصفة",
+    "sort": {
+      "timestamp": "الطابع الزمني",
+      "taskId": "معرف المهمة",
+      "linesAdded": "الأسطر المضافة",
+      "filesChanged": "الملفات المتغيرة"
+    },
+    "stats": {
+      "totalEntries": "إجمالي الإدخالات",
+      "linesAdded": "الأسطر المضافة",
+      "linesRemoved": "الأسطر المحذوفة",
+      "filesChanged": "الملفات المتغيرة"
+    },
+    "entry": {
+      "added": "مضاف",
+      "removed": "محذوف",
+      "filesChanged": "الملفات المتغيرة",
+      "netChange": "التغيير الصافي",
+      "filesModified": "الملفات المعدلة",
+      "filesCreated": "الملفات المنشأة"
+    },
+    "artifacts": {
+      "apiEndpoints": "نقاط نهاية API",
+      "components": "المكونات",
+      "functions": "الدوال",
+      "classes": "الفئات",
+      "integrations": "التكاملات",
+      "request": "الطلب:",
+      "response": "الاستجابة:",
+      "props": "الخصائص:",
+      "exports": "الصادرات:",
+      "signature": "التوقيع:",
+      "methods": "الطرق:",
+      "frontend": "الواجهة الأمامية:",
+      "backend": "الواجهة الخلفية:",
+      "dataFlow": "تدفق البيانات:",
+      "exported": "(مُصدّر)"
+    }
   },
   "common": {
     "scrollToTop": "التمرير للأعلى"

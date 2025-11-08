@@ -80,6 +80,12 @@ ${documentType === 'tasks' ? `
 - Include _Leverage fields pointing to existing code to reuse
 - Include _Requirements fields showing which requirements each task implements
 - Tasks should be atomic (1-3 files each) and in logical order
+
+**Implementation Logging:**
+- When implementing tasks, developers will use the log-implementation tool to record what was done
+- Implementation logs appear in the dashboard's "Logs" tab for easy reference
+- These logs prevent implementation details from being lost in chat history
+- Good task descriptions help developers write better implementation summaries
 ` : ''}
 
 Please read the ${documentType} template and create the comprehensive document at the specified path.`

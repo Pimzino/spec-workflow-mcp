@@ -7,7 +7,9 @@
     "steering": "ステアリング",
     "specs": "仕様書",
     "tasks": "タスク",
-    "approvals": "承認"
+    "approvals": "承認",
+    "settings": "設定",
+    "logs": "実装ログ"
   },
   "connectionStatus": {
     "connected": "接続済み",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "修正を依頼する前に少なくとも1つコメントを追加してください。"
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "実装ログ"
+    },
+    "search": {
+      "placeholder": "ログを検索..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "仕様を選択",
+      "searchPlaceholder": "仕様を検索...",
+      "noSpecsFound": "仕様が見つかりません"
+    },
+    "filter": {
+      "label": "タスクでフィルター",
+      "all": "すべて",
+      "taskPrefix": "タスク"
+    },
+    "sort": {
+      "timestamp": "日時",
+      "timestampDesc": "ログタイムスタンプでソート",
+      "taskId": "タスクID",
+      "taskIdDesc": "タスク識別子でソート",
+      "linesAdded": "追加行数",
+      "linesAddedDesc": "追加されたコード行数でソート",
+      "filesChanged": "変更ファイル数",
+      "filesChangedDesc": "変更されたファイル数でソート"
+    },
+    "stats": {
+      "title": "コード統計",
+      "linesAdded": "追加行数",
+      "linesRemoved": "削除行数",
+      "filesChanged": "変更ファイル数",
+      "netChange": "差分",
+      "totalEntries": "合計エントリ"
+    },
+    "files": {
+      "modified": "変更ファイル",
+      "created": "作成ファイル"
+    },
+    "artifacts": {
+      "title": "アーティファクト",
+      "apiEndpoints": "APIエンドポイント",
+      "components": "コンポーネント",
+      "functions": "関数",
+      "classes": "クラス",
+      "integrations": "統合",
+      "details": {
+        "request": "リクエスト:",
+        "response": "レスポンス:",
+        "props": "プロパティ:",
+        "exports": "エクスポート:",
+        "exported": "エクスポート済み",
+        "private": "プライベート",
+        "methods": "メソッド:",
+        "component": "コンポーネント:",
+        "endpoint": "エンドポイント:",
+        "flow": "フロー:"
+      }
+    },
+    "empty": {
+      "selectSpec": "仕様を選択して実装ログを表示してください",
+      "noResults": "検索フィルターに一致するログがありません",
+      "noLogs": "この仕様の実装ログはまだありません"
+    },
+    "loading": "ログを読み込み中...",
+    "taskBadge": "タスク"
+  },
   "volumeControl": {
     "mute": "通知をミュート",
     "enable": "通知音を有効にする",
     "volumeLevel": "音量: {{percentage}}%"
+  },
+  "settings": {
+    "title": "設定",
+    "section": {
+      "automatedCleanup": "自動クリーンアップ",
+      "automatedCleanupDesc": "スケジュールに基づいて、古い承認レコード、仕様、およびアーカイブされた仕様を自動的に削除します。接続されているすべてのプロジェクト全体で定期的に実行されるようにクリーンアップジョブを構成します。"
+    },
+    "description": "接続されているすべてのプロジェクト全体で自動クリーンアップジョブを管理",
+    "addJob": "ジョブを追加",
+    "loading": "ジョブを読み込み中...",
+    "noJobs": "オートメーションジョブなし",
+    "noJobsDesc": "最初のオートメーションジョブを作成して始めましょう",
+    "createFirst": "最初のジョブを作成",
+    "addNewJob": "新しいジョブを追加",
+    "editJob": "ジョブを編集",
+    "deleteJob": "ジョブを削除",
+    "deleteConfirm": "このオートメーションジョブを削除してもよろしいですか？この操作は取り消せません。",
+    "lastRun": "最後の実行",
+    "schedule": "スケジュール",
+    "runNow": "今すぐ実行",
+    "running": "実行中...",
+    "edit": "編集",
+    "delete": "削除",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "jobDescription": "{{schedule}}のスケジュールに従い、{{days}}日以上古いレコードを削除"
+  },
+  "changelog": {
+    "viewChangelog": "変更履歴を表示",
+    "modal": {
+      "title": "変更履歴",
+      "version": "バージョン",
+      "loading": "変更履歴を読み込み中...",
+      "notFound": "このバージョンの変更履歴が見つかりません"
+    }
   }
 }

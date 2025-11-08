@@ -212,8 +212,7 @@ The main server class that orchestrates all functionality:
 ```typescript
 export class SpecWorkflowMCPServer {
   private server: Server;
-  private dashboardServer?: DashboardServer;
-  private sessionManager?: SessionManager;
+  private projectRegistry: ProjectRegistry;
 }
 ```
 
@@ -271,7 +270,7 @@ Intelligent context management for efficient token usage:
 interface ToolContext {
   projectPath: string;
   dashboardUrl?: string;
-  sessionManager?: SessionManager;
+  lang?: string;
 }
 ```
 
@@ -348,7 +347,7 @@ project-root/
 │   │   └── structure.md         # Code organization
 │   ├── approvals/               # Approval workflow data
 │   │   └── spec-name/           # Per-spec approvals
-│   └── session.json             # Active dashboard session
+│   └── archive/                 # Archived specs
 └── [your project files]        # Existing project
 ```
 
@@ -363,24 +362,28 @@ project-root/
 
 ## 🌐 Dashboard Architecture
 
-### Backend (`src/dashboard/server.ts`)
+### Backend (`src/dashboard/multi-server.ts`)
 
-Fastify-based server with WebSocket support:
+Fastify-based multi-project server with WebSocket support:
 
 ```typescript
-export class DashboardServer {
+export class MultiProjectDashboardServer {
   private app: FastifyInstance;
-  private watcher: SpecWatcher;
-  private approvalStorage: ApprovalStorage;
-  private clients: Set<WebSocket>;
+  private projectManager: ProjectManager;
+  private jobScheduler: JobScheduler;
+  private clients: Map<string, Set<WebSocket>>;
 }
 ```
 
 **Features:**
+- **Multi-Project Support**: Manage multiple projects simultaneously
+- **Project Selection**: Switch between projects in the UI
 - **Static File Serving**: Frontend assets
-- **WebSocket**: Real-time updates
-- **REST API**: CRUD operations
-- **File Watching**: Auto-refresh on changes
+- **WebSocket**: Real-time, project-scoped updates
+- **REST API**: Project-scoped CRUD operations
+- **File Watching**: Per-project auto-refresh on changes
+- **Job Scheduling**: Automated task execution
+- **Session Management**: Single dashboard instance enforcement
 
 ### Frontend (`src/dashboard_frontend/`)
 
@@ -407,9 +410,9 @@ src/
 ## 🔄 State Management
 
 ### Session State
-- **Server**: Tracks active dashboard URLs
-- **Client**: Maintains connection to specific dashboard instance
-- **Persistence**: `.spec-workflow/session.json`
+- **Server**: Dashboard registers in global project registry
+- **Client**: Maintains connection to dashboard WebSocket
+- **Persistence**: `~/.spec-workflow-mcp/activeProjects.json` (global registry)
 
 ### Approval State  
 - **Storage**: JSON files in `approvals/` directory

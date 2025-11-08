@@ -8,7 +8,8 @@
     "steering": "Documents de Pilotage",
     "specs": "Documents de Spécification",
     "tasks": "Gestion des Tâches",
-    "approvals": "Demandes d'Approbation"
+    "approvals": "Demandes d'Approbation",
+    "logs": "Journaux d'Implémentation"
   },
   "overview": {
     "projectTitle": "Vue d'ensemble du Projet",
@@ -123,6 +124,53 @@
     "update": "Mettre à jour le commentaire",
     "add": "Ajouter un commentaire",
     "noTextSelected": "Aucun texte sélectionné"
+  },
+  "logs": {
+    "title": "Journaux d'Implémentation",
+    "subtitle": "Suivez toutes les modifications et artefacts d'implémentation",
+    "selectSpec": "Sélectionner une spécification...",
+    "searchPlaceholder": "Rechercher des journaux...",
+    "loading": "Chargement des journaux...",
+    "selectSpecMessage": "Sélectionnez une spécification pour afficher les journaux d'implémentation",
+    "noSearchResults": "Aucun journal ne correspond à votre recherche",
+    "noLogs": "Aucun journal d'implémentation trouvé pour cette spécification",
+    "sort": {
+      "timestamp": "Horodatage",
+      "taskId": "ID de Tâche",
+      "linesAdded": "Lignes Ajoutées",
+      "filesChanged": "Fichiers Modifiés"
+    },
+    "stats": {
+      "totalEntries": "Total d'Entrées",
+      "linesAdded": "Lignes Ajoutées",
+      "linesRemoved": "Lignes Supprimées",
+      "filesChanged": "Fichiers Modifiés"
+    },
+    "entry": {
+      "added": "Ajouté",
+      "removed": "Supprimé",
+      "filesChanged": "Fichiers Modifiés",
+      "netChange": "Changement Net",
+      "filesModified": "Fichiers Modifiés",
+      "filesCreated": "Fichiers Créés"
+    },
+    "artifacts": {
+      "apiEndpoints": "Points de Terminaison API",
+      "components": "Composants",
+      "functions": "Fonctions",
+      "classes": "Classes",
+      "integrations": "Intégrations",
+      "request": "Requête:",
+      "response": "Réponse:",
+      "props": "Props:",
+      "exports": "Exports:",
+      "signature": "Signature:",
+      "methods": "Méthodes:",
+      "frontend": "Frontend:",
+      "backend": "Backend:",
+      "dataFlow": "Flux de Données:",
+      "exported": "(exporté)"
+    }
   },
   "language": {
     "selector": "Langue",

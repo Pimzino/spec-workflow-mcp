@@ -7,7 +7,9 @@
     "steering": "Dirección",
     "specs": "Especificaciones",
     "tasks": "Tareas",
-    "approvals": "Aprobaciones"
+    "approvals": "Aprobaciones",
+    "settings": "Configuración",
+    "logs": "Registros de Implementación"
   },
   "connectionStatus": {
     "connected": "Conectado",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "Por favor agrega al menos un comentario antes de solicitar revisiones."
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "Registros de Implementación"
+    },
+    "search": {
+      "placeholder": "Buscar registros..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "Seleccionar Especificación",
+      "searchPlaceholder": "Buscar especificaciones...",
+      "noSpecsFound": "No se encontraron especificaciones"
+    },
+    "filter": {
+      "label": "Filtrar por Tarea",
+      "all": "Todas",
+      "taskPrefix": "Tarea"
+    },
+    "sort": {
+      "timestamp": "Fecha/Hora",
+      "timestampDesc": "Ordenar por timestamp del registro",
+      "taskId": "ID de Tarea",
+      "taskIdDesc": "Ordenar por identificador de tarea",
+      "linesAdded": "Líneas Agregadas",
+      "linesAddedDesc": "Ordenar por líneas de código agregadas",
+      "filesChanged": "Archivos Modificados",
+      "filesChangedDesc": "Ordenar por número de archivos modificados"
+    },
+    "stats": {
+      "title": "Estadísticas de Código",
+      "linesAdded": "Líneas Agregadas",
+      "linesRemoved": "Líneas Eliminadas",
+      "filesChanged": "Archivos Modificados",
+      "netChange": "Cambio Neto",
+      "totalEntries": "Entradas Totales"
+    },
+    "files": {
+      "modified": "Archivos Modificados",
+      "created": "Archivos Creados"
+    },
+    "artifacts": {
+      "title": "Artefactos",
+      "apiEndpoints": "Endpoints de API",
+      "components": "Componentes",
+      "functions": "Funciones",
+      "classes": "Clases",
+      "integrations": "Integraciones",
+      "details": {
+        "request": "Solicitud:",
+        "response": "Respuesta:",
+        "props": "Props:",
+        "exports": "Exportaciones:",
+        "exported": "Exportado",
+        "private": "Privado",
+        "methods": "Métodos:",
+        "component": "Componente:",
+        "endpoint": "Endpoint:",
+        "flow": "Flujo:"
+      }
+    },
+    "empty": {
+      "selectSpec": "Seleccionar una especificación para ver los registros de implementación",
+      "noResults": "Ningún registro coincide con sus filtros de búsqueda",
+      "noLogs": "Sin registros de implementación aún para esta especificación"
+    },
+    "loading": "Cargando registros...",
+    "taskBadge": "Tarea"
+  },
   "volumeControl": {
     "mute": "Silenciar notificaciones",
     "enable": "Habilitar sonidos de notificación",
     "volumeLevel": "Volumen: {{percentage}}%"
+  },
+  "settings": {
+    "title": "Configuración",
+    "section": {
+      "automatedCleanup": "Limpieza Automatizada",
+      "automatedCleanupDesc": "Elimine automáticamente registros de aprobación antiguos, especificaciones y especificaciones archivadas según un horario. Configure trabajos de limpieza para ejecutarse de forma recurrente en todos los proyectos conectados."
+    },
+    "description": "Gestionar trabajos de limpieza automatizados en todos los proyectos conectados",
+    "addJob": "Añadir Trabajo",
+    "loading": "Cargando trabajos...",
+    "noJobs": "Sin trabajos de automatización",
+    "noJobsDesc": "Cree su primer trabajo de automatización para comenzar",
+    "createFirst": "Crear Primer Trabajo",
+    "addNewJob": "Añadir Nuevo Trabajo",
+    "editJob": "Editar Trabajo",
+    "deleteJob": "Eliminar Trabajo",
+    "deleteConfirm": "¿Está seguro de que desea eliminar este trabajo de automatización? Esta acción no se puede deshacer.",
+    "lastRun": "Última Ejecución",
+    "schedule": "Horario",
+    "runNow": "Ejecutar Ahora",
+    "running": "Ejecutando...",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "jobDescription": "Eliminar registros más antiguos que {{days}} días según el horario: {{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "Ver historial de cambios",
+    "modal": {
+      "title": "Historial de cambios",
+      "version": "Versión",
+      "loading": "Cargando historial de cambios...",
+      "notFound": "Historial de cambios no encontrado para esta versión"
+    }
   }
 }

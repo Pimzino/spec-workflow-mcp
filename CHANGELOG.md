@@ -5,6 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.6] - 2025-11-08
+
+### Changed
+- Removed creation of `config.example.toml` file during workspace initialization as it is no longer needed or used.
+
+## [2.0.5] - 2025-11-08
+
+### Fixed
+- Fixed tools not respecting the project directory specified at server startup. Tools now use the server context's `projectPath` by default instead of requiring it as a mandatory argument.
+- AI agents no longer need to pass `projectPath` to tools, preventing files from being created in the wrong directory (e.g., current working directory instead of the configured project directory).
+- Updated `spec-status`, `get-implementation-logs`, `log-implementation`, and `approvals` tools to use context fallback pattern.
+- Made `projectPath` optional in all tool input schemas while maintaining backward compatibility for explicit overrides.
+
+## [2.0.4] - 2025-11-08
+
+### Fixed
+- Fixed dashboard startup failure with "Unexpected end of JSON input" error on macOS/Linux when configuration files were empty or corrupted.
+- Added proper JSON parsing error handling to catch `SyntaxError` in addition to `ENOENT` errors.
+- Implemented automatic initialization of JSON files with valid default content on first use.
+- Added automatic backup of corrupted configuration files before overwriting.
+- Improved error logging to identify which file is causing parse errors and where backups are stored.
+
+## [2.0.3]
+
+### Changed
+- Updated all MCP tool responses to respond in TOON format instead of JSON for token savings and effeciency. (More Info: https://github.com/toon-format/toon)
+
+## [2.0.2] - 2025-11-06
+
+### Changed
+- Improved the get-implementation-logs tool description and instructions to help agents understand how to use the tool.
+- Removed deprecated --AutoStartDashboard flag
+- Removed config.toml support as it is no longer needed.
+- Removed some legacy code related to the single project dashboard implementation. (not required anymore)
+- Removed Ephemeral port support as it is no longer needed. Dashboard starts on port 5000 by default if a --port is not specified.
+
+## [2.0.1] - 2025-11-06
+
+### Fixed
+- Fixed a Critical bug where approval records were not being saved correctly on approval and blocking the full process.
+- Fixed a bug with dropdowns in the dashboard causing unecassary horizontal scrollbars.
+- Fixed a bug where diff viewer for approvals was not working.
+
+## [2.0.0] - 2025-11-03
+
+### Added
+- Added NEW Unified Multi-Project Dashboard Implementation!
+- 'ESC' key now closes all dialogs and modals in the dashboard.
+- Implementation Log functionality added to the dashboard for each spec, AI Agents will now log detailed information about the implementation of each task. This information is then used by future AI agents to discover existing code and avoid duplication / mistakes when implementing new tasks especially when each task is dependant on the previous task.
+
+### Changed
+- Re-designed the dashboard to be more user friendly and intuitive.
+  - Added a new sidebar menu for the dashboard instead of header navigation.
+
+
+### Announcement
+- Deprecated the `--AutoStartDashboard` flag as it is no longer needed.
+
 ## [1.0.1] - 2025-09-24
 
 ### Changed

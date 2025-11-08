@@ -7,7 +7,9 @@
     "steering": "Steering",
     "specs": "Specs",
     "tasks": "Tasks",
-    "approvals": "Approvals"
+    "approvals": "Approvals",
+    "settings": "Settings",
+    "logs": "Implementation Logs"
   },
   "connectionStatus": {
     "connected": "Connected",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "Please add at least one comment before requesting revisions."
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "Implementation Logs"
+    },
+    "search": {
+      "placeholder": "Search logs..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "Select Specification",
+      "searchPlaceholder": "Search specs...",
+      "noSpecsFound": "No specs found"
+    },
+    "filter": {
+      "label": "Filter by Task",
+      "all": "All",
+      "taskPrefix": "Task"
+    },
+    "sort": {
+      "timestamp": "Date/Time",
+      "timestampDesc": "Sort by log timestamp",
+      "taskId": "Task ID",
+      "taskIdDesc": "Sort by task identifier",
+      "linesAdded": "Lines Added",
+      "linesAddedDesc": "Sort by lines of code added",
+      "filesChanged": "Files Changed",
+      "filesChangedDesc": "Sort by number of files modified"
+    },
+    "stats": {
+      "title": "Code Statistics",
+      "linesAdded": "Lines Added",
+      "linesRemoved": "Lines Removed",
+      "filesChanged": "Files Changed",
+      "netChange": "Net Change",
+      "totalEntries": "Total Entries"
+    },
+    "files": {
+      "modified": "Files Modified",
+      "created": "Files Created"
+    },
+    "artifacts": {
+      "title": "Artifacts",
+      "apiEndpoints": "API Endpoints",
+      "components": "Components",
+      "functions": "Functions",
+      "classes": "Classes",
+      "integrations": "Integrations",
+      "details": {
+        "request": "Request:",
+        "response": "Response:",
+        "props": "Props:",
+        "exports": "Exports:",
+        "exported": "Exported",
+        "private": "Private",
+        "methods": "Methods:",
+        "component": "Component:",
+        "endpoint": "Endpoint:",
+        "flow": "Flow:"
+      }
+    },
+    "empty": {
+      "selectSpec": "Select a specification to view implementation logs",
+      "noResults": "No logs match your search filters",
+      "noLogs": "No implementation logs yet for this specification"
+    },
+    "loading": "Loading logs...",
+    "taskBadge": "Task"
+  },
   "volumeControl": {
     "mute": "Mute notifications",
     "enable": "Enable notification sounds",
     "volumeLevel": "Volume: {{percentage}}%"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage automated cleanup jobs that run across all connected projects",
+    "addJob": "Add Job",
+    "loading": "Loading jobs...",
+    "noJobs": "No automation jobs",
+    "noJobsDesc": "Create your first automation job to get started",
+    "createFirst": "Create First Job",
+    "addNewJob": "Add New Job",
+    "editJob": "Edit Job",
+    "deleteJob": "Delete Job",
+    "deleteConfirm": "Are you sure you want to delete this automation job? This action cannot be undone.",
+    "lastRun": "Last Run",
+    "schedule": "Schedule",
+    "runNow": "Run Now",
+    "running": "Running...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "close": "Close",
+    "jobDescription": "Delete records older than {{days}} days on schedule: {{schedule}}",
+    "section": {
+      "automatedCleanup": "Automated Cleanup",
+      "automatedCleanupDesc": "Automatically delete old approval records, specifications, and archived specifications based on a schedule. Configure cleanup jobs to run on a recurring basis across all connected projects."
+    }
+  },
+  "changelog": {
+    "viewChangelog": "View changelog",
+    "modal": {
+      "title": "Changelog",
+      "version": "Version",
+      "loading": "Loading changelog...",
+      "notFound": "Changelog not found for this version"
+    }
   }
 }

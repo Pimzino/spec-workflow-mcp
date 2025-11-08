@@ -4,6 +4,11 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.0]
+
+### Added
+- Added Integration Log page to the extension. This aligns the extension with the new MCP Server functionality.
+
 ## [1.0.0]
 
 ### Updated

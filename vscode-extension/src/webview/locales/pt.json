@@ -8,7 +8,8 @@
     "steering": "Documentos de Direcionamento",
     "specs": "Documentos de Especificação",
     "tasks": "Gerenciamento de Tarefas",
-    "approvals": "Solicitações de Aprovação"
+    "approvals": "Solicitações de Aprovação",
+    "logs": "Registros de Implementação"
   },
   "overview": {
     "projectTitle": "Visão Geral do Projeto",
@@ -103,6 +104,53 @@
     "noDocs": "Nenhum documento de direcionamento encontrado",
     "copyInstructions": "Copiar Instruções",
     "copied": "Copiado!"
+  },
+  "logs": {
+    "title": "Registros de Implementação",
+    "subtitle": "Rastreie todas as alterações de implementação e artefatos",
+    "selectSpec": "Selecionar uma especificação...",
+    "searchPlaceholder": "Pesquisar registros...",
+    "loading": "Carregando registros...",
+    "selectSpecMessage": "Selecione uma especificação para visualizar os registros de implementação",
+    "noSearchResults": "Nenhum registro corresponde à sua pesquisa",
+    "noLogs": "Nenhum registro de implementação encontrado para esta especificação",
+    "sort": {
+      "timestamp": "Timestamp",
+      "taskId": "ID da Tarefa",
+      "linesAdded": "Linhas Adicionadas",
+      "filesChanged": "Arquivos Alterados"
+    },
+    "stats": {
+      "totalEntries": "Total de Entradas",
+      "linesAdded": "Linhas Adicionadas",
+      "linesRemoved": "Linhas Removidas",
+      "filesChanged": "Arquivos Alterados"
+    },
+    "entry": {
+      "added": "Adicionado",
+      "removed": "Removido",
+      "filesChanged": "Arquivos Alterados",
+      "netChange": "Alteração Líquida",
+      "filesModified": "Arquivos Modificados",
+      "filesCreated": "Arquivos Criados"
+    },
+    "artifacts": {
+      "apiEndpoints": "Endpoints de API",
+      "components": "Componentes",
+      "functions": "Funções",
+      "classes": "Classes",
+      "integrations": "Integrações",
+      "request": "Requisição:",
+      "response": "Resposta:",
+      "props": "Props:",
+      "exports": "Exportações:",
+      "signature": "Assinatura:",
+      "methods": "Métodos:",
+      "frontend": "Frontend:",
+      "backend": "Backend:",
+      "dataFlow": "Fluxo de Dados:",
+      "exported": "(exportado)"
+    }
   },
   "common": {
     "scrollToTop": "Voltar ao topo"

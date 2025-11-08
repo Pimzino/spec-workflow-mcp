@@ -25,7 +25,7 @@ CRITICAL: Only provide filePath parameter for requests - the dashboard reads fil
       },
       projectPath: {
         type: 'string',
-        description: 'Absolute path to the project root (required for request, optional for status/delete)'
+        description: 'Absolute path to the project root (optional - uses server context path if not provided)'
       },
       approvalId: {
         type: 'string',
@@ -61,7 +61,7 @@ CRITICAL: Only provide filePath parameter for requests - the dashboard reads fil
 // Type definitions for discriminated unions
 type RequestApprovalArgs = {
   action: 'request';
-  projectPath: string;
+  projectPath?: string;
   title: string;
   filePath: string;
   type: 'document' | 'action';
@@ -116,10 +116,10 @@ export async function approvalsHandler(
     case 'request':
       if (isRequestApproval(typedArgs)) {
         // Validate required fields for request
-        if (!args.projectPath || !args.title || !args.filePath || !args.type || !args.category || !args.categoryName) {
+        if (!args.title || !args.filePath || !args.type || !args.category || !args.categoryName) {
           return {
             success: false,
-            message: 'Missing required fields for request action. Required: projectPath, title, filePath, type, category, categoryName'
+            message: 'Missing required fields for request action. Required: title, filePath, type, category, categoryName'
           };
         }
         return handleRequestApproval(typedArgs, context);
@@ -167,11 +167,19 @@ async function handleRequestApproval(
   args: RequestApprovalArgs,
   context: ToolContext
 ): Promise<ToolResponse> {
-  // No need for validation here as types ensure all fields are present
+  // Use context projectPath as default, allow override via args
+  const projectPath = args.projectPath || context.projectPath;
+  
+  if (!projectPath) {
+    return {
+      success: false,
+      message: 'Project path is required but not provided in context or arguments'
+    };
+  }
 
   try {
     // Validate and resolve project path
-    const validatedProjectPath = await validateProjectPath(args.projectPath);
+    const validatedProjectPath = await validateProjectPath(projectPath);
 
     const approvalStorage = new ApprovalStorage(validatedProjectPath);
     await approvalStorage.start();
@@ -188,7 +196,7 @@ async function handleRequestApproval(
 
     return {
       success: true,
-      message: `Approval request created successfully. Please review in dashboard: ${context.dashboardUrl || 'Please start the dashboard or use VS Code extension "Spec Workflow MCP"'}`,
+      message: `Approval request created successfully. Please review in dashboard: ${context.dashboardUrl || 'Start with: spec-workflow-mcp --dashboard'}`,
       data: {
         approvalId,
         title: args.title,
@@ -198,10 +206,10 @@ async function handleRequestApproval(
         dashboardUrl: context.dashboardUrl
       },
       nextSteps: [
-        'BLOCKING - Dashboard or VS Code extension approval required',
+        'BLOCKING - Dashboard approval required',
         'VERBAL APPROVAL NOT ACCEPTED',
         'Do not proceed on verbal confirmation',
-        context.dashboardUrl ? `Use dashboard: ${context.dashboardUrl} or VS Code extension 'Spec Workflow MCP'` : 'VS Code extension Spec Workflow MCP',
+        context.dashboardUrl ? `Use dashboard: ${context.dashboardUrl}` : 'Start the dashboard with: spec-workflow-mcp --dashboard',
         `Poll status with: approvals action:"status" approvalId:"${approvalId}"`
       ],
       projectContext: {
