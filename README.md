@@ -204,6 +204,24 @@ Add to your `opencode.json` configuration file:
 ```
 </details>
 
+## 🐳 Docker Deployment
+
+Run the dashboard in a Docker container for isolated deployment:
+
+```bash
+# Using Docker Compose (recommended)
+cd containers
+docker-compose up --build
+
+# Or using Docker CLI
+docker build -f containers/Dockerfile -t spec-workflow-mcp .
+docker run -p 5000:5000 -v "./workspace/.spec-workflow:/workspace/.spec-workflow:rw" spec-workflow-mcp
+```
+
+The dashboard will be available at: http://localhost:5000
+
+[See Docker setup guide →](containers/README.md)
+
 ## 📚 Documentation
 
 - [Configuration Guide](docs/CONFIGURATION.md) - Command-line options, config files

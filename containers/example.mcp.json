@@ -1,14 +1,13 @@
 {
-    "mcpServers": {
-      "spec-workflow": {
-        "command": "docker",
-        "args": [
-          "run", "--rm", "-i",
-          "-v", "./.spec-workflow:/home/username/project/.spec-workflow:rw",
-          "--entrypoint=node",
-          "spec-workflow-mcp:latest",
-          "/app/dist/index.js", "./"
-        ]
-      }
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pimzino/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ]
     }
   }
+}
+
