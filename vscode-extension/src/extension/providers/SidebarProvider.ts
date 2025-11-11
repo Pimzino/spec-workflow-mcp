@@ -412,11 +412,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private async updateTaskStatus(specName: string, taskId: string, status: string) {
     try {
+      console.log(`updateTaskStatus: Updating task ${taskId} to ${status} in spec ${specName}`);
       await this._specWorkflowService.updateTaskStatus(specName, taskId, status);
-      // Refresh task data
-      await this.sendTasks(specName);
+      console.log(`updateTaskStatus: Successfully updated task ${taskId}. File watcher will trigger automatic refresh.`);
+      // File watcher will automatically trigger sendTasksForSpec() - no need to manually refresh
       this.sendNotification('Task status updated', 'success');
     } catch (error) {
+      console.error(`updateTaskStatus: Failed to update task ${taskId}:`, error);
       this.sendError('Failed to update task status: ' + (error as Error).message);
     }
   }

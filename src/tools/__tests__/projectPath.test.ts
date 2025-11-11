@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { specStatusHandler } from '../spec-status.js';
-import { getImplementationLogsHandler } from '../get-implementation-logs.js';
 import { logImplementationHandler } from '../log-implementation.js';
 import { approvalsHandler } from '../approvals.js';
 import { ToolContext } from '../../types.js';
@@ -41,32 +40,6 @@ describe('Tool projectPath fallback behavior', () => {
       
       const result = await specStatusHandler(
         { specName: 'test-spec' },
-        emptyContext
-      );
-      
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('Project path is required but not provided');
-    });
-  });
-
-  describe('get-implementation-logs tool', () => {
-    it('should use context.projectPath when args.projectPath is not provided', async () => {
-      const result = await getImplementationLogsHandler(
-        { specName: 'test-spec', keyword: 'test' },
-        mockContext
-      );
-      
-      // The path will be used (from context) and the tool will try to access files
-      // It may succeed or fail depending on file existence, but should not fail
-      // due to missing projectPath
-      expect(result.message).not.toContain('Project path is required but not provided');
-    });
-
-    it('should fail if neither args.projectPath nor context.projectPath is provided', async () => {
-      const emptyContext: ToolContext = { projectPath: '' };
-      
-      const result = await getImplementationLogsHandler(
-        { specName: 'test-spec', keyword: 'test' },
         emptyContext
       );
       

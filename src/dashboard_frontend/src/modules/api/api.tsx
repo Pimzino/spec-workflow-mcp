@@ -83,13 +83,19 @@ async function putJson(url: string, body: any) {
   return { ok: res.ok, status: res.status, data: res.ok ? await res.json() : null };
 }
 
-type ApiContextType = {
+// Split into two contexts to prevent unnecessary re-renders
+// Data context contains state that changes frequently
+type ApiDataContextType = {
   specs: SpecSummary[];
   archivedSpecs: SpecSummary[];
   approvals: Approval[];
   info?: ProjectInfo;
   steeringDocuments?: any;
   projectId: string | null;
+};
+
+// Actions context contains stable functions that rarely change
+type ApiActionsContextType = {
   reloadAll: () => Promise<void>;
   getAllSpecDocuments: (name: string) => Promise<Record<string, { content: string; lastModified: string } | null>>;
   getAllArchivedSpecDocuments: (name: string) => Promise<Record<string, { content: string; lastModified: string } | null>>;
@@ -113,7 +119,8 @@ type ApiContextType = {
   getChangelog: (version: string) => Promise<{ content: string }>;
 };
 
-const ApiContext = createContext<ApiContextType | undefined>(undefined);
+const ApiDataContext = createContext<ApiDataContextType | undefined>(undefined);
+const ApiActionsContext = createContext<ApiActionsContextType | undefined>(undefined);
 
 interface ApiProviderProps {
   initial?: { specs?: SpecSummary[]; archivedSpecs?: SpecSummary[]; approvals?: Approval[] };
@@ -169,16 +176,65 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
   // Handle websocket updates for real-time data changes
   useEffect(() => {
     const handleSpecUpdate = (data: { specs?: SpecSummary[]; archivedSpecs?: SpecSummary[] }) => {
-      if (data.specs) setSpecs(data.specs);
-      if (data.archivedSpecs) setArchivedSpecs(data.archivedSpecs);
+      // Only update if data actually changed (deep equality check)
+      if (data.specs) {
+        setSpecs(prevSpecs => {
+          // Check if arrays are identical to avoid unnecessary updates
+          if (prevSpecs.length !== data.specs!.length) return data.specs!;
+
+          // Check if any spec changed by comparing key properties
+          const hasChanges = data.specs!.some((newSpec, index) => {
+            const prevSpec = prevSpecs[index];
+            return !prevSpec ||
+                   prevSpec.name !== newSpec.name ||
+                   prevSpec.displayName !== newSpec.displayName ||
+                   prevSpec.status !== newSpec.status ||
+                   prevSpec.lastModified !== newSpec.lastModified ||
+                   JSON.stringify(prevSpec.taskProgress) !== JSON.stringify(newSpec.taskProgress);
+          });
+
+          return hasChanges ? data.specs! : prevSpecs;
+        });
+      }
+
+      if (data.archivedSpecs) {
+        setArchivedSpecs(prevArchived => {
+          if (prevArchived.length !== data.archivedSpecs!.length) return data.archivedSpecs!;
+
+          const hasChanges = data.archivedSpecs!.some((newSpec, index) => {
+            const prevSpec = prevArchived[index];
+            return !prevSpec || prevSpec.name !== newSpec.name;
+          });
+
+          return hasChanges ? data.archivedSpecs! : prevArchived;
+        });
+      }
     };
 
     const handleApprovalUpdate = (data: Approval[]) => {
-      setApprovals(data);
+      setApprovals(prevApprovals => {
+        // Only update if approvals changed
+        if (prevApprovals.length !== data.length) return data;
+
+        const hasChanges = data.some((newApproval, index) => {
+          const prevApproval = prevApprovals[index];
+          return !prevApproval ||
+                 prevApproval.id !== newApproval.id ||
+                 prevApproval.status !== newApproval.status;
+        });
+
+        return hasChanges ? data : prevApprovals;
+      });
     };
 
     const handleSteeringUpdate = (data: any) => {
-      setSteeringDocuments(data);
+      setSteeringDocuments(prevDocs => {
+        // Simple deep equality check for steering documents
+        if (JSON.stringify(prevDocs) === JSON.stringify(data)) {
+          return prevDocs;
+        }
+        return data;
+      });
     };
 
     // Subscribe to websocket events that contain actual data
@@ -193,16 +249,21 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
     };
   }, [subscribe, unsubscribe]);
 
-  const value = useMemo<ApiContextType>(() => {
+  // Memoize data context - changes when state updates
+  const dataValue = useMemo<ApiDataContextType>(() => ({
+    specs,
+    archivedSpecs,
+    approvals,
+    info,
+    steeringDocuments,
+    projectId,
+  }), [specs, archivedSpecs, approvals, info, steeringDocuments, projectId]);
+
+  // Memoize actions context - stable functions that rarely change
+  const actionsValue = useMemo<ApiActionsContextType>(() => {
     if (!projectId) {
-      // Return empty API when no project selected
+      // Return empty API functions when no project selected
       return {
-        specs: [],
-        archivedSpecs: [],
-        approvals: [],
-        info: undefined,
-        steeringDocuments: undefined,
-        projectId: null,
         reloadAll: async () => {},
         getAllSpecDocuments: async () => ({}),
         getAllArchivedSpecDocuments: async () => ({}),
@@ -230,12 +291,6 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
     const prefix = `/api/projects/${encodeURIComponent(projectId)}`;
 
     return {
-      specs,
-      archivedSpecs,
-      approvals,
-      info,
-      steeringDocuments,
-      projectId,
       reloadAll,
       getAllSpecDocuments: (name: string) => getJson(`${prefix}/specs/${encodeURIComponent(name)}/all`),
       getAllArchivedSpecDocuments: (name: string) => getJson(`${prefix}/specs/${encodeURIComponent(name)}/all/archived`),
@@ -271,15 +326,37 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
       getImplementationLogStats: (specName: string, taskId: string) => getJson(`${prefix}/specs/${encodeURIComponent(specName)}/implementation-log/task/${encodeURIComponent(taskId)}/stats`),
       getChangelog: (version: string) => getJson(`${prefix}/changelog/${encodeURIComponent(version)}`),
     };
-  }, [specs, archivedSpecs, approvals, info, steeringDocuments, projectId, reloadAll]);
+  }, [projectId, reloadAll]);
 
-  return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
+  return (
+    <ApiActionsContext.Provider value={actionsValue}>
+      <ApiDataContext.Provider value={dataValue}>
+        {children}
+      </ApiDataContext.Provider>
+    </ApiActionsContext.Provider>
+  );
 }
 
-export function useApi(): ApiContextType {
-  const ctx = useContext(ApiContext);
-  if (!ctx) throw new Error('useApi must be used within ApiProvider');
+// Hook for accessing API actions (stable, won't re-render when data changes)
+export function useApiActions(): ApiActionsContextType {
+  const ctx = useContext(ApiActionsContext);
+  if (!ctx) throw new Error('useApiActions must be used within ApiProvider');
   return ctx;
+}
+
+// Hook for accessing API data (will re-render when data changes)
+export function useApiData(): ApiDataContextType {
+  const ctx = useContext(ApiDataContext);
+  if (!ctx) throw new Error('useApiData must be used within ApiProvider');
+  return ctx;
+}
+
+// Legacy hook for backward compatibility - returns both data and actions
+// Components should migrate to using useApiActions() or useApiData() for better performance
+export function useApi(): ApiDataContextType & ApiActionsContextType {
+  const data = useApiData();
+  const actions = useApiActions();
+  return { ...data, ...actions };
 }
 
 

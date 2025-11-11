@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
-import { useApi } from '../api/api';
+import { useApi, useApiActions } from '../api/api';
 import { useWs } from '../ws/WebSocketProvider';
 import { useSearchParams } from 'react-router-dom';
 import { useNotifications } from '../notifications/NotificationProvider';
@@ -215,7 +215,7 @@ function StatusPill({
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const { updateTaskStatus } = useApi();
+  const { updateTaskStatus } = useApiActions();
   const { showNotification } = useNotifications();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -447,7 +447,7 @@ function SpecCard({ spec, onSelect, isSelected }: { spec: any; onSelect: (spec: 
 
 function TaskList({ specName }: { specName: string }) {
   const { t } = useTranslation();
-  const { getSpecTasksProgress, updateTaskStatus } = useApi();
+  const { getSpecTasksProgress, updateTaskStatus } = useApiActions();
   const { subscribe, unsubscribe } = useWs();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any | null>(null);
@@ -465,7 +465,8 @@ function TaskList({ specName }: { specName: string }) {
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
 
   // Track pending status updates to prevent race conditions with websocket
-  const [pendingStatusUpdates, setPendingStatusUpdates] = useState<Set<string>>(new Set());
+  // Using ref instead of state to avoid re-renders and websocket re-subscriptions
+  const pendingStatusUpdatesRef = useRef<Set<string>>(new Set());
 
   // Storage key for per-spec preferences
   const storageKey = useMemo(() => `spec-workflow:task-preferences:${specName}`, [specName]);
@@ -517,19 +518,54 @@ function TaskList({ specName }: { specName: string }) {
           // Merge websocket updates while preserving pending optimistic updates
           const mergedTaskList = event.taskList.map((serverTask: any) => {
             // If this task has a pending update, keep the local version
-            if (pendingStatusUpdates.has(serverTask.id)) {
+            if (pendingStatusUpdatesRef.current.has(serverTask.id)) {
               const localTask = prevData.taskList.find((t: any) => t.id === serverTask.id);
               return localTask || serverTask;
             }
             return serverTask;
           });
 
+          // Check if task list actually changed to avoid unnecessary re-renders
+          if (prevData.taskList.length !== mergedTaskList.length) {
+            // Length changed, definitely need to update
+          } else {
+            // Same length - check if any task actually changed
+            let hasChanges = false;
+
+            // Compare task lists by creating maps for efficient lookup
+            const prevTaskMap = new Map(prevData.taskList.map((t: any) => [t.id, t]));
+            const newTaskMap = new Map(mergedTaskList.map((t: any) => [t.id, t]));
+
+            // Check if any task changed
+            for (const [id, newTask] of newTaskMap) {
+              const prevTask = prevTaskMap.get(id);
+              if (!prevTask ||
+                  prevTask.status !== newTask.status ||
+                  prevTask.title !== newTask.title ||
+                  prevTask.completed !== newTask.completed ||
+                  prevTask.inProgress !== newTask.inProgress) {
+                hasChanges = true;
+                break;
+              }
+            }
+
+            // Also check if total, progress, or inProgress changed
+            if (!hasChanges &&
+                prevData.total === event.summary.total &&
+                prevData.inProgress === event.inProgress) {
+              // Nothing changed - return previous data to avoid re-render
+              return prevData;
+            }
+          }
+
+          const completedCount = mergedTaskList.filter((t: any) => t.status === 'completed').length;
+
           return {
             ...prevData,
             taskList: mergedTaskList,
-            completed: mergedTaskList.filter((t: any) => t.status === 'completed').length,
+            completed: completedCount,
             total: event.summary.total,
-            progress: event.summary.total > 0 ? (mergedTaskList.filter((t: any) => t.status === 'completed').length / event.summary.total) * 100 : 0,
+            progress: event.summary.total > 0 ? (completedCount / event.summary.total) * 100 : 0,
             inProgress: event.inProgress
           };
         });
@@ -541,7 +577,7 @@ function TaskList({ specName }: { specName: string }) {
     return () => {
       unsubscribe('task-status-update', handleTaskStatusUpdate);
     };
-  }, [specName, subscribe, unsubscribe, pendingStatusUpdates]);
+  }, [specName, subscribe, unsubscribe]);
 
   // Helper functions
   const filterTasksByStatus = useCallback((tasks: any[]) => {
@@ -915,7 +951,7 @@ function TaskList({ specName }: { specName: string }) {
                 const task = filteredAndSortedTasks.find(t => t.id === taskId);
                 if (task) {
                   // Mark this task as having a pending update
-                  setPendingStatusUpdates(prev => new Set(prev).add(taskId));
+                  pendingStatusUpdatesRef.current.add(taskId);
 
                   // Optimistically update the task in local data
                   setData((prevData: any) => {
@@ -936,19 +972,11 @@ function TaskList({ specName }: { specName: string }) {
                   updateTaskStatus(specName, taskId, newStatus)
                     .then(() => {
                       // Remove from pending updates on success
-                      setPendingStatusUpdates(prev => {
-                        const next = new Set(prev);
-                        next.delete(taskId);
-                        return next;
-                      });
+                      pendingStatusUpdatesRef.current.delete(taskId);
                     })
                     .catch(() => {
                       // Remove from pending updates on error
-                      setPendingStatusUpdates(prev => {
-                        const next = new Set(prev);
-                        next.delete(taskId);
-                        return next;
-                      });
+                      pendingStatusUpdatesRef.current.delete(taskId);
                       // Revert on error - fetch fresh data
                       getSpecTasksProgress(specName).then(setData);
                     });
@@ -1087,7 +1115,7 @@ function TaskList({ specName }: { specName: string }) {
                             specName={specName}
                             onStatusChange={(newStatus) => {
                               // Mark this task as having a pending update
-                              setPendingStatusUpdates(prev => new Set(prev).add(task.id));
+                              pendingStatusUpdatesRef.current.add(task.id);
 
                               // Optimistically update the task in local data
                               setData((prevData: any) => {
@@ -1108,19 +1136,11 @@ function TaskList({ specName }: { specName: string }) {
                               updateTaskStatus(specName, task.id, newStatus)
                                 .then(() => {
                                   // Remove from pending updates on success
-                                  setPendingStatusUpdates(prev => {
-                                    const next = new Set(prev);
-                                    next.delete(task.id);
-                                    return next;
-                                  });
+                                  pendingStatusUpdatesRef.current.delete(task.id);
                                 })
                                 .catch(() => {
                                   // Remove from pending updates on error
-                                  setPendingStatusUpdates(prev => {
-                                    const next = new Set(prev);
-                                    next.delete(task.id);
-                                    return next;
-                                  });
+                                  pendingStatusUpdatesRef.current.delete(task.id);
                                   // Revert on error - fetch fresh data
                                   getSpecTasksProgress(specName).then(setData);
                                 });
@@ -1319,8 +1339,6 @@ function Content() {
       }
     }
   }, [storageKey, setParams]);
-
-  useEffect(() => { reloadAll(); }, [reloadAll]);
 
   // Initialize spec selection with three-tier approach
   useEffect(() => {

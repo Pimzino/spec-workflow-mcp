@@ -1,17 +1,24 @@
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useApi } from '../api/api';
 
-type NotificationContextType = {
+// Split into two contexts to prevent unnecessary re-renders
+// Actions context contains stable functions that don't change
+type NotificationActionsContextType = {
   showNotification: (message: string, type?: 'info' | 'success' | 'warning' | 'error') => void;
-  notifications: Array<{ id: string; message: string; type: 'info' | 'success' | 'warning' | 'error'; timestamp: number }>;
   removeNotification: (id: string) => void;
-  soundEnabled: boolean;
   toggleSound: () => void;
-  volume: number;
   setVolume: (volume: number) => void;
 };
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+// State context contains dynamic state that changes frequently
+type NotificationStateContextType = {
+  notifications: Array<{ id: string; message: string; type: 'info' | 'success' | 'warning' | 'error'; timestamp: number }>;
+  soundEnabled: boolean;
+  volume: number;
+};
+
+const NotificationActionsContext = createContext<NotificationActionsContextType | undefined>(undefined);
+const NotificationStateContext = createContext<NotificationStateContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const { approvals, specs, getSpecTasksProgress } = useApi();
@@ -205,27 +212,35 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   }, []); // Empty dependency array - only run on mount
 
-  const value = {
+  // Memoize actions context - this should rarely change since functions are stable
+  const actionsValue = useMemo(() => ({
     showNotification,
-    notifications,
     removeNotification,
-    soundEnabled,
     toggleSound,
-    volume,
     setVolume
-  };
+  }), [showNotification, removeNotification, toggleSound, setVolume]);
+
+  // Memoize state context - this changes when notifications/settings change
+  const stateValue = useMemo(() => ({
+    notifications,
+    soundEnabled,
+    volume
+  }), [notifications, soundEnabled, volume]);
 
   return (
-    <NotificationContext.Provider value={value}>
-      {children}
-      <NotificationToasts />
-    </NotificationContext.Provider>
+    <NotificationActionsContext.Provider value={actionsValue}>
+      <NotificationStateContext.Provider value={stateValue}>
+        {children}
+        <NotificationToasts />
+      </NotificationStateContext.Provider>
+    </NotificationActionsContext.Provider>
   );
 }
 
 // Toast notifications component
 function NotificationToasts() {
-  const { notifications, removeNotification } = useNotifications();
+  const { removeNotification } = useNotifications();
+  const { notifications } = useNotificationState();
 
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
@@ -284,8 +299,16 @@ function NotificationToasts() {
   );
 }
 
-export function useNotifications(): NotificationContextType {
-  const ctx = useContext(NotificationContext);
+// Hook for accessing notification actions (stable, won't cause re-renders when notifications change)
+export function useNotifications(): NotificationActionsContextType {
+  const ctx = useContext(NotificationActionsContext);
   if (!ctx) throw new Error('useNotifications must be used within NotificationProvider');
+  return ctx;
+}
+
+// Hook for accessing notification state (will cause re-renders when state changes)
+export function useNotificationState(): NotificationStateContextType {
+  const ctx = useContext(NotificationStateContext);
+  if (!ctx) throw new Error('useNotificationState must be used within NotificationProvider');
   return ctx;
 }

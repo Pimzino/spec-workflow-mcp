@@ -114,7 +114,7 @@ export class ImplementationLogService {
   }
 
   /**
-   * Setup file watcher for implementation log files
+   * Setup file watcher for implementation log files (markdown format)
    */
   private setupLogWatcher() {
     // Dispose existing watcher
@@ -127,9 +127,10 @@ export class ImplementationLogService {
       return;
     }
 
+    // Watch for markdown files in Implementation Logs directories
     const logPattern = new vscode.RelativePattern(
       path.join(this.specWorkflowRoot, 'specs'),
-      '**/implementation-log.json'
+      '**/Implementation Logs/*.md'
     );
 
     this.logWatcher = vscode.workspace.createFileSystemWatcher(logPattern);
@@ -150,7 +151,7 @@ export class ImplementationLogService {
 
   /**
    * Extract spec name from log file path
-   * Path format: .spec-workflow/specs/{specName}/implementation-log.json
+   * Path format: .spec-workflow/specs/{specName}/Implementation Logs/*.md
    */
   private extractSpecNameFromLogPath(filePath: string): string | null {
     if (!this.specWorkflowRoot) {
@@ -162,11 +163,12 @@ export class ImplementationLogService {
 
     const specsDir = path.join(normalizedRoot, 'specs').replace(/\\/g, '/');
 
-    if (normalizedPath.includes(specsDir) && normalizedPath.endsWith('/implementation-log.json')) {
+    if (normalizedPath.includes(specsDir) && normalizedPath.includes('/Implementation Logs/')) {
       const relativePath = normalizedPath.substring(specsDir.length + 1);
       const pathParts = relativePath.split('/');
 
-      if (pathParts.length >= 2 && pathParts[pathParts.length - 1] === 'implementation-log.json') {
+      // Path structure: {specName}/Implementation Logs/{filename}.md
+      if (pathParts.length >= 3 && pathParts[1] === 'Implementation Logs' && pathParts[2].endsWith('.md')) {
         return pathParts[0]; // Return the spec name (first directory)
       }
     }
@@ -175,30 +177,250 @@ export class ImplementationLogService {
   }
 
   /**
-   * Load implementation log from file
+   * Load implementation logs from markdown files in Implementation Logs directory
    */
   private async loadLog(specName: string): Promise<ImplementationLog> {
     if (!this.specWorkflowRoot) {
       return { entries: [], lastUpdated: new Date().toISOString() };
     }
 
-    const logPath = path.join(
+    const logsDir = path.join(
       this.specWorkflowRoot,
       'specs',
       specName,
-      'implementation-log.json'
+      'Implementation Logs'
     );
 
     try {
-      const content = await fs.readFile(logPath, 'utf-8');
-      return JSON.parse(content) as ImplementationLog;
+      const files = await fs.readdir(logsDir);
+      const mdFiles = files.filter(f => f.endsWith('.md'));
+
+      const entries: ImplementationLogEntry[] = [];
+
+      for (const file of mdFiles) {
+        try {
+          const filePath = path.join(logsDir, file);
+          const content = await fs.readFile(filePath, 'utf-8');
+          // Parse markdown content - extract metadata
+          const entry = this.parseMarkdownLog(content);
+          if (entry) {
+            entries.push(entry);
+          }
+        } catch (error) {
+          this.logger.log(`Error reading log file ${file}: ${error}`);
+        }
+      }
+
+      // Sort by timestamp (newest first)
+      entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+      return {
+        entries,
+        lastUpdated: new Date().toISOString()
+      };
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        // File doesn't exist yet, return empty log
+        // Directory doesn't exist yet, return empty log
         return { entries: [], lastUpdated: new Date().toISOString() };
       }
-      this.logger.log(`Error loading log for spec ${specName}: ${error.message}`);
+      this.logger.log(`Error loading logs for spec ${specName}: ${error.message}`);
       return { entries: [], lastUpdated: new Date().toISOString() };
+    }
+  }
+
+  /**
+   * Parse markdown log file to extract structured data including artifacts
+   */
+  private parseMarkdownLog(content: string): ImplementationLogEntry | null {
+    try {
+      const lines = content.split('\n');
+      let idValue = '';
+      let taskId = '';
+      let summary = '';
+      let timestamp = '';
+      let linesAdded = 0;
+      let linesRemoved = 0;
+      let filesChanged = 0;
+      const filesModified: string[] = [];
+      const filesCreated: string[] = [];
+      const artifacts: ImplementationLogEntry['artifacts'] = {};
+
+      let currentSection = '';
+      let currentArtifactType: keyof ImplementationLogEntry['artifacts'] | null = null;
+      let currentItem: any = {};
+
+      // Helper function to normalize markdown keys to camelCase
+      const normalizeKey = (key: string): string => {
+        const words = key.toLowerCase().trim().split(/\s+/);
+        if (words.length === 0) return '';
+        return words[0] + words.slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+      };
+
+      // Helper function to map markdown property names to TypeScript interface property names
+      const mapPropertyName = (normalizedKey: string): string => {
+        const mapping: Record<string, string> = {
+          'exported': 'isExported'
+        };
+        return mapping[normalizedKey] || normalizedKey;
+      };
+
+      // Helper function to convert string values to appropriate types
+      const convertValue = (key: string, value: string): any => {
+        if (value === 'Yes' || value === 'yes') return true;
+        if (value === 'No' || value === 'no') return false;
+        if (value === 'N/A' || value === 'n/a') return '';
+        return value;
+      };
+
+      // Helper function to parse key-value lines "- **Key:** value"
+      const parseKeyValue = (line: string): { key: string; value: string } | null => {
+        const match = line.match(/^- \*\*([^:]+):\*\* (.*)$/);
+        if (match) {
+          return {
+            key: normalizeKey(match[1]),
+            value: match[2].trim()
+          };
+        }
+        return null;
+      };
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Parse metadata
+        if (line.includes('**Log ID:**')) {
+          idValue = line.split('**Log ID:**')[1]?.trim() || '';
+        }
+        if (line.startsWith('# Implementation Log: Task')) {
+          taskId = line.split('Task ')[1] || '';
+        }
+        if (line.includes('**Summary:**')) {
+          summary = line.split('**Summary:**')[1]?.trim() || '';
+        }
+        if (line.includes('**Timestamp:**')) {
+          timestamp = line.split('**Timestamp:**')[1]?.trim() || new Date().toISOString();
+        }
+        if (line.includes('**Lines Added:**')) {
+          const match = line.match(/\+(\d+)/);
+          linesAdded = match ? parseInt(match[1]) : 0;
+        }
+        if (line.includes('**Lines Removed:**')) {
+          const match = line.match(/-(\d+)/);
+          linesRemoved = match ? parseInt(match[1]) : 0;
+        }
+        if (line.includes('**Files Changed:**')) {
+          const match = line.match(/(\d+)/);
+          filesChanged = match ? parseInt(match[1]) : 0;
+        }
+
+        // Parse sections (## headers)
+        if (line.startsWith('## Files Modified')) {
+          currentSection = 'filesModified';
+          currentArtifactType = null;
+        } else if (line.startsWith('## Files Created')) {
+          currentSection = 'filesCreated';
+          currentArtifactType = null;
+        } else if (line.startsWith('## Artifacts')) {
+          currentSection = 'artifacts';
+          currentArtifactType = null;
+        }
+        // Parse artifact subsections (### headers)
+        else if (line.startsWith('### ')) {
+          if (Object.keys(currentItem).length > 0 && currentArtifactType) {
+            if (!artifacts[currentArtifactType]) artifacts[currentArtifactType] = [];
+            (artifacts[currentArtifactType] as any).push(currentItem);
+            currentItem = {};
+          }
+
+          const sectionName = line.slice(4).toLowerCase();
+          if (sectionName.includes('api endpoint')) {
+            currentArtifactType = 'apiEndpoints';
+          } else if (sectionName.includes('component')) {
+            currentArtifactType = 'components';
+          } else if (sectionName.includes('function')) {
+            currentArtifactType = 'functions';
+          } else if (sectionName.includes('class')) {
+            currentArtifactType = 'classes';
+          } else if (sectionName.includes('integration')) {
+            currentArtifactType = 'integrations';
+          }
+        }
+        // Parse artifact item headers (#### for individual items)
+        else if (line.startsWith('#### ') && currentArtifactType) {
+          if (Object.keys(currentItem).length > 0) {
+            if (!artifacts[currentArtifactType]) artifacts[currentArtifactType] = [];
+            (artifacts[currentArtifactType] as any).push(currentItem);
+          }
+          currentItem = {};
+
+          const itemHeader = line.slice(5).trim();
+
+          if (currentArtifactType === 'apiEndpoints') {
+            const parts = itemHeader.split(' ');
+            if (parts.length >= 2) {
+              currentItem.method = parts[0];
+              currentItem.path = parts.slice(1).join(' ');
+            } else {
+              currentItem.name = itemHeader;
+            }
+          } else {
+            currentItem.name = itemHeader;
+          }
+        }
+        // Parse file lists
+        else if ((currentSection === 'filesModified' || currentSection === 'filesCreated') &&
+                 line.startsWith('- ') && !line.includes('_No files')) {
+          const fileName = line.slice(2).trim();
+          if (currentSection === 'filesModified') {
+            filesModified.push(fileName);
+          } else {
+            filesCreated.push(fileName);
+          }
+        }
+        // Parse artifact key-value details
+        else if (currentArtifactType && line.startsWith('- **')) {
+          const kv = parseKeyValue(line);
+          if (kv) {
+            const mappedKey = mapPropertyName(kv.key);
+
+            if (mappedKey === 'exports' || mappedKey === 'methods') {
+              const items = kv.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+              currentItem[mappedKey] = items;
+            } else {
+              const convertedValue = convertValue(mappedKey, kv.value);
+              currentItem[mappedKey] = convertedValue;
+            }
+          }
+        }
+      }
+
+      // Save last artifact item
+      if (Object.keys(currentItem).length > 0 && currentArtifactType) {
+        if (!artifacts[currentArtifactType]) artifacts[currentArtifactType] = [];
+        (artifacts[currentArtifactType] as any).push(currentItem);
+      }
+
+      if (!taskId || !idValue) {
+        return null;
+      }
+
+      return {
+        id: idValue,
+        taskId,
+        timestamp,
+        summary,
+        filesModified,
+        filesCreated,
+        statistics: {
+          linesAdded,
+          linesRemoved,
+          filesChanged
+        },
+        artifacts
+      };
+    } catch (error) {
+      this.logger.log(`Error parsing markdown log: ${error}`);
+      return null;
     }
   }
 

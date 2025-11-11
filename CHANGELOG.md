@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.7] - 2025-11-10
+
+### BREAKING CHANGES
+- **Removed `get-implementation-logs` tool** - This tool is no longer available. AI agents should use native tools (grep/ripgrep) and Read to search implementation logs instead.
+
+### Changed
+- **Implementation Logs Format Migration** - Logs are now stored as individual markdown files instead of a single JSON file for improved scalability and direct agent accessibility.
+  - Old format: `.spec-workflow/specs/{spec-name}/implementation-log.json`
+  - New format: `.spec-workflow/specs/{spec-name}/Implementation Logs/*.md`
+- Implementation logs are automatically migrated from JSON to markdown format on server startup.
+- Updated all documentation and prompts to guide agents to use grep/ripgrep commands to search implementation logs.
+- Updated VSCode extension file watcher to monitor markdown files in Implementation Logs directories.
+- Updated dashboard and multi-server API endpoints to work with the new markdown format.
+
+### Added
+- **Automatic Migration System** - New `ImplementationLogMigrator` utility class handles automatic conversion of existing JSON logs to markdown format.
+- **Migration Logging** - Migration process is logged to `~/.spec-workflow-mcp/migration.log` for debugging and transparency.
+
+### Improved
+- **Agent Discovery** - AI agents can now directly grep implementation logs without special tool calls, making discovery faster and more intuitive.
+- **Log Readability** - Markdown format is more human-readable and can be directly edited if needed.
+- **Scalability** - Individual markdown files prevent performance degradation when dealing with thousands of implementation logs.
+
 ## [2.0.6] - 2025-11-08
 
 ### Changed

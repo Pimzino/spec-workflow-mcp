@@ -205,7 +205,8 @@ flowchart TD
 
 **Tools**:
 - spec-status: Check overall progress
-- get-implementation-logs: CRITICAL - Query existing code before implementing (step 3)
+- Bash (grep/ripgrep): CRITICAL - Search existing code before implementing (step 3)
+- Read: Examine implementation log files directly
 - implement-task prompt: Guide for implementing tasks
 - log-implementation: Record implementation details with artifacts after task completion (step 5)
 - Direct editing: Mark tasks as in-progress [-] or complete [x] in tasks.md
@@ -215,16 +216,15 @@ flowchart TD
 2. Read \`tasks.md\` to see all tasks
 3. For each task:
    - Edit tasks.md: Change \`[ ]\` to \`[-]\` for the task you're starting
-   - **CRITICAL: BEFORE implementing, use get-implementation-logs tool with REQUIRED filters**:
-     - NEVER call without filters - always provide keyword, taskId, or artifactType
-     - **Best practice: Call this tool 2-3 times with different single keywords to discover comprehensively**
-     - Recommended approach:
-       - \`keyword: "api"\` or \`artifactType: "apiEndpoints"\` - Find existing endpoints
-       - \`keyword: "component"\` or \`artifactType: "components"\` - Find UI components
-       - \`artifactType: "functions"\` or \`artifactType: "classes"\` - Find utility code
-       - \`keyword: "<specific-term>"\` - Search for specific patterns or names
-       - Multiple keywords: \`keyword: "api endpoint"\` uses AND logic (must match BOTH)
-     - If first search doesn't return what you need, call again with different keyword
+   - **CRITICAL: BEFORE implementing, search existing implementation logs**:
+     - Implementation logs are in: \`.spec-workflow/specs/{spec-name}/Implementation Logs/\`
+     - **Option 1: Use grep for fast searches**:
+       - \`grep -r "api\|endpoint" .spec-workflow/specs/{spec-name}/Implementation Logs/\` - Find API endpoints
+       - \`grep -r "component" .spec-workflow/specs/{spec-name}/Implementation Logs/\` - Find UI components
+       - \`grep -r "function" .spec-workflow/specs/{spec-name}/Implementation Logs/\` - Find utility functions
+       - \`grep -r "integration" .spec-workflow/specs/{spec-name}/Implementation Logs/\` - Find integration patterns
+     - **Option 2: Read markdown files directly** - Use Read tool to examine specific log files
+     - Best practice: Search 2-3 different terms to discover comprehensively
      - This prevents: duplicate endpoints, reimplemented components, broken integrations
      - Reuse existing code that already solves part of the task
    - **Read the _Prompt field** for guidance on role, approach, and success criteria
@@ -276,7 +276,11 @@ flowchart TD
 │   └── {spec-name}/
 │       ├── requirements.md
 │       ├── design.md
-│       └── tasks.md
+│       ├── tasks.md
+│       └── Implementation Logs/     # Created automatically
+│           ├── task-1_timestamp_id.md
+│           ├── task-2_timestamp_id.md
+│           └── ...
 └── steering/
     ├── product.md
     ├── tech.md

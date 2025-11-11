@@ -1,28 +1,33 @@
 import { promises as fs } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { homedir } from 'os';
 import { PathUtils } from './path-utils.js';
+import { ImplementationLogMigrator } from './implementation-log-migrator.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class WorkspaceInitializer {
   private projectPath: string;
   private version: string;
-  
+
   constructor(projectPath: string, version: string) {
     this.projectPath = projectPath;
     this.version = version;
   }
-  
+
   async initializeWorkspace(): Promise<void> {
     // Create all necessary directories
     await this.initializeDirectories();
-    
+
     // Copy template files
     await this.initializeTemplates();
-    
+
     // Create user templates README
     await this.createUserTemplatesReadme();
+
+    // Migrate implementation logs from JSON to Markdown format
+    await this.migrateImplementationLogs();
   }
   
   private async initializeDirectories(): Promise<void> {
@@ -80,7 +85,7 @@ export class WorkspaceInitializer {
   
   private async createUserTemplatesReadme(): Promise<void> {
     const readmePath = join(PathUtils.getWorkflowRoot(this.projectPath), 'user-templates', 'README.md');
-    
+
     const readmeContent = `# User Templates
 
 This directory allows you to create custom templates that override the default Spec Workflow templates.
@@ -89,7 +94,7 @@ This directory allows you to create custom templates that override the default S
 
 1. **Create your custom template file** in this directory with the exact same name as the default template you want to override:
    - \`requirements-template.md\` - Override requirements document template
-   - \`design-template.md\` - Override design document template  
+   - \`design-template.md\` - Override design document template
    - \`tasks-template.md\` - Override tasks document template
    - \`product-template.md\` - Override product steering template
    - \`tech-template.md\` - Override tech steering template
@@ -146,13 +151,34 @@ Templates can include placeholders that will be replaced when documents are crea
 - Your custom templates in this directory are preserved during updates
 - If a custom template has errors, the system will fall back to the default template
 `;
-    
+
     try {
       // Only create if it doesn't exist to avoid overwriting user's README
       await fs.access(readmePath);
     } catch {
       // File doesn't exist, create it
       await fs.writeFile(readmePath, readmeContent, 'utf-8');
+    }
+  }
+
+  /**
+   * Migrate implementation logs from JSON to Markdown format
+   * Runs on server startup to handle automatic migration for existing specs
+   */
+  private async migrateImplementationLogs(): Promise<void> {
+    try {
+      const userDataDir = resolve(homedir(), '.spec-workflow-mcp');
+      const specsDir = join(PathUtils.getWorkflowRoot(this.projectPath), 'specs');
+
+      // Create user data directory if it doesn't exist
+      await fs.mkdir(userDataDir, { recursive: true });
+
+      const migrator = new ImplementationLogMigrator(userDataDir);
+      await migrator.migrateAllSpecs(specsDir);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`Implementation log migration failed: ${errorMessage}`);
+      // Don't throw - migration failure shouldn't break server startup
     }
   }
 }

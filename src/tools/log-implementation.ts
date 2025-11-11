@@ -12,7 +12,7 @@ export const logImplementationTool: Tool = {
 
 # WHY DETAILED LOGGING MATTERS
 
-Future AI agents (and future you) will use get-implementation-logs to query these entries before implementing new tasks. Complete logs prevent:
+Future AI agents (and future you) will use grep/ripgrep to search implementation logs before implementing new tasks. Complete logs prevent:
 - ❌ Creating duplicate API endpoints
 - ❌ Reimplementing existing components
 - ❌ Duplicating utility functions and business logic

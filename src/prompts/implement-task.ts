@@ -62,31 +62,37 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
    - Check _Requirements fields for which requirements this implements
 
 4. **Discover Existing Implementations (CRITICAL):**
-   - BEFORE writing any code, use get-implementation-logs tool to query existing artifacts
-   - REQUIRED: You MUST provide a filter (keyword, taskId, or artifactType) - never call without filters
-   - **Best practice: Call this tool 2-3 times with different single keywords to build comprehensive understanding**
-   - Iterative discovery pattern (recommended):
-     - First call - keyword: "api" - Discover API endpoints
-     - Second call - keyword: "component" - Find UI components
-     - Third call - keyword: "authentication" (or other relevant term) - Check integration patterns
-   - Single keyword examples:
-     - keyword: "api" - Find existing API endpoints
-     - keyword: "endpoint" - Alternative search for APIs
-     - keyword: "component" - Find UI components
-     - keyword: "TodoList" - Search for specific component
-     - keyword: "authentication" - Find integration patterns
-   - Multiple keywords (AND logic):
-     - keyword: "api endpoint" - Must match BOTH "api" AND "endpoint"
-   - Artifact type filters:
-     - artifactType: "apiEndpoints" - Get all API endpoints
-     - artifactType: "components" - Get all components
+   - BEFORE writing any code, search implementation logs to understand existing artifacts
+   - Implementation logs are stored as markdown files in: .spec-workflow/specs/${specName}/Implementation Logs/
+
+   **Option 1: Use grep/ripgrep for fast searches**
+   \`\`\`bash
+   # Search for API endpoints
+   grep -r "GET\|POST\|PUT\|DELETE" ".spec-workflow/specs/${specName}/Implementation Logs/"
+
+   # Search for specific components
+   grep -r "ComponentName" ".spec-workflow/specs/${specName}/Implementation Logs/"
+
+   # Search for integration patterns
+   grep -r "integration\|dataFlow" ".spec-workflow/specs/${specName}/Implementation Logs/"
+   \`\`\`
+
+   **Option 2: Read markdown files directly**
+   - Use the Read tool to examine implementation log files
+   - Search for relevant sections (## API Endpoints, ## Components, ## Functions, etc.)
+   - Review artifacts from related tasks to understand established patterns
+
+   **Discovery best practices:**
+   - First: Search for "API" or "endpoint" to find existing API patterns
+   - Second: Search for "component" or specific component names to see existing UI structures
+   - Third: Search for "integration" or "dataFlow" to understand how frontend/backend connect
    - Why this matters:
-     - ❌ Don't create duplicate API endpoints - query for existing endpoints with similar paths
-     - ❌ Don't reimplement components/functions - check if utilities already exist
-     - ❌ Don't ignore established patterns - understand how middleware/integrations were set up
+     - ❌ Don't create duplicate API endpoints - check for similar paths
+     - ❌ Don't reimplement components/functions - verify utilities already don't exist
+     - ❌ Don't ignore established patterns - understand middleware/integration setup
      - ✅ Reuse existing code - leverage already-implemented functions and components
      - ✅ Follow patterns - maintain consistency with established architecture
-   - If initial search doesn't return expected results, call again with a different keyword
+   - If initial search doesn't find expected results, refine your grep patterns
    - Document any existing related implementations before proceeding
    - If you find existing code that does what the task asks, leverage it instead of recreating
 
@@ -145,7 +151,8 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
 
 **Tools to Use:**
 - spec-status: Check overall progress
-- get-implementation-logs: CRITICAL - Query existing implementations before coding (step 4)
+- Bash (grep/ripgrep): CRITICAL - Search existing implementations before coding (step 4)
+- Read: Examine markdown implementation log files directly (step 4)
 - log-implementation: Record implementation details with artifacts after task completion (step 7)
 - Edit: Directly update task markers in tasks.md file
 - Read/Write/Edit: Implement the actual code changes
@@ -155,6 +162,7 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
 - All logged implementations appear in the "Logs" tab of the dashboard
 - Filter by spec, task ID, or search by summary
 - View detailed statistics including files changed and lines modified
+- Or search directly using grep on markdown files in .spec-workflow/specs/{specName}/Implementation Logs/
 
 Please proceed with implementing ${taskId ? `task ${taskId}` : 'the next task'} following this workflow.`
       }

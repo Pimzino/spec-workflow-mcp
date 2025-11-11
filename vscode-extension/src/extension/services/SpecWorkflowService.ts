@@ -709,14 +709,21 @@ export class SpecWorkflowService {
     }
 
     const tasksPath = path.join(this.specWorkflowRoot!, 'specs', specName, 'tasks.md');
-    
+
     try {
       const content = await fs.readFile(tasksPath, 'utf-8');
-      
+
       // Use unified parser's update function
       const updatedContent = updateTaskStatus(content, taskId, status as 'pending' | 'in-progress' | 'completed');
-      
+
+      // Check if content actually changed
+      if (updatedContent === content) {
+        this.logger.log(`Task ${taskId} status already ${status} or task not found in spec ${specName}`);
+        return; // No-op if status is already correct or task doesn't exist
+      }
+
       await fs.writeFile(tasksPath, updatedContent, 'utf-8');
+      this.logger.log(`Successfully updated task ${taskId} to ${status} in spec ${specName}`);
     } catch (error) {
       throw new Error(`Failed to update task status: ${error}`);
     }

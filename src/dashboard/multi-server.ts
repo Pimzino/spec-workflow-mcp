@@ -792,7 +792,7 @@ export class MultiProjectDashboardServer {
 
         // Validate artifacts are provided
         if (!logData.artifacts) {
-          return reply.code(400).send({ error: 'artifacts field is REQUIRED. See get-implementation-logs tool for guidance on artifact structure.' });
+          return reply.code(400).send({ error: 'artifacts field is REQUIRED. Include apiEndpoints, components, functions, classes, or integrations in the artifacts object.' });
         }
 
         const specPath = join(project.projectPath, '.spec-workflow', 'specs', name);
