@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNotifications } from './NotificationProvider';
+import { useNotifications, useNotificationState } from './NotificationProvider';
 import { useTranslation } from 'react-i18next';
 import styles from './VolumeControl.module.css';
 
 export function VolumeControl() {
-  const { soundEnabled, toggleSound, volume, setVolume } = useNotifications();
+  const { toggleSound, setVolume } = useNotifications();
+  const { soundEnabled, volume } = useNotificationState();
   const { t } = useTranslation();
   const [showSlider, setShowSlider] = useState(false);
   

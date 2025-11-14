@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useApi } from '../api/api';
+import { Howl } from 'howler';
 
 // Split into two contexts to prevent unnecessary re-renders
 // Actions context contains stable functions that don't change
@@ -21,20 +22,20 @@ const NotificationActionsContext = createContext<NotificationActionsContextType 
 const NotificationStateContext = createContext<NotificationStateContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
+  console.log('[NotificationProvider] ========== COMPONENT MOUNTED WITH DIAGNOSTIC CODE ==========');
   const { approvals, specs, getSpecTasksProgress } = useApi();
   const prevApprovalsRef = useRef<typeof approvals>([]);
   const prevTaskDataRef = useRef<Map<string, any>>(new Map());
   const isInitialLoadRef = useRef(true);
-  const audioContextRef = useRef<AudioContext | null>(null);
   const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'info' | 'success' | 'warning' | 'error'; timestamp: number }>>([]);
   const [soundEnabled, setSoundEnabled] = useState(() => {
-    // Load sound preference from sessionStorage (since ports are ephemeral)
-    const saved = sessionStorage.getItem('notification-sound-enabled');
+    // Load sound preference from localStorage
+    const saved = localStorage.getItem('notification-sound-enabled');
     return saved !== null ? JSON.parse(saved) : true;
   });
   const [volume, setVolumeState] = useState(() => {
-    // Load volume preference from sessionStorage, default to max volume (100%)
-    const saved = sessionStorage.getItem('notification-volume');
+    // Load volume preference from localStorage, default to max volume (100%)
+    const saved = localStorage.getItem('notification-volume');
     return saved !== null ? parseFloat(saved) : 1.0;
   });
 
@@ -42,7 +43,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const toggleSound = useCallback(() => {
     setSoundEnabled(prev => {
       const newValue = !prev;
-      sessionStorage.setItem('notification-sound-enabled', JSON.stringify(newValue));
+      localStorage.setItem('notification-sound-enabled', JSON.stringify(newValue));
       return newValue;
     });
   }, []);
@@ -51,47 +52,47 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const setVolume = useCallback((newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
     setVolumeState(clampedVolume);
-    sessionStorage.setItem('notification-volume', clampedVolume.toString());
+    localStorage.setItem('notification-volume', clampedVolume.toString());
   }, []);
 
-  // Play notification sound
-  const playNotificationSound = useCallback(async () => {
-    // Check if sound is enabled
+  // Play notification sound using Howler.js
+  const playNotificationSound = useCallback(() => {
+    console.log('[Audio] playNotificationSound called - soundEnabled:', soundEnabled, 'volume:', volume);
+
     if (!soundEnabled) {
+      console.log('[Audio] Sound is disabled, skipping playback');
       return;
     }
-    
+
     try {
-      // Create or resume AudioContext only when we actually need to play a sound
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      
-      // Resume if suspended (this is where user interaction is required)
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-      }
-      
-      // Only proceed if we have a running context
-      if (audioContextRef.current.state !== 'running') {
-        console.warn('AudioContext not ready for playing sound - user interaction may be required');
-        return;
-      }
-      
-      const oscillator = audioContextRef.current.createOscillator();
-      const gainNode = audioContextRef.current.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContextRef.current.destination);
-      
-      oscillator.frequency.setValueAtTime(800, audioContextRef.current.currentTime);
-      oscillator.frequency.setValueAtTime(600, audioContextRef.current.currentTime + 0.1);
-      
-      gainNode.gain.setValueAtTime(volume, audioContextRef.current.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContextRef.current.currentTime + 0.5);
-      
-      oscillator.start(audioContextRef.current.currentTime);
-      oscillator.stop(audioContextRef.current.currentTime + 0.5);
+      console.log('[Audio] Playing notification with Howler - volume:', volume);
+
+      // Create a simple notification beep programmatically
+      // Using a publicly available notification sound for reliable testing
+      // You can replace this with a local audio file later
+      const notificationSound = 'https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3';
+
+      const sound = new Howl({
+        src: [notificationSound],
+        volume: volume,  // Howler.js volume control - should work correctly!
+        html5: true, // Use HTML5 Audio (more reliable for simple sounds)
+        onend: function() {
+          sound.unload(); // Clean up after playing
+        },
+        onload: function() {
+          console.log('[Audio] Howler sound loaded successfully');
+        },
+        onloaderror: function(id, error) {
+          console.error('[Audio] Howler load error:', id, error);
+          // Fallback: try to play with Web Audio anyway
+        },
+        onplayerror: function(id, error) {
+          console.error('[Audio] Howler play error:', id, error);
+        }
+      });
+
+      sound.play();
+      console.log('[Audio] Howler sound playing - current volume:', sound.volume());
     } catch (error) {
       console.error('Could not play notification sound:', error);
     }
@@ -99,17 +100,22 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
 
   // Show toast notification
-  const showNotification = useCallback((message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
+  const showNotification = useCallback((message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info', playSound: boolean = true) => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
     const notification = { id, message, type, timestamp: Date.now() };
-    
+
     setNotifications(prev => [...prev, notification]);
-    
+
+    // Play notification sound (unless explicitly disabled)
+    if (playSound) {
+      playNotificationSound();
+    }
+
     // Auto-remove after 5 seconds
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id));
     }, 5000);
-  }, []);
+  }, [playNotificationSound]);
 
   // Remove notification manually
   const removeNotification = useCallback((id: string) => {
@@ -138,9 +144,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           
           console.log('[NotificationProvider] Task completion detected:', message);
           showNotification(message, 'success');
-          playNotificationSound();
         }
-        
+
         // Check for in-progress changes
         if (currentTaskData.inProgress !== prevTaskData.inProgress) {
           if (currentTaskData.inProgress && !prevTaskData.inProgress) {
@@ -148,11 +153,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             const taskId = currentTaskData.inProgress;
             const task = currentTaskData.taskList?.find((t: any) => t.id === taskId || t.number === taskId);
             const taskTitle = task?.title || task?.description || `Task ${taskId}`;
-            
+
             const message = `Task started: ${taskTitle} in ${specDisplayName}`;
             console.log('[NotificationProvider] Task in-progress detected:', message);
             showNotification(message, 'info');
-            playNotificationSound();
           }
         }
         
@@ -172,7 +176,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     } catch (error) {
       console.error('[NotificationProvider] Failed to handle task update:', error);
     }
-  }, [getSpecTasksProgress]);
+  }, [getSpecTasksProgress, showNotification]);
 
   // Detect new approvals
   useEffect(() => {
@@ -188,13 +192,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const newApprovals = approvals.filter(a => !prevIds.has(a.id));
     
     if (newApprovals.length > 0) {
-      // Play sound
+      // Play sound once for all new approvals
       playNotificationSound();
-      
-      // Show notifications for each new approval
+
+      // Show notifications for each new approval (without playing sound for each)
       newApprovals.forEach(approval => {
         const message = `New approval request: ${approval.title}`;
-        showNotification(message, 'info');
+        showNotification(message, 'info', false); // Pass false to skip sound for each toast
       });
     }
 

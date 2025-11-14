@@ -10,23 +10,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### BREAKING CHANGES
 - **Removed `get-implementation-logs` tool** - This tool is no longer available. AI agents should use native tools (grep/ripgrep) and Read to search implementation logs instead.
 
+### Fixed
+- **Volume Control Regression** (PR #141) - Fixed critical volume control regression from NotificationProvider context split through 6 progressive commits:
+  1. Fixed volume icon always showing as muted by updating VolumeControl component to use both `useNotifications()` (actions) and `useNotificationState()` (state)
+  2. Fixed stale closure bug where `handleTaskUpdate` callback had stale reference to `playNotificationSound`, and changed volume/sound settings storage from sessionStorage to localStorage for persistence
+  3. Made audio fade-out proportional to volume level instead of fixed value
+  4. Fixed Web Audio API gain timing issues with direct value assignment and linear ramping
+  5. **Replaced Web Audio API with Howler.js** - After 4 failed attempts to fix volume control with raw Web Audio API, switched to industry-standard Howler.js library (546k weekly downloads, MDN-recommended) for reliable, simple audio playback with real MP3 files
+  6. **Fixed sound not playing at all** - Integrated `playNotificationSound()` into `showNotification()` function so all notifications (task completion, status changes, approvals) automatically play sound at user-configured volume level
+- **Dashboard Task Status Refresh** (PR #140) - Fixed critical "page reload" issue when updating task status:
+  - Removed redundant `reloadAll()` call causing unnecessary full page refreshes
+  - **Split ApiProvider context** into ApiDataContext (data) and ApiActionsContext (stable functions) to prevent unnecessary re-renders when data updates
+  - Added deep equality checks in websocket handlers before updating state
+  - Improved task list comparison from index-based to Map-based for robustness
+  - Result: Task status updates are now smooth and instant without scroll position loss or page disruption
+- **Docker Implementation** (PR #135) - Fixed Docker build failure and updated configuration:
+  - Removed invalid `COPY --from=builder /app/src/locales` command (locales are bundled in dashboard build)
+  - Updated Dockerfile to build from local source instead of git clone
+  - Fixed docker-compose.yml build context and port mappings (3000 → 5000)
+  - Added comprehensive documentation in `containers/README.md` and `containers/DOCKER_USAGE.md`
+  - Added `.dockerignore`, `containers/.env.example`, and updated `containers/example.mcp.json`
+
 ### Changed
-- **Implementation Logs Format Migration** - Logs are now stored as individual markdown files instead of a single JSON file for improved scalability and direct agent accessibility.
+- **Implementation Logs Format Migration** (PRs #136, #137, #138) - Logs are now stored as individual markdown files instead of a single JSON file for improved scalability and direct agent accessibility.
   - Old format: `.spec-workflow/specs/{spec-name}/implementation-log.json`
   - New format: `.spec-workflow/specs/{spec-name}/Implementation Logs/*.md`
 - Implementation logs are automatically migrated from JSON to markdown format on server startup.
 - Updated all documentation and prompts to guide agents to use grep/ripgrep commands to search implementation logs.
 - Updated VSCode extension file watcher to monitor markdown files in Implementation Logs directories.
 - Updated dashboard and multi-server API endpoints to work with the new markdown format.
+- Added validation for taskId and idValue in markdown log parser to match VSCode extension behavior.
 
 ### Added
 - **Automatic Migration System** - New `ImplementationLogMigrator` utility class handles automatic conversion of existing JSON logs to markdown format.
 - **Migration Logging** - Migration process is logged to `~/.spec-workflow-mcp/migration.log` for debugging and transparency.
+- **Howler.js Audio Library** - Added howler@2.2.4 dependency for reliable, cross-browser notification sounds with proper volume control.
 
 ### Improved
 - **Agent Discovery** - AI agents can now directly grep implementation logs without special tool calls, making discovery faster and more intuitive.
 - **Log Readability** - Markdown format is more human-readable and can be directly edited if needed.
 - **Scalability** - Individual markdown files prevent performance degradation when dealing with thousands of implementation logs.
+- **Dashboard Performance** - Context splitting and deep equality checks prevent unnecessary re-renders, making the dashboard significantly more responsive.
+- **Audio Quality** - Notification sounds now use real MP3 files (via Howler.js) instead of synthetic oscillator beeps for better user experience.
 
 ## [2.0.6] - 2025-11-08
 
