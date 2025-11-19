@@ -140,6 +140,12 @@ export class ApprovalStorage extends EventEmitter {
     this.watcher.on('add', () => this.emit('approval-change'));
     this.watcher.on('change', () => this.emit('approval-change'));
     this.watcher.on('unlink', () => this.emit('approval-change'));
+    
+    // Add error handler to prevent watcher crashes
+    this.watcher.on('error', (error) => {
+      console.error('Approval watcher error:', error);
+      // Don't propagate error to prevent system crash
+    });
   }
 
   async stop(): Promise<void> {

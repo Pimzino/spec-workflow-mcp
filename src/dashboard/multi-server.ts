@@ -214,16 +214,21 @@ export class MultiProjectDashboardServer {
 
     // Broadcast spec changes
     this.projectManager.on('spec-change', async (event) => {
-      const { projectId, ...data } = event;
-      const project = this.projectManager.getProject(projectId);
-      if (project) {
-        const specs = await project.parser.getAllSpecs();
-        const archivedSpecs = await project.parser.getAllArchivedSpecs();
-        this.broadcastToProject(projectId, {
-          type: 'spec-update',
-          projectId,
-          data: { specs, archivedSpecs }
-        });
+      try {
+        const { projectId, ...data } = event;
+        const project = this.projectManager.getProject(projectId);
+        if (project) {
+          const specs = await project.parser.getAllSpecs();
+          const archivedSpecs = await project.parser.getAllArchivedSpecs();
+          this.broadcastToProject(projectId, {
+            type: 'spec-update',
+            projectId,
+            data: { specs, archivedSpecs }
+          });
+        }
+      } catch (error) {
+        console.error('Error broadcasting spec changes:', error);
+        // Don't propagate error to prevent event system crash
       }
     });
 
@@ -235,25 +240,35 @@ export class MultiProjectDashboardServer {
 
     // Broadcast steering changes
     this.projectManager.on('steering-change', async (event) => {
-      const { projectId, steeringStatus } = event;
-      this.broadcastToProject(projectId, {
-        type: 'steering-update',
-        projectId,
-        data: steeringStatus
-      });
+      try {
+        const { projectId, steeringStatus } = event;
+        this.broadcastToProject(projectId, {
+          type: 'steering-update',
+          projectId,
+          data: steeringStatus
+        });
+      } catch (error) {
+        console.error('Error broadcasting steering changes:', error);
+        // Don't propagate error to prevent event system crash
+      }
     });
 
     // Broadcast approval changes
     this.projectManager.on('approval-change', async (event) => {
-      const { projectId } = event;
-      const project = this.projectManager.getProject(projectId);
-      if (project) {
-        const approvals = await project.approvalStorage.getAllPendingApprovals();
-        this.broadcastToProject(projectId, {
-          type: 'approval-update',
-          projectId,
-          data: approvals
-        });
+      try {
+        const { projectId } = event;
+        const project = this.projectManager.getProject(projectId);
+        if (project) {
+          const approvals = await project.approvalStorage.getAllPendingApprovals();
+          this.broadcastToProject(projectId, {
+            type: 'approval-update',
+            projectId,
+            data: approvals
+          });
+        }
+      } catch (error) {
+        console.error('Error broadcasting approval changes:', error);
+        // Don't propagate error to prevent event system crash
       }
     });
   }
