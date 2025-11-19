@@ -25,13 +25,10 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Load Secrets
-        uses: 1password/load-secrets-action@581a835fb51b8e7ec56b71cf2ffddd7e68bb25e0
-        with:
-          export-env: true
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          NPM_TOKEN: op://npm-deploy/npm-runner-token/secret
+      - uses: bullfrogsec/bullfrog@dcde5841b19b7ef693224207a7fdec67fce604db # v0.8.3
+
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Checkout repository
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
@@ -112,10 +109,9 @@ jobs:
       - name: Publish affected packages to NPM
         if: github.event_name == 'push'
         run: |
+          
           echo "Publishing affected packages with tag: ${{ steps.version_update.outputs.new_version }} to NPM"
           npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
 
       - name: Commit and push version changes
         if: steps.version_update.outputs.version_changed == 'true' && github.event_name != 'release'
