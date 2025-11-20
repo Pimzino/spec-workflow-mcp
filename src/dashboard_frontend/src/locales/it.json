@@ -7,7 +7,9 @@
     "steering": "Direzione",
     "specs": "Spec",
     "tasks": "Task",
-    "approvals": "Approvazioni"
+    "approvals": "Approvazioni",
+    "settings": "Impostazioni",
+    "logs": "Log di Implementazione"
   },
   "connectionStatus": {
     "connected": "Connesso",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "Aggiungi almeno un commento prima di richiedere revisioni."
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "Log di Implementazione"
+    },
+    "search": {
+      "placeholder": "Cerca log..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "Seleziona Specifica",
+      "searchPlaceholder": "Cerca specifiche...",
+      "noSpecsFound": "Nessuna specifica trovata"
+    },
+    "filter": {
+      "label": "Filtra per Attività",
+      "all": "Tutto",
+      "taskPrefix": "Attività"
+    },
+    "sort": {
+      "timestamp": "Data/Ora",
+      "timestampDesc": "Ordina per timestamp del log",
+      "taskId": "ID Attività",
+      "taskIdDesc": "Ordina per identificativo dell'attività",
+      "linesAdded": "Righe Aggiunte",
+      "linesAddedDesc": "Ordina per righe di codice aggiunte",
+      "filesChanged": "File Modificati",
+      "filesChangedDesc": "Ordina per numero di file modificati"
+    },
+    "stats": {
+      "title": "Statistiche Codice",
+      "linesAdded": "Righe Aggiunte",
+      "linesRemoved": "Righe Rimosse",
+      "filesChanged": "File Modificati",
+      "netChange": "Cambio Netto",
+      "totalEntries": "Totale Voci"
+    },
+    "files": {
+      "modified": "File Modificati",
+      "created": "File Creati"
+    },
+    "artifacts": {
+      "title": "Artefatti",
+      "apiEndpoints": "Endpoint API",
+      "components": "Componenti",
+      "functions": "Funzioni",
+      "classes": "Classi",
+      "integrations": "Integrazioni",
+      "details": {
+        "request": "Richiesta:",
+        "response": "Risposta:",
+        "props": "Props:",
+        "exports": "Esportazioni:",
+        "exported": "Esportato",
+        "private": "Privato",
+        "methods": "Metodi:",
+        "component": "Componente:",
+        "endpoint": "Endpoint:",
+        "flow": "Flusso:"
+      }
+    },
+    "empty": {
+      "selectSpec": "Seleziona una specifica per visualizzare i log di implementazione",
+      "noResults": "Nessun log corrisponde ai tuoi filtri di ricerca",
+      "noLogs": "Nessun log di implementazione ancora per questa specifica"
+    },
+    "loading": "Caricamento log...",
+    "taskBadge": "Attività"
+  },
   "volumeControl": {
     "mute": "Mute notifications",
     "enable": "Enable notification sounds",
     "volumeLevel": "Volume: {{percentage}}%"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "section": {
+      "automatedCleanup": "Pulizia Automatizzata",
+      "automatedCleanupDesc": "Elimina automaticamente i vecchi record di approvazione, le specifiche e le specifiche archiviate secondo una pianificazione. Configura i lavori di pulizia per essere eseguiti ricorrentemente su tutti i progetti connessi."
+    },
+    "description": "Gestire i lavori di pulizia automatizzati su tutti i progetti collegati",
+    "addJob": "Aggiungi lavoro",
+    "loading": "Caricamento dei lavori...",
+    "noJobs": "Nessun lavoro di automazione",
+    "noJobsDesc": "Crea il tuo primo lavoro di automazione per iniziare",
+    "createFirst": "Crea primo lavoro",
+    "addNewJob": "Aggiungi nuovo lavoro",
+    "editJob": "Modifica lavoro",
+    "deleteJob": "Elimina lavoro",
+    "deleteConfirm": "Sei sicuro di voler eliminare questo lavoro di automazione? Questa azione non può essere annullata.",
+    "lastRun": "Ultima esecuzione",
+    "schedule": "Pianificazione",
+    "runNow": "Esegui ora",
+    "running": "In esecuzione...",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "jobDescription": "Elimina i record più vecchi di {{days}} giorni secondo la pianificazione: {{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "Visualizza il registro delle modifiche",
+    "modal": {
+      "title": "Registro delle modifiche",
+      "version": "Versione",
+      "loading": "Caricamento del registro delle modifiche...",
+      "notFound": "Registro delle modifiche non trovato per questa versione"
+    }
   }
 }

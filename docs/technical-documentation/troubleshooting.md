@@ -80,12 +80,6 @@ npx -y @pimzino/spec-workflow-mcp@latest --help
    npx -y @pimzino/spec-workflow-mcp@latest --dashboard --port 8080
    ```
 
-4. **Session File Issues**
-   ```bash
-   # Remove stale session
-   rm -f .spec-workflow/session.json
-   ```
-
 ---
 
 ### Approval System Not Working  
@@ -278,17 +272,6 @@ lsof -ti:3456 | xargs kill -9
 
 # Or use different port
 --port 8080
-```
-
-### `Session file corrupted`
-
-**Meaning**: Invalid JSON in session.json
-
-**Solution**:
-```bash
-# Remove and recreate
-rm .spec-workflow/session.json
-# Restart MCP server
 ```
 
 ## ❓ Frequently Asked Questions
@@ -489,7 +472,6 @@ echo -e "\n=== End Diagnostics ==="
 ```bash
 # Collect all relevant logs
 mkdir -p debug-logs
-cp .spec-workflow/session.json debug-logs/ 2>/dev/null
 find .spec-workflow/approvals -name "*.json" -exec cp {} debug-logs/ \; 2>/dev/null
 echo "Logs collected in debug-logs/"
 ```

@@ -39,6 +39,12 @@ export class SpecWatcher extends EventEmitter {
     this.watcher.on('add', (filePath) => this.handleFileChange('created', filePath));
     this.watcher.on('change', (filePath) => this.handleFileChange('updated', filePath));
     this.watcher.on('unlink', (filePath) => this.handleFileChange('deleted', filePath));
+    
+    // Add error handler to prevent watcher crashes
+    this.watcher.on('error', (error) => {
+      console.error('File watcher error:', error);
+      // Don't propagate error to prevent system crash
+    });
 
     // File watcher started for workflow directories
   }
@@ -72,7 +78,8 @@ export class SpecWatcher extends EventEmitter {
         await this.handleSteeringChange(action, normalizedPath);
       }
     } catch (error) {
-      // Error handling file change
+      console.error(`Error handling file change for ${filePath}:`, error);
+      // Don't propagate error to prevent watcher crash
     }
   }
 

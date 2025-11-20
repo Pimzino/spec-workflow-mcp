@@ -8,7 +8,8 @@
     "steering": "ステアリングドキュメント",
     "specs": "仕様書ドキュメント",
     "tasks": "タスク管理",
-    "approvals": "承認リクエスト"
+    "approvals": "承認リクエスト",
+    "logs": "実装ログ"
   },
   "overview": {
     "projectTitle": "プロジェクト概要",
@@ -103,6 +104,53 @@
     "noDocs": "ステアリングドキュメントが見つかりません",
     "copyInstructions": "手順をコピー",
     "copied": "コピーしました！"
+  },
+  "logs": {
+    "title": "実装ログ",
+    "subtitle": "すべての実装変更とアーティファクトを追跡",
+    "selectSpec": "仕様を選択...",
+    "searchPlaceholder": "ログを検索...",
+    "loading": "ログを読み込み中...",
+    "selectSpecMessage": "実装ログを表示する仕様を選択してください",
+    "noSearchResults": "検索に一致するログがありません",
+    "noLogs": "この仕様の実装ログが見つかりません",
+    "sort": {
+      "timestamp": "タイムスタンプ",
+      "taskId": "タスクID",
+      "linesAdded": "追加行数",
+      "filesChanged": "変更ファイル数"
+    },
+    "stats": {
+      "totalEntries": "総エントリ数",
+      "linesAdded": "追加行数",
+      "linesRemoved": "削除行数",
+      "filesChanged": "変更ファイル数"
+    },
+    "entry": {
+      "added": "追加",
+      "removed": "削除",
+      "filesChanged": "変更ファイル数",
+      "netChange": "正味変更",
+      "filesModified": "変更されたファイル",
+      "filesCreated": "作成されたファイル"
+    },
+    "artifacts": {
+      "apiEndpoints": "APIエンドポイント",
+      "components": "コンポーネント",
+      "functions": "関数",
+      "classes": "クラス",
+      "integrations": "統合",
+      "request": "リクエスト:",
+      "response": "レスポンス:",
+      "props": "プロパティ:",
+      "exports": "エクスポート:",
+      "signature": "シグネチャ:",
+      "methods": "メソッド:",
+      "frontend": "フロントエンド:",
+      "backend": "バックエンド:",
+      "dataFlow": "データフロー:",
+      "exported": "(エクスポート済み)"
+    }
   },
   "common": {
     "scrollToTop": "一番上までスクロール"

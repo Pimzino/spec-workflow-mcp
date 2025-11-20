@@ -207,7 +207,6 @@ interface ContextCache {
   templates: Map<string, TemplateData>;     // Permanent cache
   specs: LRUCache<string, SpecContext>;     // 50 entries max
   steering: Map<string, SteeringContext>;   // Per-project cache
-  sessions: Map<string, SessionData>;       // Active sessions
 }
 ```
 
@@ -257,8 +256,8 @@ class FileWatcher {
 
 **Watched Paths**:
 - `.spec-workflow/specs/**/*.md` - Specification documents
-- `.spec-workflow/steering/*.md` - Steering documents  
-- `.spec-workflow/session.json` - Session tracking
+- `.spec-workflow/steering/*.md` - Steering documents
+- `.spec-workflow/approvals/**/*.json` - Approval records
 
 ### Context Loading Pipeline
 

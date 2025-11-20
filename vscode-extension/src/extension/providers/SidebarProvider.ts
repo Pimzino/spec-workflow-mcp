@@ -44,6 +44,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     this._specWorkflowService.setOnSpecsChanged(() => {
       this.sendSpecs();
     });
+
+    // Set up automatic logs updates when files change
+    this._specWorkflowService.setOnLogsChanged((specName: string) => {
+      this.sendLogsForSpec(specName);
+    });
   }
 
   public resolveWebviewView(
@@ -144,6 +149,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         case 'set-language-preference':
           await this.setLanguagePreference(message.language);
+          break;
+        case 'get-logs':
+          await this.sendLogs(message.specName);
+          break;
+        case 'search-logs':
+          await this.searchLogs(message.specName, message.query);
           break;
       }
     });
@@ -401,11 +412,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private async updateTaskStatus(specName: string, taskId: string, status: string) {
     try {
+      console.log(`updateTaskStatus: Updating task ${taskId} to ${status} in spec ${specName}`);
       await this._specWorkflowService.updateTaskStatus(specName, taskId, status);
-      // Refresh task data
-      await this.sendTasks(specName);
+      console.log(`updateTaskStatus: Successfully updated task ${taskId}. File watcher will trigger automatic refresh.`);
+      // File watcher will automatically trigger sendTasksForSpec() - no need to manually refresh
       this.sendNotification('Task status updated', 'success');
     } catch (error) {
+      console.error(`updateTaskStatus: Failed to update task ${taskId}:`, error);
       this.sendError('Failed to update task status: ' + (error as Error).message);
     }
   }
@@ -510,6 +523,79 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       });
     } catch (error) {
       this.sendError('Failed to load steering documents: ' + (error as Error).message);
+    }
+  }
+
+  private async sendLogs(specName: string) {
+    if (!this._view) {return;}
+
+    try {
+      this.logger.log(`SidebarProvider: Getting logs for spec: ${specName}`);
+      const logsData = await this._specWorkflowService.getImplementationLogs(specName);
+      this.logger.log('SidebarProvider: Logs data received from service:', {
+        specName: logsData?.specName,
+        entriesCount: logsData?.entries?.length,
+        stats: logsData?.stats
+      });
+
+      this._view.webview.postMessage({
+        type: 'logs-updated',
+        data: logsData
+      });
+      this.logger.log('SidebarProvider: Sent logs-updated message to webview');
+    } catch (error) {
+      console.error('SidebarProvider: Failed to load logs:', error);
+      this.sendError('Failed to load logs: ' + (error as Error).message);
+    }
+  }
+
+  private async sendLogsForSpec(specName: string) {
+    // Send logs update for a specific spec in real-time
+    // Only send if this spec is currently selected to avoid unnecessary updates
+    console.log(`sendLogsForSpec: Called for spec ${specName}, currentSelected: ${this._currentSelectedSpec}`);
+    if (!this._view || this._currentSelectedSpec !== specName) {
+      console.log(`sendLogsForSpec: Skipping - no view or spec not selected`);
+      return;
+    }
+
+    try {
+      const logsData = await this._specWorkflowService.getImplementationLogs(specName);
+      console.log(`sendLogsForSpec: Logs data received from service:`, {
+        specName: logsData?.specName,
+        entriesCount: logsData?.entries?.length,
+        stats: logsData?.stats
+      });
+
+      this._view.webview.postMessage({
+        type: 'logs-updated',
+        data: logsData
+      });
+      console.log(`sendLogsForSpec: Sent real-time log update for spec: ${specName}`);
+    } catch (error) {
+      console.error(`Failed to send real-time log update for spec ${specName}:`, error);
+      // Don't show error notification for real-time updates to avoid spam
+    }
+  }
+
+  private async searchLogs(specName: string, query: string) {
+    if (!this._view) {return;}
+
+    try {
+      this.logger.log(`SidebarProvider: Searching logs for spec: ${specName} with query: ${query}`);
+      const entries = await this._specWorkflowService.searchImplementationLogs(specName, query);
+      this.logger.log(`SidebarProvider: Search returned ${entries.length} results`);
+
+      this._view.webview.postMessage({
+        type: 'logs-search-results',
+        data: {
+          specName,
+          entries,
+          query
+        }
+      });
+    } catch (error) {
+      console.error('SidebarProvider: Failed to search logs:', error);
+      this.sendError('Failed to search logs: ' + (error as Error).message);
     }
   }
 

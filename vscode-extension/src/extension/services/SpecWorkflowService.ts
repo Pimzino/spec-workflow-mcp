@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { SpecData, TaskProgressData, TaskInfo, ApprovalData, SteeringStatus, PhaseStatus } from '../types';
+import { SpecData, TaskProgressData, TaskInfo, ApprovalData, SteeringStatus, PhaseStatus, LogsData, ImplementationLogEntry } from '../types';
 import { ApprovalEditorService } from './ApprovalEditorService';
 import { ArchiveService } from './ArchiveService';
+import { ImplementationLogService } from './ImplementationLogService';
 import { parseTasksFromMarkdown, updateTaskStatus } from '../utils/taskParser';
 import { Logger } from '../utils/logger';
 
@@ -23,13 +24,16 @@ export class SpecWorkflowService {
   private onSpecDocumentsChangedCallback: ((specName: string) => void) | null = null;
   private onSteeringDocumentsChangedCallback: (() => void) | null = null;
   private onSpecsChangedCallback: (() => void) | null = null;
+  private onLogsChangedCallback: ((specName: string) => void) | null = null;
   private approvalEditorService: ApprovalEditorService | null = null;
   private archiveService: ArchiveService;
+  private implementationLogService: ImplementationLogService;
   private logger: Logger;
 
   constructor(outputChannel: vscode.OutputChannel) {
     this.logger = new Logger(outputChannel);
     this.archiveService = new ArchiveService(this.logger);
+    this.implementationLogService = new ImplementationLogService(outputChannel);
     this.updateWorkspaceRoot();
 
     // Note: ApprovalEditorService will be initialized in extension.ts to avoid circular dependency
@@ -55,6 +59,13 @@ export class SpecWorkflowService {
     this.setupSteeringDocumentsWatcher();
     this.setupSpecsWatcher();
     this.setupArchiveWatcher();
+
+    // Setup logs change callback
+    this.implementationLogService.setOnLogsChanged((specName: string) => {
+      if (this.onLogsChangedCallback) {
+        this.onLogsChangedCallback(specName);
+      }
+    });
   }
 
   setOnApprovalsChanged(callback: () => void) {
@@ -75,6 +86,10 @@ export class SpecWorkflowService {
 
   setOnSpecsChanged(callback: () => void) {
     this.onSpecsChangedCallback = callback;
+  }
+
+  setOnLogsChanged(callback: (specName: string) => void) {
+    this.onLogsChangedCallback = callback;
   }
 
   setApprovalEditorService(approvalEditorService: ApprovalEditorService) {
@@ -419,6 +434,9 @@ export class SpecWorkflowService {
     if (this.archiveWatcher) {
       this.archiveWatcher.dispose();
     }
+    if (this.implementationLogService) {
+      this.implementationLogService.dispose();
+    }
   }
 
   private updateWorkspaceRoot() {
@@ -691,14 +709,21 @@ export class SpecWorkflowService {
     }
 
     const tasksPath = path.join(this.specWorkflowRoot!, 'specs', specName, 'tasks.md');
-    
+
     try {
       const content = await fs.readFile(tasksPath, 'utf-8');
-      
+
       // Use unified parser's update function
       const updatedContent = updateTaskStatus(content, taskId, status as 'pending' | 'in-progress' | 'completed');
-      
+
+      // Check if content actually changed
+      if (updatedContent === content) {
+        this.logger.log(`Task ${taskId} status already ${status} or task not found in spec ${specName}`);
+        return; // No-op if status is already correct or task doesn't exist
+      }
+
       await fs.writeFile(tasksPath, updatedContent, 'utf-8');
+      this.logger.log(`Successfully updated task ${taskId} to ${status} in spec ${specName}`);
     } catch (error) {
       throw new Error(`Failed to update task status: ${error}`);
     }
@@ -1387,6 +1412,37 @@ export class SpecWorkflowService {
    */
   async getSpecLocation(specName: string): Promise<'active' | 'archived' | 'not-found'> {
     return this.archiveService.getSpecLocation(specName);
+  }
+
+  /**
+   * Get implementation logs for a spec
+   */
+  async getImplementationLogs(specName: string): Promise<LogsData | null> {
+    try {
+      const entries = await this.implementationLogService.getLogs(specName);
+      const stats = await this.implementationLogService.getLogsStats(specName);
+
+      return {
+        specName,
+        entries,
+        stats
+      };
+    } catch (error) {
+      this.logger.error(`Error loading logs for spec ${specName}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Search implementation logs for a spec
+   */
+  async searchImplementationLogs(specName: string, query: string): Promise<ImplementationLogEntry[]> {
+    try {
+      return await this.implementationLogService.searchLogs(specName, query);
+    } catch (error) {
+      this.logger.error(`Error searching logs for spec ${specName}:`, error);
+      return [];
+    }
   }
 
 }

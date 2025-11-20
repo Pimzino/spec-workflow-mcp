@@ -1,0 +1,49 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Build artifacts
+dist
+.next
+out
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Testing
+coverage
+.nyc_output
+
+# Documentation (not needed in container)
+docs
+*.md
+!containers/README.md
+
+# CI/CD
+.github
+
+# Environment files
+.env
+.env.*
+
+# VSCode extension
+vscode-extension
+
+# Temporary files
+tmp
+temp
+*.tmp
+.spec-workflow

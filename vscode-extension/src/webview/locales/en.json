@@ -8,7 +8,8 @@
     "steering": "Steering Documents",
     "specs": "Specification Documents",
     "tasks": "Task Management",
-    "approvals": "Approval Requests"
+    "approvals": "Approval Requests",
+    "logs": "Implementation Logs"
   },
   "overview": {
     "projectTitle": "Project Overview",
@@ -103,6 +104,53 @@
     "noDocs": "No steering documents found",
     "copyInstructions": "Copy Instructions",
     "copied": "Copied!"
+  },
+  "logs": {
+    "title": "Implementation Logs",
+    "subtitle": "Track all implementation changes and artifacts",
+    "selectSpec": "Select a spec...",
+    "searchPlaceholder": "Search logs...",
+    "loading": "Loading logs...",
+    "selectSpecMessage": "Select a spec to view implementation logs",
+    "noSearchResults": "No logs match your search",
+    "noLogs": "No implementation logs found for this spec",
+    "sort": {
+      "timestamp": "Timestamp",
+      "taskId": "Task ID",
+      "linesAdded": "Lines Added",
+      "filesChanged": "Files Changed"
+    },
+    "stats": {
+      "totalEntries": "Total Entries",
+      "linesAdded": "Lines Added",
+      "linesRemoved": "Lines Removed",
+      "filesChanged": "Files Changed"
+    },
+    "entry": {
+      "added": "Added",
+      "removed": "Removed",
+      "filesChanged": "Files Changed",
+      "netChange": "Net Change",
+      "filesModified": "Files Modified",
+      "filesCreated": "Files Created"
+    },
+    "artifacts": {
+      "apiEndpoints": "API Endpoints",
+      "components": "Components",
+      "functions": "Functions",
+      "classes": "Classes",
+      "integrations": "Integrations",
+      "request": "Request:",
+      "response": "Response:",
+      "props": "Props:",
+      "exports": "Exports:",
+      "signature": "Signature:",
+      "methods": "Methods:",
+      "frontend": "Frontend:",
+      "backend": "Backend:",
+      "dataFlow": "Data Flow:",
+      "exported": "(exported)"
+    }
   },
   "common": {
     "scrollToTop": "Scroll to top"

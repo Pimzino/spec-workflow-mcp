@@ -127,7 +127,9 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
           let j = lineIdx + 1;
           while (j < endLine) {
             const nextTrim = lines[j].trim();
-            if (!nextTrim) break; // stop at blank line
+            if (!nextTrim) {
+              break; // stop at blank line
+            }
             // Stop if we hit another bullet/metadata marker or files/purpose sections
             if (
               /^-\s/.test(nextTrim) ||
@@ -248,21 +250,23 @@ export function updateTaskStatus(
   // Find and update the task line
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    
+
     // Match checkbox line with task ID in the description
     // Pattern: - [x] 1.1 Task description
-    const checkboxMatch = line.match(/^(\s*-\s+\[)([ x\-])(\]\s+)(.+)$/);
-    
+    const checkboxMatch = line.match(/^(\s*)-\s+\[([ x\-])\]\s+(.+)/);
+
     if (checkboxMatch) {
-      const taskText = checkboxMatch[4];
-      
+      const taskText = checkboxMatch[3];
+
       // Check if this line contains our target task ID
       // Match patterns like "1. Description", "1.1 Description", "2.1. Description" etc
       const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\.?\s+(.+)/);
-      
+
       if (taskMatch && taskMatch[1] === taskId) {
         // Reconstruct the line with new status
-        lines[i] = checkboxMatch[1] + statusMarker + checkboxMatch[3] + taskText;
+        const prefix = checkboxMatch[1];
+        const statusPart = `- [${statusMarker}] `;
+        lines[i] = prefix + statusPart + taskText;
         return lines.join('\n');
       }
     }

@@ -1,31 +1,33 @@
 import { promises as fs } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { homedir } from 'os';
 import { PathUtils } from './path-utils.js';
+import { ImplementationLogMigrator } from './implementation-log-migrator.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class WorkspaceInitializer {
   private projectPath: string;
   private version: string;
-  
+
   constructor(projectPath: string, version: string) {
     this.projectPath = projectPath;
     this.version = version;
   }
-  
+
   async initializeWorkspace(): Promise<void> {
     // Create all necessary directories
     await this.initializeDirectories();
-    
+
     // Copy template files
     await this.initializeTemplates();
-    
-    // Create config example
-    await this.createConfigExample();
-    
+
     // Create user templates README
     await this.createUserTemplatesReadme();
+
+    // Migrate implementation logs from JSON to Markdown format
+    await this.migrateImplementationLogs();
   }
   
   private async initializeDirectories(): Promise<void> {
@@ -81,94 +83,9 @@ export class WorkspaceInitializer {
     }
   }
   
-  private async createConfigExample(): Promise<void> {
-    const configPath = join(PathUtils.getWorkflowRoot(this.projectPath), 'config.example.toml');
-    
-    const configContent = `# Spec Workflow MCP Server Configuration File
-# ============================================
-#
-# This is an example configuration file for the Spec Workflow MCP Server.
-# Copy this file to 'config.toml' in the same directory to use it.
-#
-# Configuration Precedence:
-# 1. Command-line arguments (highest priority)
-# 2. Config file settings
-# 3. Built-in defaults (lowest priority)
-#
-# All settings are optional. Uncomment and modify as needed.
-# Please note that not all MCP clients will support loading this config file due to the nature of where they are running from.
-
-# Project directory path
-# The root directory of your project where spec files are located.
-# Note: You may have to use double slashes (\\\\) instead of single slashes (/) on Windows or for certain clients.
-# Supports tilde (~) expansion for home directory.
-# Default: current working directory
-# projectDir = "."
-# projectDir = "~/my-project"
-# projectDir = "/absolute/path/to/project"
-
-# Dashboard port
-# The port number for the web dashboard.
-# Must be between 1024 and 65535.
-# Default: ephemeral port (automatically assigned)
-# port = 3000
-
-# Auto-start dashboard
-# Automatically launch the dashboard when the MCP server starts.
-# The dashboard will open in your default browser.
-# Default: false
-# autoStartDashboard = false
-
-# Dashboard-only mode
-# Run only the web dashboard without the MCP server.
-# Useful for standalone dashboard usage.
-# Default: false
-# dashboardOnly = false
-
-# Language
-# Set the interface language for internationalization (i18n).
-# Available languages depend on your installation.
-# Common values: "en" (English), "ja" (Japanese), etc.
-# Default: system language or "en"
-# lang = "en"
-
-# Example configurations:
-# =====================
-
-# Example 1: Development setup with auto-started dashboard
-# ----------------------------------------------------------
-# projectDir = "~/dev/my-project"
-# autoStartDashboard = true
-# port = 3456
-
-# Example 2: Production MCP server without dashboard
-# ---------------------------------------------------
-# projectDir = "/var/projects/production"
-# autoStartDashboard = false
-
-# Example 3: Dashboard-only mode for viewing specs
-# -------------------------------------------------
-# projectDir = "."
-# dashboardOnly = true
-# port = 8080
-
-# Example 4: Japanese language interface
-# ---------------------------------------
-# lang = "ja"
-# autoStartDashboard = true`;
-    
-    try {
-      // Only create if it doesn't exist to avoid overwriting user's example
-      await fs.access(configPath);
-    } catch {
-      // File doesn't exist, create it
-      await fs.writeFile(configPath, configContent, 'utf-8');
-    }
-  }
-  
   private async createUserTemplatesReadme(): Promise<void> {
     const readmePath = join(PathUtils.getWorkflowRoot(this.projectPath), 'user-templates', 'README.md');
-    
+
     const readmeContent = `# User Templates
 
 This directory allows you to create custom templates that override the default Spec Workflow templates.
@@ -177,7 +94,7 @@ This directory allows you to create custom templates that override the default S
 
 1. **Create your custom template file** in this directory with the exact same name as the default template you want to override:
    - \`requirements-template.md\` - Override requirements document template
-   - \`design-template.md\` - Override design document template  
+   - \`design-template.md\` - Override design document template
    - \`tasks-template.md\` - Override tasks document template
    - \`product-template.md\` - Override product steering template
    - \`tech-template.md\` - Override tech steering template
@@ -234,13 +151,34 @@ Templates can include placeholders that will be replaced when documents are crea
 - Your custom templates in this directory are preserved during updates
 - If a custom template has errors, the system will fall back to the default template
 `;
-    
+
     try {
       // Only create if it doesn't exist to avoid overwriting user's README
       await fs.access(readmePath);
     } catch {
       // File doesn't exist, create it
       await fs.writeFile(readmePath, readmeContent, 'utf-8');
+    }
+  }
+
+  /**
+   * Migrate implementation logs from JSON to Markdown format
+   * Runs on server startup to handle automatic migration for existing specs
+   */
+  private async migrateImplementationLogs(): Promise<void> {
+    try {
+      const userDataDir = resolve(homedir(), '.spec-workflow-mcp');
+      const specsDir = join(PathUtils.getWorkflowRoot(this.projectPath), 'specs');
+
+      // Create user data directory if it doesn't exist
+      await fs.mkdir(userDataDir, { recursive: true });
+
+      const migrator = new ImplementationLogMigrator(userDataDir);
+      await migrator.migrateAllSpecs(specsDir);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`Implementation log migration failed: ${errorMessage}`);
+      // Don't throw - migration failure shouldn't break server startup
     }
   }
 }

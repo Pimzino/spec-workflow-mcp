@@ -8,7 +8,8 @@
     "steering": "指导文档",
     "specs": "规范文档",
     "tasks": "任务管理",
-    "approvals": "审批请求"
+    "approvals": "审批请求",
+    "logs": "实现日志"
   },
   "overview": {
     "projectTitle": "项目概览",
@@ -98,6 +99,53 @@
     "noDocs": "未找到指导文档",
     "copyInstructions": "复制说明",
     "copied": "已复制！"
+  },
+  "logs": {
+    "title": "实现日志",
+    "subtitle": "跟踪所有实现更改和工件",
+    "selectSpec": "选择规范...",
+    "searchPlaceholder": "搜索日志...",
+    "loading": "加载日志中...",
+    "selectSpecMessage": "选择规范以查看实现日志",
+    "noSearchResults": "没有匹配搜索的日志",
+    "noLogs": "未找到此规范的实现日志",
+    "sort": {
+      "timestamp": "时间戳",
+      "taskId": "任务ID",
+      "linesAdded": "添加行数",
+      "filesChanged": "更改文件数"
+    },
+    "stats": {
+      "totalEntries": "总条目数",
+      "linesAdded": "添加行数",
+      "linesRemoved": "删除行数",
+      "filesChanged": "更改文件数"
+    },
+    "entry": {
+      "added": "添加",
+      "removed": "删除",
+      "filesChanged": "更改文件数",
+      "netChange": "净变更",
+      "filesModified": "修改的文件",
+      "filesCreated": "创建的文件"
+    },
+    "artifacts": {
+      "apiEndpoints": "API端点",
+      "components": "组件",
+      "functions": "函数",
+      "classes": "类",
+      "integrations": "集成",
+      "request": "请求：",
+      "response": "响应：",
+      "props": "属性：",
+      "exports": "导出：",
+      "signature": "签名：",
+      "methods": "方法：",
+      "frontend": "前端：",
+      "backend": "后端：",
+      "dataFlow": "数据流：",
+      "exported": "（已导出）"
+    }
   },
   "common": {
     "scrollToTop": "滚动到顶部"

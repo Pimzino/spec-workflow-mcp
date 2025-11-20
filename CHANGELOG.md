@@ -5,6 +5,129 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.9] - 2025-11-19
+
+### Fixed
+- **Republished Clean Package** - Version 2.0.8 accidentally included uncommitted frontend changes. This version contains only the committed code from PR #143.
+
+## [2.0.8] - 2025-11-18
+
+### Fixed
+- **Dashboard "No Projects Available" Error After Spec Edits** (PR #143, fixes #142) - Fixed critical bug where editing spec documents caused the dashboard to show "No Projects Available" and the MCP client to report "Transport closed" errors:
+  - Added error handling to async event handlers in `multi-server.ts` that were causing unhandled promise rejections
+  - Added error handlers to all `chokidar` file watchers to prevent watcher crashes
+  - Improved error logging with contextual messages for easier debugging
+  - System now gracefully handles transient errors during file operations instead of crashing
+  - WebSocket connections remain stable during spec document edits
+  - No session reload required after editing spec documents
+  - Added 7 comprehensive tests to verify watcher error handling and prevent regressions
+
+## [2.0.7] - 2025-11-10
+
+### BREAKING CHANGES
+- **Removed `get-implementation-logs` tool** - This tool is no longer available. AI agents should use native tools (grep/ripgrep) and Read to search implementation logs instead.
+
+### Fixed
+- **Volume Control Regression** (PR #141) - Fixed critical volume control regression from NotificationProvider context split through 6 progressive commits:
+  1. Fixed volume icon always showing as muted by updating VolumeControl component to use both `useNotifications()` (actions) and `useNotificationState()` (state)
+  2. Fixed stale closure bug where `handleTaskUpdate` callback had stale reference to `playNotificationSound`, and changed volume/sound settings storage from sessionStorage to localStorage for persistence
+  3. Made audio fade-out proportional to volume level instead of fixed value
+  4. Fixed Web Audio API gain timing issues with direct value assignment and linear ramping
+  5. **Replaced Web Audio API with Howler.js** - After 4 failed attempts to fix volume control with raw Web Audio API, switched to industry-standard Howler.js library (546k weekly downloads, MDN-recommended) for reliable, simple audio playback with real MP3 files
+  6. **Fixed sound not playing at all** - Integrated `playNotificationSound()` into `showNotification()` function so all notifications (task completion, status changes, approvals) automatically play sound at user-configured volume level
+- **Dashboard Task Status Refresh** (PR #140) - Fixed critical "page reload" issue when updating task status:
+  - Removed redundant `reloadAll()` call causing unnecessary full page refreshes
+  - **Split ApiProvider context** into ApiDataContext (data) and ApiActionsContext (stable functions) to prevent unnecessary re-renders when data updates
+  - Added deep equality checks in websocket handlers before updating state
+  - Improved task list comparison from index-based to Map-based for robustness
+  - Result: Task status updates are now smooth and instant without scroll position loss or page disruption
+- **Docker Implementation** (PR #135) - Fixed Docker build failure and updated configuration:
+  - Removed invalid `COPY --from=builder /app/src/locales` command (locales are bundled in dashboard build)
+  - Updated Dockerfile to build from local source instead of git clone
+  - Fixed docker-compose.yml build context and port mappings (3000 → 5000)
+  - Added comprehensive documentation in `containers/README.md` and `containers/DOCKER_USAGE.md`
+  - Added `.dockerignore`, `containers/.env.example`, and updated `containers/example.mcp.json`
+
+### Changed
+- **Implementation Logs Format Migration** (PRs #136, #137, #138) - Logs are now stored as individual markdown files instead of a single JSON file for improved scalability and direct agent accessibility.
+  - Old format: `.spec-workflow/specs/{spec-name}/implementation-log.json`
+  - New format: `.spec-workflow/specs/{spec-name}/Implementation Logs/*.md`
+- Implementation logs are automatically migrated from JSON to markdown format on server startup.
+- Updated all documentation and prompts to guide agents to use grep/ripgrep commands to search implementation logs.
+- Updated VSCode extension file watcher to monitor markdown files in Implementation Logs directories.
+- Updated dashboard and multi-server API endpoints to work with the new markdown format.
+- Added validation for taskId and idValue in markdown log parser to match VSCode extension behavior.
+
+### Added
+- **Automatic Migration System** - New `ImplementationLogMigrator` utility class handles automatic conversion of existing JSON logs to markdown format.
+- **Migration Logging** - Migration process is logged to `~/.spec-workflow-mcp/migration.log` for debugging and transparency.
+- **Howler.js Audio Library** - Added howler@2.2.4 dependency for reliable, cross-browser notification sounds with proper volume control.
+
+### Improved
+- **Agent Discovery** - AI agents can now directly grep implementation logs without special tool calls, making discovery faster and more intuitive.
+- **Log Readability** - Markdown format is more human-readable and can be directly edited if needed.
+- **Scalability** - Individual markdown files prevent performance degradation when dealing with thousands of implementation logs.
+- **Dashboard Performance** - Context splitting and deep equality checks prevent unnecessary re-renders, making the dashboard significantly more responsive.
+- **Audio Quality** - Notification sounds now use real MP3 files (via Howler.js) instead of synthetic oscillator beeps for better user experience.
+
+## [2.0.6] - 2025-11-08
+
+### Changed
+- Removed creation of `config.example.toml` file during workspace initialization as it is no longer needed or used.
+
+## [2.0.5] - 2025-11-08
+
+### Fixed
+- Fixed tools not respecting the project directory specified at server startup. Tools now use the server context's `projectPath` by default instead of requiring it as a mandatory argument.
+- AI agents no longer need to pass `projectPath` to tools, preventing files from being created in the wrong directory (e.g., current working directory instead of the configured project directory).
+- Updated `spec-status`, `get-implementation-logs`, `log-implementation`, and `approvals` tools to use context fallback pattern.
+- Made `projectPath` optional in all tool input schemas while maintaining backward compatibility for explicit overrides.
+
+## [2.0.4] - 2025-11-08
+
+### Fixed
+- Fixed dashboard startup failure with "Unexpected end of JSON input" error on macOS/Linux when configuration files were empty or corrupted.
+- Added proper JSON parsing error handling to catch `SyntaxError` in addition to `ENOENT` errors.
+- Implemented automatic initialization of JSON files with valid default content on first use.
+- Added automatic backup of corrupted configuration files before overwriting.
+- Improved error logging to identify which file is causing parse errors and where backups are stored.
+
+## [2.0.3]
+
+### Changed
+- Updated all MCP tool responses to respond in TOON format instead of JSON for token savings and effeciency. (More Info: https://github.com/toon-format/toon)
+
+## [2.0.2] - 2025-11-06
+
+### Changed
+- Improved the get-implementation-logs tool description and instructions to help agents understand how to use the tool.
+- Removed deprecated --AutoStartDashboard flag
+- Removed config.toml support as it is no longer needed.
+- Removed some legacy code related to the single project dashboard implementation. (not required anymore)
+- Removed Ephemeral port support as it is no longer needed. Dashboard starts on port 5000 by default if a --port is not specified.
+
+## [2.0.1] - 2025-11-06
+
+### Fixed
+- Fixed a Critical bug where approval records were not being saved correctly on approval and blocking the full process.
+- Fixed a bug with dropdowns in the dashboard causing unecassary horizontal scrollbars.
+- Fixed a bug where diff viewer for approvals was not working.
+
+## [2.0.0] - 2025-11-03
+
+### Added
+- Added NEW Unified Multi-Project Dashboard Implementation!
+- 'ESC' key now closes all dialogs and modals in the dashboard.
+- Implementation Log functionality added to the dashboard for each spec, AI Agents will now log detailed information about the implementation of each task. This information is then used by future AI agents to discover existing code and avoid duplication / mistakes when implementing new tasks especially when each task is dependant on the previous task.
+
+### Changed
+- Re-designed the dashboard to be more user friendly and intuitive.
+  - Added a new sidebar menu for the dashboard instead of header navigation.
+
+
+### Announcement
+- Deprecated the `--AutoStartDashboard` flag as it is no longer needed.
+
 ## [1.0.1] - 2025-09-24
 
 ### Changed

@@ -14,19 +14,29 @@ Call when resuming work on a spec or checking overall completion status. Shows w
     properties: {
       projectPath: { 
         type: 'string',
-        description: 'Absolute path to the project root'
+        description: 'Absolute path to the project root (optional - uses server context path if not provided)'
       },
       specName: { 
         type: 'string',
         description: 'Name of the specification'
       }
     },
-    required: ['projectPath', 'specName']
+    required: ['specName']
   }
 };
 
 export async function specStatusHandler(args: any, context: ToolContext): Promise<ToolResponse> {
-  const { projectPath, specName } = args;
+  const { specName } = args;
+  
+  // Use context projectPath as default, allow override via args
+  const projectPath = args.projectPath || context.projectPath;
+  
+  if (!projectPath) {
+    return {
+      success: false,
+      message: 'Project path is required but not provided in context or arguments'
+    };
+  }
 
   try {
     const parser = new SpecParser(projectPath);

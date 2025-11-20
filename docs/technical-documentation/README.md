@@ -220,7 +220,7 @@ The server provides 12 MCP tools for spec-driven development:
 ├── specs/           # Specification documents
 ├── steering/        # Project guidance documents
 ├── approvals/       # Approval workflow data
-└── session.json     # Active session tracking
+└── archive/         # Archived specifications
 ```
 
 ### Workflow Phases

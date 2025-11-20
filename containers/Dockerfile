@@ -1,14 +1,21 @@
 # Build stage
 FROM node:24-alpine AS builder
-RUN apk add --no-cache git
-
 WORKDIR /app
 
-# Clone the MCP server during build
-RUN git clone --depth 1 https://github.com/Pimzino/spec-workflow-mcp.git .
+# Copy package files
+COPY package*.json ./
 
-# Install dependencies and build
-RUN npm ci && npm run build
+# Install all dependencies (including devDependencies for build)
+RUN npm ci
+
+# Copy source files
+COPY src ./src
+COPY scripts ./scripts
+COPY tsconfig.json ./tsconfig.json
+COPY vitest.config.ts ./vitest.config.ts
+
+# Build the application
+RUN npm run build
 
 # Runtime stage
 FROM node:24-alpine
@@ -18,9 +25,8 @@ WORKDIR /app
 COPY --from=builder /app/package*.json ./
 RUN npm ci --only=production
 
-# Copy built application and necessary resources
+# Copy built application
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src/locales ./src/locales
 
 RUN mkdir -p /workspace
 
@@ -32,6 +38,6 @@ USER node
 
 WORKDIR /workspace
 
-EXPOSE 3000
+EXPOSE 5000
 
-CMD node /app/dist/index.js ${SPEC_WORKFLOW_PATH:-/workspace} --dashboard --port ${DASHBOARD_PORT:-3000}
+CMD node /app/dist/index.js ${SPEC_WORKFLOW_PATH:-/workspace} --dashboard --port ${DASHBOARD_PORT:-5000}

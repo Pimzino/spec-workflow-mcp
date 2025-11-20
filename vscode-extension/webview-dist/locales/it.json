@@ -8,7 +8,8 @@
     "steering": "Documenti Direzione",
     "specs": "Documenti Specifica",
     "tasks": "Gestione Task",
-    "approvals": "Richieste Approvazione"
+    "approvals": "Richieste Approvazione",
+    "logs": "Log di Implementazione"
   },
   "overview": {
     "projectTitle": "Panoramica Progetto",
@@ -103,6 +104,53 @@
     "noDocs": "Nessun documento direzione trovato",
     "copyInstructions": "Copia Istruzioni",
     "copied": "Copiato!"
+  },
+  "logs": {
+    "title": "Log di Implementazione",
+    "subtitle": "Traccia tutte le modifiche e gli artefatti di implementazione",
+    "selectSpec": "Seleziona una specifica...",
+    "searchPlaceholder": "Cerca log...",
+    "loading": "Caricamento log...",
+    "selectSpecMessage": "Seleziona una specifica per visualizzare i log di implementazione",
+    "noSearchResults": "Nessun log corrisponde alla tua ricerca",
+    "noLogs": "Nessun log di implementazione trovato per questa specifica",
+    "sort": {
+      "timestamp": "Timestamp",
+      "taskId": "ID Attività",
+      "linesAdded": "Righe Aggiunte",
+      "filesChanged": "File Modificati"
+    },
+    "stats": {
+      "totalEntries": "Voci Totali",
+      "linesAdded": "Righe Aggiunte",
+      "linesRemoved": "Righe Rimosse",
+      "filesChanged": "File Modificati"
+    },
+    "entry": {
+      "added": "Aggiunto",
+      "removed": "Rimosso",
+      "filesChanged": "File Modificati",
+      "netChange": "Variazione Netta",
+      "filesModified": "File Modificati",
+      "filesCreated": "File Creati"
+    },
+    "artifacts": {
+      "apiEndpoints": "Endpoint API",
+      "components": "Componenti",
+      "functions": "Funzioni",
+      "classes": "Classi",
+      "integrations": "Integrazioni",
+      "request": "Richiesta:",
+      "response": "Risposta:",
+      "props": "Props:",
+      "exports": "Esportazioni:",
+      "signature": "Firma:",
+      "methods": "Metodi:",
+      "frontend": "Frontend:",
+      "backend": "Backend:",
+      "dataFlow": "Flusso Dati:",
+      "exported": "(esportato)"
+    }
   },
   "common": {
     "scrollToTop": "Scorri in alto"

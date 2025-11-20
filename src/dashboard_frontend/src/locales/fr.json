@@ -7,7 +7,9 @@
     "steering": "Pilotage",
     "specs": "Spécifications",
     "tasks": "Tâches",
-    "approvals": "Approbations"
+    "approvals": "Approbations",
+    "logs": "Journaux d'Implémentation",
+    "settings": "Paramètres"
   },
   "connectionStatus": {
     "connected": "Connecté",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "Veuillez ajouter au moins un commentaire avant de demander des révisions."
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "Journaux d'Implémentation"
+    },
+    "search": {
+      "placeholder": "Rechercher les journaux..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "Sélectionner une Spécification",
+      "searchPlaceholder": "Rechercher les spécifications...",
+      "noSpecsFound": "Aucune spécification trouvée"
+    },
+    "filter": {
+      "label": "Filtrer par Tâche",
+      "all": "Tous",
+      "taskPrefix": "Tâche"
+    },
+    "sort": {
+      "timestamp": "Date/Heure",
+      "timestampDesc": "Trier par horodatage du journal",
+      "taskId": "ID de Tâche",
+      "taskIdDesc": "Trier par identifiant de tâche",
+      "linesAdded": "Lignes Ajoutées",
+      "linesAddedDesc": "Trier par lignes de code ajoutées",
+      "filesChanged": "Fichiers Modifiés",
+      "filesChangedDesc": "Trier par nombre de fichiers modifiés"
+    },
+    "stats": {
+      "title": "Statistiques du Code",
+      "linesAdded": "Lignes Ajoutées",
+      "linesRemoved": "Lignes Supprimées",
+      "filesChanged": "Fichiers Modifiés",
+      "netChange": "Changement Net",
+      "totalEntries": "Entrées Totales"
+    },
+    "files": {
+      "modified": "Fichiers Modifiés",
+      "created": "Fichiers Créés"
+    },
+    "artifacts": {
+      "title": "Artefacts",
+      "apiEndpoints": "Endpoints d'API",
+      "components": "Composants",
+      "functions": "Fonctions",
+      "classes": "Classes",
+      "integrations": "Intégrations",
+      "details": {
+        "request": "Requête :",
+        "response": "Réponse :",
+        "props": "Props :",
+        "exports": "Exports :",
+        "exported": "Exporté",
+        "private": "Privé",
+        "methods": "Méthodes :",
+        "component": "Composant :",
+        "endpoint": "Endpoint :",
+        "flow": "Flux :"
+      }
+    },
+    "empty": {
+      "selectSpec": "Sélectionner une spécification pour afficher les journaux d'implémentation",
+      "noResults": "Aucun journal ne correspond à vos filtres de recherche",
+      "noLogs": "Aucun journal d'implémentation encore pour cette spécification"
+    },
+    "loading": "Chargement des journaux...",
+    "taskBadge": "Tâche"
+  },
   "volumeControl": {
     "mute": "Désactiver les notifications",
     "enable": "Activer les sons de notification",
     "volumeLevel": "Volume: {{percentage}}%"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "section": {
+      "automatedCleanup": "Nettoyage Automatisé",
+      "automatedCleanupDesc": "Supprimez automatiquement les anciens enregistrements d'approbation, les spécifications et les spécifications archivées selon un horaire. Configurez les tâches de nettoyage pour s'exécuter régulièrement sur tous les projets connectés."
+    },
+    "description": "Gérer les tâches de nettoyage automatisées sur tous les projets connectés",
+    "addJob": "Ajouter une tâche",
+    "loading": "Chargement des tâches...",
+    "noJobs": "Aucune tâche d'automatisation",
+    "noJobsDesc": "Créez votre première tâche d'automatisation pour commencer",
+    "createFirst": "Créer la première tâche",
+    "addNewJob": "Ajouter une nouvelle tâche",
+    "editJob": "Modifier la tâche",
+    "deleteJob": "Supprimer la tâche",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette tâche d'automatisation? Cette action ne peut pas être annulée.",
+    "lastRun": "Dernière exécution",
+    "schedule": "Calendrier",
+    "runNow": "Exécuter maintenant",
+    "running": "Exécution...",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "jobDescription": "Supprimer les enregistrements de plus de {{days}} jours selon le calendrier: {{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "Voir le journal des modifications",
+    "modal": {
+      "title": "Journal des modifications",
+      "version": "Version",
+      "loading": "Chargement du journal des modifications...",
+      "notFound": "Journal des modifications introuvable pour cette version"
+    }
   }
 }

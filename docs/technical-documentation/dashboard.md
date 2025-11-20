@@ -383,28 +383,40 @@ const routes = {
 
 **Example API Implementation**:
 ```typescript
-// src/dashboard/server.ts
-export class DashboardServer {
+// src/dashboard/multi-server.ts
+export class MultiProjectDashboardServer {
   private async setupRoutes() {
-    // Get all specifications
-    this.app.get('/api/specs', async (request, reply) => {
+    // Get all specifications for a project
+    this.app.get('/api/projects/:projectId/specs', async (request, reply) => {
       try {
-        const specs = await this.parser.getAllSpecs();
+        const { projectId } = request.params as { projectId: string };
+        const project = this.projectManager.getProject(projectId);
+        if (!project) {
+          return reply.code(404).send({ error: 'Project not found' });
+        }
+        const specs = await project.parser.getAllSpecs();
         reply.send({ success: true, data: specs });
       } catch (error) {
         reply.status(500).send({ success: false, error: error.message });
       }
     });
-    
+
     // Approve document
-    this.app.post('/api/approvals/:id/approve', async (request, reply) => {
+    this.app.post('/api/projects/:projectId/approvals/:id/approve', async (request, reply) => {
       try {
-        const { id } = request.params as { id: string };
-        await this.approvalStorage.approveDocument(id);
-        
-        // Broadcast update
-        this.broadcastToClients('approval-updated', { approvalId: id, status: 'approved' });
-        
+        const { projectId, id } = request.params as { projectId: string; id: string };
+        const project = this.projectManager.getProject(projectId);
+        if (!project) {
+          return reply.code(404).send({ error: 'Project not found' });
+        }
+        await project.approvalStorage.approveDocument(id);
+
+        // Broadcast update to project subscribers
+        this.broadcastToProjectClients(projectId, 'approval-updated', {
+          approvalId: id,
+          status: 'approved'
+        });
+
         reply.send({ success: true });
       } catch (error) {
         reply.status(500).send({ success: false, error: error.message });

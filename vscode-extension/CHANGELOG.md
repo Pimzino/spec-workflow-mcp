@@ -4,6 +4,24 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.2] - 2025-11-10
+
+### Fixed
+- **Task Status Update Bug** (PR #139) - Fixed task status updates failing in VSCode extension:
+  - Removed race condition from redundant `sendTasks()` call that competed with file watcher auto-refresh
+  - Synced extension's taskParser regex with core parser (removed `$` anchor, fixed capture groups)
+  - Changed validation to allow no-op updates instead of throwing errors
+  - Added debug logging for better diagnostics
+  - Result: Task status updates now work reliably in VSCode extension sidebar
+
+### Changed
+- **Implementation Logs Format** - Updated to support new markdown-based implementation logs (migrated from JSON format)
+
+## [1.1.0]
+
+### Added
+- Added Integration Log page to the extension. This aligns the extension with the new MCP Server functionality.
+
 ## [1.0.0]
 
 ### Updated

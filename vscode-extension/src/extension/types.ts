@@ -115,3 +115,80 @@ export interface SteeringStatus {
   };
   lastModified?: string;
 }
+
+export interface LogStatistics {
+  linesAdded: number;
+  linesRemoved: number;
+  filesChanged: number;
+}
+
+export interface ApiEndpoint {
+  method: string;
+  path: string;
+  purpose: string;
+  requestFormat?: string;
+  responseFormat?: string;
+  location: string;
+}
+
+export interface ComponentInfo {
+  name: string;
+  type: string;
+  purpose: string;
+  props?: string;
+  exports?: string[];
+  location: string;
+}
+
+export interface FunctionInfo {
+  name: string;
+  purpose: string;
+  signature?: string;
+  isExported: boolean;
+  location: string;
+}
+
+export interface ClassInfo {
+  name: string;
+  purpose: string;
+  methods?: string[];
+  isExported: boolean;
+  location: string;
+}
+
+export interface Integration {
+  description: string;
+  frontendComponent: string;
+  backendEndpoint: string;
+  dataFlow: string;
+}
+
+export interface LogArtifacts {
+  apiEndpoints?: ApiEndpoint[];
+  components?: ComponentInfo[];
+  functions?: FunctionInfo[];
+  classes?: ClassInfo[];
+  integrations?: Integration[];
+}
+
+export interface ImplementationLogEntry {
+  id: string;
+  taskId: string;
+  timestamp: string;
+  summary: string;
+  filesModified: string[];
+  filesCreated: string[];
+  statistics: LogStatistics;
+  artifacts: LogArtifacts;
+}
+
+export interface LogsData {
+  specName: string;
+  entries: ImplementationLogEntry[];
+  stats: {
+    totalEntries: number;
+    totalLinesAdded: number;
+    totalLinesRemoved: number;
+    totalFilesChanged: number;
+  };
+}

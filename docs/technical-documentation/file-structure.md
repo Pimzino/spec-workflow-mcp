@@ -20,9 +20,9 @@ project-root/
 │   ├── approvals/                     # Approval workflow data
 │   │   └── spec-name/                # Per-spec approvals
 │   │       └── approval-id.json      # Individual approval data
-│   ├── archive/                       # Completed/archived specs  
+│   ├── archive/                       # Completed/archived specs
 │   │   └── specs/                    # Archived specification docs
-│   └── session.json                  # Active dashboard session
+│   └── config.toml (optional)        # Project-specific configuration
 ├── [your existing project files]     # Your actual project
 ├── package.json                      # Your project dependencies
 └── README.md                         # Your project documentation
@@ -34,11 +34,11 @@ project-root/
 
 | File Path | Purpose | Key Features |
 |-----------|---------|--------------|
-| `src/server.ts:74-85` | MCP server initialization | Tool registration, dashboard integration |
+| `src/server.ts:74-85` | MCP server initialization | Tool registration, project registry |
 | `src/core/path-utils.ts:12-35` | Cross-platform paths | Windows/Unix path handling |
-| `src/core/session-manager.ts:15-40` | Dashboard session tracking | URL management, connection state |
+| `src/core/project-registry.ts:96-114` | Project registration | Global project tracking |
 | `src/dashboard/approval-storage.ts:20-45` | Human approval system | JSON file persistence |
-| `src/dashboard/server.ts:54` | External HTTP call | NPM version check (only external call) |
+| `src/dashboard/multi-server.ts:45-200` | Multi-project dashboard | WebSocket, file watching |
 
 **Template System** (static content, no AI generation):
 ```
@@ -47,7 +47,7 @@ src/
 │   ├── archive-service.ts            # Spec archiving functionality
 │   ├── parser.ts                     # Spec parsing & analysis
 │   ├── path-utils.ts                # Cross-platform path handling
-│   ├── session-manager.ts           # Dashboard session tracking
+│   ├── project-registry.ts          # Global project tracking
 │   └── task-parser.ts               # Task management & parsing
 ├── tools/                           # MCP tool implementations
 │   ├── index.ts                     # Tool registry & dispatcher
@@ -65,9 +65,10 @@ src/
 │   ├── get-approval-status.ts       # Check approval status
 │   └── delete-approval.ts           # Clean up approvals
 ├── dashboard/                       # Dashboard backend
-│   ├── server.ts                    # Fastify web server
+│   ├── multi-server.ts              # Multi-project Fastify server
+│   ├── project-manager.ts           # Project lifecycle management
 │   ├── approval-storage.ts          # Approval persistence
-│   ├── parser.ts                    # Dashboard-specific parsing  
+│   ├── parser.ts                    # Dashboard-specific parsing
 │   ├── watcher.ts                   # File system watching
 │   ├── utils.ts                     # Dashboard utilities
 │   └── public/                      # Static assets
@@ -160,10 +161,6 @@ vscode-extension/
 - **Format**: `{spec-name}-{document}-{timestamp}.json`
 - **Example**: `user-auth-requirements-20241215-143022.json`
 - **Auto-generated**: System creates these automatically
-
-### Session Files
-- **Session**: `session.json` (single file per project)
-- **Location**: `.spec-workflow/session.json`
 
 ## 🛠️ Path Utilities
 
@@ -288,10 +285,10 @@ export class SpecArchiveService {
 ```bash
 # Minimum required permissions
 .spec-workflow/           # 755 (rwxr-xr-x)
-├── specs/               # 755 (rwxr-xr-x)  
+├── specs/               # 755 (rwxr-xr-x)
 ├── steering/            # 755 (rwxr-xr-x)
 ├── approvals/           # 755 (rwxr-xr-x)
-└── session.json         # 644 (rw-r--r--)
+└── archive/             # 755 (rwxr-xr-x)
 ```
 
 ### Security Considerations
@@ -347,11 +344,8 @@ interface DiskUsage {
 # Remove completed approvals (older than 30 days)
 find .spec-workflow/approvals -name "*.json" -mtime +30 -delete
 
-# Archive old specifications  
+# Archive old specifications
 # (Move specs with all tasks completed to archive/)
-
-# Clean session data
-rm -f .spec-workflow/session.json
 
 # Full reset (nuclear option)
 rm -rf .spec-workflow/

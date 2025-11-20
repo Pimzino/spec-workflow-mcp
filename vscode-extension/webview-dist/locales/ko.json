@@ -8,7 +8,8 @@
     "steering": "가이드 문서",
     "specs": "명세서 문서",
     "tasks": "태스크 관리",
-    "approvals": "승인 요청"
+    "approvals": "승인 요청",
+    "logs": "구현 로그"
   },
   "overview": {
     "projectTitle": "프로젝트 개요",
@@ -103,6 +104,53 @@
     "noDocs": "가이드 문서를 찾을 수 없습니다",
     "copyInstructions": "지침 복사",
     "copied": "복사됨!"
+  },
+  "logs": {
+    "title": "구현 로그",
+    "subtitle": "모든 구현 변경 사항 및 아티팩트 추적",
+    "selectSpec": "사양 선택...",
+    "searchPlaceholder": "로그 검색...",
+    "loading": "로그 로딩 중...",
+    "selectSpecMessage": "구현 로그를 보려면 사양을 선택하세요",
+    "noSearchResults": "검색과 일치하는 로그가 없습니다",
+    "noLogs": "이 사양에 대한 구현 로그를 찾을 수 없습니다",
+    "sort": {
+      "timestamp": "타임스탬프",
+      "taskId": "작업 ID",
+      "linesAdded": "추가된 줄",
+      "filesChanged": "변경된 파일"
+    },
+    "stats": {
+      "totalEntries": "총 항목",
+      "linesAdded": "추가된 줄",
+      "linesRemoved": "제거된 줄",
+      "filesChanged": "변경된 파일"
+    },
+    "entry": {
+      "added": "추가됨",
+      "removed": "제거됨",
+      "filesChanged": "변경된 파일",
+      "netChange": "순 변경",
+      "filesModified": "수정된 파일",
+      "filesCreated": "생성된 파일"
+    },
+    "artifacts": {
+      "apiEndpoints": "API 엔드포인트",
+      "components": "컴포넌트",
+      "functions": "함수",
+      "classes": "클래스",
+      "integrations": "통합",
+      "request": "요청:",
+      "response": "응답:",
+      "props": "Props:",
+      "exports": "내보내기:",
+      "signature": "시그니처:",
+      "methods": "메서드:",
+      "frontend": "프론트엔드:",
+      "backend": "백엔드:",
+      "dataFlow": "데이터 흐름:",
+      "exported": "(내보내짐)"
+    }
   },
   "common": {
     "scrollToTop": "맨 위로 스크롤"

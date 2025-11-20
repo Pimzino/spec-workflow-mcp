@@ -13,7 +13,7 @@ interface VsCodeApi {
 }
 
 // Message types for communication between extension and webview
-export type ExtensionMessage = 
+export type ExtensionMessage =
   | { type: 'specs-updated'; data: SpecData[] }
   | { type: 'tasks-updated'; data: TaskProgressData }
   | { type: 'approvals-updated'; data: ApprovalData[] }
@@ -27,6 +27,8 @@ export type ExtensionMessage =
   | { type: 'archived-specs-updated'; data: SpecData[] }
   | { type: 'approval-categories-updated'; data: { value: string; label: string; count: number }[] }
   | { type: 'language-preference-updated'; data: string }
+  | { type: 'logs-updated'; data: any }
+  | { type: 'logs-search-results'; data: any }
   | { type: 'error'; message: string }
   | { type: 'notification'; message: string; level: 'info' | 'warning' | 'error' | 'success' };
 
@@ -55,7 +57,9 @@ export type WebviewMessage =
   | { type: 'get-approval-categories' }
   | { type: 'get-language-preference' }
   | { type: 'set-language-preference'; language: string }
-  | { type: 'open-external-url'; url: string };
+  | { type: 'open-external-url'; url: string }
+  | { type: 'get-logs'; specName: string }
+  | { type: 'search-logs'; specName: string; query: string };
 
 export type TaskStatus = 'pending' | 'in-progress' | 'completed';
 
@@ -168,6 +172,73 @@ export interface SoundNotificationConfig {
   volume: number;
   approvalSound: boolean;
   taskCompletionSound: boolean;
+}
+
+// Implementation Log Types
+export interface LogStatistics {
+  linesAdded: number;
+  linesRemoved: number;
+  filesChanged: number;
+}
+
+export interface ApiEndpoint {
+  method: string;
+  path: string;
+  purpose: string;
+  requestFormat?: string;
+  responseFormat?: string;
+  location: string;
+}
+
+export interface ComponentInfo {
+  name: string;
+  type: string;
+  purpose: string;
+  props?: string;
+  exports?: string[];
+  location: string;
+}
+
+export interface FunctionInfo {
+  name: string;
+  purpose: string;
+  signature?: string;
+  isExported: boolean;
+  location: string;
+}
+
+export interface ClassInfo {
+  name: string;
+  purpose: string;
+  methods?: string[];
+  isExported: boolean;
+  location: string;
+}
+
+export interface Integration {
+  description: string;
+  frontendComponent: string;
+  backendEndpoint: string;
+  dataFlow: string;
+}
+
+export interface LogArtifacts {
+  apiEndpoints?: ApiEndpoint[];
+  components?: ComponentInfo[];
+  functions?: FunctionInfo[];
+  classes?: ClassInfo[];
+  integrations?: Integration[];
+}
+
+export interface ImplementationLogEntry {
+  id: string;
+  taskId: string;
+  timestamp: string;
+  summary: string;
+  filesModified: string[];
+  filesCreated: string[];
+  statistics: LogStatistics;
+  artifacts: LogArtifacts;
 }
 
 class VsCodeApiService {
@@ -330,6 +401,15 @@ class VsCodeApiService {
 
   setLanguagePreference(language: string) {
     this.postMessage({ type: 'set-language-preference', language });
+  }
+
+  // Log methods
+  getLogs(specName: string) {
+    this.postMessage({ type: 'get-logs', specName });
+  }
+
+  searchLogs(specName: string, query: string) {
+    this.postMessage({ type: 'search-logs', specName, query });
   }
 }
 

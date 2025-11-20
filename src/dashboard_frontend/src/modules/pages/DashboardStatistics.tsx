@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ApiProvider, useApi } from '../api/api';
+import { useApi } from '../api/api';
 import { useWs } from '../ws/WebSocketProvider';
 
 function Content() {
@@ -150,12 +150,7 @@ function Content() {
 }
 
 export function DashboardStatistics() {
-  const { initial } = useWs();
-  return (
-    <ApiProvider initial={initial}>
-      <Content />
-    </ApiProvider>
-  );
+  return <Content />;
 }
 
 

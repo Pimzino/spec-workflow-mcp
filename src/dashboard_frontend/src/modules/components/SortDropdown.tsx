@@ -13,9 +13,10 @@ interface SortDropdownProps {
   currentOrder: string;
   onSortChange: (sort: string, order: string) => void;
   sortOptions?: SortOption[];
+  align?: 'left' | 'right';
 }
 
-export function SortDropdown({ currentSort, currentOrder, onSortChange, sortOptions }: SortDropdownProps) {
+export function SortDropdown({ currentSort, currentOrder, onSortChange, sortOptions, align = 'left' }: SortDropdownProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -73,12 +74,21 @@ export function SortDropdown({ currentSort, currentOrder, onSortChange, sortOpti
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsOpen(false);
+      }
+    };
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
@@ -133,7 +143,7 @@ export function SortDropdown({ currentSort, currentOrder, onSortChange, sortOpti
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 w-full sm:w-64 md:w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-80 overflow-hidden">
+        <div className={`absolute top-full mt-1 w-full sm:w-64 md:w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-80 overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}>
           <div className="py-1">
             {actualSortOptions.map((option) => {
               const isCurrentSort = currentSort === option.id;

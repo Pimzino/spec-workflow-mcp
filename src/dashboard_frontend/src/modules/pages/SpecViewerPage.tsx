@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ApiProvider, useApi } from '../api/api';
-import { useWs } from '../ws/WebSocketProvider';
+import { useApi } from '../api/api';
 import { useSearchParams } from 'react-router-dom';
 import { Markdown } from '../markdown/Markdown';
 import hljs from 'highlight.js/lib/common';
@@ -137,12 +136,7 @@ function Content() {
 }
 
 export function SpecViewerPage() {
-  const { initial } = useWs();
-  return (
-    <ApiProvider initial={initial}>
-      <Content />
-    </ApiProvider>
-  );
+  return <Content />;
 }
 
 

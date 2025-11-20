@@ -8,7 +8,8 @@
     "steering": "Steuerungsdokumente",
     "specs": "Spezifikationsdokumente",
     "tasks": "Aufgabenverwaltung",
-    "approvals": "Genehmigungsanfragen"
+    "approvals": "Genehmigungsanfragen",
+    "logs": "Implementierungsprotokolle"
   },
   "overview": {
     "projectTitle": "Projektübersicht",
@@ -103,6 +104,53 @@
     "noDocs": "Keine Steuerungsdokumente gefunden",
     "copyInstructions": "Anweisungen kopieren",
     "copied": "Kopiert!"
+  },
+  "logs": {
+    "title": "Implementierungsprotokolle",
+    "subtitle": "Verfolgen Sie alle Implementierungsänderungen und Artefakte",
+    "selectSpec": "Spezifikation auswählen...",
+    "searchPlaceholder": "Protokolle durchsuchen...",
+    "loading": "Protokolle werden geladen...",
+    "selectSpecMessage": "Wählen Sie eine Spezifikation aus, um Implementierungsprotokolle anzuzeigen",
+    "noSearchResults": "Keine Protokolle entsprechen Ihrer Suche",
+    "noLogs": "Keine Implementierungsprotokolle für diese Spezifikation gefunden",
+    "sort": {
+      "timestamp": "Zeitstempel",
+      "taskId": "Aufgaben-ID",
+      "linesAdded": "Hinzugefügte Zeilen",
+      "filesChanged": "Geänderte Dateien"
+    },
+    "stats": {
+      "totalEntries": "Gesamteinträge",
+      "linesAdded": "Hinzugefügte Zeilen",
+      "linesRemoved": "Entfernte Zeilen",
+      "filesChanged": "Geänderte Dateien"
+    },
+    "entry": {
+      "added": "Hinzugefügt",
+      "removed": "Entfernt",
+      "filesChanged": "Geänderte Dateien",
+      "netChange": "Nettoänderung",
+      "filesModified": "Geänderte Dateien",
+      "filesCreated": "Erstellte Dateien"
+    },
+    "artifacts": {
+      "apiEndpoints": "API-Endpunkte",
+      "components": "Komponenten",
+      "functions": "Funktionen",
+      "classes": "Klassen",
+      "integrations": "Integrationen",
+      "request": "Anfrage:",
+      "response": "Antwort:",
+      "props": "Props:",
+      "exports": "Exporte:",
+      "signature": "Signatur:",
+      "methods": "Methoden:",
+      "frontend": "Frontend:",
+      "backend": "Backend:",
+      "dataFlow": "Datenfluss:",
+      "exported": "(exportiert)"
+    }
   },
   "common": {
     "scrollToTop": "Nach oben scrollen"

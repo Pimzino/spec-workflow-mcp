@@ -7,7 +7,9 @@
     "steering": "التوجيه",
     "specs": "المواصفات",
     "tasks": "المهام",
-    "approvals": "الموافقات"
+    "approvals": "الموافقات",
+    "logs": "سجلات التنفيذ",
+    "settings": "الإعدادات"
   },
   "connectionStatus": {
     "connected": "متصل",
@@ -387,9 +389,111 @@
       "noCommentsMessage": "يرجى إضافة تعليق واحد على الأقل قبل طلب المراجعات."
     }
   },
+  "logsPage": {
+    "header": {
+      "title": "سجلات التنفيذ"
+    },
+    "search": {
+      "placeholder": "البحث في السجلات..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "اختر المواصفات",
+      "searchPlaceholder": "البحث في المواصفات...",
+      "noSpecsFound": "لم يتم العثور على مواصفات"
+    },
+    "filter": {
+      "label": "تصفية حسب المهمة",
+      "all": "الكل",
+      "taskPrefix": "المهمة"
+    },
+    "sort": {
+      "timestamp": "التاريخ/الوقت",
+      "timestampDesc": "الترتيب حسب طابع زمني للسجل",
+      "taskId": "معرّف المهمة",
+      "taskIdDesc": "الترتيب حسب معرّف المهمة",
+      "linesAdded": "الأسطر المضافة",
+      "linesAddedDesc": "الترتيب حسب أسطر الكود المضافة",
+      "filesChanged": "الملفات المتغيرة",
+      "filesChangedDesc": "الترتيب حسب عدد الملفات المعدلة"
+    },
+    "stats": {
+      "title": "إحصائيات الكود",
+      "linesAdded": "الأسطر المضافة",
+      "linesRemoved": "الأسطر المحذوفة",
+      "filesChanged": "الملفات المتغيرة",
+      "netChange": "التغيير الصافي",
+      "totalEntries": "إجمالي الإدخالات"
+    },
+    "files": {
+      "modified": "الملفات المعدلة",
+      "created": "الملفات المنشأة"
+    },
+    "artifacts": {
+      "title": "المكونات الموضعية",
+      "apiEndpoints": "نقاط نهاية API",
+      "components": "المكونات",
+      "functions": "الدوال",
+      "classes": "الفئات",
+      "integrations": "التكاملات",
+      "details": {
+        "request": "الطلب:",
+        "response": "الرد:",
+        "props": "الخصائص:",
+        "exports": "الصادرات:",
+        "exported": "مُصدَّر",
+        "private": "خاص",
+        "methods": "الطرق:",
+        "component": "المكون:",
+        "endpoint": "نقطة النهاية:",
+        "flow": "التدفق:"
+      }
+    },
+    "empty": {
+      "selectSpec": "اختر مواصفات لعرض سجلات التنفيذ",
+      "noResults": "لا توجد سجلات تطابق مرشحات البحث الخاصة بك",
+      "noLogs": "لا توجد سجلات تنفيذ حتى الآن لهذه المواصفات"
+    },
+    "loading": "جاري تحميل السجلات...",
+    "taskBadge": "المهمة"
+  },
   "volumeControl": {
     "mute": "Mute notifications",
     "enable": "Enable notification sounds",
     "volumeLevel": "Volume: {{percentage}}%"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "section": {
+      "automatedCleanup": "التنظيف الآلي",
+      "automatedCleanupDesc": "حذف سجلات الموافقة القديمة والمواصفات والمواصفات المؤرشفة تلقائياً وفقاً لجدول زمني. قم بتكوين مهام التنظيف للتشغيل بشكل متكرر عبر جميع المشاريع المتصلة."
+    },
+    "description": "إدارة وظائف التنظيف التلقائية عبر جميع المشاريع المتصلة",
+    "addJob": "إضافة وظيفة",
+    "loading": "جاري تحميل الوظائف...",
+    "noJobs": "لا توجد وظائف تشغيل تلقائي",
+    "noJobsDesc": "قم بإنشاء وظيفة التشغيل التلقائي الأولى للبدء",
+    "createFirst": "إنشاء أول وظيفة",
+    "addNewJob": "إضافة وظيفة جديدة",
+    "editJob": "تحرير الوظيفة",
+    "deleteJob": "حذف الوظيفة",
+    "deleteConfirm": "هل أنت متأكد من رغبتك في حذف وظيفة التشغيل التلقائي هذه؟ لا يمكن التراجع عن هذا الإجراء.",
+    "lastRun": "آخر تشغيل",
+    "schedule": "الجدول الزمني",
+    "runNow": "تشغيل الآن",
+    "running": "قيد التشغيل...",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "jobDescription": "حذف السجلات الأقدم من {{days}} يوم حسب الجدول الزمني: {{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "عرض سجل التغييرات",
+    "modal": {
+      "title": "سجل التغييرات",
+      "version": "الإصدار",
+      "loading": "جاري تحميل سجل التغييرات...",
+      "notFound": "لم يتم العثور على سجل التغييرات لهذا الإصدار"
+    }
   }
 }
