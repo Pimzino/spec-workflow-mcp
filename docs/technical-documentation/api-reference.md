@@ -610,9 +610,9 @@ sequenceDiagram
 
 ### `delete-approval`
 
-**Purpose**: Clean up approval after successful approval
+**Purpose**: Clean up completed, rejected, or needs-revision approvals. Cannot delete pending approvals.
 
-**Usage**: Call immediately after `approved` status before proceeding
+**Usage**: Call to clean up old approval requests after workflow completion
 
 ```typescript
 // Parameters
@@ -632,19 +632,19 @@ sequenceDiagram
   nextSteps: ["Proceed to next phase"]
 }
 
-// Response - Failed  
+// Response - Failed
 {
   success: false,
-  message: "Failed to delete approval: Approval not found or still pending",
+  message: "Failed to delete approval: Approval not found or is still pending",
   nextSteps: [
     "Check approval status first",
-    "Ensure approval is approved before deletion", 
-    "BLOCKING: Cannot proceed until cleanup succeeds"
+    "Cannot delete pending approvals - wait for approval/rejection/revision",
+    "Can delete: approved, rejected, or needs-revision status"
   ]
 }
 ```
 
-**Critical**: If deletion fails, **STOP** and return to polling status. Never proceed without successful cleanup.
+**Note**: Pending approvals cannot be deleted. You can delete approvals with status: `approved`, `rejected`, or `needs-revision`.
 
 ## 🔄 Common Usage Patterns
 
