@@ -1,0 +1,10 @@
+{
+  "name": "spec-workflow-mcp-with-dashboard",
+  "version": "2.0.9",
+  "description": "MCP server with auto-started dashboard for structured spec-driven development.",
+  "author": {
+    "name": "Pimzino"
+  },
+  "homepage": "https://github.com/Pimzino/spec-workflow-mcp",
+  "license": "GPL-3.0"
+}
