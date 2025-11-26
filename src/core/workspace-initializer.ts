@@ -29,28 +29,28 @@ export class WorkspaceInitializer {
     // Migrate implementation logs from JSON to Markdown format
     await this.migrateImplementationLogs();
   }
-  
+
   private async initializeDirectories(): Promise<void> {
     const workflowRoot = PathUtils.getWorkflowRoot(this.projectPath);
-    
+
     const directories = [
       'approvals',
-      'archive', 
+      'archive',
       'specs',
       'steering',
       'templates',
       'user-templates'
     ];
-    
+
     for (const dir of directories) {
       const dirPath = join(workflowRoot, dir);
       await fs.mkdir(dirPath, { recursive: true });
     }
   }
-  
+
   private async initializeTemplates(): Promise<void> {
     const templatesDir = join(PathUtils.getWorkflowRoot(this.projectPath), 'templates');
-    
+
     const templates = [
       'requirements-template',
       'design-template',
@@ -59,22 +59,22 @@ export class WorkspaceInitializer {
       'tech-template',
       'structure-template'
     ];
-    
+
     for (const template of templates) {
       await this.copyTemplate(template, templatesDir);
     }
   }
-  
+
   private async copyTemplate(templateName: string, targetDir: string): Promise<void> {
     // Use simple filename without version
     const targetFileName = `${templateName}.md`;
     const targetPath = join(targetDir, targetFileName);
-    
+
     const sourcePath = join(__dirname, '..', 'markdown', 'templates', `${templateName}.md`);
-    
+
     try {
       const content = await fs.readFile(sourcePath, 'utf-8');
-      
+
       // Always overwrite to ensure latest template version is used
       await fs.writeFile(targetPath, content, 'utf-8');
     } catch (error) {
@@ -82,7 +82,7 @@ export class WorkspaceInitializer {
       console.error(`Failed to copy template ${templateName}: ${errorMessage}`);
     }
   }
-  
+
   private async createUserTemplatesReadme(): Promise<void> {
     const readmePath = join(PathUtils.getWorkflowRoot(this.projectPath), 'user-templates', 'README.md');
 
