@@ -111,7 +111,7 @@ export async function approvalsHandler(
 ): Promise<ToolResponse> {
   // Cast to discriminated union type
   const typedArgs = args as ApprovalArgs;
-  
+
   switch (typedArgs.action) {
     case 'request':
       if (isRequestApproval(typedArgs)) {
@@ -155,7 +155,7 @@ export async function approvalsHandler(
         message: `Unknown action: ${(args as any).action}. Use 'request', 'status', or 'delete'.`
       };
   }
-  
+
   // This should never be reached due to exhaustive type checking
   return {
     success: false,
@@ -169,7 +169,7 @@ async function handleRequestApproval(
 ): Promise<ToolResponse> {
   // Use context projectPath as default, allow override via args
   const projectPath = args.projectPath || context.projectPath;
-  
+
   if (!projectPath) {
     return {
       success: false,
