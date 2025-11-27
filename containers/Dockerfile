@@ -28,7 +28,7 @@ RUN npm ci --only=production
 # Copy built application
 COPY --from=builder /app/dist ./dist
 
-RUN mkdir -p /workspace
+RUN mkdir -p /workspace /workspace/.spec-workflow-mcp
 
 # Change ownership of the app directory to the node user (uid=1000)
 RUN chown -R node:node /app /workspace
@@ -37,6 +37,9 @@ RUN chown -R node:node /app /workspace
 USER node
 
 WORKDIR /workspace
+
+# Set SPEC_WORKFLOW_HOME to store global state in workspace (required for containerized environments)
+ENV SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp
 
 EXPOSE 5000
 

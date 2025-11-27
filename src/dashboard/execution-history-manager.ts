@@ -1,7 +1,7 @@
-import { homedir } from 'os';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { JobExecutionHistory, JobExecutionLog } from '../types.js';
+import { getGlobalDir, getPermissionErrorHelp } from '../core/global-dir.js';
 
 export class ExecutionHistoryManager {
   private historyPath: string;
@@ -9,7 +9,7 @@ export class ExecutionHistoryManager {
   private maxHistoryEntries = 1000; // Keep last 1000 executions
 
   constructor() {
-    this.historyDir = join(homedir(), '.spec-workflow-mcp');
+    this.historyDir = getGlobalDir();
     this.historyPath = join(this.historyDir, 'job-execution-history.json');
   }
 
@@ -19,8 +19,18 @@ export class ExecutionHistoryManager {
   private async ensureHistoryDir(): Promise<void> {
     try {
       await fs.mkdir(this.historyDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist, ignore
+    } catch (error: any) {
+      // Directory might already exist, ignore EEXIST errors
+      if (error.code === 'EEXIST') {
+        return;
+      }
+      // For permission errors, provide helpful guidance
+      if (error.code === 'EACCES' || error.code === 'EPERM') {
+        console.error(getPermissionErrorHelp('create directory', this.historyDir));
+        throw error;
+      }
+      // Re-throw other errors
+      throw error;
     }
   }
 

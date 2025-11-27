@@ -385,6 +385,36 @@ export class MultiProjectDashboardServer {
       return result;
     });
 
+    // Get all archived spec documents
+    this.app.get('/api/projects/:projectId/specs/:name/all/archived', async (request, reply) => {
+      const { projectId, name } = request.params as { projectId: string; name: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      // Use archive path instead of active specs path
+      const specDir = join(project.projectPath, '.spec-workflow', 'archive', 'specs', name);
+      const documents = ['requirements', 'design', 'tasks'];
+      const result: Record<string, { content: string; lastModified: string } | null> = {};
+
+      for (const doc of documents) {
+        const docPath = join(specDir, `${doc}.md`);
+        try {
+          const content = await readFile(docPath, 'utf-8');
+          const stats = await fs.stat(docPath);
+          result[doc] = {
+            content,
+            lastModified: stats.mtime.toISOString()
+          };
+        } catch {
+          result[doc] = null;
+        }
+      }
+
+      return result;
+    });
+
     // Save spec document
     this.app.put('/api/projects/:projectId/specs/:name/:document', async (request, reply) => {
       const { projectId, name, document } = request.params as { projectId: string; name: string; document: string };

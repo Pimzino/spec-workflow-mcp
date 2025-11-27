@@ -39,6 +39,10 @@ A Model Context Protocol (MCP) server for structured spec-driven development wit
 
 🇺🇸 English • 🇯🇵 日本語 • 🇨🇳 中文 • 🇪🇸 Español • 🇧🇷 Português • 🇩🇪 Deutsch • 🇫🇷 Français • 🇷🇺 Русский • 🇮🇹 Italiano • 🇰🇷 한국어 • 🇸🇦 العربية
 
+**📖 Documentation in your language:**
+
+[English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md) | [Español](README.es.md) | [Português](README.pt.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [한국어](README.ko.md) | [العربية](README.ar.md)
+
 ## 🚀 Quick Start
 
 ### Step 1: Add to your AI tool
@@ -204,6 +208,33 @@ Add to your `opencode.json` configuration file:
 ```
 </details>
 
+<details>
+<summary><strong>Windsurf</strong></summary>
+
+Add to your `~/.codeium/windsurf/mcp_config.json` configuration file:
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+    }
+  }
+}
+```
+</details>
+
+<details>
+<summary><strong>Codex</strong></summary>
+
+Add to your `~/.codex/config.toml` configuration file:
+```toml
+[mcp_servers.spec-workflow]
+command = "npx"
+args = ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+```
+</details>
+
 ## 🐳 Docker Deployment
 
 Run the dashboard in a Docker container for isolated deployment:
@@ -221,6 +252,16 @@ docker run -p 5000:5000 -v "./workspace/.spec-workflow:/workspace/.spec-workflow
 The dashboard will be available at: http://localhost:5000
 
 [See Docker setup guide →](containers/README.md)
+
+## 🔒 Sandboxed Environments
+
+For sandboxed environments (e.g., Codex CLI with `sandbox_mode=workspace-write`) where `$HOME` is read-only, use the `SPEC_WORKFLOW_HOME` environment variable to redirect global state files to a writable location:
+
+```bash
+SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp npx -y @pimzino/spec-workflow-mcp@latest /workspace
+```
+
+[See Configuration Guide →](docs/CONFIGURATION.md#environment-variables)
 
 ## 📚 Documentation
 

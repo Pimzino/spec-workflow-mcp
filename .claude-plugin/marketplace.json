@@ -1,0 +1,33 @@
+{
+  "name": "spec-workflow-mcp-marketplace",
+  "owner": {
+    "name": "Pimzino"
+  },
+  "metadata": {
+    "description": "Spec Workflow MCP provides structured spec-driven development with a sequential workflow (Requirements → Design → Tasks), real-time web dashboard, and VSCode extension support. Includes human approval gates at each stage and project steering guidance."
+  },
+  "plugins": [
+    {
+      "name": "spec-workflow-mcp",
+      "version": "2.0.9",
+      "description": "MCP server for structured spec-driven development with real-time web dashboard and VSCode extension.",
+      "author": {
+        "name": "Pimzino"
+      },
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Pimzino/spec-workflow-mcp",
+      "source": "./.claude-plugin"
+    },
+    {
+      "name": "spec-workflow-mcp-with-dashboard",
+      "version": "2.0.9",
+      "description": "MCP server with auto-started dashboard for structured spec-driven development.",
+      "author": {
+        "name": "Pimzino"
+      },
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Pimzino/spec-workflow-mcp",
+      "source": "./.claude-plugin/with-dashboard"
+    }
+  ]
+}

@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.10] - 2025-11-26
+
+### Added
+- **Claude Code Plugin Support** (PR #121) - Added official Claude Code plugin configuration for easy installation from the Claude marketplace:
+  - Two plugin variants available: `spec-workflow-mcp` (base) and `spec-workflow-mcp-with-dashboard` (auto-starts dashboard)
+  - Plugins use `@latest` tag for automatic updates to newest releases
+  - Added `npm run sync:plugin-version` script to keep plugin versions in sync with package.json
+  - Added `npm run check:plugin-version` for CI validation of version consistency
+- **`--no-open` Flag for Dashboard** (PR #147, fixes #145) - Added new command-line flag to prevent automatic browser opening when starting the dashboard:
+  - Use `spec-workflow-mcp --dashboard --no-open` to start the dashboard without launching the browser
+  - Useful in restricted Windows environments where firewall or antivirus software blocks browser launches from processes
+  - Prevents "failed to start dashboard: spawn EPERM" errors for users without administrator privileges
+  - Dashboard URL is still printed to console so users can manually navigate to it
+- **Sandbox Environment Support** (fixes #144) - Added `SPEC_WORKFLOW_HOME` environment variable to support sandboxed MCP clients like Codex CLI:
+  - Allows overriding the default global state directory (`~/.spec-workflow-mcp`) to a writable location
+  - Essential for sandboxed environments where `$HOME` is read-only (e.g., Codex CLI with `sandbox_mode=workspace-write`)
+  - Supports both absolute paths and relative paths (resolved against current working directory)
+  - Added helpful error messages when permission errors occur, suggesting the `SPEC_WORKFLOW_HOME` workaround
+  - Updated Docker configuration to use `SPEC_WORKFLOW_HOME` by default
+  - Usage: `SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp npx spec-workflow-mcp /workspace`
+
+### Fixed
+- **Archived Specs Display Content Correctly** (PR #146) - Fixed critical bug where archived specs were not displaying content correctly in the dashboard:
+  - Added new API endpoint `/api/projects/:projectId/specs/:name/all/archived` that reads documents from the archive path (`.spec-workflow/archive/specs/{name}/`) instead of the active specs path. This was missed during the multi-project dashboard implementation.
+
 ## [2.0.9] - 2025-11-19
 
 ### Fixed

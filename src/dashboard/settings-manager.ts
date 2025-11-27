@@ -1,14 +1,14 @@
-import { homedir } from 'os';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { GlobalSettings, AutomationJob } from '../types.js';
+import { getGlobalDir, getPermissionErrorHelp } from '../core/global-dir.js';
 
 export class SettingsManager {
   private settingsPath: string;
   private settingsDir: string;
 
   constructor() {
-    this.settingsDir = join(homedir(), '.spec-workflow-mcp');
+    this.settingsDir = getGlobalDir();
     this.settingsPath = join(this.settingsDir, 'settings.json');
   }
 
@@ -18,8 +18,18 @@ export class SettingsManager {
   private async ensureSettingsDir(): Promise<void> {
     try {
       await fs.mkdir(this.settingsDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist, ignore
+    } catch (error: any) {
+      // Directory might already exist, ignore EEXIST errors
+      if (error.code === 'EEXIST') {
+        return;
+      }
+      // For permission errors, provide helpful guidance
+      if (error.code === 'EACCES' || error.code === 'EPERM') {
+        console.error(getPermissionErrorHelp('create directory', this.settingsDir));
+        throw error;
+      }
+      // Re-throw other errors
+      throw error;
     }
   }
 

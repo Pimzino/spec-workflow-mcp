@@ -29,6 +29,8 @@ OPTIONS:
   --port <number>         Specify dashboard port (1024-65535)
                          Default: 5000
                          Only use if port 5000 is unavailable
+  --no-open               Don't automatically open browser when starting dashboard
+                         Useful in restricted environments where browser launch is blocked
 
 IMPORTANT:
   Only ONE dashboard instance runs at a time. All MCP servers connect to the
@@ -45,10 +47,12 @@ MODES OF OPERATION:
 2. Dashboard Only Mode:
    spec-workflow-mcp --dashboard
    spec-workflow-mcp --dashboard --port 8080
+   spec-workflow-mcp --dashboard --no-open
 
    Runs only the web dashboard without MCP server (default port: 5000).
    Projects will automatically appear in the dashboard as MCP servers register.
    Only one dashboard instance is needed for all your projects.
+   Use --no-open to prevent automatic browser launch (useful in restricted environments).
 
 EXAMPLES:
   # Start MCP server in current directory (no dashboard)
@@ -94,12 +98,14 @@ function parseArguments(args: string[]): {
   isDashboardMode: boolean;
   port?: number;
   lang?: string;
+  noOpen?: boolean;
 } {
   const isDashboardMode = args.includes('--dashboard');
+  const noOpen = args.includes('--no-open');
   let customPort: number | undefined;
 
   // Check for invalid flags
-  const validFlags = ['--dashboard', '--port', '--help', '-h'];
+  const validFlags = ['--dashboard', '--port', '--help', '-h', '--no-open'];
   for (const arg of args) {
     if (arg.startsWith('--') && !arg.includes('=')) {
       if (!validFlags.includes(arg)) {
@@ -154,6 +160,7 @@ function parseArguments(args: string[]): {
     if (arg === '--dashboard') return false;
     if (arg.startsWith('--port=')) return false;
     if (arg === '--port') return false;
+    if (arg === '--no-open') return false;
     // Check if this arg is a value following --port
     if (index > 0 && args[index - 1] === '--port') return false;
     return true;
@@ -169,7 +176,7 @@ function parseArguments(args: string[]): {
     console.warn('Consider specifying an explicit path for better clarity.');
   }
 
-  return { projectPath, isDashboardMode, port: customPort, lang: undefined };
+  return { projectPath, isDashboardMode, port: customPort, lang: undefined, noOpen };
 }
 
 async function main() {
@@ -190,6 +197,7 @@ async function main() {
     const isDashboardMode = cliArgs.isDashboardMode || false;
     const port = cliArgs.port;
     const lang = cliArgs.lang;
+    const noOpen = cliArgs.noOpen || false;
 
     if (isDashboardMode) {
       // Check if a dashboard is already running (always check, regardless of port)
@@ -217,9 +225,12 @@ async function main() {
       } else {
         console.error(`Using default port: ${DEFAULT_DASHBOARD_PORT}`);
       }
+      if (noOpen) {
+        console.error(`Browser auto-open disabled (--no-open)`);
+      }
 
       const dashboardServer = new MultiProjectDashboardServer({
-        autoOpen: true,
+        autoOpen: !noOpen,
         port: dashboardPort
       });
 

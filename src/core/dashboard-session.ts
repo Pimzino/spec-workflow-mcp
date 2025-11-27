@@ -1,6 +1,6 @@
-import { homedir } from 'os';
 import { join } from 'path';
 import { promises as fs } from 'fs';
+import { getGlobalDir, getPermissionErrorHelp } from './global-dir.js';
 
 export interface DashboardSessionEntry {
   url: string;
@@ -12,13 +12,14 @@ export interface DashboardSessionEntry {
 /**
  * Manages the global dashboard session
  * Stores dashboard connection info in ~/.spec-workflow-mcp/activeSession.json
+ * (or SPEC_WORKFLOW_HOME if set)
  */
 export class DashboardSessionManager {
   private sessionDir: string;
   private sessionPath: string;
 
   constructor() {
-    this.sessionDir = join(homedir(), '.spec-workflow-mcp');
+    this.sessionDir = getGlobalDir();
     this.sessionPath = join(this.sessionDir, 'activeSession.json');
   }
 
@@ -28,8 +29,18 @@ export class DashboardSessionManager {
   private async ensureSessionDir(): Promise<void> {
     try {
       await fs.mkdir(this.sessionDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist, ignore
+    } catch (error: any) {
+      // Directory might already exist, ignore EEXIST errors
+      if (error.code === 'EEXIST') {
+        return;
+      }
+      // For permission errors, provide helpful guidance
+      if (error.code === 'EACCES' || error.code === 'EPERM') {
+        console.error(getPermissionErrorHelp('create directory', this.sessionDir));
+        throw error;
+      }
+      // Re-throw other errors
+      throw error;
     }
   }
 

@@ -1,8 +1,8 @@
-import { homedir } from 'os';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { basename, resolve } from 'path';
 import { createHash } from 'crypto';
+import { getGlobalDir, getPermissionErrorHelp } from './global-dir.js';
 
 export interface ProjectRegistryEntry {
   projectId: string;
@@ -28,7 +28,7 @@ export class ProjectRegistry {
   private needsInitialization: boolean = false;
 
   constructor() {
-    this.registryDir = join(homedir(), '.spec-workflow-mcp');
+    this.registryDir = getGlobalDir();
     this.registryPath = join(this.registryDir, 'activeProjects.json');
   }
 
@@ -38,8 +38,18 @@ export class ProjectRegistry {
   private async ensureRegistryDir(): Promise<void> {
     try {
       await fs.mkdir(this.registryDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist, ignore
+    } catch (error: any) {
+      // Directory might already exist, ignore EEXIST errors
+      if (error.code === 'EEXIST') {
+        return;
+      }
+      // For permission errors, provide helpful guidance
+      if (error.code === 'EACCES' || error.code === 'EPERM') {
+        console.error(getPermissionErrorHelp('create directory', this.registryDir));
+        throw error;
+      }
+      // Re-throw other errors
+      throw error;
     }
   }
 

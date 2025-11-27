@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
-import { join, dirname, resolve } from 'path';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { homedir } from 'os';
 import { PathUtils } from './path-utils.js';
 import { ImplementationLogMigrator } from './implementation-log-migrator.js';
+import { getGlobalDir } from './global-dir.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -167,7 +167,7 @@ Templates can include placeholders that will be replaced when documents are crea
    */
   private async migrateImplementationLogs(): Promise<void> {
     try {
-      const userDataDir = resolve(homedir(), '.spec-workflow-mcp');
+      const userDataDir = getGlobalDir();
       const specsDir = join(PathUtils.getWorkflowRoot(this.projectPath), 'specs');
 
       // Create user data directory if it doesn't exist

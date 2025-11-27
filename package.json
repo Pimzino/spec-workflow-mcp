@@ -22,6 +22,8 @@
     "build:dashboard": "vite build --config src/dashboard_frontend/vite.config.ts",
     "clean": "rimraf dist",
     "validate:i18n": "node scripts/validate-i18n.js",
+    "sync:plugin-version": "node scripts/sync-plugin-version.js",
+    "check:plugin-version": "node scripts/sync-plugin-version.js --check",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",

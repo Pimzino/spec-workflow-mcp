@@ -57,9 +57,47 @@ Only use a custom port if port 5000 is unavailable:
 npx -y @pimzino/spec-workflow-mcp@latest --dashboard --port 8080
 ```
 
+## Environment Variables
+
+### SPEC_WORKFLOW_HOME
+
+Override the default global state directory (`~/.spec-workflow-mcp`). This is useful for sandboxed environments where `$HOME` is read-only.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SPEC_WORKFLOW_HOME` | `~/.spec-workflow-mcp` | Directory for global state files |
+
+**Files stored in this directory:**
+- `activeProjects.json` - Project registry
+- `activeSession.json` - Dashboard session info
+- `settings.json` - Global settings
+- `job-execution-history.json` - Job execution history
+- `migration.log` - Implementation log migration tracking
+
+**Usage examples:**
+
+```bash
+# Absolute path
+SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp npx -y @pimzino/spec-workflow-mcp@latest /workspace
+
+# Relative path (resolved against current working directory)
+SPEC_WORKFLOW_HOME=./.spec-workflow-mcp npx -y @pimzino/spec-workflow-mcp@latest .
+
+# For dashboard mode
+SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+```
+
+**Sandboxed environments (e.g., Codex CLI):**
+
+When running in sandboxed environments like Codex CLI with `sandbox_mode=workspace-write`, set `SPEC_WORKFLOW_HOME` to a writable location within your workspace:
+
+```bash
+SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp npx -y @pimzino/spec-workflow-mcp@latest /workspace
+```
+
 ## Dashboard Session Management
 
-The dashboard stores its session information in `~/.spec-workflow-mcp/activeSession.json`. This file:
+The dashboard stores its session information in `~/.spec-workflow-mcp/activeSession.json` (or `$SPEC_WORKFLOW_HOME/activeSession.json` if set). This file:
 - Enforces single dashboard instance
 - Allows MCP servers to discover the running dashboard
 - Automatically cleans up when dashboard stops

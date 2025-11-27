@@ -1,0 +1,10 @@
+{
+  "name": "spec-workflow-mcp",
+  "version": "2.0.9",
+  "description": "MCP server for structured spec-driven development with real-time web dashboard and VSCode extension.",
+  "author": {
+    "name": "Pimzino"
+  },
+  "homepage": "https://github.com/Pimzino/spec-workflow-mcp",
+  "license": "GPL-3.0"
+}
