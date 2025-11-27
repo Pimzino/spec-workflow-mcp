@@ -29,6 +29,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Archived Specs Display Content Correctly** (PR #146) - Fixed critical bug where archived specs were not displaying content correctly in the dashboard:
   - Added new API endpoint `/api/projects/:projectId/specs/:name/all/archived` that reads documents from the archive path (`.spec-workflow/archive/specs/{name}/`) instead of the active specs path. This was missed during the multi-project dashboard implementation.
+- **Tasks.md Format Validation** (fixes #151) - Added validation to ensure tasks.md follows the required format before approval:
+  - New `task-validator.ts` module validates checkbox format (`- [ ]`), task IDs, and metadata delimiters
+  - Validation runs automatically when requesting approval for tasks.md files
+  - Blocks approval if format errors are found, with detailed error messages and fix suggestions
+  - Prevents dashboard from failing to track task status due to malformed task files
+  - Warnings for missing underscore delimiters on metadata fields (`_Requirements:_`, `_Leverage:_`, `_Prompt:_`)
 
 ## [2.0.9] - 2025-11-19
 
