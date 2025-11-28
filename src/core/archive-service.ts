@@ -6,7 +6,8 @@ export class SpecArchiveService {
   private projectPath: string;
 
   constructor(projectPath: string) {
-    this.projectPath = projectPath;
+    // Translate path for Docker environments (host -> container mapping)
+    this.projectPath = PathUtils.translatePath(projectPath);
   }
 
   async archiveSpec(specName: string): Promise<void> {
