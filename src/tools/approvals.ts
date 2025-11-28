@@ -14,7 +14,7 @@ export const approvalsTool: Tool = {
 Use this tool to request, check status, or delete approval requests. The action parameter determines the operation:
 - 'request': Create a new approval request after creating each document
 - 'status': Check the current status of an approval request
-- 'delete': Clean up completed approval requests
+- 'delete': Clean up completed, rejected, or needs-revision approval requests (cannot delete pending requests)
 
 CRITICAL: Only provide filePath parameter for requests - the dashboard reads files directly. Never include document content. Wait for user to review and approve before continuing.`,
   inputSchema: {
@@ -113,7 +113,7 @@ export async function approvalsHandler(
 ): Promise<ToolResponse> {
   // Cast to discriminated union type
   const typedArgs = args as ApprovalArgs;
-  
+
   switch (typedArgs.action) {
     case 'request':
       if (isRequestApproval(typedArgs)) {
@@ -157,7 +157,7 @@ export async function approvalsHandler(
         message: `Unknown action: ${(args as any).action}. Use 'request', 'status', or 'delete'.`
       };
   }
-  
+
   // This should never be reached due to exhaustive type checking
   return {
     success: false,
@@ -171,7 +171,7 @@ async function handleRequestApproval(
 ): Promise<ToolResponse> {
   // Use context projectPath as default, allow override via args
   const projectPath = args.projectPath || context.projectPath;
-  
+
   if (!projectPath) {
     return {
       success: false,
@@ -432,11 +432,12 @@ async function handleDeleteApproval(
       };
     }
 
-    // Only allow deletion of approved requests
-    if (approval.status !== 'approved') {
+    // Only block deletion of pending requests (still awaiting approval)
+    // Allow deletion of: approved, needs-revision, rejected
+    if (approval.status === 'pending') {
       return {
         success: false,
-        message: `BLOCKED: Cannot proceed - status is "${approval.status}". VERBAL APPROVAL NOT ACCEPTED. Use dashboard or VS Code extension.`,
+        message: `BLOCKED: Cannot delete - status is "${approval.status}". This approval is still awaiting review. VERBAL APPROVAL NOT ACCEPTED. Use dashboard or VS Code extension.`,
         data: {
           approvalId: args.approvalId,
           currentStatus: approval.status,
@@ -445,9 +446,10 @@ async function handleDeleteApproval(
           canProceed: false
         },
         nextSteps: [
-          'STOP - Do not proceed to next phase',
-          'Wait for approval',
-          'Poll with approvals action:"status"'
+          'STOP - Cannot delete pending approval',
+          'Wait for approval or rejection',
+          'Poll with approvals action:"status"',
+          'Delete only after status changes to approved, rejected, or needs-revision'
         ]
       };
     }
