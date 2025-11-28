@@ -4,6 +4,39 @@ import { constants } from 'fs';
 
 export class PathUtils {
   /**
+   * Translate a host path to container path if running in Docker with path mapping configured.
+   * 
+   * Environment variables:
+   * - SPEC_WORKFLOW_HOST_PATH_PREFIX: Path prefix on the host (e.g., /Users/username)
+   * - SPEC_WORKFLOW_CONTAINER_PATH_PREFIX: Corresponding path in container (e.g., /projects)
+   * 
+   * Example: If host prefix is "/Users/dev" and container prefix is "/projects",
+   * then "/Users/dev/myapp" becomes "/projects/myapp"
+   */
+  static translatePath(hostPath: string): string {
+    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX;
+    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX;
+    
+    if (hostPrefix && containerPrefix && hostPath.startsWith(hostPrefix)) {
+      return hostPath.replace(hostPrefix, containerPrefix);
+    }
+    return hostPath;
+  }
+
+  /**
+   * Reverse translation: container path back to host path (for display/registry)
+   */
+  static reverseTranslatePath(containerPath: string): string {
+    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX;
+    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX;
+    
+    if (hostPrefix && containerPrefix && containerPath.startsWith(containerPrefix)) {
+      return containerPath.replace(containerPrefix, hostPrefix);
+    }
+    return containerPath;
+  }
+
+  /**
    * Safely join paths ensuring no directory traversal
    */
   private static safeJoin(basePath: string, ...paths: string[]): string {
