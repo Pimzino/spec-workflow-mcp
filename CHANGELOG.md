@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.11] - 2025-11-28
+
+### Changed
+- **Flexible Approval Deletion** (PR #119) - Modified approval deletion logic to allow deleting approvals in any non-pending status:
+  - Can now delete approvals with status: `approved`, `rejected`, or `needs-revision`
+  - Only `pending` approvals are blocked from deletion (still awaiting review)
+  - Improves flexibility for cleanup operations while preventing accidental deletion of approvals still awaiting review
+  - Updated error messages and next steps guidance to clarify the new behavior
+  - Updated documentation in TOOLS-REFERENCE.md and api-reference.md
+
 ## [2.0.10] - 2025-11-26
 
 ### Added
