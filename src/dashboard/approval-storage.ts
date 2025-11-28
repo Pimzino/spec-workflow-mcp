@@ -101,7 +101,8 @@ export interface ApprovalRequest {
 }
 
 export class ApprovalStorage extends EventEmitter {
-  public projectPath: string; // Make public so dashboard server can access it
+  public projectPath: string; // Make public so dashboard server can access it (translated for local access)
+  public originalProjectPath: string; // Original host path for display/registry
   private approvalsDir: string;
   private watcher?: chokidar.FSWatcher;
 
@@ -113,8 +114,14 @@ export class ApprovalStorage extends EventEmitter {
       throw new Error('Project path cannot be empty');
     }
     
+    // Store original path for reference
+    this.originalProjectPath = resolve(projectPath);
+    
+    // Translate path for Docker environments (host -> container mapping)
+    const translatedPath = PathUtils.translatePath(this.originalProjectPath);
+    
     // Resolve to absolute path
-    const resolvedPath = resolve(projectPath);
+    const resolvedPath = resolve(translatedPath);
     
     // Prevent root directory usage which causes permission errors
     if (resolvedPath === '/' || resolvedPath === '\\' || resolvedPath.match(/^[A-Z]:\\?$/)) {

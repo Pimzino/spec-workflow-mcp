@@ -17,7 +17,8 @@ export class SpecWatcher extends EventEmitter {
 
   constructor(projectPath: string, parser: SpecParser) {
     super();
-    this.projectPath = projectPath;
+    // Translate path for Docker environments (host -> container mapping)
+    this.projectPath = PathUtils.translatePath(projectPath);
     this.parser = parser;
   }
 
