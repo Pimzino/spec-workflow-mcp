@@ -39,7 +39,9 @@ export async function specStatusHandler(args: any, context: ToolContext): Promis
   }
 
   try {
-    const parser = new SpecParser(projectPath);
+    // Translate path at tool entry point (components expect pre-translated paths)
+    const translatedPath = PathUtils.translatePath(projectPath);
+    const parser = new SpecParser(translatedPath);
     const spec = await parser.getSpec(specName);
     
     if (!spec) {

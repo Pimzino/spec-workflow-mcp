@@ -125,13 +125,13 @@ export class ProjectManager extends EventEmitter {
    */
   private async addProject(entry: ProjectRegistryEntry): Promise<void> {
     try {
-      // Translate path for Docker environments (host -> container mapping)
+      // Translate path once at entry point (components should not know about Docker)
       const translatedPath = PathUtils.translatePath(entry.projectPath);
-      
-      const parser = new SpecParser(entry.projectPath);
-      const watcher = new SpecWatcher(entry.projectPath, parser);
-      const approvalStorage = new ApprovalStorage(entry.projectPath);
-      const archiveService = new SpecArchiveService(entry.projectPath);
+
+      const parser = new SpecParser(translatedPath);
+      const watcher = new SpecWatcher(translatedPath, parser);
+      const approvalStorage = new ApprovalStorage(translatedPath, entry.projectPath);
+      const archiveService = new SpecArchiveService(translatedPath);
 
       // Start watchers
       await watcher.start();

@@ -107,29 +107,25 @@ export class ApprovalStorage extends EventEmitter {
   private approvalsDir: string;
   private watcher?: chokidar.FSWatcher;
 
-  constructor(projectPath: string) {
+  constructor(translatedPath: string, originalPath?: string) {
     super();
 
     // Validate project path
-    if (!projectPath || projectPath.trim() === '') {
+    if (!translatedPath || translatedPath.trim() === '') {
       throw new Error('Project path cannot be empty');
     }
-    
-    // Store original path for reference
-    this.originalProjectPath = resolve(projectPath);
-    
-    // Translate path for Docker environments (host -> container mapping)
-    const translatedPath = PathUtils.translatePath(this.originalProjectPath);
-    
-    // Resolve to absolute path
+
+    // Resolve to absolute path (already translated by caller)
     const resolvedPath = resolve(translatedPath);
-    
+
     // Prevent root directory usage which causes permission errors
     if (resolvedPath === '/' || resolvedPath === '\\' || resolvedPath.match(/^[A-Z]:\\?$/)) {
       throw new Error(`Invalid project path: ${resolvedPath}. Cannot use root directory for spec workflow.`);
     }
 
     this.projectPath = resolvedPath;
+    // Store original path for display/registry (fall back to translated if not provided)
+    this.originalProjectPath = resolve(originalPath ?? translatedPath);
     this.approvalsDir = PathUtils.getApprovalsPath(resolvedPath);
   }
 

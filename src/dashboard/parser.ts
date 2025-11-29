@@ -16,12 +16,11 @@ export class SpecParser {
   private steeringPath: string;
 
   constructor(projectPath: string) {
-    // Translate path for Docker environments (host -> container mapping)
-    const translatedPath = PathUtils.translatePath(projectPath);
-    this.projectPath = translatedPath;
-    this.specsPath = PathUtils.getSpecPath(translatedPath, '');
-    this.archiveSpecsPath = PathUtils.getArchiveSpecsPath(translatedPath);
-    this.steeringPath = PathUtils.getSteeringPath(translatedPath);
+    // Path should already be translated by caller (ProjectManager)
+    this.projectPath = projectPath;
+    this.specsPath = PathUtils.getSpecPath(projectPath, '');
+    this.archiveSpecsPath = PathUtils.getArchiveSpecsPath(projectPath);
+    this.steeringPath = PathUtils.getSteeringPath(projectPath);
   }
 
   async getAllSpecs(): Promise<ParsedSpec[]> {
