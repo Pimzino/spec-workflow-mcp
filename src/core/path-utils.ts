@@ -14,11 +14,18 @@ export class PathUtils {
    * then "/Users/dev/myapp" becomes "/projects/myapp"
    */
   static translatePath(hostPath: string): string {
-    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX;
-    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX;
-    
-    if (hostPrefix && containerPrefix && hostPath.startsWith(hostPrefix)) {
-      return hostPath.replace(hostPrefix, containerPrefix);
+    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX?.trim();
+    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX?.trim();
+
+    // Validate non-empty after trimming (fixes whitespace env var bug)
+    if (!hostPrefix || !containerPrefix) {
+      return hostPath;
+    }
+
+    if (this.pathMatchesPrefix(hostPath, hostPrefix)) {
+      // Use substring instead of replace to avoid regex interpretation of special chars
+      const relativePath = hostPath.substring(this.normalizePrefix(hostPrefix).length);
+      return this.normalizePrefix(containerPrefix) + relativePath;
     }
     return hostPath;
   }
@@ -27,13 +34,43 @@ export class PathUtils {
    * Reverse translation: container path back to host path (for display/registry)
    */
   static reverseTranslatePath(containerPath: string): string {
-    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX;
-    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX;
-    
-    if (hostPrefix && containerPrefix && containerPath.startsWith(containerPrefix)) {
-      return containerPath.replace(containerPrefix, hostPrefix);
+    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX?.trim();
+    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX?.trim();
+
+    // Validate non-empty after trimming
+    if (!hostPrefix || !containerPrefix) {
+      return containerPath;
+    }
+
+    if (this.pathMatchesPrefix(containerPath, containerPrefix)) {
+      // Use substring instead of replace to avoid regex interpretation of special chars
+      const relativePath = containerPath.substring(this.normalizePrefix(containerPrefix).length);
+      return this.normalizePrefix(hostPrefix) + relativePath;
     }
     return containerPath;
+  }
+
+  /**
+   * Normalize prefix by removing trailing slashes.
+   * Fixes mismatch between "/Users/dev/" and "/Users/dev".
+   */
+  private static normalizePrefix(prefix: string): string {
+    return prefix.replace(/[/\\]+$/, '');
+  }
+
+  /**
+   * Check if a path matches a prefix with proper boundary checking.
+   * Prevents partial matches like "/Users/dev" matching "/Users/developer".
+   * Handles trailing slash inconsistencies.
+   */
+  private static pathMatchesPrefix(path: string, prefix: string): boolean {
+    const normalizedPath = this.normalizePrefix(path);
+    const normalizedPrefix = this.normalizePrefix(prefix);
+
+    if (normalizedPath === normalizedPrefix) return true;
+    // Check for path separator boundary (Unix `/` or Windows `\`)
+    return normalizedPath.startsWith(normalizedPrefix + '/') ||
+           normalizedPath.startsWith(normalizedPrefix + '\\');
   }
 
   /**
