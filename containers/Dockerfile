@@ -14,8 +14,8 @@ COPY scripts ./scripts
 COPY tsconfig.json ./tsconfig.json
 COPY vitest.config.ts ./vitest.config.ts
 
-# Build the application
-RUN npm run build
+# Install dependencies and build
+RUN npm install && npm run build
 
 # Runtime stage
 FROM node:24-alpine
@@ -30,11 +30,9 @@ COPY --from=builder /app/dist ./dist
 
 RUN mkdir -p /workspace /workspace/.spec-workflow-mcp
 
-# Change ownership of the app directory to the node user (uid=1000)
-RUN chown -R node:node /app /workspace
-
-# Switch to the node user to match host user permissions
-USER node
+# Ensure application files are readable by any UID
+# This is necessary because we run the container with --user flag at runtime
+RUN chmod -R a+rX /app
 
 WORKDIR /workspace
 
@@ -43,4 +41,4 @@ ENV SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp
 
 EXPOSE 5000
 
-CMD node /app/dist/index.js ${SPEC_WORKFLOW_PATH:-/workspace} --dashboard --port ${DASHBOARD_PORT:-5000}
+CMD ["sh", "-c", "node /app/dist/index.js ${SPEC_WORKFLOW_PATH:-/workspace} --dashboard --port ${DASHBOARD_PORT:-3000}"]
