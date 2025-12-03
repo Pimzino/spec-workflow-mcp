@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.0] - 2025-12-03
 
+### Fixed
+- **Improved Diff Visibility in Changes Tab** (fixes #158) - Fixed issue where adding a single line would cause all subsequent text to appear as changed:
+  - Replaced naive index-based line comparison with proper `diffLines` algorithm from the `diff` library
+  - Now correctly identifies only the actual changed lines, not positional differences
+  - Provides accurate visual diff representation matching user expectations
+
 ### Added
 - **MDX Editor Integration** - Replaced basic markdown textareas with a full-featured rich text editor powered by MDXEditor:
   - **Rich Text Editing** - WYSIWYG editing experience with live preview for markdown content

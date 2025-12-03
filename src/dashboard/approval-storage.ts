@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import { join, isAbsolute, resolve, basename } from 'path';
 import chokidar from 'chokidar';
+import { diffLines, Change } from 'diff';
 import { PathUtils } from '../core/path-utils.js';
 
 export interface ApprovalComment {
@@ -592,70 +593,62 @@ export class ApprovalStorage extends EventEmitter {
       toContent = toSnapshot.content;
     }
 
-    // Basic diff computation (we'll enhance this when we add the diff library)
-    const fromLines = fromContent.split('\n');
-    const toLines = toContent.split('\n');
-
-    // Simple line-by-line comparison for now
-    const diffLines: DiffLine[] = [];
+    const changes: Change[] = diffLines(fromContent, toContent);
+    
+    const resultLines: DiffLine[] = [];
     let additions = 0;
     let deletions = 0;
-    let changes = 0;
+    let oldLineNum = 1;
+    let newLineNum = 1;
 
-    // This is a very basic implementation - will be replaced with proper diff library
-    const maxLines = Math.max(fromLines.length, toLines.length);
-    for (let i = 0; i < maxLines; i++) {
-      const fromLine = fromLines[i];
-      const toLine = toLines[i];
+    for (const change of changes) {
+      // Split the change value into lines, handling the trailing newline properly
+      const lines = change.value.split('\n');
+      // Remove the last empty element if the value ended with a newline
+      if (lines.length > 0 && lines[lines.length - 1] === '') {
+        lines.pop();
+      }
 
-      if (fromLine !== undefined && toLine !== undefined) {
-        if (fromLine === toLine) {
-          diffLines.push({
-            type: 'normal',
-            oldLineNumber: i + 1,
-            newLineNumber: i + 1,
-            content: fromLine
+      for (const line of lines) {
+        if (change.added) {
+          additions++;
+          resultLines.push({
+            type: 'add',
+            newLineNumber: newLineNum++,
+            content: line
+          });
+        } else if (change.removed) {
+          deletions++;
+          resultLines.push({
+            type: 'delete',
+            oldLineNumber: oldLineNum++,
+            content: line
           });
         } else {
-          changes++;
-          diffLines.push({
-            type: 'delete',
-            oldLineNumber: i + 1,
-            content: fromLine
-          });
-          diffLines.push({
-            type: 'add',
-            newLineNumber: i + 1,
-            content: toLine
+          // Unchanged line
+          resultLines.push({
+            type: 'normal',
+            oldLineNumber: oldLineNum++,
+            newLineNumber: newLineNum++,
+            content: line
           });
         }
-      } else if (fromLine !== undefined) {
-        deletions++;
-        diffLines.push({
-          type: 'delete',
-          oldLineNumber: i + 1,
-          content: fromLine
-        });
-      } else if (toLine !== undefined) {
-        additions++;
-        diffLines.push({
-          type: 'add',
-          newLineNumber: i + 1,
-          content: toLine
-        });
       }
     }
+
+    const fromLineCount = fromContent ? fromContent.split('\n').length : 0;
+    const toLineCount = toContent ? toContent.split('\n').length : 0;
 
     return {
       additions,
       deletions,
-      changes,
+      changes: additions + deletions,
       chunks: [{
         oldStart: 1,
-        oldLines: fromLines.length,
+        oldLines: fromLineCount,
         newStart: 1,
-        newLines: toLines.length,
-        lines: diffLines
+        newLines: toLineCount,
+        lines: resultLines
       }]
     };
   }
