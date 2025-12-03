@@ -93,18 +93,73 @@
   border-color: #374151;
 }
 
+/* Select dropdown content (language selector, block type selector, etc.) */
+.mdx-editor-wrapper .mdxeditor-select-content {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 .mdx-editor-wrapper.dark-theme .mdxeditor-select-content {
   background-color: #1f2937;
   border-color: #374151;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Select dropdown items */
+.mdx-editor-wrapper .mdxeditor-select-item {
+  color: #374151;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 .mdx-editor-wrapper.dark-theme .mdxeditor-select-item {
   color: #f9fafb;
 }
 
+.mdx-editor-wrapper .mdxeditor-select-item:hover,
+.mdx-editor-wrapper .mdxeditor-select-item[data-highlighted] {
+  background-color: #f3f4f6;
+}
+
 .mdx-editor-wrapper.dark-theme .mdxeditor-select-item:hover,
 .mdx-editor-wrapper.dark-theme .mdxeditor-select-item[data-highlighted] {
   background-color: #374151;
+}
+
+/* Scrollbar styling for select dropdown */
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-content::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-content::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-content::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 /* Select trigger (BlockTypeSelect) styling in toolbar */
@@ -153,11 +208,15 @@ html.dark .mdxeditor-popup-container [data-radix-popper-content-wrapper] > div {
 html.dark .mdxeditor-select-content {
   background-color: #1f2937 !important;
   border-color: #374151 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .dark .mdxeditor-select-item,
 html.dark .mdxeditor-select-item {
   color: #f9fafb !important;
+  padding: 0.5rem 0.75rem;
 }
 
 .dark .mdxeditor-select-item:hover,
@@ -165,6 +224,29 @@ html.dark .mdxeditor-select-item {
 html.dark .mdxeditor-select-item:hover,
 html.dark .mdxeditor-select-item[data-highlighted] {
   background-color: #374151 !important;
+}
+
+/* Global scrollbar styling for select dropdown in dark mode */
+.dark .mdxeditor-select-content::-webkit-scrollbar,
+html.dark .mdxeditor-select-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark .mdxeditor-select-content::-webkit-scrollbar-track,
+html.dark .mdxeditor-select-content::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.dark .mdxeditor-select-content::-webkit-scrollbar-thumb,
+html.dark .mdxeditor-select-content::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.dark .mdxeditor-select-content::-webkit-scrollbar-thumb:hover,
+html.dark .mdxeditor-select-content::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 /* Ensure popup container has high z-index when rendered to body */
@@ -181,6 +263,230 @@ body > .mdxeditor-popup-container {
 
 .mdx-editor-wrapper.dark-theme pre.hljs {
   background-color: #1f2937 !important;
+}
+
+/* ============================================
+   Code Block Editor Styling (CodeMirror based)
+   ============================================ */
+
+/* Code block wrapper container */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"],
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] {
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"],
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] {
+  border-color: #374151;
+  background-color: #1f2937;
+}
+
+/* Code block header (language label) */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] > div:first-child,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] > div:first-child {
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] > div:first-child,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] > div:first-child {
+  background-color: #374151;
+  border-bottom-color: #4b5563;
+  color: #9ca3af;
+}
+
+/* CodeMirror editor within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-editor,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-editor {
+  background-color: #f9fafb;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-editor,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-editor {
+  background-color: #1f2937;
+}
+
+/* CodeMirror scroller within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-scroller,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-scroller {
+  background-color: #f9fafb;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-scroller,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-scroller {
+  background-color: #1f2937;
+}
+
+/* CodeMirror gutters within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-gutters,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-gutters {
+  background-color: #f3f4f6;
+  border-right: 1px solid #e5e7eb;
+  color: #9ca3af;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-gutters,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-gutters {
+  background-color: #374151;
+  border-right-color: #4b5563;
+  color: #6b7280;
+}
+
+/* CodeMirror content within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-content,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-content {
+  color: #1f2937;
+  caret-color: #1f2937;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-content,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+/* CodeMirror cursor within code blocks */
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-cursor,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+/* CodeMirror active line within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-activeLine,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-activeLine,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* CodeMirror active line gutter within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* CodeMirror selection within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* CodeMirror line numbers within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement {
+  color: #9ca3af;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement {
+  color: #6b7280;
+}
+
+/* Global dark mode support for code block editors */
+.dark [class*="_codeMirrorWrapper"],
+html.dark [class*="_codeMirrorWrapper"],
+.dark [class*="codeMirrorWrapper"],
+html.dark [class*="codeMirrorWrapper"] {
+  border-color: #374151;
+  background-color: #1f2937;
+}
+
+.dark [class*="_codeMirrorWrapper"] > div:first-child,
+html.dark [class*="_codeMirrorWrapper"] > div:first-child,
+.dark [class*="codeMirrorWrapper"] > div:first-child,
+html.dark [class*="codeMirrorWrapper"] > div:first-child {
+  background-color: #374151;
+  border-bottom-color: #4b5563;
+  color: #9ca3af;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-editor,
+html.dark [class*="_codeMirrorWrapper"] .cm-editor,
+.dark [class*="codeMirrorWrapper"] .cm-editor,
+html.dark [class*="codeMirrorWrapper"] .cm-editor {
+  background-color: #1f2937;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-scroller,
+html.dark [class*="_codeMirrorWrapper"] .cm-scroller,
+.dark [class*="codeMirrorWrapper"] .cm-scroller,
+html.dark [class*="codeMirrorWrapper"] .cm-scroller {
+  background-color: #1f2937;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-gutters,
+html.dark [class*="_codeMirrorWrapper"] .cm-gutters,
+.dark [class*="codeMirrorWrapper"] .cm-gutters,
+html.dark [class*="codeMirrorWrapper"] .cm-gutters {
+  background-color: #374151;
+  border-right-color: #4b5563;
+  color: #6b7280;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-content,
+html.dark [class*="_codeMirrorWrapper"] .cm-content,
+.dark [class*="codeMirrorWrapper"] .cm-content,
+html.dark [class*="codeMirrorWrapper"] .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-cursor,
+html.dark [class*="_codeMirrorWrapper"] .cm-cursor,
+.dark [class*="codeMirrorWrapper"] .cm-cursor,
+html.dark [class*="codeMirrorWrapper"] .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-activeLine,
+html.dark [class*="_codeMirrorWrapper"] .cm-activeLine,
+.dark [class*="codeMirrorWrapper"] .cm-activeLine,
+html.dark [class*="codeMirrorWrapper"] .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+html.dark [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+.dark [class*="codeMirrorWrapper"] .cm-activeLineGutter,
+html.dark [class*="codeMirrorWrapper"] .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+html.dark [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+.dark [class*="codeMirrorWrapper"] .cm-selectionBackground,
+html.dark [class*="codeMirrorWrapper"] .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+html.dark [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+.dark [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+html.dark [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement {
+  color: #6b7280;
 }
 
 /* Mermaid container styling */
