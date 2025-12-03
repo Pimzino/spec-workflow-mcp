@@ -94,7 +94,11 @@
     "cancel": "Abbrechen",
     "delete": "Löschen",
     "closeModalAria": "Modal schließen",
-    "ok": "OK"
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "Ungespeicherte Änderungen",
+      "message": "Sie haben ungespeicherte Änderungen. Sind Sie sicher, dass Sie ohne Speichern schließen möchten?"
+    }
   },
   "tasksPage": {
     "header": {

@@ -94,7 +94,11 @@
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "closeModalAria": "Cerrar modal",
-    "ok": "Aceptar"
+    "ok": "Aceptar",
+    "unsavedChanges": {
+      "title": "Cambios sin guardar",
+      "message": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar sin guardar?"
+    }
   },
   "tasksPage": {
     "header": {

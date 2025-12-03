@@ -94,7 +94,11 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "closeModalAria": "Close modal",
-    "ok": "OK"
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "Unsaved Changes",
+      "message": "You have unsaved changes. Are you sure you want to close without saving?"
+    }
   },
   "tasksPage": {
     "header": {

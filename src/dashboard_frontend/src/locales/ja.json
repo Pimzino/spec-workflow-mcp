@@ -94,7 +94,11 @@
     "cancel": "キャンセル",
     "delete": "削除",
     "closeModalAria": "モーダルを閉じる",
-    "ok": "OK"
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "未保存の変更",
+      "message": "未保存の変更があります。保存せずに閉じてもよろしいですか？"
+    }
   },
   "tasksPage": {
     "header": {

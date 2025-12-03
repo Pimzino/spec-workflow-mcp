@@ -94,7 +94,11 @@
     "cancel": "Annulla",
     "delete": "Elimina",
     "closeModalAria": "Chiudi modale",
-    "ok": "OK"
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "Modifiche non salvate",
+      "message": "Hai modifiche non salvate. Sei sicuro di voler chiudere senza salvare?"
+    }
   },
   "tasksPage": {
     "header": {

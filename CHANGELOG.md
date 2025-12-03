@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.0] - 2025-12-03
 
 ### Fixed
+- **Unsaved Changes Modal Translations** - Added missing translations for the unsaved changes confirmation modal in Steering and Spec document editors across all 11 supported languages (Arabic, German, English, Spanish, French, Italian, Japanese, Korean, Portuguese, Russian, Chinese)
 - **Improved Diff Visibility in Changes Tab** (fixes #158) - Fixed issue where adding a single line would cause all subsequent text to appear as changed:
   - Replaced naive index-based line comparison with proper `diffLines` algorithm from the `diff` library
   - Now correctly identifies only the actual changed lines, not positional differences
