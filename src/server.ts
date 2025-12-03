@@ -163,14 +163,29 @@ export class SpecWorkflowMCPServer {
     });
   }
 
+  /**
+   * Check if running in Docker mode (path translation enabled)
+   * When in Docker, we can't verify host PIDs and want projects to persist
+   */
+  private isDockerMode(): boolean {
+    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX;
+    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX;
+    return !!(hostPrefix && containerPrefix);
+  }
+
   async stop() {
     try {
-      // Unregister from global registry
-      try {
-        await this.projectRegistry.unregisterProject(this.projectPath);
-        console.error('Project unregistered from global registry');
-      } catch (error) {
-        // Ignore errors during cleanup
+      // Only unregister when NOT in Docker mode
+      // In Docker, projects should persist across sessions since we can't verify host PIDs
+      if (!this.isDockerMode()) {
+        try {
+          await this.projectRegistry.unregisterProject(this.projectPath);
+          console.error('Project unregistered from global registry');
+        } catch (error) {
+          // Ignore errors during cleanup
+        }
+      } else {
+        console.error('Docker mode: skipping project unregistration (projects persist across sessions)');
       }
 
       // Stop MCP server
