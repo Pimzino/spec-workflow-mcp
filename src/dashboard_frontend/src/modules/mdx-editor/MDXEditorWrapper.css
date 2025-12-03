@@ -1,0 +1,779 @@
+/* MDX Editor Wrapper Styles */
+
+.mdx-editor-wrapper {
+  width: 100%;
+}
+
+.mdx-editor-wrapper.view-mode,
+.mdx-editor-wrapper.edit-mode {
+  overflow: hidden;
+}
+
+/* Dark theme support for MDX Editor */
+.mdx-editor-wrapper.dark-theme {
+  --accentBase: #3b82f6;
+  --accentBgSubtle: rgba(59, 130, 246, 0.1);
+  --accentBg: rgba(59, 130, 246, 0.2);
+  --accentBgActive: rgba(59, 130, 246, 0.3);
+  --accentText: #60a5fa;
+  --accentTextContrast: #ffffff;
+  --accentSolid: #3b82f6;
+  --accentSolidHover: #2563eb;
+
+  --baseBase: #111827;
+  --baseBgSubtle: #1f2937;
+  --baseBg: #374151;
+  --baseBgHover: #4b5563;
+  --baseBgActive: #6b7280;
+  --baseLine: #4b5563;
+  --baseBorder: #6b7280;
+  --baseBorderHover: #9ca3af;
+  --baseSolid: #9ca3af;
+  --baseSolidHover: #d1d5db;
+  --baseText: #9ca3af;
+  --baseTextContrast: #f9fafb;
+}
+
+/* Toolbar styling */
+.mdx-editor-wrapper .mdxeditor-toolbar {
+  background-color: var(--baseBgSubtle, #f9fafb);
+  border-bottom: 1px solid var(--baseLine, #e5e7eb);
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar {
+  background-color: #1f2937;
+  border-bottom-color: #374151;
+}
+
+/* Toolbar button styling */
+.mdx-editor-wrapper .mdxeditor-toolbar button {
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.mdx-editor-wrapper .mdxeditor-toolbar button:hover {
+  background-color: var(--baseBgHover, #e5e7eb);
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar button:hover {
+  background-color: #374151;
+}
+
+.mdx-editor-wrapper .mdxeditor-toolbar button[data-state="on"] {
+  background-color: var(--accentBg, rgba(59, 130, 246, 0.2));
+  color: var(--accentText, #3b82f6);
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar button[data-state="on"] {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+/* Editor content area */
+.mdx-editor-wrapper .mdxeditor-root-contenteditable {
+  min-height: 200px;
+  background-color: white;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-root-contenteditable {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+/* Popup and dropdown styling */
+.mdx-editor-wrapper .mdxeditor-popup-container {
+  z-index: 100;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-popup-container [data-radix-popper-content-wrapper] > div {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+/* Select dropdown content (language selector, block type selector, etc.) */
+.mdx-editor-wrapper .mdxeditor-select-content {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-content {
+  background-color: #1f2937;
+  border-color: #374151;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Select dropdown items */
+.mdx-editor-wrapper .mdxeditor-select-item {
+  color: #374151;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-item {
+  color: #f9fafb;
+}
+
+.mdx-editor-wrapper .mdxeditor-select-item:hover,
+.mdx-editor-wrapper .mdxeditor-select-item[data-highlighted] {
+  background-color: #f3f4f6;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-item:hover,
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-item[data-highlighted] {
+  background-color: #374151;
+}
+
+/* Scrollbar styling for select dropdown */
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.mdx-editor-wrapper .mdxeditor-select-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-content::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-content::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-select-content::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Select trigger (BlockTypeSelect) styling in toolbar */
+.mdx-editor-wrapper .mdxeditor-toolbar button[role="combobox"],
+.mdx-editor-wrapper .mdxeditor-toolbar [data-toolbar-item][role="combobox"] {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: #374151;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar button[role="combobox"],
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar [data-toolbar-item][role="combobox"] {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+.mdx-editor-wrapper .mdxeditor-toolbar button[role="combobox"]:hover,
+.mdx-editor-wrapper .mdxeditor-toolbar [data-toolbar-item][role="combobox"]:hover {
+  background-color: #f3f4f6;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar button[role="combobox"]:hover,
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar [data-toolbar-item][role="combobox"]:hover {
+  background-color: #4b5563;
+}
+
+/*
+ * Global styles for MDXEditor popups rendered to document.body via overlayContainer
+ * These styles apply when dark mode is active on the html/body element
+ */
+.dark .mdxeditor-popup-container,
+html.dark .mdxeditor-popup-container {
+  z-index: 9999;
+}
+
+.dark .mdxeditor-popup-container [data-radix-popper-content-wrapper] > div,
+html.dark .mdxeditor-popup-container [data-radix-popper-content-wrapper] > div {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .mdxeditor-select-content,
+html.dark .mdxeditor-select-content {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dark .mdxeditor-select-item,
+html.dark .mdxeditor-select-item {
+  color: #f9fafb !important;
+  padding: 0.5rem 0.75rem;
+}
+
+.dark .mdxeditor-select-item:hover,
+.dark .mdxeditor-select-item[data-highlighted],
+html.dark .mdxeditor-select-item:hover,
+html.dark .mdxeditor-select-item[data-highlighted] {
+  background-color: #374151 !important;
+}
+
+/* Global scrollbar styling for select dropdown in dark mode */
+.dark .mdxeditor-select-content::-webkit-scrollbar,
+html.dark .mdxeditor-select-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark .mdxeditor-select-content::-webkit-scrollbar-track,
+html.dark .mdxeditor-select-content::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.dark .mdxeditor-select-content::-webkit-scrollbar-thumb,
+html.dark .mdxeditor-select-content::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.dark .mdxeditor-select-content::-webkit-scrollbar-thumb:hover,
+html.dark .mdxeditor-select-content::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Ensure popup container has high z-index when rendered to body */
+body > .mdxeditor-popup-container {
+  z-index: 9999 !important;
+}
+
+/* Code block styling */
+.mdx-editor-wrapper pre.hljs {
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.mdx-editor-wrapper.dark-theme pre.hljs {
+  background-color: #1f2937 !important;
+}
+
+/* ============================================
+   Code Block Editor Styling (CodeMirror based)
+   ============================================ */
+
+/* Code block wrapper container */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"],
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] {
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"],
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] {
+  border-color: #374151;
+  background-color: #1f2937;
+}
+
+/* Code block header (language label) */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] > div:first-child,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] > div:first-child {
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] > div:first-child,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] > div:first-child {
+  background-color: #374151;
+  border-bottom-color: #4b5563;
+  color: #9ca3af;
+}
+
+/* CodeMirror editor within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-editor,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-editor {
+  background-color: #f9fafb;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-editor,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-editor {
+  background-color: #1f2937;
+}
+
+/* CodeMirror scroller within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-scroller,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-scroller {
+  background-color: #f9fafb;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-scroller,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-scroller {
+  background-color: #1f2937;
+}
+
+/* CodeMirror gutters within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-gutters,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-gutters {
+  background-color: #f3f4f6;
+  border-right: 1px solid #e5e7eb;
+  color: #9ca3af;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-gutters,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-gutters {
+  background-color: #374151;
+  border-right-color: #4b5563;
+  color: #6b7280;
+}
+
+/* CodeMirror content within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-content,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-content {
+  color: #1f2937;
+  caret-color: #1f2937;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-content,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+/* CodeMirror cursor within code blocks */
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-cursor,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+/* CodeMirror active line within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-activeLine,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-activeLine,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* CodeMirror active line gutter within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* CodeMirror selection within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* CodeMirror line numbers within code blocks */
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+.mdx-editor-wrapper [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement {
+  color: #9ca3af;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.mdx-editor-wrapper.dark-theme [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+.mdx-editor-wrapper.dark-theme [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement {
+  color: #6b7280;
+}
+
+/* Global dark mode support for code block editors */
+.dark [class*="_codeMirrorWrapper"],
+html.dark [class*="_codeMirrorWrapper"],
+.dark [class*="codeMirrorWrapper"],
+html.dark [class*="codeMirrorWrapper"] {
+  border-color: #374151;
+  background-color: #1f2937;
+}
+
+.dark [class*="_codeMirrorWrapper"] > div:first-child,
+html.dark [class*="_codeMirrorWrapper"] > div:first-child,
+.dark [class*="codeMirrorWrapper"] > div:first-child,
+html.dark [class*="codeMirrorWrapper"] > div:first-child {
+  background-color: #374151;
+  border-bottom-color: #4b5563;
+  color: #9ca3af;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-editor,
+html.dark [class*="_codeMirrorWrapper"] .cm-editor,
+.dark [class*="codeMirrorWrapper"] .cm-editor,
+html.dark [class*="codeMirrorWrapper"] .cm-editor {
+  background-color: #1f2937;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-scroller,
+html.dark [class*="_codeMirrorWrapper"] .cm-scroller,
+.dark [class*="codeMirrorWrapper"] .cm-scroller,
+html.dark [class*="codeMirrorWrapper"] .cm-scroller {
+  background-color: #1f2937;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-gutters,
+html.dark [class*="_codeMirrorWrapper"] .cm-gutters,
+.dark [class*="codeMirrorWrapper"] .cm-gutters,
+html.dark [class*="codeMirrorWrapper"] .cm-gutters {
+  background-color: #374151;
+  border-right-color: #4b5563;
+  color: #6b7280;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-content,
+html.dark [class*="_codeMirrorWrapper"] .cm-content,
+.dark [class*="codeMirrorWrapper"] .cm-content,
+html.dark [class*="codeMirrorWrapper"] .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-cursor,
+html.dark [class*="_codeMirrorWrapper"] .cm-cursor,
+.dark [class*="codeMirrorWrapper"] .cm-cursor,
+html.dark [class*="codeMirrorWrapper"] .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-activeLine,
+html.dark [class*="_codeMirrorWrapper"] .cm-activeLine,
+.dark [class*="codeMirrorWrapper"] .cm-activeLine,
+html.dark [class*="codeMirrorWrapper"] .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+html.dark [class*="_codeMirrorWrapper"] .cm-activeLineGutter,
+.dark [class*="codeMirrorWrapper"] .cm-activeLineGutter,
+html.dark [class*="codeMirrorWrapper"] .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+html.dark [class*="_codeMirrorWrapper"] .cm-selectionBackground,
+.dark [class*="codeMirrorWrapper"] .cm-selectionBackground,
+html.dark [class*="codeMirrorWrapper"] .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+html.dark [class*="_codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+.dark [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement,
+html.dark [class*="codeMirrorWrapper"] .cm-lineNumbers .cm-gutterElement {
+  color: #6b7280;
+}
+
+/* Mermaid container styling */
+.mdx-editor-wrapper .mermaid-container {
+  display: flex;
+  justify-content: center;
+  background-color: var(--baseBgSubtle, #f9fafb);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.mdx-editor-wrapper.dark-theme .mermaid-container {
+  background-color: #1f2937;
+}
+
+.mdx-editor-wrapper .mermaid-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Table styling */
+.mdx-editor-wrapper table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.mdx-editor-wrapper th,
+.mdx-editor-wrapper td {
+  border: 1px solid var(--baseLine, #e5e7eb);
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+
+.mdx-editor-wrapper.dark-theme th,
+.mdx-editor-wrapper.dark-theme td {
+  border-color: #374151;
+}
+
+.mdx-editor-wrapper th {
+  background-color: var(--baseBgSubtle, #f9fafb);
+  font-weight: 600;
+}
+
+.mdx-editor-wrapper.dark-theme th {
+  background-color: #1f2937;
+}
+
+/* Link styling */
+.mdx-editor-wrapper a {
+  color: var(--accentText, #3b82f6);
+  text-decoration: underline;
+}
+
+.mdx-editor-wrapper a:hover {
+  color: var(--accentSolidHover, #2563eb);
+}
+
+/* Blockquote styling */
+.mdx-editor-wrapper blockquote {
+  border-left: 4px solid var(--accentBase, #3b82f6);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--baseText, #6b7280);
+  font-style: italic;
+}
+
+.mdx-editor-wrapper.dark-theme blockquote {
+  color: #9ca3af;
+}
+
+/* Separator in toolbar */
+.mdx-editor-wrapper .mdxeditor-toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background-color: var(--baseLine, #e5e7eb);
+  margin: 0 4px;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar-separator {
+  background-color: #4b5563;
+}
+
+/* Rich text editor root container */
+.mdx-editor-wrapper .mdxeditor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mdx-editor-wrapper .mdxeditor > div:last-child {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Focus styles */
+.mdx-editor-wrapper .mdxeditor-root-contenteditable:focus-within {
+  outline: none;
+}
+
+/* Source mode styling */
+.mdx-editor-wrapper.source-mode {
+  height: 100%;
+}
+
+.mdx-editor-wrapper.source-mode > div {
+  height: 100%;
+}
+
+/* Enhanced source mode styling */
+.mdx-editor-wrapper.source-mode .source-content {
+  height: 100%;
+  overflow: auto;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.mdx-editor-wrapper.source-mode.dark-theme .source-content {
+  background-color: #111827;
+  border-color: #374151;
+}
+
+.mdx-editor-wrapper.source-mode .source-pre {
+  margin: 0;
+  padding: 1rem;
+  min-height: 100%;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+  color: #374151;
+  background: transparent;
+}
+
+.mdx-editor-wrapper.source-mode.dark-theme .source-pre {
+  color: #e5e7eb;
+}
+
+.mdx-editor-wrapper.source-mode .source-pre code {
+  font-family: inherit;
+  font-size: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+/* MDXEditor diffSourcePlugin source editor styling (CodeMirror) */
+.mdx-editor-wrapper .mdxeditor-source-editor {
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor {
+  background-color: #111827;
+}
+
+/* CodeMirror editor within source mode */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-editor {
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-editor {
+  background-color: #111827;
+}
+
+/* CodeMirror content area */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-scroller {
+  background-color: #ffffff;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-scroller {
+  background-color: #111827;
+}
+
+/* CodeMirror gutters (line numbers) */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-gutters {
+  background-color: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-gutters {
+  background-color: #1f2937;
+  border-right-color: #374151;
+  color: #9ca3af;
+}
+
+/* CodeMirror active line */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* CodeMirror active line gutter */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* CodeMirror cursor */
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+/* CodeMirror selection */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* CodeMirror text content */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-content {
+  color: #374151;
+  caret-color: #374151;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+/* CodeMirror line numbers */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-lineNumbers .cm-gutterElement {
+  color: #9ca3af;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-lineNumbers .cm-gutterElement {
+  color: #6b7280;
+}
+
+/* Global dark mode support for source editor (when rendered outside wrapper) */
+.dark .mdxeditor-source-editor,
+html.dark .mdxeditor-source-editor {
+  background-color: #111827;
+}
+
+.dark .mdxeditor-source-editor .cm-editor,
+html.dark .mdxeditor-source-editor .cm-editor {
+  background-color: #111827;
+}
+
+.dark .mdxeditor-source-editor .cm-scroller,
+html.dark .mdxeditor-source-editor .cm-scroller {
+  background-color: #111827;
+}
+
+.dark .mdxeditor-source-editor .cm-gutters,
+html.dark .mdxeditor-source-editor .cm-gutters {
+  background-color: #1f2937;
+  border-right-color: #374151;
+  color: #9ca3af;
+}
+
+.dark .mdxeditor-source-editor .cm-content,
+html.dark .mdxeditor-source-editor .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+.dark .mdxeditor-source-editor .cm-cursor,
+html.dark .mdxeditor-source-editor .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+.dark .mdxeditor-source-editor .cm-activeLine,
+html.dark .mdxeditor-source-editor .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.dark .mdxeditor-source-editor .cm-activeLineGutter,
+html.dark .mdxeditor-source-editor .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.dark .mdxeditor-source-editor .cm-selectionBackground,
+html.dark .mdxeditor-source-editor .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}

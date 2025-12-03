@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { Markdown } from '../markdown/Markdown';
+import { MDXEditorWrapper } from '../mdx-editor';
 
 interface ChangelogModalProps {
   isOpen: boolean;
@@ -102,7 +102,7 @@ export function ChangelogModal({
             </div>
           ) : content ? (
             <div className="prose dark:prose-invert max-w-none">
-              <Markdown content={content} />
+              <MDXEditorWrapper content={content} mode="view" enableMermaid={true} />
             </div>
           ) : (
             <div className="text-gray-500 dark:text-gray-400 text-center">

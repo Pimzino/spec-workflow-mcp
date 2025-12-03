@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useApi } from '../api/api';
 import { useSearchParams } from 'react-router-dom';
-import { Markdown } from '../markdown/Markdown';
+import { MDXEditorWrapper } from '../mdx-editor';
 import hljs from 'highlight.js/lib/common';
 import { useTranslation } from 'react-i18next';
 
@@ -117,7 +117,7 @@ function Content() {
           </div>
         ) : current ? (
           viewMode === 'rendered' ? (
-            <Markdown content={current.content} />
+            <MDXEditorWrapper content={current.content} mode="view" enableMermaid={true} />
           ) : (
             renderSourceView(current.content)
           )
