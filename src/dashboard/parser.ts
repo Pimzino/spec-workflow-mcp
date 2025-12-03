@@ -16,6 +16,7 @@ export class SpecParser {
   private steeringPath: string;
 
   constructor(projectPath: string) {
+    // Path should already be translated by caller (ProjectManager)
     this.projectPath = projectPath;
     this.specsPath = PathUtils.getSpecPath(projectPath, '');
     this.archiveSpecsPath = PathUtils.getArchiveSpecsPath(projectPath);

@@ -316,7 +316,7 @@ export class MultiProjectDashboardServer {
       return {
         projectId,
         projectName: project.projectName,
-        projectPath: project.projectPath,
+        projectPath: project.originalProjectPath,  // Return original path for display
         steering: steeringStatus,
         version: this.packageVersion
       };

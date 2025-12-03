@@ -116,8 +116,18 @@ export class ProjectRegistry {
 
   /**
    * Check if a process is still running
+   * Note: When running in Docker with path translation, we can't check host PIDs,
+   * so we assume processes are alive if path translation is enabled.
    */
   private isProcessAlive(pid: number): boolean {
+    // If path translation is enabled, we're in Docker and can't check host PIDs
+    const hostPrefix = process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX;
+    const containerPrefix = process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX;
+    if (hostPrefix && containerPrefix) {
+      // Can't verify host PIDs from inside Docker, assume alive
+      return true;
+    }
+    
     try {
       // Sending signal 0 checks if process exists without actually sending a signal
       process.kill(pid, 0);
