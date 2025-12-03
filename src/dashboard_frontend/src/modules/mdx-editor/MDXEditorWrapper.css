@@ -107,6 +107,71 @@
   background-color: #374151;
 }
 
+/* Select trigger (BlockTypeSelect) styling in toolbar */
+.mdx-editor-wrapper .mdxeditor-toolbar button[role="combobox"],
+.mdx-editor-wrapper .mdxeditor-toolbar [data-toolbar-item][role="combobox"] {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: #374151;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar button[role="combobox"],
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar [data-toolbar-item][role="combobox"] {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+.mdx-editor-wrapper .mdxeditor-toolbar button[role="combobox"]:hover,
+.mdx-editor-wrapper .mdxeditor-toolbar [data-toolbar-item][role="combobox"]:hover {
+  background-color: #f3f4f6;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar button[role="combobox"]:hover,
+.mdx-editor-wrapper.dark-theme .mdxeditor-toolbar [data-toolbar-item][role="combobox"]:hover {
+  background-color: #4b5563;
+}
+
+/*
+ * Global styles for MDXEditor popups rendered to document.body via overlayContainer
+ * These styles apply when dark mode is active on the html/body element
+ */
+.dark .mdxeditor-popup-container,
+html.dark .mdxeditor-popup-container {
+  z-index: 9999;
+}
+
+.dark .mdxeditor-popup-container [data-radix-popper-content-wrapper] > div,
+html.dark .mdxeditor-popup-container [data-radix-popper-content-wrapper] > div {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .mdxeditor-select-content,
+html.dark .mdxeditor-select-content {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+.dark .mdxeditor-select-item,
+html.dark .mdxeditor-select-item {
+  color: #f9fafb !important;
+}
+
+.dark .mdxeditor-select-item:hover,
+.dark .mdxeditor-select-item[data-highlighted],
+html.dark .mdxeditor-select-item:hover,
+html.dark .mdxeditor-select-item[data-highlighted] {
+  background-color: #374151 !important;
+}
+
+/* Ensure popup container has high z-index when rendered to body */
+body > .mdxeditor-popup-container {
+  z-index: 9999 !important;
+}
+
 /* Code block styling */
 .mdx-editor-wrapper pre.hljs {
   margin: 1rem 0;

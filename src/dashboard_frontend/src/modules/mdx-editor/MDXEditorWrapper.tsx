@@ -74,7 +74,7 @@ const plainTextCodeBlockDescriptor: CodeBlockEditorDescriptor = {
 function SourceToggle() {
   const viewMode = useCellValue(viewMode$);
   const changeViewMode = usePublisher(viewMode$);
-  
+
   return (
     <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded p-0.5">
       <button
@@ -359,6 +359,7 @@ export function MDXEditorWrapper({
           plugins={plugins}
           placeholder={placeholder || t('editor.markdown.placeholder')}
           contentEditableClassName="prose prose-sm max-w-none dark:prose-invert p-4 min-h-full focus:outline-none"
+          overlayContainer={document.body}
         />
       </div>
 
