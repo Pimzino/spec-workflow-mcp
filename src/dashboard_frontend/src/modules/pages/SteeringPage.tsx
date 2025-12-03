@@ -6,11 +6,11 @@ import { useTranslation } from 'react-i18next';
 
 function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
   if (!dateStr) return t ? t('common.never') : 'Never';
-  return new Date(dateStr).toLocaleDateString(undefined, { 
-    month: 'short', 
-    day: 'numeric', 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  return new Date(dateStr).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   });
 }
 
@@ -43,7 +43,7 @@ function SteeringModal({ document, isOpen, onClose }: { document: SteeringDocume
 
     let active = true;
     setLoading(true);
-    
+
     getSteeringDocument(document.name)
       .then((data) => {
         if (active) {
@@ -76,10 +76,10 @@ function SteeringModal({ document, isOpen, onClose }: { document: SteeringDocume
   // Save function for editor
   const handleSave = useCallback(async () => {
     if (!document || !editContent) return;
-    
+
     setSaving(true);
     setSaveError('');
-    
+
     try {
       const result = await saveSteeringDocument(document.name, editContent);
       if (result.ok) {
@@ -144,15 +144,8 @@ function SteeringModal({ document, isOpen, onClose }: { document: SteeringDocume
       );
     }
 
-    if (!content && !editContent) {
-      return (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          {t('common.noContentAvailable')}
-        </div>
-      );
-    }
-
     // Always use edit mode - MDX Editor toolbar has built-in source toggle
+    // Show editor even for empty documents so users can create content
     return (
       <MDXEditorWrapper
         content={editContent}
@@ -216,7 +209,7 @@ function SteeringModal({ document, isOpen, onClose }: { document: SteeringDocume
 function SteeringDocumentRow({ document, onOpenModal }: { document: SteeringDocument; onOpenModal: (document: SteeringDocument) => void }) {
   const { t } = useTranslation();
   return (
-    <tr 
+    <tr
       className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
       onClick={() => onOpenModal(document)}
     >
@@ -239,7 +232,7 @@ function SteeringDocumentRow({ document, onOpenModal }: { document: SteeringDocu
       </td>
       <td className="px-4 py-4">
         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          document.exists 
+          document.exists
             ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
             : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
         }`}>
@@ -274,7 +267,7 @@ function Content() {
       lastModified: steeringDocuments?.lastModified
     },
     {
-      name: 'tech', 
+      name: 'tech',
       displayName: 'Technical',
       exists: steeringDocuments?.documents?.tech || false,
       lastModified: steeringDocuments?.lastModified
@@ -298,7 +291,7 @@ function Content() {
             </p>
           </div>
         </div>
-        
+
         {/* Documents Table - Desktop */}
         <div className="overflow-x-auto hidden lg:block">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -320,9 +313,9 @@ function Content() {
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {documents.map((doc) => (
-                <SteeringDocumentRow 
-                  key={doc.name} 
-                  document={doc} 
+                <SteeringDocumentRow
+                  key={doc.name}
+                  document={doc}
                   onOpenModal={setSelectedDocument}
                 />
               ))}
@@ -351,7 +344,7 @@ function Content() {
                         {doc.displayName}
                       </h3>
                       <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        doc.exists 
+                        doc.exists
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                       }`}>
@@ -393,10 +386,10 @@ function Content() {
         )}
       </div>
 
-      <SteeringModal 
-        document={selectedDocument} 
-        isOpen={!!selectedDocument} 
-        onClose={() => setSelectedDocument(null)} 
+      <SteeringModal
+        document={selectedDocument}
+        isOpen={!!selectedDocument}
+        onClose={() => setSelectedDocument(null)}
       />
     </div>
   );

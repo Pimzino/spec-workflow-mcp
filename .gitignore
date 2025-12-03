@@ -142,6 +142,7 @@ CLAUDE.md
 AGENTS.md
 opencodetmp.spec-workflow/session.json
 opencodetmp
+.cursor
 
 # Spec Workflow MCP
 .specworkflow

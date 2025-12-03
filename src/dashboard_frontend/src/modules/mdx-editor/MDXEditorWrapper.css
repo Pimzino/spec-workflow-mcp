@@ -328,3 +328,146 @@ body > .mdxeditor-popup-container {
   background: transparent;
   padding: 0;
 }
+
+/* MDXEditor diffSourcePlugin source editor styling (CodeMirror) */
+.mdx-editor-wrapper .mdxeditor-source-editor {
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor {
+  background-color: #111827;
+}
+
+/* CodeMirror editor within source mode */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-editor {
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-editor {
+  background-color: #111827;
+}
+
+/* CodeMirror content area */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-scroller {
+  background-color: #ffffff;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-scroller {
+  background-color: #111827;
+}
+
+/* CodeMirror gutters (line numbers) */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-gutters {
+  background-color: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-gutters {
+  background-color: #1f2937;
+  border-right-color: #374151;
+  color: #9ca3af;
+}
+
+/* CodeMirror active line */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* CodeMirror active line gutter */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* CodeMirror cursor */
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+/* CodeMirror selection */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* CodeMirror text content */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-content {
+  color: #374151;
+  caret-color: #374151;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+/* CodeMirror line numbers */
+.mdx-editor-wrapper .mdxeditor-source-editor .cm-lineNumbers .cm-gutterElement {
+  color: #9ca3af;
+}
+
+.mdx-editor-wrapper.dark-theme .mdxeditor-source-editor .cm-lineNumbers .cm-gutterElement {
+  color: #6b7280;
+}
+
+/* Global dark mode support for source editor (when rendered outside wrapper) */
+.dark .mdxeditor-source-editor,
+html.dark .mdxeditor-source-editor {
+  background-color: #111827;
+}
+
+.dark .mdxeditor-source-editor .cm-editor,
+html.dark .mdxeditor-source-editor .cm-editor {
+  background-color: #111827;
+}
+
+.dark .mdxeditor-source-editor .cm-scroller,
+html.dark .mdxeditor-source-editor .cm-scroller {
+  background-color: #111827;
+}
+
+.dark .mdxeditor-source-editor .cm-gutters,
+html.dark .mdxeditor-source-editor .cm-gutters {
+  background-color: #1f2937;
+  border-right-color: #374151;
+  color: #9ca3af;
+}
+
+.dark .mdxeditor-source-editor .cm-content,
+html.dark .mdxeditor-source-editor .cm-content {
+  color: #e5e7eb;
+  caret-color: #e5e7eb;
+}
+
+.dark .mdxeditor-source-editor .cm-cursor,
+html.dark .mdxeditor-source-editor .cm-cursor {
+  border-left-color: #f9fafb;
+}
+
+.dark .mdxeditor-source-editor .cm-activeLine,
+html.dark .mdxeditor-source-editor .cm-activeLine {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.dark .mdxeditor-source-editor .cm-activeLineGutter,
+html.dark .mdxeditor-source-editor .cm-activeLineGutter {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+.dark .mdxeditor-source-editor .cm-selectionBackground,
+html.dark .mdxeditor-source-editor .cm-selectionBackground {
+  background-color: rgba(59, 130, 246, 0.3) !important;
+}
