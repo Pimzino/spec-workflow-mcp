@@ -94,7 +94,11 @@
     "cancel": "取消",
     "delete": "删除",
     "closeModalAria": "关闭弹窗",
-    "ok": "确定"
+    "ok": "确定",
+    "unsavedChanges": {
+      "title": "未保存的更改",
+      "message": "您有未保存的更改。确定要关闭而不保存吗？"
+    }
   },
   "tasksPage": {
     "header": {

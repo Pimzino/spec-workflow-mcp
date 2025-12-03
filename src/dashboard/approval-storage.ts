@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import { join, isAbsolute, resolve, basename } from 'path';
 import chokidar from 'chokidar';
+import { diffLines, Change } from 'diff';
 import { PathUtils } from '../core/path-utils.js';
 
 export interface ApprovalComment {
@@ -107,20 +108,20 @@ export class ApprovalStorage extends EventEmitter {
 
   constructor(projectPath: string) {
     super();
-    
+
     // Validate project path
     if (!projectPath || projectPath.trim() === '') {
       throw new Error('Project path cannot be empty');
     }
-    
+
     // Resolve to absolute path
     const resolvedPath = resolve(projectPath);
-    
+
     // Prevent root directory usage which causes permission errors
     if (resolvedPath === '/' || resolvedPath === '\\' || resolvedPath.match(/^[A-Z]:\\?$/)) {
       throw new Error(`Invalid project path: ${resolvedPath}. Cannot use root directory for spec workflow.`);
     }
-    
+
     this.projectPath = resolvedPath;
     this.approvalsDir = PathUtils.getApprovalsPath(resolvedPath);
   }
@@ -128,7 +129,7 @@ export class ApprovalStorage extends EventEmitter {
   async start(): Promise<void> {
     // Create the approvals directory (empty) so watcher can establish properly
     await fs.mkdir(this.approvalsDir, { recursive: true });
-    
+
     // Set up file watcher for approval directory and all subdirectories
     // This will catch new directories and files created dynamically
     this.watcher = chokidar.watch(`${this.approvalsDir}/**/*.json`, {
@@ -140,7 +141,7 @@ export class ApprovalStorage extends EventEmitter {
     this.watcher.on('add', () => this.emit('approval-change'));
     this.watcher.on('change', () => this.emit('approval-change'));
     this.watcher.on('unlink', () => this.emit('approval-change'));
-    
+
     // Add error handler to prevent watcher crashes
     this.watcher.on('error', (error) => {
       console.error('Approval watcher error:', error);
@@ -155,7 +156,7 @@ export class ApprovalStorage extends EventEmitter {
       await this.watcher.close();
       this.watcher = undefined;
     }
-    
+
     // Clean up EventEmitter listeners
     this.removeAllListeners();
   }
@@ -204,7 +205,7 @@ export class ApprovalStorage extends EventEmitter {
     try {
       const approvalPath = await this.findApprovalPath(id);
       if (!approvalPath) return null;
-      
+
       const content = await fs.readFile(approvalPath, 'utf-8');
       return JSON.parse(content) as ApprovalRequest;
     } catch {
@@ -230,7 +231,7 @@ export class ApprovalStorage extends EventEmitter {
     } catch {
       // Approvals directory doesn't exist
     }
-    
+
     return null;
   }
 
@@ -278,8 +279,8 @@ export class ApprovalStorage extends EventEmitter {
   }
 
   async createRevision(
-    originalId: string, 
-    newContent: string, 
+    originalId: string,
+    newContent: string,
     reason?: string
   ): Promise<string> {
     const originalApproval = await this.getApproval(originalId);
@@ -292,10 +293,10 @@ export class ApprovalStorage extends EventEmitter {
     }
 
     // Read the current file content for revision history
-    const filePath = isAbsolute(originalApproval.filePath) 
-      ? originalApproval.filePath 
+    const filePath = isAbsolute(originalApproval.filePath)
+      ? originalApproval.filePath
       : join(this.projectPath, originalApproval.filePath);
-    
+
     let currentContent = '';
     try {
       currentContent = await fs.readFile(filePath, 'utf-8');
@@ -325,7 +326,7 @@ export class ApprovalStorage extends EventEmitter {
     originalApproval.annotations = undefined;
     originalApproval.comments = undefined;
     originalApproval.respondedAt = undefined;
-    
+
     const approvalFilePath = await this.findApprovalPath(originalId);
     if (!approvalFilePath) {
       throw new Error(`Approval ${originalId} file not found`);
@@ -337,7 +338,7 @@ export class ApprovalStorage extends EventEmitter {
 
   async getAllPendingApprovals(): Promise<ApprovalRequest[]> {
     const allApprovals = await this.getAllApprovals();
-    return allApprovals.filter(approval => 
+    return allApprovals.filter(approval =>
       approval.status === 'pending'
     );
   }
@@ -345,7 +346,7 @@ export class ApprovalStorage extends EventEmitter {
   async getAllApprovals(): Promise<ApprovalRequest[]> {
     try {
       const approvals: ApprovalRequest[] = [];
-      
+
       try {
         const categoryNames = await fs.readdir(this.approvalsDir, { withFileTypes: true });
         for (const categoryName of categoryNames) {
@@ -403,13 +404,13 @@ export class ApprovalStorage extends EventEmitter {
 
     try {
       const files = await fs.readdir(this.approvalsDir);
-      
+
       for (const file of files) {
         if (file.endsWith('.json')) {
           try {
             const content = await fs.readFile(join(this.approvalsDir, file), 'utf-8');
             const approval = JSON.parse(content) as ApprovalRequest;
-            
+
             const createdAt = new Date(approval.createdAt);
             if (createdAt < cutoffDate && approval.status !== 'pending') {
               await fs.unlink(join(this.approvalsDir, file));
@@ -592,70 +593,66 @@ export class ApprovalStorage extends EventEmitter {
       toContent = toSnapshot.content;
     }
 
-    // Basic diff computation (we'll enhance this when we add the diff library)
-    const fromLines = fromContent.split('\n');
-    const toLines = toContent.split('\n');
+    const changes: Change[] = diffLines(fromContent, toContent);
 
-    // Simple line-by-line comparison for now
-    const diffLines: DiffLine[] = [];
+    const resultLines: DiffLine[] = [];
     let additions = 0;
     let deletions = 0;
-    let changes = 0;
+    let oldLineNum = 1;
+    let newLineNum = 1;
 
-    // This is a very basic implementation - will be replaced with proper diff library
-    const maxLines = Math.max(fromLines.length, toLines.length);
-    for (let i = 0; i < maxLines; i++) {
-      const fromLine = fromLines[i];
-      const toLine = toLines[i];
+    for (const change of changes) {
+      // Split the change value into lines, handling the trailing newline properly
+      const lines = change.value.split('\n');
+      // Remove the last empty element if the value ended with a newline
+      if (lines.length > 0 && lines[lines.length - 1] === '') {
+        lines.pop();
+      }
 
-      if (fromLine !== undefined && toLine !== undefined) {
-        if (fromLine === toLine) {
-          diffLines.push({
-            type: 'normal',
-            oldLineNumber: i + 1,
-            newLineNumber: i + 1,
-            content: fromLine
+      for (const line of lines) {
+        if (change.added) {
+          additions++;
+          resultLines.push({
+            type: 'add',
+            newLineNumber: newLineNum++,
+            content: line
+          });
+        } else if (change.removed) {
+          deletions++;
+          resultLines.push({
+            type: 'delete',
+            oldLineNumber: oldLineNum++,
+            content: line
           });
         } else {
-          changes++;
-          diffLines.push({
-            type: 'delete',
-            oldLineNumber: i + 1,
-            content: fromLine
-          });
-          diffLines.push({
-            type: 'add',
-            newLineNumber: i + 1,
-            content: toLine
+          // Unchanged line
+          resultLines.push({
+            type: 'normal',
+            oldLineNumber: oldLineNum++,
+            newLineNumber: newLineNum++,
+            content: line
           });
         }
-      } else if (fromLine !== undefined) {
-        deletions++;
-        diffLines.push({
-          type: 'delete',
-          oldLineNumber: i + 1,
-          content: fromLine
-        });
-      } else if (toLine !== undefined) {
-        additions++;
-        diffLines.push({
-          type: 'add',
-          newLineNumber: i + 1,
-          content: toLine
-        });
       }
     }
+
+    // Count actual lines processed (matching the diff loop's handling of trailing newlines)
+    // We use the line number counters which were incremented for each actual line processed
+    const fromLineCount = oldLineNum - 1;
+    const toLineCount = newLineNum - 1;
 
     return {
       additions,
       deletions,
-      changes,
+      // changes represents in-place modifications; diffLines only produces additions/deletions
+      // so changes is always 0 (the frontend calculates totalChanges = additions + deletions + changes)
+      changes: 0,
       chunks: [{
         oldStart: 1,
-        oldLines: fromLines.length,
+        oldLines: fromLineCount,
         newStart: 1,
-        newLines: toLines.length,
-        lines: diffLines
+        newLines: toLineCount,
+        lines: resultLines
       }]
     };
   }

@@ -94,7 +94,11 @@
     "cancel": "Cancelar",
     "delete": "Excluir",
     "closeModalAria": "Fechar modal",
-    "ok": "OK"
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "Alterações não salvas",
+      "message": "Você tem alterações não salvas. Tem certeza de que deseja fechar sem salvar?"
+    }
   },
   "tasksPage": {
     "header": {

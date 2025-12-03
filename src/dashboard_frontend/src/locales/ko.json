@@ -94,7 +94,11 @@
     "cancel": "취소",
     "delete": "삭제",
     "closeModalAria": "모달 닫기",
-    "ok": "OK"
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "저장되지 않은 변경사항",
+      "message": "저장되지 않은 변경사항이 있습니다. 저장하지 않고 닫으시겠습니까?"
+    }
   },
   "tasksPage": {
     "header": {

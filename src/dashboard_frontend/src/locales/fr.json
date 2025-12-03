@@ -94,7 +94,11 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "closeModalAria": "Fermer la modale",
-    "ok": "OK"
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "Modifications non enregistrées",
+      "message": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir fermer sans enregistrer ?"
+    }
   },
   "tasksPage": {
     "header": {
