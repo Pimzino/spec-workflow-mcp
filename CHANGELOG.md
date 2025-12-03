@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-12-03
+
+### Added
+- **MDX Editor Integration** - Replaced basic markdown textareas with a full-featured rich text editor powered by MDXEditor:
+  - **Rich Text Editing** - WYSIWYG editing experience with live preview for markdown content
+  - **Toolbar Controls** - Full toolbar with formatting options (bold, italic, underline, headings, lists, links, tables, code blocks)
+  - **Source Mode Toggle** - Switch between rich text and raw markdown source editing with a single click
+  - **Code Block Support** - Syntax-highlighted code blocks with CodeMirror integration and language selector dropdown
+  - **Mermaid Diagram Support** - Render Mermaid diagrams directly in the editor with live preview
+  - **Dark Mode Support** - Complete dark theme styling for all editor components including:
+    - Editor content area and toolbar
+    - Source mode (CodeMirror) with proper syntax highlighting
+    - Code blocks with themed gutters, line numbers, and selection
+    - Dropdown menus and language selectors (scrollable with custom scrollbars)
+    - Popups and dialogs
+  - **Keyboard Shortcuts** - Ctrl+S to save, standard text formatting shortcuts
+  - **Auto-save Status** - Visual indicators for saving, saved, and unsaved changes states
+  - **Character/Line Count** - Real-time statistics in the editor footer
+  - Applied to both Steering Documents and Spec Documents editing modals
+
+### Changed
+- Steering document modals now show the editor even for empty/new documents, allowing users to create content directly
+
 ## [2.0.11] - 2025-11-28
 
 ### Changed

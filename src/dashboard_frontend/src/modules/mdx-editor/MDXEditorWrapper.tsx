@@ -180,26 +180,36 @@ export function MDXEditorWrapper({
   const { isDarkMode } = useMDXEditorTheme();
   const editorRef = useRef<MDXEditorMethods>(null);
   const [localContent, setLocalContent] = useState(content);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedContent, setLastSavedContent] = useState(content);
+  const isInternalChangeRef = useRef(false);
+  const hasUnsavedChanges = localContent !== lastSavedContent;
 
-  // Sync local content with prop
+  // Sync local content with prop when content changes from external source
   useEffect(() => {
-    setLocalContent(content);
-    // Reset unsaved changes when content prop changes from external source
-    setHasUnsavedChanges(false);
-    // Programmatically update MDX Editor content when prop changes
-    if (editorRef.current) {
-      editorRef.current.setMarkdown(content);
+    // Only update lastSavedContent if this is an external change (not from user editing)
+    if (!isInternalChangeRef.current) {
+      setLocalContent(content);
+      setLastSavedContent(content);
+      // Programmatically update MDX Editor content when prop changes
+      if (editorRef.current) {
+        editorRef.current.setMarkdown(content);
+      }
     }
+    // Reset the flag after processing
+    isInternalChangeRef.current = false;
   }, [content]);
 
-  // Track unsaved changes
+  // Update last saved content when save is successful
   useEffect(() => {
-    setHasUnsavedChanges(localContent !== content);
-  }, [localContent, content]);
+    if (saved && !saving) {
+      setLastSavedContent(localContent);
+    }
+  }, [saved, saving, localContent]);
 
   // Handle content change
   const handleChange = useCallback((newContent: string) => {
+    // Mark this as an internal change so the effect doesn't reset lastSavedContent
+    isInternalChangeRef.current = true;
     setLocalContent(newContent);
     onChange?.(newContent);
   }, [onChange]);
