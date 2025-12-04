@@ -71,13 +71,13 @@ function SearchableSpecDropdown({ specs, selected, onSelect, align = 'left' }: {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[200px] md:min-w-[240px] px-3 py-2 md:px-4 md:py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[200px] md:min-w-[240px] px-4 py-2.5 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white hover:bg-white/80 dark:hover:bg-gray-800/80 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
       >
-        <span className="truncate">
+        <span className="truncate font-medium">
           {selectedSpec ? selectedSpec.displayName : t('tasksPage.dropdown.selectPlaceholder')}
         </span>
         <svg
-          className={`w-4 h-4 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 ml-2 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -87,17 +87,22 @@ function SearchableSpecDropdown({ specs, selected, onSelect, align = 'left' }: {
       </button>
 
       {isOpen && (
-        <div className={`absolute top-full mt-1 w-full sm:w-80 md:w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}>
+        <div className={`absolute top-full mt-2 w-full sm:w-80 md:w-96 glass-card shadow-xl z-50 max-h-96 overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}>
           {/* Search Input */}
-          <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-600">
-            <input
-              type="text"
-              placeholder={t('tasksPage.search.placeholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              autoFocus
-            />
+          <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700/50">
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder={t('tasksPage.search.placeholder')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                autoFocus
+              />
+            </div>
           </div>
 
           {/* Options List */}
@@ -107,8 +112,10 @@ function SearchableSpecDropdown({ specs, selected, onSelect, align = 'left' }: {
                 <button
                   key={spec.name}
                   onClick={() => handleSelect(spec)}
-                  className={`w-full px-4 py-3 md:px-6 md:py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700 transition-colors ${
-                    selected === spec.name ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'
+                  className={`w-full px-4 py-3 md:px-5 md:py-4 text-left transition-all duration-200 ${
+                    selected === spec.name
+                      ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300'
+                      : 'text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -121,7 +128,7 @@ function SearchableSpecDropdown({ specs, selected, onSelect, align = 'left' }: {
                       )}
                     </div>
                     {selected === spec.name && (
-                      <svg className="w-4 h-4 text-blue-600 dark:text-blue-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-purple-600 dark:text-purple-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
                     )}
@@ -383,61 +390,63 @@ function SpecCard({ spec, onSelect, isSelected }: { spec: any; onSelect: (spec: 
 
   return (
     <div
-      className={`bg-white dark:bg-gray-800 shadow rounded-lg cursor-pointer hover:shadow-lg transition-all ${
-        isSelected ? 'ring-2 ring-blue-500' : ''
+      className={`glass-card cursor-pointer card-lift glow-hover ${
+        isSelected ? 'ring-2 ring-purple-500' : ''
       } ${
         spec.status === 'completed' ? 'opacity-75' : ''
       }`}
       onClick={() => onSelect(spec)}
     >
-      <div className="p-4 sm:p-6 md:p-8">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <h3 className={`text-base sm:text-lg md:text-xl font-medium mb-2 truncate ${
-              spec.status === 'completed'
-                ? 'text-gray-600 dark:text-gray-400'
-                : 'text-gray-900 dark:text-white'
-            }`}>
-              {spec.displayName}
-            </h3>
-            <div className={`flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-xs sm:text-sm md:text-base space-y-1 sm:space-y-0 ${
-              spec.status === 'completed'
-                ? 'text-gray-400 dark:text-gray-500'
-                : 'text-gray-500 dark:text-gray-400'
-            }`}>
-              <span className="flex items-center gap-1">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {formatDate(spec.lastModified, t)}
-              </span>
-              {spec.taskProgress && (
-                <span className="flex items-center gap-1">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
-                  <span className="truncate">{t('tasksPage.dropdown.completedOutOfTotalShort', { completed: spec.taskProgress.completed, total: spec.taskProgress.total })}</span>
-                </span>
-              )}
-            </div>
+      <div className="p-4 sm:p-5">
+        <div className="flex items-start justify-between mb-3">
+          <div className="gradient-icon w-10 h-10">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
           </div>
-          <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-400 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-          </svg>
+          {spec.taskProgress && (
+            <span className={`status-badge ${progress >= 100 ? 'status-badge-success' : progress >= 50 ? 'status-badge-info' : 'status-badge-pending'}`}>
+              {progress}%
+            </span>
+          )}
+        </div>
+
+        <h3 className={`text-base sm:text-lg font-bold mb-2 truncate ${
+          spec.status === 'completed'
+            ? 'text-gray-600 dark:text-gray-400'
+            : 'text-gray-900 dark:text-white'
+        }`}>
+          {spec.displayName}
+        </h3>
+
+        <div className={`flex flex-wrap gap-2 text-xs mb-3 ${
+          spec.status === 'completed'
+            ? 'text-gray-400 dark:text-gray-500'
+            : 'text-gray-500 dark:text-gray-400'
+        }`}>
+          <span className="flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {formatDate(spec.lastModified, t)}
+          </span>
+          {spec.taskProgress && (
+            <span className="flex items-center gap-1">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {t('tasksPage.dropdown.completedOutOfTotalShort', { completed: spec.taskProgress.completed, total: spec.taskProgress.total })}
+            </span>
+          )}
         </div>
 
         {/* Progress bar */}
         {spec.taskProgress && spec.taskProgress.total > 0 && (
-          <div className="mt-3 sm:mt-4">
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div
-                className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {t('common.percentComplete', { percent: progress })}
-            </p>
+          <div className="progress-gradient h-2">
+            <div
+              className="progress-gradient-fill"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         )}
       </div>
@@ -737,93 +746,102 @@ function TaskList({ specName }: { specName: string }) {
 
   return (
     <div className="grid gap-4">
-      {/* Stats Grid */}
+      {/* Stats Grid - Glass cards with gradient icons */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Tasks Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2 sm:mb-3">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="glass-card p-4 sm:p-5 glow-hover">
+          <div className="flex items-start justify-between mb-3">
+            <div className="gradient-icon-blue w-10 h-10 sm:w-12 sm:h-12">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.total')}</div>
+            <span className="status-badge status-badge-info text-[10px]">100%</span>
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1">{data.total}</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.totalDesc')}</div>
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-1">{data.total}</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.total')}</div>
         </div>
 
         {/* Completed Tasks Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2 sm:mb-3">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="glass-card p-4 sm:p-5 glow-hover">
+          <div className="flex items-start justify-between mb-3">
+            <div className="gradient-icon-green w-10 h-10 sm:w-12 sm:h-12">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.done')}</div>
+            <span className="status-badge status-badge-success text-[10px]">
+              {data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0}%
+            </span>
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-green-600 dark:text-green-400 mb-1">{data.completed}</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.doneDesc')}</div>
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-600 dark:text-green-400 mb-1">{data.completed}</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.done')}</div>
         </div>
 
         {/* Remaining Tasks Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2 sm:mb-3">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="glass-card p-4 sm:p-5 glow-hover">
+          <div className="flex items-start justify-between mb-3">
+            <div className="gradient-icon-yellow w-10 h-10 sm:w-12 sm:h-12">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.left')}</div>
+            <span className="status-badge status-badge-pending text-[10px]">
+              {data.total > 0 ? Math.round(((data.total - data.completed) / data.total) * 100) : 0}%
+            </span>
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-amber-600 dark:text-amber-400 mb-1">{data.total - data.completed}</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.leftDesc')}</div>
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-600 dark:text-amber-400 mb-1">{data.total - data.completed}</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.left')}</div>
         </div>
 
         {/* Progress Percentage Card */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2 sm:mb-3">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="glass-card p-4 sm:p-5 glow-hover">
+          <div className="flex items-start justify-between mb-3">
+            <div className="gradient-icon w-10 h-10 sm:w-12 sm:h-12">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('tasksPage.stats.progress')}</div>
+            <span className={`status-badge text-[10px] ${Math.round(data.progress) >= 75 ? 'status-badge-success' : Math.round(data.progress) >= 50 ? 'status-badge-info' : 'status-badge-pending'}`}>
+              {Math.round(data.progress) >= 75 ? 'Great!' : Math.round(data.progress) >= 50 ? 'Good' : 'In Progress'}
+            </span>
           </div>
-          <div className="text-xl sm:text-2xl font-semibold text-purple-600 dark:text-purple-400 mb-1">{Math.round(data.progress)}%</div>
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.progressDesc')}</div>
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 mb-1">{Math.round(data.progress)}%</div>
+          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('tasksPage.stats.progress')}</div>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6">
+      {/* Progress Bar - Gradient style */}
+      <div className="glass-card p-4 sm:p-5">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">{t('tasksPage.overallProgress')}</h3>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{Math.round(data.progress)}%</span>
+          <span className="px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+            {Math.round(data.progress)}%
+          </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-3">
+        <div className="progress-gradient h-3 sm:h-4">
           <div
-            className="bg-blue-600 dark:bg-blue-500 h-2 sm:h-3 rounded-full transition-all duration-500"
+            className="progress-gradient-fill"
             style={{ width: `${data.progress}%` }}
           />
         </div>
       </div>
 
-      {/* Filter and Sort Controls */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">{t('tasksPage.taskDetails')}</h3>
+      {/* Filter and Sort Controls - Glass card with pill buttons */}
+      <div className="glass-card p-4 sm:p-5 overflow-hidden">
+        <div className="flex flex-col gap-4">
+          {/* Top row: Title and View Toggle */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">{t('tasksPage.taskDetails')}</h3>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* View Mode Switcher */}
-            <div className="flex w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
+            {/* View Mode Switcher - Pill style */}
+            <div className="flex p-1 bg-gray-100 dark:bg-gray-800/80 rounded-full border border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex-1 px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 flex items-center gap-2 justify-center ${
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
                   viewMode === 'list'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -833,10 +851,10 @@ function TaskList({ specName }: { specName: string }) {
               </button>
               <button
                 onClick={() => setViewMode('kanban')}
-                className={`flex-1 px-3 py-2 text-sm font-medium rounded-r-lg transition-all duration-200 flex items-center gap-2 justify-center ${
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
                   viewMode === 'kanban'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -845,30 +863,57 @@ function TaskList({ specName }: { specName: string }) {
                 <span>{t('common.viewMode.kanban', 'Kanban')}</span>
               </button>
             </div>
+          </div>
 
-            {/* Status Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('tasksPage.status')}:</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'in-progress' | 'completed')}
-                className="px-3 py-1.5 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          {/* Bottom row: Status Filter Pills and Sort */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            {/* Status Filter Pills */}
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setStatusFilter('all')}
+                className={`btn-pill ${statusFilter === 'all' ? 'active' : ''}`}
               >
-                <option value="all">{t('tasksPage.filters.all')} ({taskCounts.all})</option>
-                <option value="pending">{t('tasksPage.filters.pending')} ({taskCounts.pending})</option>
-                <option value="in-progress">{t('tasksPage.filters.inProgress')} ({taskCounts['in-progress']})</option>
-                <option value="completed">{t('tasksPage.filters.completed')} ({taskCounts.completed})</option>
-              </select>
+                <span>{t('tasksPage.filters.all')}</span>
+                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${statusFilter === 'all' ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                  {taskCounts.all}
+                </span>
+              </button>
+              <button
+                onClick={() => setStatusFilter('pending')}
+                className={`btn-pill ${statusFilter === 'pending' ? 'active !bg-gray-500' : ''}`}
+              >
+                <span>{t('tasksPage.filters.pending')}</span>
+                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${statusFilter === 'pending' ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                  {taskCounts.pending}
+                </span>
+              </button>
+              <button
+                onClick={() => setStatusFilter('in-progress')}
+                className={`btn-pill ${statusFilter === 'in-progress' ? 'active !bg-gradient-to-r !from-orange-500 !to-amber-500' : ''}`}
+              >
+                <span>{t('tasksPage.filters.inProgress')}</span>
+                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${statusFilter === 'in-progress' ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                  {taskCounts['in-progress']}
+                </span>
+              </button>
+              <button
+                onClick={() => setStatusFilter('completed')}
+                className={`btn-pill ${statusFilter === 'completed' ? 'active !bg-gradient-to-r !from-green-500 !to-teal-500' : ''}`}
+              >
+                <span>{t('tasksPage.filters.completed')}</span>
+                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${statusFilter === 'completed' ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                  {taskCounts.completed}
+                </span>
+              </button>
             </div>
 
             {/* Sort Controls - Hide in kanban view */}
             {viewMode === 'list' && (
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('tasksPage.sort.label')}:</label>
+              <div className="flex items-center gap-2 ml-auto">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as 'default' | 'status' | 'id' | 'description')}
-                  className="px-3 py-1.5 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 py-2 text-sm bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                 >
                   <option value="default">{t('tasksPage.sort.defaultOrder')}</option>
                   <option value="status">{t('tasksPage.sort.byStatus')}</option>
@@ -879,7 +924,7 @@ function TaskList({ specName }: { specName: string }) {
                 {sortBy !== 'default' && (
                   <button
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    className="px-2 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="p-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-800/80 focus:ring-2 focus:ring-purple-500 transition-all"
                     title={t(`tasksPage.sort.${sortOrder === 'asc' ? 'sortDescending' : 'sortAscending'}`)}
                   >
                     {sortOrder === 'asc' ? (
@@ -900,8 +945,8 @@ function TaskList({ specName }: { specName: string }) {
 
         {/* Results Summary */}
         {statusFilter !== 'all' && (
-          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-            <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+          <div className="mt-4 p-3 bg-purple-50/50 dark:bg-purple-900/10 border border-purple-200/50 dark:border-purple-800/50 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
@@ -910,7 +955,7 @@ function TaskList({ specName }: { specName: string }) {
                 {filteredAndSortedTasks.filter((t: any) => !t.isHeader).length === 0 && (
                   <span> - <button
                     onClick={() => setStatusFilter('all')}
-                    className="underline hover:no-underline"
+                    className="underline hover:no-underline font-medium"
                   >
                     {t('tasksPage.showAllTasks')}
                   </button></span>
@@ -1386,10 +1431,10 @@ function Content() {
 
     return (
       <div className="grid gap-4">
-        {/* Header with Spec Selector */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Header with Spec Selector - Glass styling */}
+        <div className="glass-card p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">
               {selectedSpec
                 ? `${t('tasksPage.header.title')}: ${selectedSpec.displayName}`
                 : t('tasksPage.header.title')
@@ -1400,7 +1445,6 @@ function Content() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('tasksPage.labels.spec')}</label>
             <SearchableSpecDropdown
               specs={specs}
               selected={selected}
@@ -1416,20 +1460,25 @@ function Content() {
 
   return (
     <div className="grid gap-4">
-      {/* Header with Search */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header with Search - Glass styling */}
+      <div className="glass-card p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">{t('tasksPage.header.title')}</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{t('tasksPage.header.title')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {t('tasksPage.header.subtitle.unselected')}
           </p>
         </div>
-        <input
-          className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto"
-          placeholder={t('tasksPage.search.placeholder')}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        <div className="relative w-full sm:w-auto">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            className="pl-10 pr-4 py-2.5 rounded-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 w-full sm:w-64 transition-all"
+            placeholder={t('tasksPage.search.placeholder')}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* Spec Selection Grid */}
@@ -1445,12 +1494,14 @@ function Content() {
           ))}
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 sm:p-12">
+        <div className="glass-card p-6 sm:p-12">
           <div className="text-center text-gray-500 dark:text-gray-400">
-            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p className="text-lg font-medium mb-2">{t('tasksPage.noSpecsFound.title')}</p>
+            <div className="mx-auto w-16 h-16 gradient-icon mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <p className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('tasksPage.noSpecsFound.title')}</p>
             <p className="text-sm">{query ? t('tasksPage.noSpecsFound.noMatch', { query }) : t('tasksPage.noSpecsFound.noSpecsAvailable')}</p>
           </div>
         </div>

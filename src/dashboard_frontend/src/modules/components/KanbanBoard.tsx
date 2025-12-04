@@ -167,10 +167,13 @@ export function KanbanBoard({
     const configs = {
       pending: {
         title: t('tasksPage.statusPill.pending', 'Pending'),
-        bgColor: 'bg-gray-50 dark:bg-gray-900/50',
-        borderColor: 'border-gray-200 dark:border-gray-700',
-        headerBg: 'bg-gray-100 dark:bg-gray-800',
+        bgColor: 'bg-white/50 dark:bg-gray-900/30 backdrop-blur-xl',
+        borderColor: 'border-gray-200/50 dark:border-gray-700/50',
+        headerBg: 'bg-gray-100/80 dark:bg-gray-800/80',
         textColor: 'text-gray-700 dark:text-gray-300',
+        badgeBg: 'bg-gray-200 dark:bg-gray-700',
+        iconBg: 'bg-gray-200 dark:bg-gray-700',
+        glowColor: 'ring-gray-400/30',
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -179,10 +182,13 @@ export function KanbanBoard({
       },
       'in-progress': {
         title: t('tasksPage.statusPill.inProgress', 'In Progress'),
-        bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-        borderColor: 'border-orange-200 dark:border-orange-700',
-        headerBg: 'bg-orange-100 dark:bg-orange-800',
+        bgColor: 'bg-orange-50/50 dark:bg-orange-900/10 backdrop-blur-xl',
+        borderColor: 'border-orange-200/50 dark:border-orange-700/50',
+        headerBg: 'bg-gradient-to-r from-orange-500 to-amber-500',
         textColor: 'text-orange-700 dark:text-orange-300',
+        badgeBg: 'bg-white/20',
+        iconBg: 'bg-orange-200 dark:bg-orange-700/50',
+        glowColor: 'ring-orange-400/50',
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -191,10 +197,13 @@ export function KanbanBoard({
       },
       completed: {
         title: t('tasksPage.statusPill.completed', 'Completed'),
-        bgColor: 'bg-green-50 dark:bg-green-900/20',
-        borderColor: 'border-green-200 dark:border-green-700',
-        headerBg: 'bg-green-100 dark:bg-green-800',
+        bgColor: 'bg-green-50/50 dark:bg-green-900/10 backdrop-blur-xl',
+        borderColor: 'border-green-200/50 dark:border-green-700/50',
+        headerBg: 'bg-gradient-to-r from-green-500 to-teal-500',
         textColor: 'text-green-700 dark:text-green-300',
+        badgeBg: 'bg-white/20',
+        iconBg: 'bg-green-200 dark:bg-green-700/50',
+        glowColor: 'ring-green-400/50',
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -209,6 +218,7 @@ export function KanbanBoard({
   const DroppableColumn = ({ status }: { status: 'pending' | 'in-progress' | 'completed' }) => {
     const config = getColumnConfig(status);
     const columnTasks = tasksByStatus[status];
+    const isGradientHeader = status === 'in-progress' || status === 'completed';
 
     const {
       isOver,
@@ -226,25 +236,28 @@ export function KanbanBoard({
         ref={setNodeRef}
         key={status}
         className={`
-          w-72 snap-center flex-shrink-0 rounded-lg border flex flex-col
+          w-72 snap-center flex-shrink-0 rounded-2xl border flex flex-col
           sm:w-80 md:w-80
           lg:flex-1 lg:min-w-80
           ${config.borderColor} ${config.bgColor}
-          ${isOver ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}
+          transition-all duration-300
+          ${isOver ? `ring-2 ${config.glowColor} shadow-lg scale-[1.02]` : 'shadow-sm'}
         `}
       >
         {/* Column Header */}
-        <div className={`px-4 py-3 rounded-t-lg ${config.headerBg} border-b ${config.borderColor}`}>
+        <div className={`px-4 py-3 rounded-t-2xl ${config.headerBg} ${!isGradientHeader ? `border-b ${config.borderColor}` : ''}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className={config.textColor}>
-                {config.icon}
+              <div className={`p-1.5 rounded-lg ${isGradientHeader ? 'bg-white/20' : config.iconBg}`}>
+                <div className={isGradientHeader ? 'text-white' : config.textColor}>
+                  {config.icon}
+                </div>
               </div>
-              <h3 className={`text-sm font-medium ${config.textColor}`}>
+              <h3 className={`text-sm font-semibold ${isGradientHeader ? 'text-white' : config.textColor}`}>
                 {config.title}
               </h3>
             </div>
-            <span className={`text-sm ${config.textColor} bg-white dark:bg-gray-800 px-2 py-1 rounded-full`}>
+            <span className={`text-sm font-bold ${isGradientHeader ? 'text-white' : config.textColor} ${config.badgeBg} px-2.5 py-1 rounded-full`}>
               {columnTasks.length}
             </span>
           </div>
@@ -259,24 +272,41 @@ export function KanbanBoard({
           <div
             className={`
               flex-1 p-2 sm:p-3 space-y-2 transition-all duration-200
-              max-h-[70vh] overflow-y-auto
-              ${/* Enhanced mobile drop zone feedback */ ''}
+              max-h-[70vh] overflow-y-auto rounded-b-2xl
               ${isOver
-                ? 'bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-400 ring-opacity-75 scale-[1.02]'
-                : ''
+                ? `border-2 border-dashed ${
+                    status === 'pending' ? 'border-gray-400 bg-gray-100/50 dark:bg-gray-800/50' :
+                    status === 'in-progress' ? 'border-orange-400 bg-orange-100/50 dark:bg-orange-900/20' :
+                    'border-green-400 bg-green-100/50 dark:bg-green-900/20'
+                  }`
+                : 'border-2 border-transparent'
               }
             `}
             style={{
-              touchAction: 'pan-y', /* Allow vertical scrolling within columns */
+              touchAction: 'pan-y',
             }}
           >
             {columnTasks.length === 0 ? (
-              <div className="flex items-center justify-center min-h-[120px] text-center py-4 text-gray-400 dark:text-gray-500">
-                <div className="text-xs">
+              <div className={`
+                flex flex-col items-center justify-center min-h-[120px] text-center py-6
+                ${isOver ? 'opacity-100' : 'opacity-60'}
+                transition-opacity duration-200
+              `}>
+                <div className={`w-12 h-12 rounded-full ${config.iconBg} flex items-center justify-center mb-3`}>
+                  <div className={config.textColor}>
+                    {config.icon}
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
                   {status === 'pending' && t('tasksPage.kanban.noPendingTasks', 'No pending tasks')}
                   {status === 'in-progress' && t('tasksPage.kanban.noInProgressTasks', 'No tasks in progress')}
                   {status === 'completed' && t('tasksPage.kanban.noCompletedTasks', 'No completed tasks')}
                 </div>
+                {isOver && (
+                  <div className="mt-2 text-xs font-medium text-purple-600 dark:text-purple-400">
+                    Drop here
+                  </div>
+                )}
               </div>
             ) : (
               columnTasks.map((task) => (

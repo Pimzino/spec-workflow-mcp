@@ -1,19 +1,51 @@
 :root {
+  /* Light theme (preserved) */
   --bg: #f8fafc;
   --panel: #ffffff;
+  --panel-transparent: rgba(255, 255, 255, 0.8);
   --text: #0f172a;
   --muted: #475569;
   --border: #e2e8f0;
   --brand: #4f46e5;
+
+  /* Accent colors */
+  --accent-yellow: #fbbf24;
+  --accent-green: #22c55e;
+  --accent-orange: #f97316;
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+
+  /* Gradients */
+  --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  --gradient-green: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
+  --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-yellow: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+  --gradient-chart: linear-gradient(180deg, rgba(139, 92, 246, 0.3) 0%, rgba(139, 92, 246, 0) 100%);
 }
 
 .dark:root {
-  --bg: #0f172a;
-  --panel: #111827;
+  /* Deep purple/navy dark theme */
+  --bg: #0f0d1a;
+  --panel: #1e1b2e;
+  --panel-transparent: rgba(30, 27, 46, 0.8);
   --text: #e5e7eb;
   --muted: #94a3b8;
-  --border: #1f2937;
-  --brand: #6366f1;
+  --border: #2d2640;
+  --brand: #8b5cf6;
+
+  /* Accent colors (same in dark mode for vibrancy) */
+  --accent-yellow: #fbbf24;
+  --accent-green: #22c55e;
+  --accent-orange: #f97316;
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+
+  /* Gradients */
+  --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  --gradient-green: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
+  --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-yellow: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+  --gradient-chart: linear-gradient(180deg, rgba(139, 92, 246, 0.3) 0%, rgba(139, 92, 246, 0) 100%);
 }
 
 html, body, #root { height: 100%; }
@@ -42,7 +74,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: system
 .select { padding: 8px 10px; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
 
 .progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
-.progress-bar > span { display: block; height: 100%; background: linear-gradient(90deg, #60a5fa, #a78bfa); }
+.progress-bar > span { display: block; height: 100%; background: linear-gradient(90deg, #8b5cf6, #ec4899); }
 
 .task { border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
 .task.header { background: color-mix(in srgb, var(--brand) 10%, var(--panel)); }
@@ -163,5 +195,3 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: system
 .dark .hljs-link {
   color: #79c0ff;
 }
-
-

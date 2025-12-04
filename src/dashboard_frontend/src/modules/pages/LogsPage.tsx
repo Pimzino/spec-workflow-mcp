@@ -12,7 +12,11 @@ import {
   CircleStackIcon,
   LinkIcon,
   ChevronRightIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  CalendarDaysIcon,
+  DocumentTextIcon,
+  MagnifyingGlassIcon,
+  ClipboardDocumentListIcon
 } from '@heroicons/react/24/solid';
 
 function formatDate(dateStr: string) {
@@ -48,175 +52,185 @@ function getTotalArtifactCount(artifacts: ImplementationLogEntry['artifacts']): 
   );
 }
 
-// Artifact Section Component
+// Artifact Section Component with gradient pills
 function ArtifactSection({
   title,
   icon: IconComponent,
   items,
-  type,
-  color
+  type
 }: {
   title: string;
   icon: React.ComponentType<{ className: string }>;
   items: any[];
   type: 'api' | 'component' | 'function' | 'class' | 'integration';
-  color: string;
 }) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!items || items.length === 0) return null;
 
-  const bgColor = {
-    api: 'bg-blue-50 dark:bg-blue-900/20',
-    component: 'bg-purple-50 dark:bg-purple-900/20',
-    function: 'bg-green-50 dark:bg-green-900/20',
-    class: 'bg-orange-50 dark:bg-orange-900/20',
-    integration: 'bg-indigo-50 dark:bg-indigo-900/20'
+  const gradientStyles = {
+    api: 'from-blue-500 to-cyan-400',
+    component: 'from-purple-500 to-pink-400',
+    function: 'from-green-500 to-emerald-400',
+    class: 'from-orange-500 to-amber-400',
+    integration: 'from-pink-500 to-rose-400'
+  }[type];
+
+  const bgStyles = {
+    api: 'bg-blue-500/10 dark:bg-blue-500/20',
+    component: 'bg-purple-500/10 dark:bg-purple-500/20',
+    function: 'bg-green-500/10 dark:bg-green-500/20',
+    class: 'bg-orange-500/10 dark:bg-orange-500/20',
+    integration: 'bg-pink-500/10 dark:bg-pink-500/20'
   }[type];
 
   const textColor = {
-    api: 'text-blue-700 dark:text-blue-300',
-    component: 'text-purple-700 dark:text-purple-300',
-    function: 'text-green-700 dark:text-green-300',
-    class: 'text-orange-700 dark:text-orange-300',
-    integration: 'text-indigo-700 dark:text-indigo-300'
+    api: 'text-blue-600 dark:text-blue-400',
+    component: 'text-purple-600 dark:text-purple-400',
+    function: 'text-green-600 dark:text-green-400',
+    class: 'text-orange-600 dark:text-orange-400',
+    integration: 'text-pink-600 dark:text-pink-400'
   }[type];
 
   return (
-    <div className={`rounded-lg p-3 ${bgColor}`}>
+    <div className="overflow-hidden rounded-xl">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between hover:opacity-80 transition-opacity"
+        className={`w-full flex items-center justify-between p-3 transition-all duration-200 ${bgStyles} ${isExpanded ? 'rounded-t-xl' : 'rounded-xl'} hover:opacity-90`}
       >
-        <div className="flex items-center gap-2">
-          <IconComponent className={`w-5 h-5 ${textColor}`} />
-          <h5 className={`font-semibold text-sm ${textColor}`}>
-            {title} ({items.length})
-          </h5>
+        <div className="flex items-center gap-3">
+          {/* Gradient pill with icon */}
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r ${gradientStyles} text-white shadow-md`}>
+            <IconComponent className="w-4 h-4" />
+            <span className="font-semibold text-sm">{title}</span>
+          </div>
+          {/* Count badge */}
+          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${bgStyles} ${textColor}`}>
+            {items.length}
+          </span>
         </div>
-        {isExpanded ? (
-          <ChevronDownIcon className={`w-4 h-4 ${textColor}`} />
-        ) : (
-          <ChevronRightIcon className={`w-4 h-4 ${textColor}`} />
-        )}
+        <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`}>
+          <ChevronRightIcon className={`w-5 h-5 ${textColor}`} />
+        </div>
       </button>
 
-      {isExpanded && (
-        <div className="mt-3 space-y-2 pt-3 border-t border-gray-200 dark:border-gray-600">
+      {/* Expandable content with animation */}
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className={`p-4 space-y-3 ${bgStyles} border-t border-white/10`}>
           {items.map((item, idx) => (
-            <div key={idx} className="text-sm">
+            <div
+              key={idx}
+              className="p-3 rounded-lg bg-white/5 dark:bg-black/20 border border-white/5 dark:border-white/5 hover:bg-white/10 dark:hover:bg-black/30 transition-colors"
+            >
               {type === 'api' && (
-                <div className="space-y-1">
-                  <div className="font-mono text-xs">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">{item.method}</span> {item.path}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-500/20 text-blue-400 font-mono">
+                      {item.method}
+                    </span>
+                    <code className="text-sm text-gray-300 font-mono">{item.path}</code>
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                  <p className="text-sm text-gray-400">{item.purpose}</p>
                   {item.requestFormat && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
-                      {t('logsPage.artifacts.details.request')} {item.requestFormat}
+                    <div className="text-xs text-gray-500">
+                      <span className="text-gray-600 dark:text-gray-500">{t('logsPage.artifacts.details.request')}</span> {item.requestFormat}
                     </div>
                   )}
                   {item.responseFormat && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
-                      {t('logsPage.artifacts.details.response')} {item.responseFormat}
+                    <div className="text-xs text-gray-500">
+                      <span className="text-gray-600 dark:text-gray-500">{t('logsPage.artifacts.details.response')}</span> {item.responseFormat}
                     </div>
                   )}
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <code className="inline-block text-xs bg-black/30 px-2 py-1 rounded font-mono text-gray-400">
                     {item.location}
-                  </div>
+                  </code>
                 </div>
               )}
 
               {type === 'component' && (
-                <div className="space-y-1">
-                  <div className="font-mono text-xs font-bold text-purple-600 dark:text-purple-400">
-                    {item.name}
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-400 text-xs">{item.type}</div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                <div className="space-y-2">
+                  <code className="text-sm font-bold text-purple-400 font-mono">{item.name}</code>
+                  <div className="text-xs text-gray-500">{item.type}</div>
+                  <p className="text-sm text-gray-400">{item.purpose}</p>
                   {item.props && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
-                      {t('logsPage.artifacts.details.props')} {item.props}
+                    <div className="text-xs text-gray-500">
+                      <span className="text-gray-600 dark:text-gray-500">{t('logsPage.artifacts.details.props')}</span> {item.props}
                     </div>
                   )}
                   {item.exports && item.exports.length > 0 && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
-                      {t('logsPage.artifacts.details.exports')} {item.exports.join(', ')}
+                    <div className="text-xs text-gray-500">
+                      <span className="text-gray-600 dark:text-gray-500">{t('logsPage.artifacts.details.exports')}</span> {item.exports.join(', ')}
                     </div>
                   )}
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <code className="inline-block text-xs bg-black/30 px-2 py-1 rounded font-mono text-gray-400">
                     {item.location}
-                  </div>
+                  </code>
                 </div>
               )}
 
               {type === 'function' && (
-                <div className="space-y-1">
-                  <div className="font-mono text-xs font-bold text-green-600 dark:text-green-400">
-                    {item.name}
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                <div className="space-y-2">
+                  <code className="text-sm font-bold text-green-400 font-mono">{item.name}</code>
+                  <p className="text-sm text-gray-400">{item.purpose}</p>
                   {item.signature && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500 font-mono bg-gray-100 dark:bg-gray-700 p-1 rounded">
+                    <code className="block text-xs text-gray-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">
                       {item.signature}
-                    </div>
+                    </code>
                   )}
                   <div className="text-xs">
                     {item.isExported ? (
-                      <span className="text-green-600 dark:text-green-400 font-semibold">{t('logsPage.artifacts.details.exported')}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 font-semibold">{t('logsPage.artifacts.details.exported')}</span>
                     ) : (
-                      <span className="text-gray-500 dark:text-gray-400">{t('logsPage.artifacts.details.private')}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-gray-500/20 text-gray-400">{t('logsPage.artifacts.details.private')}</span>
                     )}
                   </div>
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <code className="inline-block text-xs bg-black/30 px-2 py-1 rounded font-mono text-gray-400">
                     {item.location}
-                  </div>
+                  </code>
                 </div>
               )}
 
               {type === 'class' && (
-                <div className="space-y-1">
-                  <div className="font-mono text-xs font-bold text-orange-600 dark:text-orange-400">
-                    {item.name}
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                <div className="space-y-2">
+                  <code className="text-sm font-bold text-orange-400 font-mono">{item.name}</code>
+                  <p className="text-sm text-gray-400">{item.purpose}</p>
                   {item.methods && item.methods.length > 0 && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
-                      {t('logsPage.artifacts.details.methods')} {item.methods.join(', ')}
+                    <div className="text-xs text-gray-500">
+                      <span className="text-gray-600 dark:text-gray-500">{t('logsPage.artifacts.details.methods')}</span> {item.methods.join(', ')}
                     </div>
                   )}
                   <div className="text-xs">
                     {item.isExported ? (
-                      <span className="text-green-600 dark:text-green-400 font-semibold">{t('logsPage.artifacts.details.exported')}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 font-semibold">{t('logsPage.artifacts.details.exported')}</span>
                     ) : (
-                      <span className="text-gray-500 dark:text-gray-400">{t('logsPage.artifacts.details.private')}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-gray-500/20 text-gray-400">{t('logsPage.artifacts.details.private')}</span>
                     )}
                   </div>
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <code className="inline-block text-xs bg-black/30 px-2 py-1 rounded font-mono text-gray-400">
                     {item.location}
-                  </div>
+                  </code>
                 </div>
               )}
 
               {type === 'integration' && (
-                <div className="space-y-1">
-                  <div className="text-gray-600 dark:text-gray-400 font-medium">{item.description}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">
-                    {t('logsPage.artifacts.details.component')} {item.frontendComponent}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-300">{item.description}</p>
+                  <div className="text-xs text-gray-500">
+                    <span className="text-gray-600 dark:text-gray-500">{t('logsPage.artifacts.details.component')}</span> {item.frontendComponent}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">
-                    {t('logsPage.artifacts.details.endpoint')} {item.backendEndpoint}
+                  <div className="text-xs text-gray-500">
+                    <span className="text-gray-600 dark:text-gray-500">{t('logsPage.artifacts.details.endpoint')}</span> {item.backendEndpoint}
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-1 rounded">
-                    {t('logsPage.artifacts.details.flow')} {item.dataFlow}
+                  <div className="text-xs bg-black/30 p-2 rounded text-gray-400">
+                    <span className="text-gray-500">{t('logsPage.artifacts.details.flow')}</span> {item.dataFlow}
                   </div>
                 </div>
               )}
             </div>
           ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -263,13 +277,18 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[200px] md:min-w-[240px] px-3 py-2 md:px-4 md:py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[200px] md:min-w-[240px] px-4 py-2.5 glass-card hover:border-purple-500/30 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-200"
       >
-        <span className="truncate">
-          {selectedSpec ? selectedSpec.displayName : t('logsPage.specDropdown.selectPlaceholder')}
-        </span>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg gradient-icon-blue flex items-center justify-center">
+            <DocumentTextIcon className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-gray-900 dark:text-white font-medium truncate">
+            {selectedSpec ? selectedSpec.displayName : t('logsPage.specDropdown.selectPlaceholder')}
+          </span>
+        </div>
         <svg
-          className={`w-4 h-4 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 ml-2 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -279,26 +298,29 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 w-full sm:w-80 md:w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
-          <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-600">
-            <input
-              type="text"
-              placeholder={t('logsPage.specDropdown.searchPlaceholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              autoFocus
-            />
+        <div className="absolute top-full mt-2 w-full sm:w-80 md:w-96 glass-card overflow-hidden z-50 shadow-2xl">
+          <div className="p-3 border-b border-white/10 dark:border-gray-700/50">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder={t('logsPage.specDropdown.searchPlaceholder')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white/5 dark:bg-black/20 border border-white/10 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                autoFocus
+              />
+            </div>
           </div>
           <div className="overflow-y-auto max-h-80">
             {filteredSpecs.map((spec) => (
               <button
                 key={spec.name}
                 onClick={() => handleSelect(spec)}
-                className="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors"
+                className="w-full text-left px-4 py-3 hover:bg-purple-500/10 border-b border-white/5 dark:border-gray-700/30 last:border-b-0 transition-all duration-200 group"
               >
-                <div className="font-medium text-gray-900 dark:text-white">{spec.displayName}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{spec.name}</div>
+                <div className="font-medium text-gray-900 dark:text-white group-hover:text-purple-400 transition-colors">{spec.displayName}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{spec.name}</div>
               </button>
             ))}
             {filteredSpecs.length === 0 && (
@@ -322,52 +344,55 @@ function LogEntryCard({ entry }: LogEntryProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-3">
+    <div className={`glass-card overflow-hidden transition-all duration-300 ${isExpanded ? 'ring-1 ring-purple-500/30' : ''}`}>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-start justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        className={`w-full flex items-start justify-between p-4 md:p-5 transition-all duration-200 ${isExpanded ? 'bg-purple-500/5' : 'hover:bg-white/5 dark:hover:bg-white/5'}`}
       >
         <div className="flex-1 text-left">
-          <div className="flex items-center gap-2">
-            <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded text-xs font-medium">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Task badge with gradient */}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-blue-500 to-cyan-400 text-white shadow-md">
               {t('logsPage.taskBadge', 'Task')} {entry.taskId}
             </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            {/* Timestamp with calendar icon */}
+            <span className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+              <CalendarDaysIcon className="w-4 h-4" />
               {formatDate(entry.timestamp)}
             </span>
           </div>
-          <p className="mt-2 text-gray-900 dark:text-white font-medium">{entry.summary}</p>
+          <p className="mt-3 text-gray-900 dark:text-white font-semibold text-lg">{entry.summary}</p>
         </div>
-        <div className="ml-4 text-gray-500 dark:text-gray-400 flex-shrink-0">
-          {isExpanded ? (
-            <ChevronDownIcon className="w-5 h-5" />
-          ) : (
-            <ChevronRightIcon className="w-5 h-5" />
-          )}
+        <div className={`ml-4 p-2 rounded-lg transition-all duration-300 ${isExpanded ? 'bg-purple-500/20 rotate-90' : 'bg-white/5 dark:bg-white/5'}`}>
+          <ChevronRightIcon className={`w-5 h-5 transition-colors ${isExpanded ? 'text-purple-400' : 'text-gray-500 dark:text-gray-400'}`} />
         </div>
       </button>
 
-      {isExpanded && (
-        <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-4">
+      {/* Expandable content with animation */}
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="border-t border-white/10 dark:border-gray-700/50 p-4 md:p-5 space-y-5">
           {/* Code Statistics */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('logsPage.stats.title')}</h4>
+            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+              {t('logsPage.stats.title')}
+            </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-green-50 dark:bg-green-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.linesAdded')}</div>
-                <div className="text-lg font-semibold text-green-600 dark:text-green-400">+{entry.statistics.linesAdded}</div>
+              <div className="p-3 rounded-xl bg-green-500/10 dark:bg-green-500/20 border border-green-500/20">
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesAdded')}</div>
+                <div className="text-xl font-bold text-green-500">+{entry.statistics.linesAdded}</div>
               </div>
-              <div className="bg-red-50 dark:bg-red-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.linesRemoved')}</div>
-                <div className="text-lg font-semibold text-red-600 dark:text-red-400">-{entry.statistics.linesRemoved}</div>
+              <div className="p-3 rounded-xl bg-red-500/10 dark:bg-red-500/20 border border-red-500/20">
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesRemoved')}</div>
+                <div className="text-xl font-bold text-red-500">-{entry.statistics.linesRemoved}</div>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.filesChanged')}</div>
-                <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">{entry.statistics.filesChanged}</div>
+              <div className="p-3 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20">
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.filesChanged')}</div>
+                <div className="text-xl font-bold text-blue-500">{entry.statistics.filesChanged}</div>
               </div>
-              <div className="bg-purple-50 dark:bg-purple-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.netChange')}</div>
-                <div className="text-lg font-semibold text-purple-600 dark:text-purple-400">{entry.statistics.linesAdded - entry.statistics.linesRemoved}</div>
+              <div className="p-3 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/20">
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.netChange')}</div>
+                <div className="text-xl font-bold text-purple-500">{entry.statistics.linesAdded - entry.statistics.linesRemoved}</div>
               </div>
             </div>
           </div>
@@ -375,12 +400,15 @@ function LogEntryCard({ entry }: LogEntryProps) {
           {/* Files Modified */}
           {entry.filesModified.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('logsPage.files.modified')} ({entry.filesModified.length})</h4>
-              <div className="space-y-1">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                {t('logsPage.files.modified')} ({entry.filesModified.length})
+              </h4>
+              <div className="space-y-1.5">
                 {entry.filesModified.map((file, idx) => (
-                  <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                    <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
-                    <code className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                  <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-black/20 hover:bg-blue-500/10 transition-colors group">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 group-hover:ring-2 group-hover:ring-blue-500/30 transition-all"></span>
+                    <code className="text-sm font-mono text-gray-600 dark:text-gray-300 group-hover:text-blue-400 transition-colors">
                       {file}
                     </code>
                   </div>
@@ -392,12 +420,15 @@ function LogEntryCard({ entry }: LogEntryProps) {
           {/* Files Created */}
           {entry.filesCreated.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('logsPage.files.created')} ({entry.filesCreated.length})</h4>
-              <div className="space-y-1">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                {t('logsPage.files.created')} ({entry.filesCreated.length})
+              </h4>
+              <div className="space-y-1.5">
                 {entry.filesCreated.map((file, idx) => (
-                  <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                    <code className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                  <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-black/20 hover:bg-green-500/10 transition-colors group">
+                    <span className="w-2 h-2 rounded-full bg-green-500 group-hover:ring-2 group-hover:ring-green-500/30 transition-all"></span>
+                    <code className="text-sm font-mono text-gray-600 dark:text-gray-300 group-hover:text-green-400 transition-colors">
                       {file}
                     </code>
                   </div>
@@ -409,17 +440,17 @@ function LogEntryCard({ entry }: LogEntryProps) {
           {/* Artifacts */}
           {hasAnyArtifacts(entry.artifacts) && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                 {t('logsPage.artifacts.title')} ({getTotalArtifactCount(entry.artifacts)})
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {entry.artifacts.apiEndpoints && entry.artifacts.apiEndpoints.length > 0 && (
                   <ArtifactSection
                     title={t('logsPage.artifacts.apiEndpoints')}
                     icon={GlobeAltIcon}
                     items={entry.artifacts.apiEndpoints}
                     type="api"
-                    color="blue"
                   />
                 )}
 
@@ -429,7 +460,6 @@ function LogEntryCard({ entry }: LogEntryProps) {
                     icon={CubeIcon}
                     items={entry.artifacts.components}
                     type="component"
-                    color="purple"
                   />
                 )}
 
@@ -439,7 +469,6 @@ function LogEntryCard({ entry }: LogEntryProps) {
                     icon={CodeBracketSquareIcon}
                     items={entry.artifacts.functions}
                     type="function"
-                    color="green"
                   />
                 )}
 
@@ -449,7 +478,6 @@ function LogEntryCard({ entry }: LogEntryProps) {
                     icon={CircleStackIcon}
                     items={entry.artifacts.classes}
                     type="class"
-                    color="orange"
                   />
                 )}
 
@@ -459,14 +487,13 @@ function LogEntryCard({ entry }: LogEntryProps) {
                     icon={LinkIcon}
                     items={entry.artifacts.integrations}
                     type="integration"
-                    color="indigo"
                   />
                 )}
               </div>
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -689,10 +716,11 @@ export function LogsPage() {
   ];
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">{t('logsPage.header.title')}</h1>
+    <div className="w-full h-full flex flex-col bg-gray-50 dark:bg-[#0f0d1a]">
+      {/* Header with glass card */}
+      <div className="glass-card m-4 md:m-6 mb-0 p-4 md:p-6">
+        {/* Title with gradient text */}
+        <h1 className="text-3xl font-bold gradient-text mb-6">{t('logsPage.header.title')}</h1>
 
         {/* Controls */}
         <div className="space-y-4">
@@ -702,13 +730,17 @@ export function LogsPage() {
               selected={selectedSpec}
               onSelect={setSelectedSpec}
             />
-            <input
-              type="text"
-              placeholder={t('logsPage.search.placeholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            {/* Search input with glass styling */}
+            <div className="relative flex-1">
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder={t('logsPage.search.placeholder')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-12 pr-4 py-2.5 bg-white/5 dark:bg-black/20 border border-white/10 dark:border-gray-700/50 rounded-full text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+              />
+            </div>
             <SortDropdown
               currentSort={sortBy}
               currentOrder={sortOrder}
@@ -718,22 +750,21 @@ export function LogsPage() {
             />
           </div>
 
-          {/* Task Filter */}
+          {/* Task Filter Pills */}
           {uniqueTasks.length > 0 && (
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-3">
                 {t('logsPage.filter.label')}
               </label>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setTaskFilter('')}
-                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                    !taskFilter
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                  }`}
+                  className={`btn-pill ${!taskFilter ? 'active' : ''}`}
                 >
-                  {t('logsPage.filter.all')} ({logs.length})
+                  {t('logsPage.filter.all')}
+                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${!taskFilter ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                    {logs.length}
+                  </span>
                 </button>
                 {uniqueTasks.map(taskId => {
                   const count = logs.filter(log => log.taskId === taskId).length;
@@ -741,13 +772,12 @@ export function LogsPage() {
                     <button
                       key={taskId}
                       onClick={() => setTaskFilter(taskId)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                        taskFilter === taskId
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                      }`}
+                      className={`btn-pill ${taskFilter === taskId ? 'active' : ''}`}
                     >
-                      {t('logsPage.filter.taskPrefix')} {taskId} ({count})
+                      {t('logsPage.filter.taskPrefix')} {taskId}
+                      <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${taskFilter === taskId ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                        {count}
+                      </span>
                     </button>
                   );
                 })}
@@ -757,50 +787,95 @@ export function LogsPage() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats Cards with glass styling */}
       {selectedSpec && logs.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
+        <div className="px-4 md:px-6 py-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.totalEntries')}</div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.totalEntries}</div>
+            <div className="glass-card p-4 glow-hover">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-icon-blue flex items-center justify-center">
+                  <ClipboardDocumentListIcon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.totalEntries')}</div>
+                  <div className="text-2xl font-bold text-blue-500">{stats.totalEntries}</div>
+                </div>
+              </div>
             </div>
-            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesAdded')}</div>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">+{stats.totalLinesAdded}</div>
+            <div className="glass-card p-4 glow-hover">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-icon-green flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesAdded')}</div>
+                  <div className="text-2xl font-bold text-green-500">+{stats.totalLinesAdded}</div>
+                </div>
+              </div>
             </div>
-            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesRemoved')}</div>
-              <div className="text-2xl font-bold text-red-600 dark:text-red-400">-{stats.totalLinesRemoved}</div>
+            <div className="glass-card p-4 glow-hover">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-red-500 to-rose-400 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesRemoved')}</div>
+                  <div className="text-2xl font-bold text-red-500">-{stats.totalLinesRemoved}</div>
+                </div>
+              </div>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.filesChanged')}</div>
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.totalFiles}</div>
+            <div className="glass-card p-4 glow-hover">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-icon flex items-center justify-center">
+                  <DocumentTextIcon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.filesChanged')}</div>
+                  <div className="text-2xl font-bold text-purple-500">{stats.totalFiles}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pt-2">
         {!selectedSpec ? (
+          /* Empty state - select spec */
           <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <p className="text-gray-500 dark:text-gray-400">{t('logsPage.empty.selectSpec')}</p>
+            <div className="text-center glass-card p-12 max-w-md">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl gradient-icon flex items-center justify-center">
+                <DocumentTextIcon className="w-10 h-10 text-white" />
+              </div>
+              <p className="text-lg text-gray-500 dark:text-gray-400">{t('logsPage.empty.selectSpec')}</p>
             </div>
           </div>
         ) : error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
+          <div className="glass-card border-red-500/30 p-6">
+            <p className="text-red-500">{error}</p>
           </div>
         ) : loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="text-gray-500 dark:text-gray-400">{t('logsPage.loading')}</div>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl gradient-icon animate-pulse flex items-center justify-center">
+                <ClipboardDocumentListIcon className="w-6 h-6 text-white" />
+              </div>
+              <p className="text-gray-500 dark:text-gray-400">{t('logsPage.loading')}</p>
+            </div>
           </div>
         ) : filteredAndSortedLogs.length === 0 ? (
+          /* Empty state - no logs */
           <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <p className="text-gray-500 dark:text-gray-400">
+            <div className="text-center glass-card p-12 max-w-md">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-gray-500 to-gray-400 flex items-center justify-center opacity-50">
+                <ClipboardDocumentListIcon className="w-10 h-10 text-white" />
+              </div>
+              <p className="text-lg text-gray-500 dark:text-gray-400">
                 {search || taskFilter
                   ? t('logsPage.empty.noResults')
                   : t('logsPage.empty.noLogs')}
@@ -808,7 +883,7 @@ export function LogsPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-4">
             {filteredAndSortedLogs.map((entry) => (
               <LogEntryCard key={entry.id} entry={entry} />
             ))}

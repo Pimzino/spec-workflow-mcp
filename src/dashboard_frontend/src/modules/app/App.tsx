@@ -21,9 +21,15 @@ import { LanguageSelector } from '../../components/LanguageSelector';
 import { I18nErrorBoundary } from '../../components/I18nErrorBoundary';
 import { ProjectDropdown } from '../components/ProjectDropdown';
 import { PageNavigationSidebar } from '../components/PageNavigationSidebar';
+import { ActivitySidebar } from '../components/ActivitySidebar';
 import { ChangelogModal } from '../modals/ChangelogModal';
 
-function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
+interface HeaderProps {
+  toggleSidebar: () => void;
+  toggleActivitySidebar: () => void;
+}
+
+function Header({ toggleSidebar, toggleActivitySidebar }: HeaderProps) {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const { connected } = useWs();
@@ -49,7 +55,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
 
   return (
     <>
-      <header className="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-10 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#1e1b2e]/80 border-b border-gray-200 dark:border-[#2d2640]/50">
         <div className="w-full px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Page Navigation Sidebar Toggle Button */}
@@ -123,14 +129,14 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
           className="fixed inset-0 z-50 lg:hidden"
           onClick={closeMobileMenu}
         >
-          <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" />
 
           <div
-            className="absolute right-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-xl transform transition-transform"
+            className="absolute right-0 top-0 h-full w-64 bg-white dark:bg-[#1e1b2e]/95 backdrop-blur-xl shadow-xl transform transition-transform border-l border-gray-200 dark:border-[#2d2640]/50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[#2d2640]/50">
                 <div className="text-lg font-semibold">{t('mobile.settings', 'Settings')}</div>
                 <button
                   onClick={closeMobileMenu}
@@ -175,7 +181,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
                 </div>
 
                 {info?.version && (
-                  <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="pt-2 border-t border-gray-200 dark:border-[#2d2640]/50">
                     <div className="text-center">
                       <button
                         onClick={() => {
@@ -211,14 +217,26 @@ function AppInner() {
   const { initial } = useWs();
   const { currentProjectId } = useProjects();
   const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on desktop
+  const [activitySidebarOpen, setActivitySidebarOpen] = useState(false); // For mobile/tablet
 
   const SIDEBAR_COLLAPSE_KEY = 'spec-workflow-sidebar-collapsed';
+  const ACTIVITY_SIDEBAR_KEY = 'spec-workflow-activity-sidebar-visible';
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     try {
       const stored = localStorage.getItem(SIDEBAR_COLLAPSE_KEY);
       return stored ? JSON.parse(stored) : false;
     } catch {
       return false;
+    }
+  });
+
+  const [activitySidebarVisible, setActivitySidebarVisible] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem(ACTIVITY_SIDEBAR_KEY);
+      return stored ? JSON.parse(stored) : true; // Default visible on desktop
+    } catch {
+      return true;
     }
   });
 
@@ -231,6 +249,15 @@ function AppInner() {
     }
   }, [sidebarCollapsed]);
 
+  // Persist activity sidebar visibility to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(ACTIVITY_SIDEBAR_KEY, JSON.stringify(activitySidebarVisible));
+    } catch (error) {
+      console.error('Failed to save activity sidebar state:', error);
+    }
+  }, [activitySidebarVisible]);
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -239,10 +266,17 @@ function AppInner() {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
+  const toggleActivitySidebar = () => {
+    // On mobile, toggle the mobile sidebar
+    setActivitySidebarOpen(!activitySidebarOpen);
+    // On desktop, toggle visibility
+    setActivitySidebarVisible(!activitySidebarVisible);
+  };
+
   return (
     <ApiProvider initial={initial} projectId={currentProjectId}>
       <NotificationProvider>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 lg:flex">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#0f0d1a] text-gray-900 dark:text-gray-100">
           {/* Page Navigation Sidebar */}
           <PageNavigationSidebar
             isOpen={sidebarOpen}
@@ -250,8 +284,26 @@ function AppInner() {
             onClose={() => setSidebarOpen(false)}
             onToggleCollapse={toggleSidebarCollapse}
           />
-          <div className="flex-1 flex flex-col min-w-0">
-            <Header toggleSidebar={toggleSidebar} />
+
+          {/* Activity Sidebar - visible on xl screens, slide-in on smaller */}
+          <div className={`hidden xl:block ${activitySidebarVisible ? '' : 'xl:hidden'}`}>
+            <ActivitySidebar
+              isOpen={true}
+              onClose={() => setActivitySidebarVisible(false)}
+            />
+          </div>
+
+          {/* Mobile/Tablet Activity Sidebar */}
+          <div className="xl:hidden">
+            <ActivitySidebar
+              isOpen={activitySidebarOpen}
+              onClose={() => setActivitySidebarOpen(false)}
+            />
+          </div>
+
+          {/* Main content area - offset by sidebar width on desktop */}
+          <div className={`flex-1 flex flex-col min-w-0 lg:ml-[72px] ${activitySidebarVisible ? 'xl:mr-[280px]' : ''}`}>
+            <Header toggleSidebar={toggleSidebar} toggleActivitySidebar={toggleActivitySidebar} />
             <HighlightStyles />
             <main className="w-full px-6 py-6">
             {currentProjectId ? (

@@ -77,7 +77,7 @@ export function JobExecutionHistory({ jobId, isExpanded }: JobExecutionHistoryPr
 
   if (loading) {
     return (
-      <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-600">
+      <div className="p-4 bg-gray-50/30 dark:bg-gray-800/20 border-t border-gray-200 dark:border-gray-700/30">
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
           <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Loading history...</span>
@@ -95,41 +95,41 @@ export function JobExecutionHistory({ jobId, isExpanded }: JobExecutionHistoryPr
   }
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-600 space-y-4">
+    <div className="p-4 bg-gray-50/30 dark:bg-gray-800/20 border-t border-gray-200 dark:border-gray-700/30 space-y-4">
       {/* Statistics Summary */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm">
             <div className="text-xs text-gray-600 dark:text-gray-400">Total Runs</div>
             <div className="text-lg font-semibold text-gray-900 dark:text-white">
               {stats.totalExecutions}
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm">
             <div className="text-xs text-gray-600 dark:text-gray-400">Success Rate</div>
             <div className={`text-lg font-semibold ${stats.successRate === 100 ? 'text-green-600 dark:text-green-400' : stats.successRate >= 50 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
               {stats.successRate.toFixed(0)}%
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm">
             <div className="text-xs text-gray-600 dark:text-gray-400">Items Deleted</div>
             <div className="text-lg font-semibold text-gray-900 dark:text-white">
               {stats.totalItemsDeleted}
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm">
             <div className="text-xs text-gray-600 dark:text-gray-400">Successful</div>
             <div className="text-lg font-semibold text-green-600 dark:text-green-400">
               {stats.successfulExecutions}
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm">
             <div className="text-xs text-gray-600 dark:text-gray-400">Failed</div>
             <div className="text-lg font-semibold text-red-600 dark:text-red-400">
               {stats.failedExecutions}
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm">
             <div className="text-xs text-gray-600 dark:text-gray-400">Avg Duration</div>
             <div className="text-lg font-semibold text-gray-900 dark:text-white">
               {(stats.avgDuration / 1000).toFixed(1)}s

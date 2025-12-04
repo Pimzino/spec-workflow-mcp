@@ -55,6 +55,22 @@
     "npm": "npm package",
     "github": "GitHub"
   },
+  "dashboard": {
+    "totalTasks": "Total Tasks",
+    "acrossAllSpecs": "Across all specs",
+    "completed": "Completed",
+    "remaining": "remaining",
+    "actionRequired": "Action required",
+    "taskTrend": "Task Completion Trend",
+    "progressOverTime": "Progress over time",
+    "week": "Week",
+    "month": "Month",
+    "all": "All",
+    "overallProgress": "Overall Progress",
+    "tasksCompleted": "Tasks Completed",
+    "done": "Done",
+    "left": "Left"
+  },
   "editor": {
     "markdown": {
       "title": "Markdown Editor",
@@ -237,6 +253,8 @@
       "lastModifiedDesc": "Sort by modification date"
     },
     "noTasks": "No tasks",
+    "result": "result",
+    "results": "results",
     "search": {
       "placeholder": {
         "active": "Search active specs...",
@@ -247,7 +265,8 @@
       "title": "No Documents Available",
       "description": "This spec doesn't have any documents created yet.",
       "noResults": "No specs found",
-      "noResultsDescription": "Try adjusting your search or filters"
+      "noResultsDescription": "Try adjusting your search or filters",
+      "clearSearch": "Clear search"
     },
     "tabs": {
       "active": "Active",
@@ -499,5 +518,26 @@
       "loading": "Loading changelog...",
       "notFound": "Changelog not found for this version"
     }
+  },
+  "activity": {
+    "lastActions": "Last actions",
+    "settings": "Activity settings",
+    "toggle": "Toggle activity sidebar",
+    "noActivity": "No recent activity",
+    "noActivityDesc": "Actions will appear here as you work",
+    "showAll": "Show all actions",
+    "specEdited": "Spec edited",
+    "specEditedDesc": "Spec for {{name}} has been edited",
+    "taskCompleted": "Task completed",
+    "taskCompletedDesc": "Task {{id}} completed",
+    "approval": "Approval update",
+    "approvalDesc": "Approval for {{title}} {{status}}",
+    "approved": "approved",
+    "rejected": "rejected",
+    "pending": "pending",
+    "logAdded": "Log added",
+    "logAddedDesc": "Implementation log added",
+    "steeringEdited": "Steering updated",
+    "steeringEditedDesc": "{{type}} document updated"
   }
 }

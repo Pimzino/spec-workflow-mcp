@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Cog6ToothIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import { AutomationJob } from '../../types';
 import { getTemplatesByType } from './JobTemplates';
 
@@ -155,9 +156,9 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-        <div className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="glass-card max-w-2xl w-full max-h-[90vh] flex flex-col">
+        <div className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700/50">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {isEditMode ? 'Edit Automation Job' : 'Create New Automation Job'}
           </h2>
@@ -175,7 +176,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Weekly Cleanup"
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white ${
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
                 errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
             />
@@ -256,7 +257,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               max="3650"
               value={formData.daysOld}
               onChange={(e) => setFormData({ ...formData, daysOld: parseInt(e.target.value) || 0 })}
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white ${
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
                 errors.daysOld ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
             />
@@ -330,7 +331,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               value={formData.schedule}
               onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
               placeholder="e.g., 0 2 * * * (daily at 2 AM)"
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white font-mono text-sm ${
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm ${
                 errors.schedule ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
             />
@@ -371,7 +372,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors disabled:opacity-50"
+              className="flex-1 btn-glass transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -379,7 +380,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               type="submit"
               form="job-form"
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 btn-gradient transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading && <span className="animate-spin">⟳</span>}
               {isEditMode ? 'Update Job' : 'Create Job'}

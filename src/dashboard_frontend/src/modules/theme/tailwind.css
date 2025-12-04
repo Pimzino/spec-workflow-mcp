@@ -45,3 +45,289 @@
 .drop-zone-active {
   @apply ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/10;
 }
+/* ===========================
+   GLASSMORPHISM UTILITIES
+   =========================== */
+
+.glass {
+  @apply backdrop-blur-xl;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass {
+  background: rgba(30, 27, 46, 0.8);
+}
+
+.glass-card {
+  @apply backdrop-blur-xl rounded-2xl border transition-all duration-200;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-card {
+  background: rgba(30, 27, 46, 0.8);
+  border-color: rgba(45, 38, 64, 0.8);
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.05);
+}
+
+.glass-card:hover {
+  box-shadow: 0 8px 32px -2px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-card:hover {
+  box-shadow: 0 8px 32px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.gradient-border {
+  @apply relative rounded-2xl;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899, #8b5cf6);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===========================
+   GRADIENT UTILITIES
+   =========================== */
+
+.gradient-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.gradient-yellow {
+  background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+}
+
+.gradient-chart {
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.3) 0%, rgba(139, 92, 246, 0) 100%);
+}
+
+.gradient-icon {
+  @apply flex items-center justify-center rounded-xl;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+}
+
+.gradient-icon-green {
+  @apply flex items-center justify-center rounded-xl;
+  background: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
+}
+
+.gradient-icon-blue {
+  @apply flex items-center justify-center rounded-xl;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.gradient-icon-yellow {
+  @apply flex items-center justify-center rounded-xl;
+  background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+}
+
+/* ===========================
+   BUTTON STYLES
+   =========================== */
+
+.btn-pill {
+  @apply inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
+  @apply bg-transparent border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400;
+}
+
+.btn-pill:hover {
+  @apply bg-gray-100 dark:bg-gray-800/50 text-gray-900 dark:text-gray-200;
+}
+
+.btn-pill.active {
+  @apply border-transparent text-white;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  box-shadow: 0 4px 12px -2px rgba(139, 92, 246, 0.4);
+}
+
+.btn-gradient {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-all duration-200;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  box-shadow: 0 4px 12px -2px rgba(139, 92, 246, 0.3);
+}
+
+.btn-gradient:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -2px rgba(139, 92, 246, 0.4);
+}
+
+.btn-gradient:active {
+  transform: translateY(0);
+}
+
+.btn-gradient-green {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-all duration-200;
+  background: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
+  box-shadow: 0 4px 12px -2px rgba(34, 197, 94, 0.3);
+}
+
+.btn-gradient-green:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -2px rgba(34, 197, 94, 0.4);
+}
+
+.btn-gradient-yellow {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-900 transition-all duration-200;
+  background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+  box-shadow: 0 4px 12px -2px rgba(251, 191, 36, 0.3);
+}
+
+.btn-gradient-yellow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -2px rgba(251, 191, 36, 0.4);
+}
+
+.btn-gradient-red {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-all duration-200;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.3);
+}
+
+.btn-gradient-red:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -2px rgba(239, 68, 68, 0.4);
+}
+
+.btn-glass {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200;
+  @apply bg-white/10 dark:bg-white/5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300;
+  backdrop-filter: blur(8px);
+}
+
+.btn-glass:hover {
+  @apply bg-white/20 dark:bg-white/10 border-gray-300 dark:border-gray-600;
+}
+
+.btn-icon {
+  @apply inline-flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200;
+  @apply text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white;
+  @apply hover:bg-gray-100 dark:hover:bg-gray-800;
+}
+
+.btn-icon.active {
+  @apply text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20;
+}
+
+/* ===========================
+   STATUS INDICATORS
+   =========================== */
+
+.status-badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+}
+
+.status-badge-pending {
+  @apply bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400;
+}
+
+.status-badge-success {
+  @apply bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400;
+}
+
+.status-badge-error {
+  @apply bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400;
+}
+
+.status-badge-info {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400;
+}
+
+.status-indicator {
+  @apply w-2 h-2 rounded-full;
+}
+
+.status-indicator-online {
+  @apply bg-green-500;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.status-indicator-offline {
+  @apply bg-red-500;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.status-indicator-pending {
+  @apply bg-amber-500;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+}
+
+/* ===========================
+   PROGRESS BAR
+   =========================== */
+
+.progress-gradient {
+  @apply w-full h-2 rounded-full overflow-hidden;
+  background: rgba(45, 38, 64, 0.3);
+}
+
+.progress-gradient-fill {
+  @apply h-full rounded-full transition-all duration-500;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+}
+
+/* ===========================
+   CARD UTILITIES
+   =========================== */
+
+.glow-hover {
+  @apply transition-shadow duration-300;
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+}
+
+.dark .glow-hover:hover {
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+}
+
+.card-lift {
+  @apply transition-all duration-200;
+}
+
+.card-lift:hover {
+  @apply -translate-y-0.5;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .card-lift:hover {
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.1);
+}

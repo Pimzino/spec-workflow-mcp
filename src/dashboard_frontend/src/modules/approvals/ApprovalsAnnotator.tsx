@@ -62,39 +62,47 @@ function CommentModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-lg sm:rounded-lg shadow-xl w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="glass-card rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col border border-gray-200/20 dark:border-gray-700/30">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div className="flex items-center justify-between p-4 sm:p-4 lg:p-6 border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0 bg-gradient-to-r from-amber-500/10 to-yellow-500/10">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg sm:text-lg font-semibold text-gray-900 dark:text-white">
-              {isEditing ? t('approvals.annotator.editCommentTitle') : t('approvals.annotator.addCommentTitle')}
-            </h3>
-            <p className="text-sm sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-1">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md shadow-amber-500/25">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                {isEditing ? t('approvals.annotator.editCommentTitle') : t('approvals.annotator.addCommentTitle')}
+              </h3>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 ml-11">
               {t('approvals.annotator.subtitle')}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-2 -m-2 touch-manipulation flex-shrink-0"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-all duration-200 p-2 -m-2 touch-manipulation flex-shrink-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50"
           >
-            <svg className="w-6 h-6 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Highlighted Text Preview */}
-        <div className="p-4 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 min-w-0 flex-shrink-0">
-          <label className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-2">
+        <div className="p-4 sm:p-4 lg:p-6 border-b border-gray-200/50 dark:border-gray-700/50 min-w-0 flex-shrink-0">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('approvals.annotator.highlightedText')}
           </label>
-          <div 
-            className="p-3 sm:p-3 rounded-lg border text-sm sm:text-sm leading-relaxed max-h-32 sm:max-h-32 overflow-y-auto min-w-0"
+          <div
+            className="p-3 rounded-xl text-sm leading-relaxed max-h-32 overflow-y-auto min-w-0 shadow-inner"
             style={{
               backgroundColor: selectedColor.bg,
               borderColor: selectedColor.border,
-              borderWidth: '2px'
+              borderWidth: '2px',
+              borderStyle: 'solid'
             }}
           >
             <pre className="whitespace-pre-wrap font-mono text-gray-900 dark:text-gray-100 break-words overflow-x-auto max-w-full">
@@ -104,29 +112,29 @@ function CommentModal({
         </div>
 
         {/* Color Picker */}
-        <div className="p-4 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 min-w-0 flex-shrink-0">
-          <label className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-2">
+        <div className="p-4 sm:p-4 lg:p-6 border-b border-gray-200/50 dark:border-gray-700/50 min-w-0 flex-shrink-0">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('approvals.annotator.chooseHighlightColor')}
           </label>
           <div className="flex items-center gap-3">
             <input
               type="color"
               value={selectedColorHex}
-              onChange={(e) => { 
-                const v = e.target.value; 
-                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase()); 
+              onChange={(e) => {
+                const v = e.target.value;
+                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase());
               }}
-              className="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
+              className="w-10 h-10 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer shadow-sm hover:shadow-md transition-shadow"
               title={t('approvals.annotator.pickColorTooltip')}
             />
             <input
               type="text"
               value={selectedColorHex}
-              onChange={(e) => { 
-                const v = e.target.value; 
-                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase()); 
+              onChange={(e) => {
+                const v = e.target.value;
+                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase());
               }}
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white font-mono uppercase"
+              className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800/50 dark:text-white font-mono uppercase focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
               placeholder="#FFEB3B"
               pattern="^#[0-9A-Fa-f]{6}$"
               maxLength={7}
@@ -136,7 +144,7 @@ function CommentModal({
 
         {/* Comment Input */}
         <div className="p-4 sm:p-4 lg:p-6 min-w-0 flex-1 flex flex-col">
-          <label className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('approvals.annotator.yourComment')}
           </label>
           <textarea
@@ -144,29 +152,29 @@ function CommentModal({
             onChange={(e) => setComment(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('approvals.annotator.commentPlaceholder')}
-            className="w-full min-w-0 px-3 sm:px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-base leading-relaxed flex-1 min-h-[120px]"
+            className="w-full min-w-0 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none text-base leading-relaxed flex-1 min-h-[120px] transition-all"
             autoFocus
           />
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 sm:mt-2 break-words">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 break-words">
             <span className="hidden sm:inline">{t('approvals.annotator.hints.desktop')}</span>
             <span className="sm:hidden">{t('approvals.annotator.hints.mobile')}</span>
           </p>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 sm:gap-3 p-4 sm:p-4 lg:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex-shrink-0">
+        <div className="flex items-center justify-end gap-3 p-4 sm:p-4 lg:p-6 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/30 flex-shrink-0">
           <button
             onClick={onClose}
-            className="px-4 sm:px-4 py-3 text-base text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors touch-manipulation"
+            className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors touch-manipulation rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50"
           >
             {t('common.cancel')}
           </button>
           <button
             onClick={handleSave}
             disabled={!comment.trim()}
-            className="px-4 sm:px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 sm:gap-2 text-base touch-manipulation"
+            className="px-5 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 touch-manipulation transition-all duration-200 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-md shadow-amber-500/25 hover:shadow-lg hover:shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
-            <svg className="w-4 h-4 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
             <span className="hidden sm:inline">{isEditing ? t('approvals.annotator.updateCommentButton') : t('approvals.annotator.addCommentButton')}</span>
@@ -318,7 +326,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
       <div data-section="annotations" className="lg:col-span-2">
 
         {/* Content Display */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div className="glass-card rounded-xl overflow-hidden">
           {viewMode === 'preview' ? (
             <div className="p-4 sm:p-6">
               <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-img:max-w-full prose-img:h-auto prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-pre:bg-gray-50 dark:prose-pre:bg-gray-900 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300">
@@ -328,11 +336,13 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
           ) : (
             <div className="p-4">
               {/* Instruction note */}
-              <div className="mb-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-                <p className="text-xs text-blue-700 dark:text-blue-300 m-0 flex items-start gap-2">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+              <div className="mb-3 p-3 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-200/50 dark:border-amber-700/30 rounded-xl">
+                <p className="text-xs text-amber-700 dark:text-amber-300 m-0 flex items-start gap-2">
+                  <div className="w-5 h-5 rounded-md bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <span className="leading-relaxed break-words">
                     <strong>{t('approvals.annotator.instructions.title')}</strong><br className="hidden sm:block" />
                     <span className="block sm:hidden">{t('approvals.annotator.instructions.mobile')}</span>
@@ -343,12 +353,12 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                 </p>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 min-w-0">
-                <pre 
-                  className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed select-text cursor-text font-mono text-gray-900 dark:text-gray-100 overflow-x-auto break-words max-w-full" 
+              <div className="bg-gray-50/80 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200/50 dark:border-gray-700/30 min-w-0">
+                <pre
+                  className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed select-text cursor-text font-mono text-gray-900 dark:text-gray-100 overflow-x-auto break-words max-w-full"
                   onMouseUp={handleSelectionMouseUp}
                   onClick={handleContentClick}
-                  dangerouslySetInnerHTML={{ __html: annotatedHtml }} 
+                  dangerouslySetInnerHTML={{ __html: annotatedHtml }}
                 />
               </div>
             </div>
@@ -357,20 +367,22 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
       </div>
 
       {/* Comments Sidebar - Right sidebar on desktop, bottom on mobile */}
-      <div data-section="comments" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col max-h-[60vh] lg:max-h-[80vh] lg:col-span-1">
+      <div data-section="comments" className="glass-card rounded-xl flex flex-col max-h-[60vh] lg:max-h-[80vh] lg:col-span-1">
         {/* Comments Header */}
-        <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
-          <h4 className="font-medium text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+        <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-purple-500/5 to-indigo-500/5 rounded-t-xl">
+          <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-sm sm:text-base">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-md shadow-purple-500/25">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
             Comments & Feedback
           </h4>
 
           {/* Preview mode note */}
           {viewMode === 'preview' && (
-            <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg text-xs sm:text-sm text-blue-800 dark:text-blue-200">
-              <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 inline flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mb-3 p-3 bg-purple-500/10 border border-purple-200/50 dark:border-purple-700/30 rounded-xl text-xs sm:text-sm text-purple-800 dark:text-purple-200">
+              <svg className="w-3.5 h-3.5 mr-1.5 inline flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             {t('approvals.annotator.switchHelp')}
@@ -381,9 +393,9 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
           {viewMode === 'annotate' && (
             <button
               onClick={addGeneral}
-              className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 touch-manipulation"
+              className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white shadow-md shadow-purple-500/25 hover:shadow-lg hover:shadow-purple-500/30"
             >
-              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               <span className="hidden sm:inline">{t('approvals.annotator.addGeneralComment.button')}</span>
@@ -394,65 +406,76 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         </div>
 
         {/* Comments List */}
-        <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2 sm:space-y-3">
+        <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3">
           {comments.length === 0 ? (
-            <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400 text-sm">
-              <svg className="mx-auto w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <p className="text-xs sm:text-sm font-medium">{t('approvals.annotator.empty.title')}</p>
-              <p className="text-xs mt-1">{t('approvals.annotator.empty.description')}</p>
+            <div className="text-center py-8">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t('approvals.annotator.empty.title')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('approvals.annotator.empty.description')}</p>
             </div>
           ) : (
             comments.map((c, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-gray-900 p-2 sm:p-3 rounded-lg border border-gray-200 dark:border-gray-700 relative">
+              <div key={idx} className="glass p-3 rounded-xl relative group transition-all duration-200 hover:shadow-md">
                 {/* Color indicator for selection comments */}
                 {c.type === 'selection' && c.highlightColor && (
                   <div
-                    className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg"
+                    className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl"
                     style={{ backgroundColor: c.highlightColor.border }}
                   />
                 )}
 
-                <div className="flex items-start justify-between mb-1 sm:mb-2" style={{ marginLeft: c.type === 'selection' && c.highlightColor ? '8px' : '0' }}>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+                <div className="flex items-start justify-between mb-2" style={{ marginLeft: c.type === 'selection' && c.highlightColor ? '8px' : '0' }}>
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
                     {/* Color dot for selection comments */}
                     {c.type === 'selection' && c.highlightColor && (
                       <div
-                        className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border flex-shrink-0"
-                        style={{ 
-                          backgroundColor: c.highlightColor.bg, 
-                          borderColor: c.highlightColor.border 
+                        className="w-3 h-3 rounded-full border-2 flex-shrink-0 shadow-sm"
+                        style={{
+                          backgroundColor: c.highlightColor.bg,
+                          borderColor: c.highlightColor.border
                         }}
                         title={t('approvals.annotator.colorHighlight', { color: c.highlightColor.name })}
                       />
                     )}
-                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 truncate">
-                      <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 truncate ${
+                      c.type === 'selection'
+                        ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                        : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                    }`}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {c.type === 'selection' ? (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        ) : (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        )}
                       </svg>
                       <span className="truncate">{c.type === 'selection' ? t('approvals.annotator.badge.textSelection') : t('approvals.annotator.badge.generalComment')}</span>
                     </span>
                   </div>
                   <button
                     onClick={() => remove(idx)}
-                    className="text-gray-400 hover:text-red-500 text-xs p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors touch-manipulation flex-shrink-0 ml-2"
+                    className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 touch-manipulation flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100"
                     title={t('approvals.annotator.tooltips.deleteComment')}
                   >
-                    <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </div>
 
                 {c.selectedText && (
-                  <div className="mb-1 sm:mb-2 p-1.5 sm:p-2 rounded text-xs italic leading-relaxed" style={{ 
+                  <div className="mb-2 p-2 rounded-lg text-xs italic leading-relaxed shadow-inner" style={{
                     marginLeft: c.highlightColor ? '8px' : '0',
-                    backgroundColor: c.highlightColor?.bg || 'rgb(254, 249, 195)', 
-                    borderColor: c.highlightColor?.border || '#F59E0B', 
-                    borderWidth: '1px' 
+                    backgroundColor: c.highlightColor?.bg || 'rgb(254, 249, 195)',
+                    borderColor: c.highlightColor?.border || '#F59E0B',
+                    borderWidth: '1px',
+                    borderStyle: 'solid'
                   }}>
-                    <span className="break-words">"{c.selectedText.substring(0, 80)}{c.selectedText.length > 80 ? '...' : ''}"</span>
+                    <span className="break-words text-gray-800">"{c.selectedText.substring(0, 80)}{c.selectedText.length > 80 ? '...' : ''}"</span>
                   </div>
                 )}
 
