@@ -93,7 +93,7 @@ export function ProjectDropdown() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('projects.search', 'Search projects...')}
-              className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-gray-100"
+              className="input-glass input-glass-sm"
             />
           </div>
 

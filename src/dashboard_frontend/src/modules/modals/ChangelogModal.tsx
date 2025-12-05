@@ -98,7 +98,7 @@ export function ChangelogModal({
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[200px] gap-3">
-              <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+              <div className="spinner-gradient spinner-gradient-lg" />
               <div className="text-gray-400 text-sm">
                 {t('changelog.modal.loading', 'Loading changelog...')}
               </div>

@@ -134,7 +134,7 @@ function CommentModal({
                 const v = e.target.value;
                 if (isValidHex(v)) setSelectedColorHex(v.toUpperCase());
               }}
-              className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800/50 dark:text-white font-mono uppercase focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+              className="flex-1 px-4 py-3 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm dark:text-white font-mono uppercase focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
               placeholder="#FFEB3B"
               pattern="^#[0-9A-Fa-f]{6}$"
               maxLength={7}
@@ -152,7 +152,7 @@ function CommentModal({
             onChange={(e) => setComment(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('approvals.annotator.commentPlaceholder')}
-            className="w-full min-w-0 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none text-base leading-relaxed flex-1 min-h-[120px] transition-all"
+            className="w-full min-w-0 px-4 py-3 border border-gray-200/50 dark:border-gray-700/50 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none text-base leading-relaxed flex-1 min-h-[120px] transition-all"
             autoFocus
           />
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 break-words">

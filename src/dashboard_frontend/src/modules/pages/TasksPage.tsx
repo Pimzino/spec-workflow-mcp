@@ -339,10 +339,7 @@ function StatusPill({
         title={t('tasksPage.statusPill.clickToChange')}
       >
         {isUpdating ? (
-          <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
+          <div className="spinner-gradient w-3 h-3" />
         ) : (
           config.icon
         )}
@@ -719,13 +716,10 @@ function TaskList({ specName }: { specName: string }) {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div className="flex items-center justify-center py-12">
-          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span>{t('tasksPage.loading')}</span>
+      <div className="glass-card p-6">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="spinner-gradient spinner-gradient-lg mb-4" />
+          <span className="text-gray-400 text-sm">{t('tasksPage.loading')}</span>
         </div>
       </div>
     );
@@ -1304,21 +1298,21 @@ function TaskList({ specName }: { specName: string }) {
       </div>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-40">
+      <div className="fixed bottom-4 right-4 flex flex-col gap-3 z-40">
         {/* Scroll to Top Button */}
         {showScrollToTop && (
           <button
             onClick={scrollToTop}
-            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-full shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 hover:scale-105 active:scale-95 transition-all duration-200 group"
             title="Scroll to top"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
             </svg>
-            {/* Tooltip */}
-            <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+            {/* Glass Tooltip */}
+            <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-purple-900/80 dark:bg-purple-950/90 backdrop-blur-md border border-purple-500/20 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap pointer-events-none shadow-lg shadow-purple-500/10">
               Scroll to Top
-              <div className="absolute top-full right-3 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-purple-900/80 dark:border-t-purple-950/90"></div>
             </div>
           </button>
         )}
@@ -1327,16 +1321,16 @@ function TaskList({ specName }: { specName: string }) {
         {showFloatingButton && (
           <button
             onClick={scrollToNextPending}
-            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-full shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 hover:scale-105 active:scale-95 transition-all duration-200 group"
             title="Jump to next pending task"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
-            {/* Tooltip */}
-            <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+            {/* Glass Tooltip */}
+            <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-purple-900/80 dark:bg-purple-950/90 backdrop-blur-md border border-purple-500/20 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap pointer-events-none shadow-lg shadow-purple-500/10">
               Next Pending Task
-              <div className="absolute top-full right-3 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-purple-900/80 dark:border-t-purple-950/90"></div>
             </div>
           </button>
         )}

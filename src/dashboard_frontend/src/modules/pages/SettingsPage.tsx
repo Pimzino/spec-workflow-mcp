@@ -338,10 +338,8 @@ function Content() {
       {loading && (
         <div className="glass-card p-12">
           <div className="flex flex-col items-center justify-center">
-            <div className="w-12 h-12 rounded-xl gradient-purple flex items-center justify-center mb-4 animate-pulse">
-              <Cog6ToothIcon className="w-6 h-6 text-white animate-spin" />
-            </div>
-            <span className="text-gray-400">
+            <div className="spinner-gradient spinner-gradient-lg mb-4" />
+            <span className="text-gray-400 text-sm">
               {t('settings.loading', 'Loading jobs...')}
             </span>
           </div>
@@ -476,9 +474,7 @@ function Content() {
                     >
                       {running[job.id] ? (
                         <>
-                          <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
+                          <div className="spinner-gradient spinner-gradient-sm" />
                           {t('settings.running', 'Running...')}
                         </>
                       ) : (

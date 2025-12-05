@@ -121,7 +121,7 @@ function ArtifactSection({
           {items.map((item, idx) => (
             <div
               key={idx}
-              className="p-3 rounded-lg bg-white/5 dark:bg-black/20 border border-white/5 dark:border-white/5 hover:bg-white/10 dark:hover:bg-black/30 transition-colors"
+              className="p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/5 dark:border-white/5 hover:bg-white/10 dark:hover:bg-black/30 transition-colors"
             >
               {type === 'api' && (
                 <div className="space-y-2">
@@ -307,7 +307,7 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
                 placeholder={t('logsPage.specDropdown.searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white/5 dark:bg-black/20 border border-white/10 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
                 autoFocus
               />
             </div>
@@ -406,7 +406,7 @@ function LogEntryCard({ entry }: LogEntryProps) {
               </h4>
               <div className="space-y-1.5">
                 {entry.filesModified.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-black/20 hover:bg-blue-500/10 transition-colors group">
+                  <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-blue-500/10 transition-colors group">
                     <span className="w-2 h-2 rounded-full bg-blue-500 group-hover:ring-2 group-hover:ring-blue-500/30 transition-all"></span>
                     <code className="text-sm font-mono text-gray-600 dark:text-gray-300 group-hover:text-blue-400 transition-colors">
                       {file}
@@ -426,7 +426,7 @@ function LogEntryCard({ entry }: LogEntryProps) {
               </h4>
               <div className="space-y-1.5">
                 {entry.filesCreated.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-black/20 hover:bg-green-500/10 transition-colors group">
+                  <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-green-500/10 transition-colors group">
                     <span className="w-2 h-2 rounded-full bg-green-500 group-hover:ring-2 group-hover:ring-green-500/30 transition-all"></span>
                     <code className="text-sm font-mono text-gray-600 dark:text-gray-300 group-hover:text-green-400 transition-colors">
                       {file}
@@ -738,7 +738,7 @@ export function LogsPage() {
                 placeholder={t('logsPage.search.placeholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-2.5 bg-white/5 dark:bg-black/20 border border-white/10 dark:border-gray-700/50 rounded-full text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                className="w-full pl-12 pr-4 py-2.5 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-full text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
               />
             </div>
             <SortDropdown

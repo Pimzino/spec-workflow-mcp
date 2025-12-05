@@ -21,9 +21,13 @@ export function VolumeControl() {
   return (
     <div className="flex items-center gap-2">
       {/* Mute/Unmute Button */}
-      <button 
-        onClick={toggleSound} 
-        className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      <button
+        onClick={toggleSound}
+        className={`p-2 rounded-xl transition-all duration-200
+          bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm
+          border border-gray-200/30 dark:border-gray-700/30
+          hover:bg-purple-500/10 hover:border-purple-400/30
+          ${soundEnabled ? 'text-purple-500 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
         title={soundEnabled ? t('volumeControl.mute') : t('volumeControl.enable')}
       >
         {soundEnabled ? (
@@ -42,17 +46,20 @@ export function VolumeControl() {
 
       {/* Volume Slider - only show when sound is enabled */}
       {soundEnabled && (
-        <div className="flex items-center gap-2">
+        <div className={`${styles.sliderContainer} flex items-center gap-2 px-3 py-1.5 rounded-xl
+          bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm
+          border border-gray-200/20 dark:border-gray-700/20`}>
           <input
             type="range"
             min="0"
             max="100"
             value={volumePercentage}
             onChange={handleVolumeChange}
-            className={`${styles.slider} ${styles.dark}`}
+            className={styles.slider}
             title={t('volumeControl.volumeLevel', { percentage: volumePercentage })}
           />
-          <span className="text-xs text-gray-500 dark:text-gray-400 min-w-[2rem]">
+          <span className={`text-xs min-w-[2rem] font-medium transition-colors
+            ${volumePercentage > 0 ? 'text-purple-500 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}>
             {volumePercentage}%
           </span>
         </div>

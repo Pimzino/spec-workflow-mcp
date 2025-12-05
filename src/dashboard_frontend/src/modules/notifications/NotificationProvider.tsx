@@ -246,51 +246,71 @@ function NotificationToasts() {
   const { removeNotification } = useNotifications();
   const { notifications } = useNotificationState();
 
+  // Get toast card styling based on notification type
+  const getToastStyles = (type: 'info' | 'success' | 'warning' | 'error') => {
+    switch (type) {
+      case 'error':
+        return 'bg-red-500/10 border-red-500/30 shadow-red-500/20';
+      case 'warning':
+        return 'bg-amber-500/10 border-amber-500/30 shadow-amber-500/20';
+      case 'success':
+        return 'bg-green-500/10 border-green-500/30 shadow-green-500/20';
+      case 'info':
+      default:
+        return 'bg-purple-500/10 border-purple-500/30 shadow-purple-500/20';
+    }
+  };
+
+  // Get icon container gradient based on notification type
+  const getIconGradient = (type: 'info' | 'success' | 'warning' | 'error') => {
+    switch (type) {
+      case 'error':
+        return 'bg-gradient-to-br from-red-500 to-rose-500';
+      case 'warning':
+        return 'bg-gradient-to-br from-amber-500 to-orange-500';
+      case 'success':
+        return 'bg-gradient-to-br from-green-500 to-emerald-500';
+      case 'info':
+      default:
+        return 'bg-gradient-to-br from-purple-500 to-indigo-500';
+    }
+  };
+
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
       {notifications.map(notification => (
         <div
           key={notification.id}
-          className={`rounded-lg p-4 shadow-lg border transition-all duration-300 ease-in-out ${
-            notification.type === 'error' 
-              ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200'
-              : notification.type === 'warning'
-              ? 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-200'  
-              : notification.type === 'success'
-              ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200'
-              : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200'
-          }`}
+          className={`rounded-xl p-4 shadow-lg border backdrop-blur-md transition-all duration-300 animate-slide-in-right ${getToastStyles(notification.type)}`}
         >
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-2">
-              <svg 
-                className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                  notification.type === 'error' ? 'text-red-500' :
-                  notification.type === 'warning' ? 'text-yellow-500' :
-                  notification.type === 'success' ? 'text-green-500' :
-                  'text-blue-500'
-                }`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                {notification.type === 'error' ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                ) : notification.type === 'warning' ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                ) : notification.type === 'success' ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                )}
-              </svg>
-              <p className="text-sm font-medium break-words">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              {/* Icon with gradient background container */}
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${getIconGradient(notification.type)}`}>
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  {notification.type === 'error' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  ) : notification.type === 'warning' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                  ) : notification.type === 'success' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  )}
+                </svg>
+              </div>
+              <p className="text-sm font-medium break-words text-gray-900 dark:text-white pt-1">
                 {notification.message}
               </p>
             </div>
             <button
               onClick={() => removeNotification(notification.id)}
-              className="ml-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-white/10 rounded-lg p-1 transition-all duration-200 flex-shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

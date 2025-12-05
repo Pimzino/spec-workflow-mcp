@@ -108,7 +108,7 @@ export function SortDropdown({ currentSort, currentOrder, onSortChange, sortOpti
 
   const getOrderIcon = (isCurrentSort: boolean) => {
     if (!isCurrentSort || currentSort === 'default') return null;
-    
+
     return currentOrder === 'asc' ? (
       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
@@ -122,63 +122,106 @@ export function SortDropdown({ currentSort, currentOrder, onSortChange, sortOpti
 
   return (
     <div className="relative" ref={dropdownRef}>
+      {/* Dropdown Button with Glass Effect */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[140px] md:min-w-[160px] px-3 py-2 md:px-4 md:py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        className={`
+          flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[140px] md:min-w-[160px]
+          px-3 py-2 md:px-4 md:py-2.5
+          bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm
+          border border-gray-200/50 dark:border-gray-700/50
+          rounded-xl
+          text-gray-900 dark:text-white
+          transition-all duration-200
+          hover:bg-white/70 dark:hover:bg-gray-800/70
+          hover:border-gray-300/50 dark:hover:border-gray-600/50
+          hover:shadow-lg hover:shadow-purple-500/5 dark:hover:shadow-purple-500/10
+          focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500/50
+          ${isOpen ? 'ring-2 ring-purple-500/30 border-purple-500/50' : ''}
+        `}
         title={t('tasksPage.sort.changeSortOrder')}
       >
         <span className="flex items-center gap-2 truncate">
-          {currentSortOption.icon}
+          <span className={`transition-colors duration-200 ${isOpen ? 'text-purple-500 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}>
+            {currentSortOption.icon}
+          </span>
           <span className="text-sm font-medium">{currentSortOption.label}</span>
           {getOrderIcon(true)}
         </span>
-        <svg 
-          className={`w-4 h-4 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          className={`w-4 h-4 ml-2 transition-all duration-200 ${isOpen ? 'rotate-180 text-purple-500 dark:text-purple-400' : 'text-gray-400'}`}
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
+      {/* Dropdown Menu with Glass Card Styling */}
       {isOpen && (
-        <div className={`absolute top-full mt-1 w-full sm:w-64 md:w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-80 overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}>
-          <div className="py-1">
+        <div
+          className={`
+            absolute top-full mt-2 w-full sm:w-72 md:w-80
+            glass-card shadow-2xl
+            z-50 max-h-[400px] overflow-hidden
+            animate-in fade-in slide-in-from-top-2 duration-200
+            ${align === 'right' ? 'right-0' : 'left-0'}
+          `}
+        >
+          {/* Sort Options */}
+          <div className="py-2">
             {actualSortOptions.map((option) => {
               const isCurrentSort = currentSort === option.id;
               const orderIcon = getOrderIcon(isCurrentSort);
-              
+
               return (
                 <button
                   key={option.id}
                   onClick={() => handleSortSelect(option.id)}
-                  className={`w-full px-4 py-3 md:px-4 md:py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700 transition-colors ${
-                    isCurrentSort ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'
-                  }`}
+                  className={`
+                    w-full px-4 py-3 text-left
+                    transition-all duration-150
+                    ${isCurrentSort
+                      ? 'bg-purple-500/10 dark:bg-purple-500/15 border-l-2 border-purple-500'
+                      : 'hover:bg-purple-500/5 dark:hover:bg-purple-500/10 border-l-2 border-transparent'
+                    }
+                  `}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className={`flex-shrink-0 ${isCurrentSort ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}>
+                      {/* Icon Container */}
+                      <div className={`
+                        flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center
+                        transition-all duration-200
+                        ${isCurrentSort
+                          ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                        }
+                      `}>
                         {option.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">{option.label}</div>
+                        <div className={`font-medium text-sm truncate ${isCurrentSort ? 'text-purple-700 dark:text-purple-300' : 'text-gray-900 dark:text-white'}`}>
+                          {option.label}
+                        </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                           {option.description}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                       {orderIcon && (
-                        <div className="text-gray-400 dark:text-gray-500">
+                        <div className="text-purple-500 dark:text-purple-400">
                           {orderIcon}
                         </div>
                       )}
                       {isCurrentSort && (
-                        <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                        </svg>
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -186,41 +229,53 @@ export function SortDropdown({ currentSort, currentOrder, onSortChange, sortOpti
               );
             })}
           </div>
-          
+
           {/* Sort Order Toggle for Non-Default Options */}
           {currentSort !== 'default' && (
             <>
-              <div className="border-t border-gray-200 dark:border-gray-600"></div>
-              <div className="p-3">
-                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {/* Divider with Glass Effect */}
+              <div className="mx-4 border-t border-gray-200/50 dark:border-gray-700/50"></div>
+
+              <div className="p-4">
+                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                   </svg>
-                  {t('tasksPage.sort.sortOrder')}:
+                  {t('tasksPage.sort.sortOrder')}
                 </div>
-                <div className="flex gap-1">
+
+                {/* Pill-style Order Toggle Buttons */}
+                <div className="flex gap-2">
                   <button
                     onClick={() => onSortChange(currentSort, 'asc')}
-                    className={`px-2 py-1 text-xs rounded transition-colors flex items-center gap-1 ${
-                      currentOrder === 'asc'
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
+                    className={`
+                      flex-1 px-3 py-2 text-xs font-medium rounded-full
+                      flex items-center justify-center gap-1.5
+                      transition-all duration-200
+                      ${currentOrder === 'asc'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }
+                    `}
                   >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
                     </svg>
                     {t('tasksPage.sort.ascending')}
                   </button>
                   <button
                     onClick={() => onSortChange(currentSort, 'desc')}
-                    className={`px-2 py-1 text-xs rounded transition-colors flex items-center gap-1 ${
-                      currentOrder === 'desc'
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
+                    className={`
+                      flex-1 px-3 py-2 text-xs font-medium rounded-full
+                      flex items-center justify-center gap-1.5
+                      transition-all duration-200
+                      ${currentOrder === 'desc'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }
+                    `}
                   >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                     {t('tasksPage.sort.descending')}
