@@ -30,45 +30,65 @@ cd containers
 docker-compose up --build
 ```
 
-The dashboard will be available at: http://localhost:5000
+The container will run with your host user's UID/GID at runtime using the `--user` flag, ensuring proper file permissions.
 
-### Option 2: Using Docker CLI
+## MCP Server Configuration
 
-Build and run manually:
+### Automated Setup (Recommended)
+
+The easiest way to configure the MCP server is to use the provided setup script:
+
+```bash
+# From your project directory (where you want to use spec-workflow)
+/path/to/spec-workflow-mcp/containers/setup-mcp.sh
+```
+
+This script will:
+- Detect your user ID and group ID automatically
+- Create or update `.mcp.json` with the correct configuration
+- Handle existing MCP configurations safely
+- Provide clear next steps
+
+### Manual Configuration
+
+If you prefer to configure manually, create or update the `.mcp.json` file in your project root:
+
+```json
+{
+    "mcpServers": {
+      "spec-workflow": {
+        "command": "docker",
+        "args": [
+          "run", "--rm", "-i",
+          "--user", "1000:1000",
+          "-v", "/full/path/to/project:/full/path/to/project:rw",
+          "--entrypoint=node",
+          "spec-workflow-mcp:latest",
+          "/app/dist/index.js", "/full/path/to/project"
+        ]
+      }
+    }
+  }
 
 ```bash
 # From the repository root
 docker build -f containers/Dockerfile -t spec-workflow-mcp .
-docker run -p 5000:5000 -v "./workspace/.spec-workflow:/workspace/.spec-workflow:rw" spec-workflow-mcp
 ```
 
-## Building the Image
+**Important**: Replace `1000:1000` with your actual user ID and group ID (get them with `id -u` and `id -g`).
 
-### Build from Repository Root
-
-**Important:** The Dockerfile must be built from the repository root directory, not from the `containers` directory, because it needs access to the source code.
-
-```bash
-# From the repository root
-docker build -f containers/Dockerfile -t spec-workflow-mcp .
-```
-
-### Build Arguments
+## Important Configuration Notes
 
 The image is built in two stages:
 1. **Builder stage**: Installs dependencies and builds the TypeScript application
 2. **Runtime stage**: Creates a minimal production image with only necessary files
 
-## Running the Dashboard
+The container requires the entire project directory to be mounted at the **exact same path** inside the container as it exists on the host system. This is so the MCP server can reliably create and manage the `.spec-workflow` directory.
 
-### Basic Usage
 
-Run the dashboard on the default port (5000):
-
-```bash
-docker run -p 5000:5000 \
-  -v "./workspace/.spec-workflow:/workspace/.spec-workflow:rw" \
-  spec-workflow-mcp
+**Example:** If your project is at `/home/steev/myproject`, your configuration would mount:
+```
+-v /home/steev/myproject:/home/steev/myproject:rw
 ```
 
 ### Custom Port
@@ -82,7 +102,10 @@ docker run -p 8080:8080 \
   spec-workflow-mcp
 ```
 
-### Using a Specific Project Path
+- **Path Consistency**: The container path must match your host path exactly
+- **Volume Mount**: The entire project directory must be mounted for the MCP server to access source code
+- **Auto-creation**: The `.spec-workflow` directory will be created if it doesn't exist
+- **SELinux Note**: If you're using SELinux, you may need to add `:z` to the volume mount (e.g., `:rw,z`)
 
 Mount your project's `.spec-workflow` directory:
 
@@ -201,7 +224,11 @@ Use similar configuration with the appropriate MCP client settings. The MCP serv
 
 ### Common Issues
 
-#### 1. Port Already in Use
+1. **Permission Denied**: The container runs with your host user ID/GID via the `--user` flag. Ensure `.mcp.json` includes the correct user ID from `id -u` and group ID from `id -g`
+2. **Port Already in Use**: Choose a different port using the `DASHBOARD_PORT` variable
+3. **Path Not Found**: Verify that your `SPEC_WORKFLOW_PATH` matches your actual project location
+4. **SELinux Issues**: On SELinux-enabled systems, add `:z` to volume mounts
+5. **File Ownership Issues**: Rebuild the container with the correct user/group IDs if `.spec-workflow` files are created with wrong ownership
 
 **Error:** `Bind for 0.0.0.0:5000 failed: port is already allocated`
 
