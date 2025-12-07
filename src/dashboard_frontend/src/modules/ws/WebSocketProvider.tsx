@@ -19,6 +19,10 @@ interface WebSocketProviderProps {
   projectId: string | null;
 }
 
+// Reconnection constants
+const MAX_RETRY_DELAY = 30000;
+const INITIAL_RETRY_DELAY = 1000;
+
 export function WebSocketProvider({ children, projectId }: WebSocketProviderProps) {
   const [connected, setConnected] = useState(false);
   const [initial, setInitial] = useState<InitialPayload | undefined>(undefined);
@@ -26,6 +30,7 @@ export function WebSocketProvider({ children, projectId }: WebSocketProviderProp
   const eventHandlersRef = useRef<Map<string, Set<(data: any) => void>>>(new Map());
   const retryTimerRef = useRef<any>(null);
   const currentProjectIdRef = useRef<string | null>(null);
+  const retryDelayRef = useRef(INITIAL_RETRY_DELAY);
 
   const connectToWebSocket = useCallback((targetProjectId: string | null) => {
     // Close existing connection if any
@@ -51,15 +56,28 @@ export function WebSocketProvider({ children, projectId }: WebSocketProviderProp
     wsRef.current = ws;
     currentProjectIdRef.current = targetProjectId;
 
-    ws.onopen = () => setConnected(true);
+    ws.onopen = () => {
+      setConnected(true);
+      // Reset retry delay on successful connection
+      retryDelayRef.current = INITIAL_RETRY_DELAY;
+    };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       setConnected(false);
+
+      // Don't reconnect on clean close (code 1000) or going away (code 1001)
+      if (event.code === 1000 || event.code === 1001) {
+        return;
+      }
+
       // Only retry if we're still on the same project
       if (currentProjectIdRef.current === targetProjectId) {
         retryTimerRef.current = setTimeout(() => {
           connectToWebSocket(targetProjectId);
-        }, 2000);
+        }, retryDelayRef.current);
+
+        // Exponential backoff for next retry
+        retryDelayRef.current = Math.min(retryDelayRef.current * 1.5, MAX_RETRY_DELAY);
       }
     };
 
@@ -100,6 +118,8 @@ export function WebSocketProvider({ children, projectId }: WebSocketProviderProp
     if (projectId) {
       // Clear initial data when switching projects
       setInitial(undefined);
+      // Reset retry delay when switching projects
+      retryDelayRef.current = INITIAL_RETRY_DELAY;
       connectToWebSocket(projectId);
     }
 
