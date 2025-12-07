@@ -6,11 +6,19 @@ services:
     ports:
       - "${DASHBOARD_PORT:-5000}:${DASHBOARD_PORT:-5000}"
     volumes:
-      - "${SPEC_WORKFLOW_PATH:-./workspace}/.spec-workflow:/workspace/.spec-workflow:rw"
-      # Mount global state directory if using SPEC_WORKFLOW_HOME
-      - "${SPEC_WORKFLOW_PATH:-./workspace}/.spec-workflow-mcp:/workspace/.spec-workflow-mcp:rw"
+      # Global state directory - shared between host MCP clients and container
+      # Uses SPEC_WORKFLOW_HOME inside container for state files (activeProjects.json, session, etc.)
+      - "${HOME}/.spec-workflow-mcp:/home/node/.spec-workflow-mcp:rw"
+      # Mount host projects directory for path translation
+      # Set HOST_PROJECT_ROOT to your projects parent directory (e.g., /Users/yourname or /home/yourname)
+      - "${HOST_PROJECT_ROOT:-${HOME}}:/projects:rw"
     environment:
       - DASHBOARD_PORT=${DASHBOARD_PORT:-5000}
-      # Store global state files in workspace (required for sandboxed environments)
-      - SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp
+      # Global state location (upstream's SPEC_WORKFLOW_HOME)
+      # Required for sandboxed environments where container $HOME may differ
+      - SPEC_WORKFLOW_HOME=/home/node/.spec-workflow-mcp
+      # Path translation for Docker: maps host paths to container paths
+      # When host MCP client registers /Users/dev/myproject, container accesses /projects/myproject
+      - SPEC_WORKFLOW_HOST_PATH_PREFIX=${HOST_PROJECT_ROOT:-${HOME}}
+      - SPEC_WORKFLOW_CONTAINER_PATH_PREFIX=/projects
     restart: unless-stopped

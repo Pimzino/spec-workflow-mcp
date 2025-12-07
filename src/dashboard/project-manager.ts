@@ -5,10 +5,12 @@ import { SpecWatcher } from './watcher.js';
 import { ApprovalStorage } from './approval-storage.js';
 import { SpecArchiveService } from '../core/archive-service.js';
 import { ProjectRegistry, ProjectRegistryEntry, generateProjectId } from '../core/project-registry.js';
+import { PathUtils } from '../core/path-utils.js';
 
 export interface ProjectContext {
   projectId: string;
-  projectPath: string;
+  projectPath: string;           // Translated path for local file access
+  originalProjectPath: string;   // Original host path for display/registry
   projectName: string;
   parser: SpecParser;
   watcher: SpecWatcher;
@@ -123,10 +125,13 @@ export class ProjectManager extends EventEmitter {
    */
   private async addProject(entry: ProjectRegistryEntry): Promise<void> {
     try {
-      const parser = new SpecParser(entry.projectPath);
-      const watcher = new SpecWatcher(entry.projectPath, parser);
-      const approvalStorage = new ApprovalStorage(entry.projectPath);
-      const archiveService = new SpecArchiveService(entry.projectPath);
+      // Translate path once at entry point (components should not know about Docker)
+      const translatedPath = PathUtils.translatePath(entry.projectPath);
+
+      const parser = new SpecParser(translatedPath);
+      const watcher = new SpecWatcher(translatedPath, parser);
+      const approvalStorage = new ApprovalStorage(translatedPath, entry.projectPath);
+      const archiveService = new SpecArchiveService(translatedPath);
 
       // Start watchers
       await watcher.start();
@@ -151,7 +156,8 @@ export class ProjectManager extends EventEmitter {
 
       const context: ProjectContext = {
         projectId: entry.projectId,
-        projectPath: entry.projectPath,
+        projectPath: translatedPath,            // Use translated path for file access
+        originalProjectPath: entry.projectPath, // Keep original for display/registry
         projectName: entry.projectName,
         parser,
         watcher,
@@ -227,7 +233,7 @@ export class ProjectManager extends EventEmitter {
     return Array.from(this.projects.values()).map(p => ({
       projectId: p.projectId,
       projectName: p.projectName,
-      projectPath: p.projectPath
+      projectPath: p.originalProjectPath  // Return original path for display
     }));
   }
 

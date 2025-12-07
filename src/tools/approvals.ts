@@ -2,7 +2,7 @@ import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { ToolContext, ToolResponse } from '../types.js';
 import { ApprovalStorage } from '../dashboard/approval-storage.js';
 import { join } from 'path';
-import { validateProjectPath } from '../core/path-utils.js';
+import { validateProjectPath, PathUtils } from '../core/path-utils.js';
 import { readFile } from 'fs/promises';
 import { validateTasksMarkdown, formatValidationErrors } from '../core/task-validator.js';
 
@@ -182,8 +182,10 @@ async function handleRequestApproval(
   try {
     // Validate and resolve project path
     const validatedProjectPath = await validateProjectPath(projectPath);
+    // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
+    const translatedPath = PathUtils.translatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
     await approvalStorage.start();
 
     // Validate tasks.md format before allowing approval request
@@ -294,8 +296,10 @@ async function handleGetApprovalStatus(
 
     // Validate and resolve project path
     const validatedProjectPath = await validateProjectPath(projectPath);
+    // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
+    const translatedPath = PathUtils.translatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
     await approvalStorage.start();
 
     const approval = await approvalStorage.getApproval(args.approvalId);
@@ -415,8 +419,10 @@ async function handleDeleteApproval(
 
     // Validate and resolve project path
     const validatedProjectPath = await validateProjectPath(projectPath);
+    // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
+    const translatedPath = PathUtils.translatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
     await approvalStorage.start();
 
     // Check if approval exists and its status

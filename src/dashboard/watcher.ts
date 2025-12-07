@@ -17,6 +17,7 @@ export class SpecWatcher extends EventEmitter {
 
   constructor(projectPath: string, parser: SpecParser) {
     super();
+    // Path should already be translated by caller (ProjectManager)
     this.projectPath = projectPath;
     this.parser = parser;
   }
