@@ -253,6 +253,61 @@ The dashboard will be available at: http://localhost:5000
 
 [See Docker setup guide →](containers/README.md)
 
+## 🔒 Security
+
+Spec-Workflow MCP includes enterprise-grade security features suitable for corporate environments:
+
+### ✅ Implemented Security Controls
+
+| Feature | Description |
+|---------|-------------|
+| **Localhost Binding** | Binds to `127.0.0.1` by default, preventing network exposure |
+| **Rate Limiting** | 120 requests/minute per client with automatic cleanup |
+| **Audit Logging** | Structured JSON logs with timestamp, actor, action, and result |
+| **Security Headers** | X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, CSP, Referrer-Policy |
+| **CORS Protection** | Restricted to localhost origins by default |
+| **Docker Hardening** | Non-root user, read-only filesystem, dropped capabilities, resource limits |
+
+### ⚠️ Not Yet Implemented
+
+| Feature | Workaround |
+|---------|------------|
+| **HTTPS/TLS** | Use a reverse proxy (nginx, Apache) with TLS certificates |
+| **User Authentication** | Use a reverse proxy with Basic Auth or OAuth2 Proxy for SSO |
+
+### For External/Network Access
+
+If you need to expose the dashboard beyond localhost, we recommend:
+
+1. **Keep dashboard on localhost** (`127.0.0.1`)
+2. **Use nginx or Apache** as a reverse proxy with:
+   - TLS/HTTPS termination
+   - Basic authentication or OAuth2
+3. **Configure firewall rules** to restrict access
+
+```nginx
+# Example nginx reverse proxy with auth
+server {
+    listen 443 ssl;
+    server_name dashboard.example.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+    
+    auth_basic "Dashboard Access";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+[See Docker security guide →](containers/README.md#security-configuration)
+
 ## 🔒 Sandboxed Environments
 
 For sandboxed environments (e.g., Codex CLI with `sandbox_mode=workspace-write`) where `$HOME` is read-only, use the `SPEC_WORKFLOW_HOME` environment variable to redirect global state files to a writable location:
