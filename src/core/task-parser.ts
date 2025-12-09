@@ -182,7 +182,8 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     
     // Extract task ID and description
     // Match patterns like "1. Description", "1.1 Description", "2.1. Description" etc
-    const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\.?\s+(.+)/);
+    // Also handles escaped periods from MDXEditor: "1\. Description"
+    const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
     
     let taskId: string;
     let description: string;
@@ -363,7 +364,8 @@ export function updateTaskStatus(
 
       // Check if this line contains our target task ID
       // Match patterns like "1. Description", "1.1 Description", "2.1. Description" etc
-      const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\.?\s+(.+)/);
+      // Also handles escaped periods from MDXEditor: "1\. Description"
+      const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
 
       if (taskMatch && taskMatch[1] === taskId) {
         // Reconstruct the line with new status, preserving the original list marker
