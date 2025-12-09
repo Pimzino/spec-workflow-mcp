@@ -40,6 +40,9 @@ export class MultiProjectDashboardServer {
   private heartbeatInterval?: NodeJS.Timeout;
   private readonly HEARTBEAT_INTERVAL_MS = 30000;
   private readonly HEARTBEAT_TIMEOUT_MS = 10000;
+  // Debounce spec broadcasts to coalesce rapid updates
+  private pendingSpecBroadcasts: Map<string, NodeJS.Timeout> = new Map();
+  private readonly SPEC_BROADCAST_DEBOUNCE_MS = 300;
 
   constructor(options: MultiDashboardOptions = {}) {
     this.options = options;
@@ -225,24 +228,37 @@ export class MultiProjectDashboardServer {
       });
     });
 
-    // Broadcast spec changes
-    this.projectManager.on('spec-change', async (event) => {
-      try {
-        const { projectId, ...data } = event;
-        const project = this.projectManager.getProject(projectId);
-        if (project) {
-          const specs = await project.parser.getAllSpecs();
-          const archivedSpecs = await project.parser.getAllArchivedSpecs();
-          this.broadcastToProject(projectId, {
-            type: 'spec-update',
-            projectId,
-            data: { specs, archivedSpecs }
-          });
-        }
-      } catch (error) {
-        console.error('Error broadcasting spec changes:', error);
-        // Don't propagate error to prevent event system crash
+    // Broadcast spec changes (debounced per project to coalesce rapid updates)
+    this.projectManager.on('spec-change', (event) => {
+      const { projectId } = event;
+
+      // Clear existing pending broadcast for this project
+      const existingTimeout = this.pendingSpecBroadcasts.get(projectId);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
       }
+
+      // Schedule debounced broadcast
+      const timeout = setTimeout(async () => {
+        this.pendingSpecBroadcasts.delete(projectId);
+        try {
+          const project = this.projectManager.getProject(projectId);
+          if (project) {
+            const specs = await project.parser.getAllSpecs();
+            const archivedSpecs = await project.parser.getAllArchivedSpecs();
+            this.broadcastToProject(projectId, {
+              type: 'spec-update',
+              projectId,
+              data: { specs, archivedSpecs }
+            });
+          }
+        } catch (error) {
+          console.error('Error broadcasting spec changes:', error);
+          // Don't propagate error to prevent event system crash
+        }
+      }, this.SPEC_BROADCAST_DEBOUNCE_MS);
+
+      this.pendingSpecBroadcasts.set(projectId, timeout);
     });
 
     // Broadcast task updates
@@ -1197,6 +1213,12 @@ export class MultiProjectDashboardServer {
   async stop() {
     // Stop heartbeat monitoring
     this.stopHeartbeat();
+
+    // Clear pending spec broadcasts
+    for (const timeout of this.pendingSpecBroadcasts.values()) {
+      clearTimeout(timeout);
+    }
+    this.pendingSpecBroadcasts.clear();
 
     // Close all WebSocket connections
     this.clients.forEach((connection) => {

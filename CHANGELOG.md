@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2025-12-09
+
+### Fixed
+- **Task Notification System Not Working** - Fixed task completion and in-progress notifications not appearing. The notification system now uses WebSocket event data directly instead of making separate API calls, eliminating race conditions and timing issues that prevented notifications from triggering.
+
+- **Dashboard Disconnection During Approval Process** (fixes #162) - Fixed critical stability issue where dashboard WebSocket connections would disconnect when AI clients (e.g., Codex CLI) modified documents during the approval workflow:
+  - **Approval Storage Debouncing** - Added 500ms debounce for approval file change events to prevent event flooding when approvals are rapidly created/modified
+  - **Spec Broadcast Debouncing** - Added 300ms debounce for spec update broadcasts to coalesce rapid file changes into a single UI update
+  - **WebSocket Heartbeat Monitoring** - Added ping/pong heartbeat mechanism to detect and clean up stale connections proactively
+  - **File Watcher Debouncing** - Implemented 500ms debounce for spec file change events to prevent event flooding during rapid document modifications
+  - **File Stability Detection** - Added file size stability checking before processing changes, preventing partial file reads during write operations
+  - **Graceful Connection Cleanup** - Improved error handling in broadcast methods with scheduled cleanup to avoid modifying collections during iteration
+  - **Exponential Backoff Reconnection** - Frontend WebSocket now uses exponential backoff (1s to 30s) for reconnection attempts instead of fixed 2s intervals
+  - **Clean Disconnect Handling** - WebSocket client no longer attempts reconnection on clean close events (codes 1000, 1001)
+
 ## [2.1.0] - 2025-12-03
 
 ### Fixed
