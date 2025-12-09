@@ -229,7 +229,7 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
             if (!nextTrim) break; // stop at blank line
             // Stop if we hit another bullet/metadata marker or files/purpose sections
             if (
-              /^-\s/.test(nextTrim) ||
+              /^[-*]\s/.test(nextTrim) ||
               /^Files?:/i.test(nextTrim) ||
               /^Purpose:/i.test(nextTrim)
             ) {
@@ -267,9 +267,9 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
             .filter(f => f.length > 0);
           files.push(...filePaths);
         }
-      } else if (contentLine.startsWith('- ') && !contentLine.match(/^-\s+\[/)) {
+      } else if (contentLine.match(/^[-*]\s/) && !contentLine.match(/^[-*]\s+\[/)) {
         // Regular bullet point - could be implementation detail or purpose
-        const bulletContent = contentLine.substring(2).trim();
+        const bulletContent = contentLine.replace(/^[-*]\s+/, '').trim();
         if (bulletContent.startsWith('Purpose:')) {
           purposes.push(bulletContent.substring(8).trim());
         } else if (!bulletContent.match(/^Files?:/) && !bulletContent.match(/^Purpose:/)) {
