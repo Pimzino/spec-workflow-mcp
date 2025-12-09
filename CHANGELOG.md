@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.1] - 2025-12-09
 
+### Added
+- **Enterprise Security Features** (PR #165) - Comprehensive security controls for corporate environments:
+  - **Localhost Binding** - Dashboard binds to `127.0.0.1` by default, preventing network exposure
+  - **Rate Limiting** - 120 requests/minute per client with automatic cleanup to prevent abuse
+  - **Audit Logging** - Structured JSON logs with timestamp, actor, action, and result for compliance
+  - **Security Headers** - X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, CSP, Referrer-Policy
+  - **CORS Protection** - Restricted to localhost origins by default
+  - **Network Security Validation** - Explicit opt-in required for non-localhost binding (`SPEC_WORKFLOW_ALLOW_EXTERNAL_ACCESS=true`)
+
+- **Docker Security Hardening** (PR #165) - Enhanced container security:
+  - Non-root user execution (`node` user)
+  - Read-only root filesystem
+  - Dropped all Linux capabilities (`cap_drop: ALL`)
+  - No privilege escalation (`no-new-privileges`)
+  - Resource limits (CPU/memory) to prevent DoS
+  - Proper signal handling with `dumb-init`
+  - New `Dockerfile.prebuilt` for environments with limited Docker memory
+
+- **New Configuration Options** - Environment variables for security control:
+  - `SPEC_WORKFLOW_BIND_ADDRESS` - IP address to bind to (default: `127.0.0.1`)
+  - `SPEC_WORKFLOW_ALLOW_EXTERNAL_ACCESS` - Explicit opt-in for network exposure
+  - `SPEC_WORKFLOW_RATE_LIMIT_ENABLED` - Enable/disable rate limiting
+  - `SPEC_WORKFLOW_CORS_ENABLED` - Enable/disable CORS protection
+
+- **Health Check Endpoint** - New `/api/test` endpoint for monitoring dashboard availability
+
+- **Docker Test Script** - Comprehensive `containers/test-docker.sh` script to validate security configurations
+
+### Changed
+- Docker Compose now defaults to localhost-only port binding (`127.0.0.1:5000:5000`)
+- Dashboard displays security configuration status on startup
+- Improved error messages for security configuration issues
+
 ### Fixed
 - **Task Notification System Not Working** - Fixed task completion and in-progress notifications not appearing. The notification system now uses WebSocket event data directly instead of making separate API calls, eliminating race conditions and timing issues that prevented notifications from triggering.
 
