@@ -3,6 +3,26 @@
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * Normalize line endings to LF (Unix-style)
+ * Fixes #166: Templates shipped with CRLF cause git changes on Linux/WSL
+ */
+function normalizeLineEndings(content) {
+  return content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
+/**
+ * Copy a file, normalizing line endings for markdown files
+ */
+function copyFile(srcPath, destPath) {
+  if (srcPath.endsWith('.md')) {
+    const content = fs.readFileSync(srcPath, 'utf-8');
+    fs.writeFileSync(destPath, normalizeLineEndings(content), 'utf-8');
+  } else {
+    fs.copyFileSync(srcPath, destPath);
+  }
+}
+
 function copyDir(src, dest) {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
@@ -17,7 +37,7 @@ function copyDir(src, dest) {
     if (entry.isDirectory()) {
       copyDir(srcPath, destPath);
     } else {
-      fs.copyFileSync(srcPath, destPath);
+      copyFile(srcPath, destPath);
     }
   }
 }

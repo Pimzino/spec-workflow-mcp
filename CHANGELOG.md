@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Task Notification System Not Working** - Fixed task completion and in-progress notifications not appearing. The notification system now uses WebSocket event data directly instead of making separate API calls, eliminating race conditions and timing issues that prevented notifications from triggering.
 
+- **Templates Shipped with CRLF Line Endings** (fixes #166) - Fixed issue where template files were shipped with Windows-style CRLF line endings, causing git to detect them as modified on Linux/WSL/macOS systems:
+  - Updated `.gitattributes` to enforce LF line endings for markdown files (`*.md text eol=lf`)
+  - Modified `scripts/copy-static.cjs` to normalize line endings to LF during the build process
+  - Converted all template files in `src/markdown/templates/` from CRLF to LF
+  - Templates are now cross-platform compatible and won't trigger spurious git changes
+
 - **Dashboard Disconnection During Approval Process** (fixes #162) - Fixed critical stability issue where dashboard WebSocket connections would disconnect when AI clients (e.g., Codex CLI) modified documents during the approval workflow:
   - **Approval Storage Debouncing** - Added 500ms debounce for approval file change events to prevent event flooding when approvals are rapidly created/modified
   - **Spec Broadcast Debouncing** - Added 300ms debounce for spec update broadcasts to coalesce rapid file changes into a single UI update
