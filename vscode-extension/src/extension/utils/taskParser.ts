@@ -45,10 +45,10 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
   const tasks: ParsedTask[] = [];
   let inProgressTask: string | null = null;
   
-  // Find all lines with checkboxes
+  // Find all lines with checkboxes (supports both - and * list markers)
   const checkboxIndices: number[] = [];
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].match(/^\s*-\s+\[([ x\-])\]/)) {
+    if (lines[i].match(/^\s*[-*]\s+\[([ x\-])\]/)) {
       checkboxIndices.push(i);
     }
   }
@@ -59,15 +59,16 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     const endLine = idx < checkboxIndices.length - 1 ? checkboxIndices[idx + 1] : lines.length;
     
     const line = lines[lineNumber];
-    const checkboxMatch = line.match(/^(\s*)-\s+\[([ x\-])\]\s+(.+)/);
-    
+    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-])\]\s+(.+)/);
+
     if (!checkboxMatch) {
       continue;
     }
-    
+
     const indent = checkboxMatch[1];
-    const statusChar = checkboxMatch[2];
-    const taskText = checkboxMatch[3];
+    const listMarker = checkboxMatch[2]; // '-' or '*'
+    const statusChar = checkboxMatch[3];
+    const taskText = checkboxMatch[4];
     
     // Determine status
     let status: 'pending' | 'in-progress' | 'completed';
@@ -81,7 +82,8 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     
     // Extract task ID and description
     // Match patterns like "1. Description", "1.1 Description", "2.1. Description" etc
-    const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\.?\s+(.+)/);
+    // Also handles escaped periods from MDXEditor: "1\. Description"
+    const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
     
     let taskId: string;
     let description: string;
@@ -132,7 +134,7 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
             }
             // Stop if we hit another bullet/metadata marker or files/purpose sections
             if (
-              /^-\s/.test(nextTrim) ||
+              /^[-*]\s/.test(nextTrim) ||
               /^Files?:/i.test(nextTrim) ||
               /^Purpose:/i.test(nextTrim)
             ) {
@@ -170,9 +172,9 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
             .filter(f => f.length > 0);
           files.push(...filePaths);
         }
-      } else if (contentLine.startsWith('- ') && !contentLine.match(/^-\s+\[/)) {
+      } else if (contentLine.match(/^[-*]\s/) && !contentLine.match(/^[-*]\s+\[/)) {
         // Regular bullet point - could be implementation detail or purpose
-        const bulletContent = contentLine.substring(2).trim();
+        const bulletContent = contentLine.replace(/^[-*]\s+/, '').trim();
         if (bulletContent.startsWith('Purpose:')) {
           purposes.push(bulletContent.substring(8).trim());
         } else if (!bulletContent.match(/^Files?:/) && !bulletContent.match(/^Purpose:/)) {
@@ -251,21 +253,23 @@ export function updateTaskStatus(
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Match checkbox line with task ID in the description
-    // Pattern: - [x] 1.1 Task description
-    const checkboxMatch = line.match(/^(\s*)-\s+\[([ x\-])\]\s+(.+)/);
+    // Match checkbox line with task ID in the description (supports both - and * list markers)
+    // Pattern: - [x] 1.1 Task description  or  * [x] 1.1 Task description
+    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-])\]\s+(.+)/);
 
     if (checkboxMatch) {
-      const taskText = checkboxMatch[3];
+      const prefix = checkboxMatch[1];
+      const listMarker = checkboxMatch[2]; // Preserve original list marker
+      const taskText = checkboxMatch[4];
 
       // Check if this line contains our target task ID
       // Match patterns like "1. Description", "1.1 Description", "2.1. Description" etc
-      const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\.?\s+(.+)/);
+      // Also handles escaped periods from MDXEditor: "1\. Description"
+      const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
 
       if (taskMatch && taskMatch[1] === taskId) {
-        // Reconstruct the line with new status
-        const prefix = checkboxMatch[1];
-        const statusPart = `- [${statusMarker}] `;
+        // Reconstruct the line with new status, preserving the original list marker
+        const statusPart = `${listMarker} [${statusMarker}] `;
         lines[i] = prefix + statusPart + taskText;
         return lines.join('\n');
       }
