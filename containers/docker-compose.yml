@@ -4,7 +4,9 @@ services:
       context: ..
       dockerfile: containers/Dockerfile
     ports:
-      - "${DASHBOARD_PORT:-5000}:${DASHBOARD_PORT:-5000}"
+      # Security: Only expose to host's localhost by default
+      # To expose to network: DASHBOARD_HOST=0.0.0.0 docker-compose up
+      - "${DASHBOARD_HOST:-127.0.0.1}:${DASHBOARD_PORT:-5000}:${DASHBOARD_PORT:-5000}"
     volumes:
       # Global state directory - shared between host MCP clients and container
       # Uses SPEC_WORKFLOW_HOME inside container for state files (activeProjects.json, session, etc.)
@@ -21,4 +23,27 @@ services:
       # When host MCP client registers /Users/dev/myproject, container accesses /projects/myproject
       - SPEC_WORKFLOW_HOST_PATH_PREFIX=${HOST_PROJECT_ROOT:-${HOME}}
       - SPEC_WORKFLOW_CONTAINER_PATH_PREFIX=/projects
+      # Docker networking: App binds to 0.0.0.0 inside container (required for port forwarding)
+      # External access is controlled by Docker port mapping above, not these settings
+      - SPEC_WORKFLOW_BIND_ADDRESS=0.0.0.0
+      - SPEC_WORKFLOW_ALLOW_EXTERNAL_ACCESS=true
+      # Security: Rate limiting (defaults to enabled)
+      - SPEC_WORKFLOW_RATE_LIMIT_ENABLED=${SPEC_WORKFLOW_RATE_LIMIT_ENABLED:-true}
     restart: unless-stopped
+    # Security: Read-only root filesystem (except mounted volumes)
+    read_only: true
+    # Security: Drop all capabilities
+    cap_drop:
+      - ALL
+    # Security: No new privileges
+    security_opt:
+      - no-new-privileges:true
+    # Resource limits to prevent DoS
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M

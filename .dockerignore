@@ -2,8 +2,7 @@
 node_modules
 npm-debug.log
 
-# Build artifacts
-dist
+# Build artifacts (dist is included for Dockerfile.prebuilt)
 .next
 out
 

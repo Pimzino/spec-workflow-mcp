@@ -1,18 +1,29 @@
 import fastify, { FastifyInstance } from 'fastify';
 import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
+import fastifyCors from '@fastify/cors';
 import { join, dirname, basename, resolve } from 'path';
 import { readFile } from 'fs/promises';
 import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
 import open from 'open';
 import { WebSocket } from 'ws';
-import { findAvailablePort, validateAndCheckPort } from './utils.js';
+import { validateAndCheckPort, DASHBOARD_TEST_MESSAGE } from './utils.js';
 import { parseTasksFromMarkdown } from '../core/task-parser.js';
 import { ProjectManager } from './project-manager.js';
 import { JobScheduler } from './job-scheduler.js';
 import { ImplementationLogManager } from './implementation-log-manager.js';
 import { DashboardSessionManager } from '../core/dashboard-session.js';
+import { 
+  getSecurityConfig, 
+  RateLimiter,
+  AuditLogger,
+  createSecurityHeadersMiddleware,
+  getCorsConfig,
+  isLocalhostAddress,
+  DEFAULT_SECURITY_CONFIG
+} from '../core/security-utils.js';
+import { SecurityConfig } from '../types.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,6 +37,9 @@ interface WebSocketConnection {
 export interface MultiDashboardOptions {
   autoOpen?: boolean;
   port?: number;
+  bindAddress?: string; // Network binding address
+  allowExternalAccess?: boolean; // Explicit opt-in for non-localhost binding
+  security?: Partial<SecurityConfig>; // Security features configuration
 }
 
 export class MultiProjectDashboardServer {
@@ -34,6 +48,11 @@ export class MultiProjectDashboardServer {
   private jobScheduler: JobScheduler;
   private sessionManager: DashboardSessionManager;
   private options: MultiDashboardOptions;
+  private bindAddress: string;
+  private allowExternalAccess: boolean;
+  private securityConfig: SecurityConfig;
+  private rateLimiter?: RateLimiter;
+  private auditLogger?: AuditLogger;
   private actualPort: number = 0;
   private clients: Set<WebSocketConnection> = new Set();
   private packageVersion: string = 'unknown';
@@ -49,10 +68,46 @@ export class MultiProjectDashboardServer {
     this.projectManager = new ProjectManager();
     this.jobScheduler = new JobScheduler(this.projectManager);
     this.sessionManager = new DashboardSessionManager();
+    
+    // Initialize network binding configuration
+    this.bindAddress = options.bindAddress || '127.0.0.1';
+    this.allowExternalAccess = options.allowExternalAccess || false;
+    
+    // Validate network binding security
+    if (!isLocalhostAddress(this.bindAddress) && !this.allowExternalAccess) {
+      throw new Error(
+        `SECURITY ERROR: Binding to '${this.bindAddress}' (non-localhost) requires explicit allowExternalAccess=true. ` +
+        'This exposes your dashboard to network access. Use 127.0.0.1 for localhost-only access.'
+      );
+    }
+    
+    // Initialize security features configuration
+    this.securityConfig = getSecurityConfig(options.security);
+    
     this.app = fastify({ logger: false });
   }
 
   async start() {
+    // Security warning if binding to non-localhost address
+    if (!isLocalhostAddress(this.bindAddress)) {
+      console.error('');
+      console.error('⚠️  ═══════════════════════════════════════════════════════════');
+      console.error(`⚠️  SECURITY WARNING: Dashboard binding to ${this.bindAddress}`);
+      console.error('⚠️  This exposes your dashboard to network-based attacks!');
+      console.error('⚠️  Recommendation: Use 127.0.0.1 for localhost-only access');
+      console.error('⚠️  ═══════════════════════════════════════════════════════════');
+      console.error('');
+    }
+    
+    // Display security status
+    console.error('🔒 Security Configuration:');
+    console.error(`   - Bind Address: ${this.bindAddress}`);
+    console.error(`   - Rate Limiting: ${this.securityConfig.rateLimitEnabled ? 'ENABLED ✓' : 'DISABLED ⚠️'}`);
+    console.error(`   - Audit Logging: ${this.securityConfig.auditLogEnabled ? 'ENABLED ✓' : 'DISABLED ⚠️'}`);
+    console.error(`   - CORS: ${this.securityConfig.corsEnabled ? 'ENABLED ✓' : 'DISABLED ⚠️'}`);
+    console.error(`   - Allowed Origins: ${this.securityConfig.allowedOrigins.join(', ')}`);
+    console.error('');
+    
     // Fetch package version once at startup
     try {
       const response = await fetch('https://registry.npmjs.org/@pimzino/spec-workflow-mcp/latest');
@@ -72,11 +127,38 @@ export class MultiProjectDashboardServer {
       }
     }
 
+    // Initialize security components
+    if (this.securityConfig.rateLimitEnabled) {
+      this.rateLimiter = new RateLimiter(this.securityConfig);
+    }
+    
+    if (this.securityConfig.auditLogEnabled) {
+      this.auditLogger = new AuditLogger(this.securityConfig);
+      await this.auditLogger.initialize();
+    }
+
     // Initialize project manager
     await this.projectManager.initialize();
 
     // Initialize job scheduler
     await this.jobScheduler.initialize();
+
+    // Register CORS plugin if enabled
+    const corsConfig = getCorsConfig(this.securityConfig);
+    if (corsConfig !== false) {
+      await this.app.register(fastifyCors, corsConfig as any);
+    }
+
+    // Register security middleware (apply to all routes)
+    this.app.addHook('onRequest', createSecurityHeadersMiddleware());
+    
+    if (this.rateLimiter) {
+      this.app.addHook('onRequest', this.rateLimiter.middleware());
+    }
+    
+    if (this.auditLogger) {
+      this.app.addHook('onRequest', this.auditLogger.middleware());
+    }
 
     // Register plugins
     await this.app.register(fastifyStatic, {
@@ -198,11 +280,14 @@ export class MultiProjectDashboardServer {
       throw new Error('Dashboard port must be specified');
     }
 
-    await validateAndCheckPort(this.options.port);
+    await validateAndCheckPort(this.options.port, this.bindAddress);
     this.actualPort = this.options.port;
 
-    // Start server
-    await this.app.listen({ port: this.actualPort, host: '0.0.0.0' });
+    // Start server with configured network binding
+    await this.app.listen({ 
+      port: this.actualPort, 
+      host: this.bindAddress 
+    });
 
     // Start WebSocket heartbeat monitoring
     this.startHeartbeat();
@@ -303,6 +388,11 @@ export class MultiProjectDashboardServer {
   }
 
   private registerApiRoutes() {
+    // Health check / test endpoint (used by utils.ts to detect running dashboard)
+    this.app.get('/api/test', async () => {
+      return { message: DASHBOARD_TEST_MESSAGE };
+    });
+
     // Projects list
     this.app.get('/api/projects/list', async () => {
       return this.projectManager.getProjectsList();

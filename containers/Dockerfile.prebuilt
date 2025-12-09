@@ -1,35 +1,22 @@
-# Build stage
-FROM node:24-alpine AS builder
-WORKDIR /app
+# Dockerfile for pre-built application
+# Use this when Docker has limited memory for building
+# 
+# Usage:
+#   1. Build locally first: npm run build
+#   2. Then build Docker image: docker build -f containers/Dockerfile.prebuilt -t spec-workflow-mcp .
 
-# Copy package files
-COPY package*.json ./
-
-# Install all dependencies (including devDependencies for build)
-RUN npm ci
-
-# Copy source files
-COPY src ./src
-COPY scripts ./scripts
-COPY tsconfig.json ./tsconfig.json
-COPY vitest.config.ts ./vitest.config.ts
-
-# Build the application (increase heap size for Vite build)
-RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
-
-# Runtime stage
 FROM node:24-alpine
 WORKDIR /app
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Copy only production files
-COPY --from=builder /app/package*.json ./
+# Copy package files and install production dependencies only
+COPY package*.json ./
 RUN npm ci --only=production
 
-# Copy built application
-COPY --from=builder /app/dist ./dist
+# Copy pre-built application (must run `npm run build` locally first)
+COPY dist ./dist
 
 RUN mkdir -p /workspace /workspace/.spec-workflow-mcp
 
@@ -60,3 +47,4 @@ ENTRYPOINT ["dumb-init", "--"]
 # Run as non-root user with secure defaults
 # Use shell form for CMD to enable environment variable expansion
 CMD node /app/dist/index.js ${SPEC_WORKFLOW_PATH:-/workspace} --dashboard --port ${DASHBOARD_PORT:-5000}
+

@@ -229,10 +229,79 @@ async function main() {
         console.error(`Browser auto-open disabled (--no-open)`);
       }
 
-      const dashboardServer = new MultiProjectDashboardServer({
-        autoOpen: !noOpen,
-        port: dashboardPort
-      });
+      // Load configuration from environment variables
+      let bindAddress: string | undefined;
+      let allowExternalAccess: boolean | undefined;
+      const securityConfig: any = {};
+      
+      // Network binding configuration
+      if (process.env.SPEC_WORKFLOW_BIND_ADDRESS) {
+        bindAddress = process.env.SPEC_WORKFLOW_BIND_ADDRESS;
+      }
+      
+      // External access opt-in (only override if explicitly set to true or false)
+      if (process.env.SPEC_WORKFLOW_ALLOW_EXTERNAL_ACCESS !== undefined) {
+        const allowExternal = process.env.SPEC_WORKFLOW_ALLOW_EXTERNAL_ACCESS.toLowerCase();
+        if (allowExternal === 'true') {
+          allowExternalAccess = true;
+        } else if (allowExternal === 'false') {
+          allowExternalAccess = false;
+        }
+        // If invalid value, ignore and use default
+      }
+      
+      // Security features configuration
+      
+      // Rate limiting toggle (only override if explicitly set to true or false)
+      if (process.env.SPEC_WORKFLOW_RATE_LIMIT_ENABLED !== undefined) {
+        const rateLimitEnabled = process.env.SPEC_WORKFLOW_RATE_LIMIT_ENABLED.toLowerCase();
+        if (rateLimitEnabled === 'true') {
+          securityConfig.rateLimitEnabled = true;
+        } else if (rateLimitEnabled === 'false') {
+          securityConfig.rateLimitEnabled = false;
+        }
+        // If invalid value, ignore and use default
+      }
+      
+      // CORS toggle (only override if explicitly set to true or false)
+      if (process.env.SPEC_WORKFLOW_CORS_ENABLED !== undefined) {
+        const corsEnabled = process.env.SPEC_WORKFLOW_CORS_ENABLED.toLowerCase();
+        if (corsEnabled === 'true') {
+          securityConfig.corsEnabled = true;
+        } else if (corsEnabled === 'false') {
+          securityConfig.corsEnabled = false;
+        }
+        // If invalid value, ignore and use default
+      }
+
+      // Create dashboard server (network binding validation happens in constructor)
+      let dashboardServer: MultiProjectDashboardServer;
+      try {
+        dashboardServer = new MultiProjectDashboardServer({
+          autoOpen: !noOpen,
+          port: dashboardPort,
+          bindAddress,
+          allowExternalAccess,
+          security: securityConfig
+        });
+      } catch (error: any) {
+        // Provide user-friendly error message with environment variable names
+        if (error.message.includes('SECURITY ERROR') || error.message.includes('non-localhost')) {
+          console.error('');
+          console.error('❌ Security Configuration Error:');
+          console.error(error.message);
+          console.error('');
+          console.error('To fix this, either:');
+          console.error('  1. Use localhost binding (secure):');
+          console.error('     export SPEC_WORKFLOW_BIND_ADDRESS=127.0.0.1');
+          console.error('');
+          console.error('  2. Explicitly allow external access (insecure):');
+          console.error('     export SPEC_WORKFLOW_ALLOW_EXTERNAL_ACCESS=true');
+          console.error('');
+          process.exit(1);
+        }
+        throw error; // Re-throw other errors
+      }
 
       try {
         const dashboardUrl = await dashboardServer.start();
