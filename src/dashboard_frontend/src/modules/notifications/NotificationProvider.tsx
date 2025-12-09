@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useApi } from '../api/api';
+import { useWs } from '../ws/WebSocketProvider';
 import { Howl } from 'howler';
 
 // Split into two contexts to prevent unnecessary re-renders
@@ -24,6 +25,7 @@ const NotificationStateContext = createContext<NotificationStateContextType | un
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   console.log('[NotificationProvider] ========== COMPONENT MOUNTED WITH DIAGNOSTIC CODE ==========');
   const { approvals, specs, getSpecTasksProgress } = useApi();
+  const { subscribe, unsubscribe } = useWs();
   const prevApprovalsRef = useRef<typeof approvals>([]);
   const prevTaskDataRef = useRef<Map<string, any>>(new Map());
   const isInitialLoadRef = useRef(true);
@@ -215,6 +217,84 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       isInitialLoadRef.current = false;
     }
   }, []); // Empty dependency array - only run on mount
+
+  // Subscribe to task status updates via WebSocket
+  useEffect(() => {
+    const handleTaskStatusUpdate = (event: any) => {
+      console.log('[NotificationProvider] Received task-status-update event:', event);
+      const spec = specs.find(s => s.name === event.specName);
+      if (!spec) {
+        console.log('[NotificationProvider] Spec not found:', event.specName);
+        return;
+      }
+
+      const specDisplayName = spec.displayName;
+      const prevTaskData = prevTaskDataRef.current.get(event.specName);
+
+      // Extract current data from the WebSocket event
+      const currentTaskData = {
+        total: event.summary.total,
+        completed: event.summary.completed,
+        inProgress: event.inProgress,
+        taskList: event.taskList
+      };
+
+      console.log('[NotificationProvider] Previous task data:', prevTaskData);
+      console.log('[NotificationProvider] Current task data:', currentTaskData);
+
+      if (!prevTaskData) {
+        // First time seeing this spec - just store the data without notification
+        console.log('[NotificationProvider] Initializing task data for:', event.specName);
+        prevTaskDataRef.current.set(event.specName, currentTaskData);
+        return;
+      }
+
+      // We have previous data - check for changes and show notifications
+
+      // Check for completion changes
+      if (currentTaskData.completed > prevTaskData.completed) {
+        const newlyCompleted = currentTaskData.completed - prevTaskData.completed;
+        const message = newlyCompleted === 1
+          ? `Task completed in ${specDisplayName} (${currentTaskData.completed}/${currentTaskData.total})`
+          : `${newlyCompleted} tasks completed in ${specDisplayName} (${currentTaskData.completed}/${currentTaskData.total})`;
+
+        console.log('[NotificationProvider] Task completion detected:', message);
+        showNotification(message, 'success');
+      }
+
+      // Check for in-progress changes
+      if (currentTaskData.inProgress !== prevTaskData.inProgress) {
+        if (currentTaskData.inProgress && !prevTaskData.inProgress) {
+          // Task moved to in-progress
+          const taskId = currentTaskData.inProgress;
+          const task = currentTaskData.taskList?.find((t: any) => t.id === taskId || t.number === taskId);
+          const taskTitle = task?.title || task?.description || `Task ${taskId}`;
+
+          const message = `Task started: ${taskTitle} in ${specDisplayName}`;
+          console.log('[NotificationProvider] Task in-progress detected:', message);
+          showNotification(message, 'info');
+        }
+      }
+
+      // Check if all tasks are now completed (project finished)
+      if (currentTaskData.completed === currentTaskData.total &&
+          prevTaskData.completed < currentTaskData.total &&
+          currentTaskData.total > 0) {
+        const message = `🎉 All tasks completed in ${specDisplayName}!`;
+        console.log('[NotificationProvider] Project completion detected:', message);
+        showNotification(message, 'success');
+      }
+
+      // Store current data for next comparison
+      prevTaskDataRef.current.set(event.specName, currentTaskData);
+    };
+
+    subscribe('task-status-update', handleTaskStatusUpdate);
+
+    return () => {
+      unsubscribe('task-status-update', handleTaskStatusUpdate);
+    };
+  }, [specs, subscribe, unsubscribe, showNotification]);
 
   // Memoize actions context - this should rarely change since functions are stable
   const actionsValue = useMemo(() => ({

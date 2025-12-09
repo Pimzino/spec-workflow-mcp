@@ -106,6 +106,8 @@ export class ApprovalStorage extends EventEmitter {
   public originalProjectPath: string; // Original host path for display/registry
   private approvalsDir: string;
   private watcher?: chokidar.FSWatcher;
+  private pendingEmit: NodeJS.Timeout | null = null;
+  private readonly DEBOUNCE_MS = 500;
 
   constructor(translatedPath: string, originalPath?: string) {
     super();
@@ -141,9 +143,9 @@ export class ApprovalStorage extends EventEmitter {
       ignorePermissionErrors: true
     });
 
-    this.watcher.on('add', () => this.emit('approval-change'));
-    this.watcher.on('change', () => this.emit('approval-change'));
-    this.watcher.on('unlink', () => this.emit('approval-change'));
+    this.watcher.on('add', () => this.scheduleApprovalChangeEmit());
+    this.watcher.on('change', () => this.scheduleApprovalChangeEmit());
+    this.watcher.on('unlink', () => this.scheduleApprovalChangeEmit());
 
     // Add error handler to prevent watcher crashes
     this.watcher.on('error', (error) => {
@@ -152,7 +154,27 @@ export class ApprovalStorage extends EventEmitter {
     });
   }
 
+  /**
+   * Schedule a debounced approval-change event emission
+   * Coalesces rapid changes to prevent event flooding
+   */
+  private scheduleApprovalChangeEmit(): void {
+    if (this.pendingEmit) {
+      clearTimeout(this.pendingEmit);
+    }
+    this.pendingEmit = setTimeout(() => {
+      this.pendingEmit = null;
+      this.emit('approval-change');
+    }, this.DEBOUNCE_MS);
+  }
+
   async stop(): Promise<void> {
+    // Clear pending debounced emit
+    if (this.pendingEmit) {
+      clearTimeout(this.pendingEmit);
+      this.pendingEmit = null;
+    }
+
     if (this.watcher) {
       // Remove all listeners before closing to prevent memory leaks
       this.watcher.removeAllListeners();

@@ -20,6 +20,7 @@ const __dirname = dirname(__filename);
 interface WebSocketConnection {
   socket: WebSocket;
   projectId?: string;
+  isAlive?: boolean;
 }
 
 export interface MultiDashboardOptions {
@@ -36,6 +37,12 @@ export class MultiProjectDashboardServer {
   private actualPort: number = 0;
   private clients: Set<WebSocketConnection> = new Set();
   private packageVersion: string = 'unknown';
+  private heartbeatInterval?: NodeJS.Timeout;
+  private readonly HEARTBEAT_INTERVAL_MS = 30000;
+  private readonly HEARTBEAT_TIMEOUT_MS = 10000;
+  // Debounce spec broadcasts to coalesce rapid updates
+  private pendingSpecBroadcasts: Map<string, NodeJS.Timeout> = new Map();
+  private readonly SPEC_BROADCAST_DEBOUNCE_MS = 300;
 
   constructor(options: MultiDashboardOptions = {}) {
     this.options = options;
@@ -90,7 +97,13 @@ export class MultiProjectDashboardServer {
         const projectId = url.searchParams.get('projectId') || undefined;
 
         connection.projectId = projectId;
+        connection.isAlive = true;
         self.clients.add(connection);
+
+        // Handle pong for heartbeat
+        socket.on('pong', () => {
+          connection.isAlive = true;
+        });
 
         // Send initial state for the requested project
         if (projectId) {
@@ -191,6 +204,9 @@ export class MultiProjectDashboardServer {
     // Start server
     await this.app.listen({ port: this.actualPort, host: '0.0.0.0' });
 
+    // Start WebSocket heartbeat monitoring
+    this.startHeartbeat();
+
     // Register dashboard in the session manager
     const dashboardUrl = `http://localhost:${this.actualPort}`;
     await this.sessionManager.registerDashboard(dashboardUrl, this.actualPort, process.pid);
@@ -212,24 +228,37 @@ export class MultiProjectDashboardServer {
       });
     });
 
-    // Broadcast spec changes
-    this.projectManager.on('spec-change', async (event) => {
-      try {
-        const { projectId, ...data } = event;
-        const project = this.projectManager.getProject(projectId);
-        if (project) {
-          const specs = await project.parser.getAllSpecs();
-          const archivedSpecs = await project.parser.getAllArchivedSpecs();
-          this.broadcastToProject(projectId, {
-            type: 'spec-update',
-            projectId,
-            data: { specs, archivedSpecs }
-          });
-        }
-      } catch (error) {
-        console.error('Error broadcasting spec changes:', error);
-        // Don't propagate error to prevent event system crash
+    // Broadcast spec changes (debounced per project to coalesce rapid updates)
+    this.projectManager.on('spec-change', (event) => {
+      const { projectId } = event;
+
+      // Clear existing pending broadcast for this project
+      const existingTimeout = this.pendingSpecBroadcasts.get(projectId);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
       }
+
+      // Schedule debounced broadcast
+      const timeout = setTimeout(async () => {
+        this.pendingSpecBroadcasts.delete(projectId);
+        try {
+          const project = this.projectManager.getProject(projectId);
+          if (project) {
+            const specs = await project.parser.getAllSpecs();
+            const archivedSpecs = await project.parser.getAllArchivedSpecs();
+            this.broadcastToProject(projectId, {
+              type: 'spec-update',
+              projectId,
+              data: { specs, archivedSpecs }
+            });
+          }
+        } catch (error) {
+          console.error('Error broadcasting spec changes:', error);
+          // Don't propagate error to prevent event system crash
+        }
+      }, this.SPEC_BROADCAST_DEBOUNCE_MS);
+
+      this.pendingSpecBroadcasts.set(projectId, timeout);
     });
 
     // Broadcast task updates
@@ -1062,8 +1091,13 @@ export class MultiProjectDashboardServer {
   private broadcastToAll(message: any) {
     const messageStr = JSON.stringify(message);
     this.clients.forEach((connection) => {
-      if (connection.socket.readyState === 1) {
-        connection.socket.send(messageStr);
+      try {
+        if (connection.socket.readyState === WebSocket.OPEN) {
+          connection.socket.send(messageStr);
+        }
+      } catch (error) {
+        console.error('Error broadcasting to client:', error);
+        this.scheduleConnectionCleanup(connection);
       }
     });
   }
@@ -1071,10 +1105,63 @@ export class MultiProjectDashboardServer {
   private broadcastToProject(projectId: string, message: any) {
     const messageStr = JSON.stringify(message);
     this.clients.forEach((connection) => {
-      if (connection.socket.readyState === 1 && connection.projectId === projectId) {
-        connection.socket.send(messageStr);
+      try {
+        if (connection.socket.readyState === WebSocket.OPEN && connection.projectId === projectId) {
+          connection.socket.send(messageStr);
+        }
+      } catch (error) {
+        console.error('Error broadcasting to project client:', error);
+        this.scheduleConnectionCleanup(connection);
       }
     });
+  }
+
+  private scheduleConnectionCleanup(connection: WebSocketConnection) {
+    // Use setImmediate to avoid modifying Set during iteration
+    setImmediate(() => {
+      try {
+        this.clients.delete(connection);
+        connection.socket.removeAllListeners();
+        if (connection.socket.readyState === WebSocket.OPEN) {
+          connection.socket.close();
+        }
+      } catch {
+        // Ignore cleanup errors
+      }
+    });
+  }
+
+  private startHeartbeat() {
+    this.heartbeatInterval = setInterval(() => {
+      this.clients.forEach((connection) => {
+        if (connection.socket.readyState === WebSocket.OPEN) {
+          try {
+            // Mark as waiting for pong
+            connection.isAlive = false;
+            connection.socket.ping();
+          } catch {
+            this.scheduleConnectionCleanup(connection);
+          }
+        }
+      });
+
+      // Check for dead connections after timeout
+      setTimeout(() => {
+        this.clients.forEach((connection) => {
+          if (connection.isAlive === false) {
+            console.error('Connection did not respond to heartbeat, cleaning up');
+            this.scheduleConnectionCleanup(connection);
+          }
+        });
+      }, this.HEARTBEAT_TIMEOUT_MS);
+    }, this.HEARTBEAT_INTERVAL_MS);
+  }
+
+  private stopHeartbeat() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = undefined;
+    }
   }
 
   private async broadcastTaskUpdate(projectId: string, specName: string) {
@@ -1124,11 +1211,20 @@ export class MultiProjectDashboardServer {
   }
 
   async stop() {
+    // Stop heartbeat monitoring
+    this.stopHeartbeat();
+
+    // Clear pending spec broadcasts
+    for (const timeout of this.pendingSpecBroadcasts.values()) {
+      clearTimeout(timeout);
+    }
+    this.pendingSpecBroadcasts.clear();
+
     // Close all WebSocket connections
     this.clients.forEach((connection) => {
       try {
         connection.socket.removeAllListeners();
-        if (connection.socket.readyState === 1) {
+        if (connection.socket.readyState === WebSocket.OPEN) {
           connection.socket.close();
         }
       } catch (error) {
