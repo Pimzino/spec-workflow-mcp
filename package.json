@@ -49,7 +49,7 @@
     "@fastify/websocket": "^8.2.1",
     "@heroicons/react": "^2.2.0",
     "@mdxeditor/editor": "^3.50.0",
-    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@modelcontextprotocol/sdk": "^1.24.3",
     "@tailwindcss/vite": "^4.1.13",
     "@toon-format/toon": "^0.8.0",
     "chokidar": "^3.5.3",
@@ -81,12 +81,12 @@
     "@types/react-dom": "^18.3.0",
     "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^4.3.3",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "^4.0.15",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.13",
     "tsx": "^4.7.0",
     "typescript": "^5.7.2",
-    "vite": "^5.4.8",
-    "vitest": "^2.1.8"
+    "vite": "^7.2.7",
+    "vitest": "^4.0.15"
   }
 }
