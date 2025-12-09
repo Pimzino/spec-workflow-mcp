@@ -234,10 +234,11 @@ export function createSecurityHeadersMiddleware() {
     reply.header('Referrer-Policy', 'strict-origin-when-cross-origin'); // Prevent referrer leakage
     
     // CSP for dashboard
+    // Note: cdn.jsdelivr.net is required for highlight.js stylesheets used by the MDX editor
     reply.header(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
-    ); // Allow scripts, styles, and images from the same origin
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:;"
+    );
   };
 }
 
