@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2025-12-10
+
+### Fixed
+- **Dashboard JS/CSS Loading Fails with Custom Port** (fixes #167) - Fixed issue where the dashboard would fail to load JavaScript and CSS assets when using a custom port (e.g., `--port 5002`):
+  - CORS `allowedOrigins` was hardcoded to port 5000, blocking requests from other ports
+  - CSP `connect-src` directive was missing WebSocket origins for custom ports
+  - Added `generateAllowedOrigins(port)` helper to dynamically generate allowed origins based on the actual port
+  - Updated `getSecurityConfig()` to accept port parameter and generate port-aware CORS configuration
+  - Updated `createSecurityHeadersMiddleware()` to include dynamic `connect-src` for WebSocket connections
+  - Security configuration now correctly displays the actual allowed origins on startup
+
 ## [2.1.1] - 2025-12-09
 
 ### Added

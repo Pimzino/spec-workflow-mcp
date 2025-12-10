@@ -8,15 +8,28 @@ import { writeFile, appendFile, mkdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import { SecurityConfig } from '../types.js';
 
+// Default port for the dashboard
+export const DEFAULT_DASHBOARD_PORT = 5000;
+
 // Default security configuration (secure by default)
+// Note: allowedOrigins should be dynamically generated based on the actual port
 export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
   rateLimitEnabled: true,
   rateLimitPerMinute: 120, // 120 requests per minute per client
   auditLogEnabled: true,
   auditLogRetentionDays: 30,
   corsEnabled: true,
-  allowedOrigins: ['http://localhost:5000', 'http://127.0.0.1:5000']
+  allowedOrigins: [`http://localhost:${DEFAULT_DASHBOARD_PORT}`, `http://127.0.0.1:${DEFAULT_DASHBOARD_PORT}`]
 };
+
+/**
+ * Generate allowed origins for CORS based on the actual port
+ * @param port - The port the dashboard is running on
+ * @returns Array of allowed origin URLs
+ */
+export function generateAllowedOrigins(port: number): string[] {
+  return [`http://localhost:${port}`, `http://127.0.0.1:${port}`];
+}
 
 /**
  * Check if an IP address is localhost
@@ -24,7 +37,7 @@ export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
  * @returns true if the address is localhost (127.x.x.x, localhost, or ::1)
  */
 export function isLocalhostAddress(address: string): boolean {
-  return address === 'localhost' || 
+  return address === 'localhost' ||
          address === '::1' || // IPv6 localhost
          address.startsWith('127.'); // Any 127.x.x.x address (includes 127.0.0.1)
 }
@@ -32,9 +45,21 @@ export function isLocalhostAddress(address: string): boolean {
 /**
  * Get security configuration with secure defaults
  * Note: Network binding validation (bindAddress/allowExternalAccess) is handled separately at the config layer
+ * @param userConfig - Optional user-provided security configuration overrides
+ * @param port - The port the dashboard is running on (used to generate dynamic allowedOrigins)
  */
-export function getSecurityConfig(userConfig?: Partial<SecurityConfig>): SecurityConfig {
-  const config = { ...DEFAULT_SECURITY_CONFIG, ...userConfig };
+export function getSecurityConfig(userConfig?: Partial<SecurityConfig>, port?: number): SecurityConfig {
+  const actualPort = port || DEFAULT_DASHBOARD_PORT;
+
+  // Generate dynamic allowedOrigins based on the actual port if not explicitly provided
+  const dynamicAllowedOrigins = generateAllowedOrigins(actualPort);
+
+  const config = {
+    ...DEFAULT_SECURITY_CONFIG,
+    allowedOrigins: dynamicAllowedOrigins,
+    ...userConfig
+  };
+
   return config;
 }
 
@@ -44,14 +69,14 @@ export function getSecurityConfig(userConfig?: Partial<SecurityConfig>): Securit
 export class RateLimiter {
   private requests: Map<string, number[]> = new Map();
   private config: SecurityConfig;
-  
+
   constructor(config: SecurityConfig) {
     this.config = config;
-    
+
     // Clean up old entries every minute
     setInterval(() => this.cleanup(), 60000);
   }
-  
+
   /**
    * Check if request should be rate limited
    */
@@ -59,31 +84,31 @@ export class RateLimiter {
     if (!this.config.rateLimitEnabled) {
       return { allowed: true };
     }
-    
+
     const now = Date.now();
     const windowMs = 60000; // 1 minute window
     const maxRequests = this.config.rateLimitPerMinute;
-    
+
     // Get client request history
     const requests = this.requests.get(clientId) || [];
-    
+
     // Filter to requests within the current window
     const recentRequests = requests.filter(timestamp => now - timestamp < windowMs);
-    
+
     // Check if limit exceeded
     if (recentRequests.length >= maxRequests) {
       const oldestRequest = recentRequests[0];
       const retryAfter = Math.ceil((oldestRequest + windowMs - now) / 1000);
       return { allowed: false, retryAfter };
     }
-    
+
     // Add current request
     recentRequests.push(now);
     this.requests.set(clientId, recentRequests);
-    
+
     return { allowed: true };
   }
-  
+
   /**
    * Create rate limiting middleware
    */
@@ -91,9 +116,9 @@ export class RateLimiter {
     return async (request: FastifyRequest, reply: FastifyReply) => {
       // Use IP address as client identifier
       const clientId = request.ip || 'unknown';
-      
+
       const result = this.checkLimit(clientId);
-      
+
       if (!result.allowed) {
         return reply
           .code(429)
@@ -106,14 +131,14 @@ export class RateLimiter {
       }
     };
   }
-  
+
   /**
    * Clean up old request records
    */
   private cleanup() {
     const now = Date.now();
     const windowMs = 60000;
-    
+
     for (const [clientId, requests] of this.requests.entries()) {
       const recentRequests = requests.filter(timestamp => now - timestamp < windowMs);
       if (recentRequests.length === 0) {
@@ -143,10 +168,10 @@ export interface AuditLogEntry {
 export class AuditLogger {
   private config: SecurityConfig;
   private logPath: string;
-  
+
   constructor(config: SecurityConfig, workspaceRoot?: string) {
     this.config = config;
-    
+
     // Determine audit log path
     if (config.auditLogPath) {
       this.logPath = config.auditLogPath;
@@ -157,7 +182,7 @@ export class AuditLogger {
       this.logPath = join(process.cwd(), 'audit.log');
     }
   }
-  
+
   /**
    * Initialize audit log (create directory if needed)
    */
@@ -165,7 +190,7 @@ export class AuditLogger {
     if (!this.config.auditLogEnabled) {
       return;
     }
-    
+
     try {
       const logDir = join(this.logPath, '..');
       await mkdir(logDir, { recursive: true });
@@ -173,7 +198,7 @@ export class AuditLogger {
       console.error('Failed to initialize audit log:', error);
     }
   }
-  
+
   /**
    * Log an audit event
    */
@@ -181,7 +206,7 @@ export class AuditLogger {
     if (!this.config.auditLogEnabled) {
       return;
     }
-    
+
     try {
       const logLine = JSON.stringify(entry) + '\n';
       await appendFile(this.logPath, logLine, 'utf-8');
@@ -189,14 +214,14 @@ export class AuditLogger {
       console.error('Failed to write audit log:', error);
     }
   }
-  
+
   /**
    * Create audit logging middleware
    */
   middleware() {
     return async (request: FastifyRequest, reply: FastifyReply) => {
       const startTime = Date.now();
-      
+
       // Log after response is sent using reply.then() which fires after response completes
       reply.then(
         () => {
@@ -212,7 +237,7 @@ export class AuditLogger {
               userAgent: request.headers['user-agent']
             }
           };
-          
+
           // Fire and forget - don't await to avoid blocking
           this.log(entry).catch(() => {});
         },
@@ -224,20 +249,24 @@ export class AuditLogger {
 
 /**
  * Security headers middleware
+ * @param port - The port the dashboard is running on (used for CSP connect-src for WebSocket)
  */
-export function createSecurityHeadersMiddleware() {
+export function createSecurityHeadersMiddleware(port?: number) {
+  const actualPort = port || DEFAULT_DASHBOARD_PORT;
+
   return async (request: FastifyRequest, reply: FastifyReply) => {
     // Add security headers
     reply.header('X-Content-Type-Options', 'nosniff'); // Prevent MIME type sniffing
     reply.header('X-Frame-Options', 'DENY'); // Prevent clickjacking
     reply.header('X-XSS-Protection', '1; mode=block'); // Enable XSS protection
     reply.header('Referrer-Policy', 'strict-origin-when-cross-origin'); // Prevent referrer leakage
-    
+
     // CSP for dashboard
     // Note: cdn.jsdelivr.net is required for highlight.js stylesheets used by the MDX editor
+    // connect-src allows WebSocket connections to the dashboard on the actual port
     reply.header(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:;"
+      `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' ws://localhost:${actualPort} ws://127.0.0.1:${actualPort};`
     );
   };
 }
@@ -249,7 +278,7 @@ export function getCorsConfig(config: SecurityConfig) {
   if (!config.corsEnabled) {
     return false; // Disable CORS
   }
-  
+
   return {
     origin: (origin: string, callback: (error: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (e.g., curl, Postman)
@@ -257,7 +286,7 @@ export function getCorsConfig(config: SecurityConfig) {
         callback(null, true);
         return;
       }
-      
+
       // Check if origin is in allowed list
       if (config.allowedOrigins.includes(origin)) {
         callback(null, true);
