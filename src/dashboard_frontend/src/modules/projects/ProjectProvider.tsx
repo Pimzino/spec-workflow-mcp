@@ -1,9 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
+export interface ProjectInstance {
+  pid: number;
+  registeredAt: string;
+}
+
 export interface Project {
   projectId: string;
   projectName: string;
   projectPath: string;
+  instances: ProjectInstance[];
 }
 
 interface ProjectContextType {

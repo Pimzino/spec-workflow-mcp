@@ -4,7 +4,7 @@ import { SpecParser } from './parser.js';
 import { SpecWatcher } from './watcher.js';
 import { ApprovalStorage } from './approval-storage.js';
 import { SpecArchiveService } from '../core/archive-service.js';
-import { ProjectRegistry, ProjectRegistryEntry, generateProjectId } from '../core/project-registry.js';
+import { ProjectRegistry, ProjectRegistryEntry, ProjectInstance, generateProjectId } from '../core/project-registry.js';
 import { PathUtils } from '../core/path-utils.js';
 
 export interface ProjectContext {
@@ -12,6 +12,7 @@ export interface ProjectContext {
   projectPath: string;           // Translated path for local file access
   originalProjectPath: string;   // Original host path for display/registry
   projectName: string;
+  instances: ProjectInstance[];  // Active MCP server instances for this project
   parser: SpecParser;
   watcher: SpecWatcher;
   approvalStorage: ApprovalStorage;
@@ -22,7 +23,6 @@ export class ProjectManager extends EventEmitter {
   private registry: ProjectRegistry;
   private projects: Map<string, ProjectContext> = new Map();
   private registryWatcher?: chokidar.FSWatcher;
-  private cleanupInterval?: NodeJS.Timeout;
 
   constructor() {
     super();
@@ -32,9 +32,10 @@ export class ProjectManager extends EventEmitter {
   /**
    * Initialize the project manager
    * Loads projects from registry and starts watching for changes
+   * Note: MCP servers handle their own lifecycle cleanup via stop()
    */
   async initialize(): Promise<void> {
-    // Clean up stale projects first
+    // Clean up stale instances once at startup (self-healing for crashes)
     await this.registry.cleanupStaleProjects();
 
     // Load all projects from registry
@@ -43,10 +44,9 @@ export class ProjectManager extends EventEmitter {
     // Watch registry file for changes
     this.startRegistryWatcher();
 
-    // Periodic cleanup every 30 seconds
-    this.cleanupInterval = setInterval(async () => {
-      await this.cleanupStaleProjects();
-    }, 30000);
+    // Note: Removed periodic cleanup interval
+    // MCP servers are responsible for cleaning up their own instances on stop()
+    // The cleanup at startup handles any orphaned instances from crashes
   }
 
   /**
@@ -91,7 +91,7 @@ export class ProjectManager extends EventEmitter {
 
   /**
    * Sync current projects with registry
-   * Add new projects, remove deleted ones
+   * Add new projects, remove deleted ones, update instances for existing projects
    */
   private async syncWithRegistry(): Promise<void> {
     try {
@@ -99,10 +99,16 @@ export class ProjectManager extends EventEmitter {
       const registryIds = new Set(entries.map(e => e.projectId));
       const currentIds = new Set(this.projects.keys());
 
-      // Add new projects
+      // Add new projects or update instances for existing ones
       for (const entry of entries) {
         if (!currentIds.has(entry.projectId)) {
           await this.addProject(entry);
+        } else {
+          // Update instances for existing project
+          const project = this.projects.get(entry.projectId);
+          if (project) {
+            project.instances = entry.instances || [];
+          }
         }
       }
 
@@ -159,6 +165,7 @@ export class ProjectManager extends EventEmitter {
         projectPath: translatedPath,            // Use translated path for file access
         originalProjectPath: entry.projectPath, // Keep original for display/registry
         projectName: entry.projectName,
+        instances: entry.instances || [],       // Track MCP server instances
         parser,
         watcher,
         approvalStorage,
@@ -202,17 +209,6 @@ export class ProjectManager extends EventEmitter {
   }
 
   /**
-   * Clean up stale projects (dead processes)
-   */
-  private async cleanupStaleProjects(): Promise<void> {
-    const removedCount = await this.registry.cleanupStaleProjects();
-    if (removedCount > 0) {
-      // Registry changed, sync will be triggered by watcher
-      console.error(`Cleaned up ${removedCount} stale project(s)`);
-    }
-  }
-
-  /**
    * Get a project context by ID
    */
   getProject(projectId: string): ProjectContext | undefined {
@@ -229,11 +225,17 @@ export class ProjectManager extends EventEmitter {
   /**
    * Get projects list for API
    */
-  getProjectsList(): Array<{ projectId: string; projectName: string; projectPath: string }> {
+  getProjectsList(): Array<{
+    projectId: string;
+    projectName: string;
+    projectPath: string;
+    instances: ProjectInstance[];
+  }> {
     return Array.from(this.projects.values()).map(p => ({
       projectId: p.projectId,
       projectName: p.projectName,
-      projectPath: p.originalProjectPath  // Return original path for display
+      projectPath: p.originalProjectPath,  // Return original path for display
+      instances: p.instances
     }));
   }
 
@@ -274,12 +276,6 @@ export class ProjectManager extends EventEmitter {
    * Stop the project manager
    */
   async stop(): Promise<void> {
-    // Stop cleanup interval
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-      this.cleanupInterval = undefined;
-    }
-
     // Stop registry watcher
     if (this.registryWatcher) {
       this.registryWatcher.removeAllListeners();

@@ -138,6 +138,13 @@ export function ProjectDropdown() {
                           title={project.projectName}
                         >
                           {project.projectName}
+                          {project.instances?.length > 0 && (
+                            <span className="text-gray-500 dark:text-gray-400 ml-1 font-normal">
+                              ({project.instances.length === 1
+                                ? `PID: ${project.instances[0].pid}`
+                                : `${project.instances.length} instances`})
+                            </span>
+                          )}
                         </span>
                       </div>
                       {isCurrent && (

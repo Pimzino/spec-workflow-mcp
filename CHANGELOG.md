@@ -49,6 +49,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Converted all template files in `src/markdown/templates/` from CRLF to LF
   - Templates are now cross-platform compatible and won't trigger spurious git changes
 
+- **Self-Healing Project Registry** (fixes #164) - Fixed rapid project add/remove cycles when Claude Code recycles MCP processes:
+  - **Multi-Instance Support** - Projects now track multiple MCP server instances (PIDs) simultaneously, allowing unlimited concurrent sessions per project
+  - **Self-Healing Registration** - When an MCP server starts, it automatically cleans up dead PIDs from crashed sessions and reuses the project slot
+  - **PID-Specific Cleanup** - MCP servers now only unregister their own instance on shutdown, leaving other active instances intact
+  - **Removed Aggressive Cleanup** - Dashboard no longer runs periodic 30-second cleanup; MCP servers manage their own lifecycle
+  - **PID Visibility** - Project dropdown now shows PID for single instances or instance count for multiple instances
+
 - **Dashboard Disconnection During Approval Process** (fixes #162) - Fixed critical stability issue where dashboard WebSocket connections would disconnect when AI clients (e.g., Codex CLI) modified documents during the approval workflow:
   - **Approval Storage Debouncing** - Added 500ms debounce for approval file change events to prevent event flooding when approvals are rapidly created/modified
   - **Spec Broadcast Debouncing** - Added 300ms debounce for spec update broadcasts to coalesce rapid file changes into a single UI update

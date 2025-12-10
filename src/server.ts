@@ -179,8 +179,9 @@ export class SpecWorkflowMCPServer {
       // In Docker, projects should persist across sessions since we can't verify host PIDs
       if (!this.isDockerMode()) {
         try {
-          await this.projectRegistry.unregisterProject(this.projectPath);
-          console.error('Project unregistered from global registry');
+          // Pass current PID to only remove this specific instance
+          await this.projectRegistry.unregisterProject(this.projectPath, process.pid);
+          console.error('Project instance unregistered from global registry');
         } catch (error) {
           // Ignore errors during cleanup
         }

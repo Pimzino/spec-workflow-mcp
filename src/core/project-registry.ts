@@ -4,12 +4,16 @@ import { basename, resolve } from 'path';
 import { createHash } from 'crypto';
 import { getGlobalDir, getPermissionErrorHelp } from './global-dir.js';
 
+export interface ProjectInstance {
+  pid: number;
+  registeredAt: string;
+}
+
 export interface ProjectRegistryEntry {
   projectId: string;
   projectPath: string;
   projectName: string;
-  pid: number;
-  registeredAt: string;
+  instances: ProjectInstance[];
 }
 
 /**
@@ -139,6 +143,8 @@ export class ProjectRegistry {
 
   /**
    * Register a project in the global registry
+   * Self-healing: If a project exists with dead PIDs, cleans them up and adds new PID
+   * Multi-instance: Allows unlimited MCP server instances per project
    */
   async registerProject(projectPath: string, pid: number): Promise<string> {
     const registry = await this.readRegistry();
@@ -147,28 +153,61 @@ export class ProjectRegistry {
     const projectId = generateProjectId(absolutePath);
     const projectName = basename(absolutePath);
 
-    const entry: ProjectRegistryEntry = {
-      projectId,
-      projectPath: absolutePath,
-      projectName,
-      pid,
-      registeredAt: new Date().toISOString()
-    };
+    const existing = registry.get(projectId);
 
-    registry.set(projectId, entry);
+    if (existing) {
+      // Self-healing: Filter out dead PIDs
+      const liveInstances = existing.instances.filter(i => this.isProcessAlive(i.pid));
+
+      // Check if this PID is already registered (avoid duplicates)
+      if (!liveInstances.some(i => i.pid === pid)) {
+        liveInstances.push({ pid, registeredAt: new Date().toISOString() });
+      }
+
+      // Update with live instances (no limit on number of instances)
+      existing.instances = liveInstances;
+      registry.set(projectId, existing);
+    } else {
+      // New project
+      const entry: ProjectRegistryEntry = {
+        projectId,
+        projectPath: absolutePath,
+        projectName,
+        instances: [{ pid, registeredAt: new Date().toISOString() }]
+      };
+      registry.set(projectId, entry);
+    }
+
     await this.writeRegistry(registry);
     return projectId;
   }
 
   /**
    * Unregister a project from the global registry by path
+   * If pid is provided, only removes that specific instance
+   * If no pid provided, removes the entire project (backwards compat)
    */
-  async unregisterProject(projectPath: string): Promise<void> {
+  async unregisterProject(projectPath: string, pid?: number): Promise<void> {
     const registry = await this.readRegistry();
     const absolutePath = resolve(projectPath);
     const projectId = generateProjectId(absolutePath);
 
-    registry.delete(projectId);
+    const entry = registry.get(projectId);
+    if (!entry) return;
+
+    if (pid !== undefined) {
+      // Remove only this PID's instance
+      entry.instances = entry.instances.filter(i => i.pid !== pid);
+      if (entry.instances.length === 0) {
+        registry.delete(projectId);
+      } else {
+        registry.set(projectId, entry);
+      }
+    } else {
+      // Remove entire project (backwards compat)
+      registry.delete(projectId);
+    }
+
     await this.writeRegistry(registry);
   }
 
@@ -208,18 +247,31 @@ export class ProjectRegistry {
   }
 
   /**
-   * Clean up stale projects (where the process is no longer running)
+   * Clean up stale instances (where the process is no longer running)
+   * Projects with no live instances are removed entirely
+   * Returns the count of removed instances
    */
   async cleanupStaleProjects(): Promise<number> {
     const registry = await this.readRegistry();
-    let removedCount = 0;
+    let removedInstanceCount = 0;
     let needsWrite = this.needsInitialization; // Write if file needs initialization
 
     for (const [projectId, entry] of registry.entries()) {
-      if (!this.isProcessAlive(entry.pid)) {
-        registry.delete(projectId);
-        removedCount++;
+      const liveInstances = entry.instances.filter(i => this.isProcessAlive(i.pid));
+      const deadCount = entry.instances.length - liveInstances.length;
+
+      if (deadCount > 0) {
+        removedInstanceCount += deadCount;
         needsWrite = true;
+
+        if (liveInstances.length === 0) {
+          // No live instances, remove entire project
+          registry.delete(projectId);
+        } else {
+          // Keep project with only live instances
+          entry.instances = liveInstances;
+          registry.set(projectId, entry);
+        }
       }
     }
 
@@ -228,7 +280,7 @@ export class ProjectRegistry {
       this.needsInitialization = false; // Reset flag after successful write
     }
 
-    return removedCount;
+    return removedInstanceCount;
   }
 
   /**
