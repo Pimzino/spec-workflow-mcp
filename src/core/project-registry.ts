@@ -77,6 +77,12 @@ export class ProjectRegistry {
         return new Map();
       }
       const data = JSON.parse(trimmedContent) as Record<string, ProjectRegistryEntry>;
+      // Ensure backward compatibility: add default empty instances array if missing (older format)
+      for (const entry of Object.values(data)) {
+        if (!Array.isArray(entry.instances)) {
+          entry.instances = [];
+        }
+      }
       return new Map(Object.entries(data));
     } catch (error: any) {
       if (error.code === 'ENOENT') {
@@ -131,7 +137,7 @@ export class ProjectRegistry {
       // Can't verify host PIDs from inside Docker, assume alive
       return true;
     }
-    
+
     try {
       // Sending signal 0 checks if process exists without actually sending a signal
       process.kill(pid, 0);

@@ -81,7 +81,7 @@ export class ProjectManager extends EventEmitter {
     this.registryWatcher.on('add', async () => {
       await this.syncWithRegistry();
     });
-    
+
     // Add error handler to prevent watcher crashes
     this.registryWatcher.on('error', (error) => {
       console.error('Registry watcher error:', error);

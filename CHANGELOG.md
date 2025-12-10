@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.3] - 2025-12-10
+
+### Fixed
+- **Dashboard Startup Crash for Users with Older Data Files** (fixes #168) - Fixed `Cannot read properties of undefined (reading 'filter')` error that prevented dashboard startup for users upgrading from older versions:
+  - Added backward compatibility guard in `project-registry.ts` to ensure `instances` array exists on all registry entries
+  - Added backward compatibility guard in `settings-manager.ts` to ensure `automationJobs` array exists in settings
+  - Users with older `activeProjects.json` or `settings.json` files from previous versions can now start the dashboard without errors
+
 ## [2.1.2] - 2025-12-10
 
 ### Fixed

@@ -54,7 +54,12 @@ export class SettingsManager {
         await this.saveSettings(defaultSettings);
         return defaultSettings;
       }
-      return JSON.parse(trimmedContent) as GlobalSettings;
+      const parsed = JSON.parse(trimmedContent) as GlobalSettings;
+      // Ensure backward compatibility: add default automationJobs array if missing (older format)
+      if (!Array.isArray(parsed.automationJobs)) {
+        parsed.automationJobs = [];
+      }
+      return parsed;
     } catch (error: any) {
       if (error.code === 'ENOENT') {
         // File doesn't exist yet, create it with default settings

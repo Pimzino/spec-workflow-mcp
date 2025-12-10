@@ -4,6 +4,11 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.3] - 2025-12-10
+
+### Fixed
+- **Task Parser Alignment** - Aligned VSCode extension task parser with dashboard parser for consistent task parsing behavior
+
 ## [1.1.2] - 2025-11-10
 
 ### Fixed
