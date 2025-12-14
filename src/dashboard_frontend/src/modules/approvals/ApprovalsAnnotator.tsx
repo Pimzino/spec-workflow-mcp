@@ -12,17 +12,20 @@ export type ApprovalComment = {
   selectedText?: string;
   highlightColor?: { bg: string; border: string; name: string };
   id?: string; // Add unique ID for each comment
+  // Position-based fields for precise highlighting
+  startOffset?: number;  // Character offset from start of content
+  endOffset?: number;    // Character offset for end of selection
 };
 
 // Modal component for adding/editing comments
-function CommentModal({ 
-  isOpen, 
-  onClose, 
-  onSave, 
-  selectedText, 
-  highlightColor, 
+function CommentModal({
+  isOpen,
+  onClose,
+  onSave,
+  selectedText,
+  highlightColor,
   initialComment = '',
-  isEditing = false 
+  isEditing = false
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -89,7 +92,7 @@ function CommentModal({
           <label className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-2">
             {t('approvals.annotator.highlightedText')}
           </label>
-          <div 
+          <div
             className="p-3 sm:p-3 rounded-lg border text-sm sm:text-sm leading-relaxed max-h-32 sm:max-h-32 overflow-y-auto min-w-0"
             style={{
               backgroundColor: selectedColor.bg,
@@ -112,9 +115,9 @@ function CommentModal({
             <input
               type="color"
               value={selectedColorHex}
-              onChange={(e) => { 
-                const v = e.target.value; 
-                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase()); 
+              onChange={(e) => {
+                const v = e.target.value;
+                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase());
               }}
               className="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
               title={t('approvals.annotator.pickColorTooltip')}
@@ -122,9 +125,9 @@ function CommentModal({
             <input
               type="text"
               value={selectedColorHex}
-              onChange={(e) => { 
-                const v = e.target.value; 
-                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase()); 
+              onChange={(e) => {
+                const v = e.target.value;
+                if (isValidHex(v)) setSelectedColorHex(v.toUpperCase());
               }}
               className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white font-mono uppercase"
               placeholder="#FFEB3B"
@@ -178,29 +181,85 @@ function CommentModal({
   );
 }
 
-export function renderContentWithAnnotations(content: string, comments: ApprovalComment[], onHighlightClick?: (commentId: string) => void, tooltip?: string) {
-  let processedContent = (content ?? '')
+// Helper function to escape HTML
+function escapeHtml(text: string): string {
+  return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-  const selectionComments = comments.filter((c) => c.type === 'selection' && c.selectedText && c.highlightColor) as Required<ApprovalComment>[];
-  selectionComments.sort((a, b) => (b.selectedText?.length || 0) - (a.selectedText?.length || 0));
-  for (const c of selectionComments) {
-    const escaped = (c.selectedText || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-    const regex = new RegExp(escaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-    const style = `background-color: ${c.highlightColor.bg}; border-bottom: 2px solid ${c.highlightColor.border}; padding: 1px 2px; border-radius: 2px; cursor: pointer;`;
-    const clickHandler = onHighlightClick ? `data-comment-id="${c.id || ''}"` : '';
-    const titleAttr = tooltip || 'Click to view/edit comment';
-    processedContent = processedContent.replace(regex, `<span style="${style}" class="highlight-${c.highlightColor.name} highlight-clickable" ${clickHandler} title="${titleAttr}">${escaped}</span>`);
+}
+
+export function renderContentWithAnnotations(content: string, comments: ApprovalComment[], onHighlightClick?: (commentId: string) => void, tooltip?: string) {
+  const rawContent = content ?? '';
+  const selectionComments = comments.filter(
+    (c) => c.type === 'selection' && c.selectedText && c.highlightColor
+  );
+
+  // Separate comments with position data from those without
+  const positionedComments = selectionComments.filter(
+    c => c.startOffset !== undefined && c.endOffset !== undefined
+  );
+  const legacyComments = selectionComments.filter(
+    c => c.startOffset === undefined || c.endOffset === undefined
+  );
+
+  // Build highlight regions from positioned comments
+  // Sort by startOffset to process in order
+  const sortedPositioned = [...positionedComments].sort(
+    (a, b) => a.startOffset! - b.startOffset!
+  );
+
+  // Create a list of highlight regions (non-overlapping, earliest wins for overlaps)
+  type HighlightRegion = {
+    start: number;
+    end: number;
+    comment: ApprovalComment;
+  };
+
+  const regions: HighlightRegion[] = [];
+  for (const c of sortedPositioned) {
+    const start = c.startOffset!;
+    const end = c.endOffset!;
+
+    // Check for overlaps with existing regions and skip if overlapping
+    const overlaps = regions.some(r => !(end <= r.start || start >= r.end));
+    if (!overlaps && start < end && start >= 0 && end <= rawContent.length) {
+      regions.push({ start, end, comment: c });
+    }
   }
-  return processedContent;
+
+  // Build result by inserting spans at exact positions
+  let result = '';
+  let lastEnd = 0;
+  const titleAttr = tooltip || 'Click to view/edit comment';
+
+  for (const region of regions) {
+    const c = region.comment;
+    // Add text before this annotation
+    result += escapeHtml(rawContent.slice(lastEnd, region.start));
+    // Add highlighted span
+    const style = `background-color: ${c.highlightColor!.bg}; border-bottom: 2px solid ${c.highlightColor!.border}; padding: 1px 2px; border-radius: 2px; cursor: pointer;`;
+    const clickHandler = onHighlightClick ? `data-comment-id="${c.id || ''}"` : '';
+    result += `<span style="${style}" class="highlight-${c.highlightColor!.name} highlight-clickable" ${clickHandler} title="${titleAttr}">${escapeHtml(rawContent.slice(region.start, region.end))}</span>`;
+    lastEnd = region.end;
+  }
+  // Add remaining text
+  result += escapeHtml(rawContent.slice(lastEnd));
+
+  // Handle legacy comments without position data (backward compatibility)
+  // For these, we highlight only the first occurrence (no 'g' flag)
+  for (const c of legacyComments) {
+    const escaped = escapeHtml(c.selectedText || '');
+    // Use regex without 'g' flag to match only the first occurrence
+    const regex = new RegExp(escaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const style = `background-color: ${c.highlightColor!.bg}; border-bottom: 2px solid ${c.highlightColor!.border}; padding: 1px 2px; border-radius: 2px; cursor: pointer;`;
+    const clickHandler = onHighlightClick ? `data-comment-id="${c.id || ''}"` : '';
+    result = result.replace(regex, `<span style="${style}" class="highlight-${c.highlightColor!.name} highlight-clickable" ${clickHandler} title="${titleAttr}">${escaped}</span>`);
+  }
+
+  return result;
 }
 
 export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMode, setViewMode }:
@@ -211,6 +270,8 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
     selectedText: string;
     isEditing: boolean;
     editingComment?: ApprovalComment;
+    startOffset?: number;  // Character offset from start of content
+    endOffset?: number;    // Character offset for end of selection
   }>({ isOpen: false, selectedText: '', isEditing: false });
   const [generalCommentModalOpen, setGeneralCommentModalOpen] = useState(false);
   const [deleteModalState, setDeleteModalState] = useState<{ isOpen: boolean; commentIndex: number }>({ isOpen: false, commentIndex: -1 });
@@ -218,18 +279,47 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
   // Generate unique ID for new comments
   const generateCommentId = () => `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  function handleSelectionMouseUp() {
+  function handleSelectionMouseUp(e: React.MouseEvent<HTMLPreElement>) {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim() || '';
-    if (!selectedText) return;
-    
+    if (!selectedText || !selection?.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    const preElement = e.currentTarget;
+
+    // Calculate offset relative to the pre element's text content
+    // We need to calculate the offset in the *original* content (before HTML escaping)
+    // Since the pre element contains escaped HTML, we need to work with the raw content
+    let startOffset: number | undefined;
+    let endOffset: number | undefined;
+
+    try {
+      // Create a range from the start of the pre element to the start of the selection
+      const preRange = document.createRange();
+      preRange.selectNodeContents(preElement);
+      preRange.setEnd(range.startContainer, range.startOffset);
+
+      // Get the text length from the pre element start to the selection start
+      // This gives us the offset within the displayed text
+      const displayedStartOffset = preRange.toString().length;
+
+      // The displayed text matches the original content (raw text is shown in the pre)
+      // So the offsets are directly usable
+      startOffset = displayedStartOffset;
+      endOffset = displayedStartOffset + selectedText.length;
+    } catch {
+      // If offset calculation fails, continue without offsets (fallback behavior)
+    }
+
     // Open modal for adding comment
     setModalState({
       isOpen: true,
       selectedText,
-      isEditing: false
+      isEditing: false,
+      startOffset,
+      endOffset
     });
-    
+
     // Clear selection after a brief delay to prevent flicker
     setTimeout(() => {
       try { selection?.removeAllRanges(); } catch {}
@@ -250,22 +340,24 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
 
   function handleModalSave(commentText: string, color: { bg: string; border: string; name: string }) {
     if (modalState.isEditing && modalState.editingComment) {
-      // Update existing comment
-      const updatedComments = comments.map(c => 
-        c.id === modalState.editingComment!.id 
+      // Update existing comment (preserve original offsets)
+      const updatedComments = comments.map(c =>
+        c.id === modalState.editingComment!.id
           ? { ...c, comment: commentText, highlightColor: color, timestamp: new Date().toISOString() }
           : c
       );
       onCommentsChange(updatedComments);
     } else {
-      // Add new comment
+      // Add new comment with position offsets
       const newComment: ApprovalComment = {
         type: 'selection',
         comment: commentText,
         timestamp: new Date().toISOString(),
         selectedText: modalState.selectedText,
         highlightColor: color,
-        id: generateCommentId()
+        id: generateCommentId(),
+        startOffset: modalState.startOffset,
+        endOffset: modalState.endOffset
       };
       onCommentsChange([...comments, newComment]);
     }
@@ -280,9 +372,9 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
   }
 
   function handleGeneralCommentSubmit(commentText: string) {
-    onCommentsChange([...comments, { 
-      type: 'general', 
-      comment: commentText, 
+    onCommentsChange([...comments, {
+      type: 'general',
+      comment: commentText,
       timestamp: new Date().toISOString(),
       id: generateCommentId()
     }]);
@@ -344,11 +436,11 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 min-w-0">
-                <pre 
-                  className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed select-text cursor-text font-mono text-gray-900 dark:text-gray-100 overflow-x-auto break-words max-w-full" 
+                <pre
+                  className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed select-text cursor-text font-mono text-gray-900 dark:text-gray-100 overflow-x-auto break-words max-w-full"
                   onMouseUp={handleSelectionMouseUp}
                   onClick={handleContentClick}
-                  dangerouslySetInnerHTML={{ __html: annotatedHtml }} 
+                  dangerouslySetInnerHTML={{ __html: annotatedHtml }}
                 />
               </div>
             </div>
@@ -420,9 +512,9 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                     {c.type === 'selection' && c.highlightColor && (
                       <div
                         className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border flex-shrink-0"
-                        style={{ 
-                          backgroundColor: c.highlightColor.bg, 
-                          borderColor: c.highlightColor.border 
+                        style={{
+                          backgroundColor: c.highlightColor.bg,
+                          borderColor: c.highlightColor.border
                         }}
                         title={t('approvals.annotator.colorHighlight', { color: c.highlightColor.name })}
                       />
@@ -446,11 +538,11 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                 </div>
 
                 {c.selectedText && (
-                  <div className="mb-1 sm:mb-2 p-1.5 sm:p-2 rounded text-xs italic leading-relaxed" style={{ 
+                  <div className="mb-1 sm:mb-2 p-1.5 sm:p-2 rounded text-xs italic leading-relaxed" style={{
                     marginLeft: c.highlightColor ? '8px' : '0',
-                    backgroundColor: c.highlightColor?.bg || 'rgb(254, 249, 195)', 
-                    borderColor: c.highlightColor?.border || '#F59E0B', 
-                    borderWidth: '1px' 
+                    backgroundColor: c.highlightColor?.bg || 'rgb(254, 249, 195)',
+                    borderColor: c.highlightColor?.border || '#F59E0B',
+                    borderWidth: '1px'
                   }}>
                     <span className="break-words">"{c.selectedText.substring(0, 80)}{c.selectedText.length > 80 ? '...' : ''}"</span>
                   </div>

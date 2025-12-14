@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.4] - 2025-12-14
+
+### Fixed
+- **Dashboard Annotation Word-Level Highlighting** (fixes #169) - Fixed issue where annotating text in the Dashboard Approvals tab would highlight all occurrences of the same text instead of just the specific selection:
+  - Added `startOffset` and `endOffset` fields to capture exact character positions when selecting text for annotation
+  - Rewrote `renderContentWithAnnotations()` to use position-based highlighting instead of global regex text-matching
+  - Updated modal state and comment creation to preserve and pass position data
+  - Existing annotations without position data fall back to highlighting the first occurrence only (backward compatible)
+
 ## [2.1.3] - 2025-12-10
 
 ### Fixed
