@@ -497,7 +497,7 @@ export class ApprovalStorage extends EventEmitter {
     if (trigger === 'initial') {
       const existingInitial = metadata.snapshots.find(s => s.trigger === 'initial');
       if (existingInitial) {
-        console.log(`Initial snapshot already exists for ${approval.filePath}, skipping creation`);
+        console.error(`Initial snapshot already exists for ${approval.filePath}, skipping creation`);
         return;
       }
     }
