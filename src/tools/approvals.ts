@@ -9,14 +9,20 @@ import { validateTasksMarkdown, formatValidationErrors } from '../core/task-vali
 /**
  * Safely translate a path, with defensive checks to provide better error messages
  * in case of module loading issues.
+ * 
+ * Note: The original issue reported "PathUtils.translatePath is not a function" on Windows.
+ * While we couldn't reproduce it, this defensive check ensures a clear error message
+ * is provided if such edge cases occur.
  */
 function safeTranslatePath(path: string): string {
-  // Defensive check: ensure PathUtils and translatePath exist
-  if (!PathUtils) {
-    throw new Error('PathUtils module is not loaded. Please check that the spec-workflow-mcp package is installed correctly.');
-  }
-  if (typeof PathUtils.translatePath !== 'function') {
-    throw new Error(`PathUtils.translatePath is not available (got ${typeof PathUtils.translatePath}). This may indicate a module loading issue. Please reinstall the package.`);
+  // Defensive check: ensure translatePath method exists and is callable
+  // This handles edge cases where the class might be partially initialized
+  if (typeof PathUtils?.translatePath !== 'function') {
+    throw new Error(
+      `PathUtils.translatePath is not available (got ${typeof PathUtils?.translatePath}). ` +
+      'This may indicate a module loading issue. Please reinstall the package with: ' +
+      'npm uninstall @pimzino/spec-workflow-mcp && npm install @pimzino/spec-workflow-mcp'
+    );
   }
   return PathUtils.translatePath(path);
 }
