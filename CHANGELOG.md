@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.6] - 2025-12-19
+
+### Fixed
+- **Approvals Tool Path Translation Error** (PR #173) - Fixed error when `PathUtils.translatePath` is called with undefined or null values in the approvals tool:
+  - Added defensive checks to `safeTranslatePath` helper function to guard against undefined/null input paths
+  - Prevents runtime errors when path translation encounters missing or invalid path values
+  - Improves stability of the approvals workflow on cross-platform environments
+
 ## [2.1.5] - 2025-12-16
 
 ### Fixed
