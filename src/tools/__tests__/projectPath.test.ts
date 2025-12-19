@@ -140,5 +140,54 @@ describe('Tool projectPath fallback behavior', () => {
       expect(result.success).toBe(false);
       expect(result.message).toContain('Project path is required but not provided');
     });
+
+    it('should not report PathUtils.translatePath error for request action', async () => {
+      const result = await approvalsHandler(
+        {
+          action: 'request',
+          title: 'Test approval',
+          filePath: 'test.md',
+          type: 'document',
+          category: 'spec',
+          categoryName: 'test-spec'
+        },
+        mockContext
+      );
+      
+      // The actual error should be about path validation, not about PathUtils
+      expect(result.success).toBe(false);
+      expect(result.message).not.toContain('PathUtils.translatePath is not a function');
+      expect(result.message).not.toContain('PathUtils.translatePath is not available');
+    });
+
+    it('should not report PathUtils.translatePath error for status action', async () => {
+      const result = await approvalsHandler(
+        {
+          action: 'status',
+          approvalId: 'test-id'
+        },
+        mockContext
+      );
+      
+      // The actual error should be about path validation, not about PathUtils
+      expect(result.success).toBe(false);
+      expect(result.message).not.toContain('PathUtils.translatePath is not a function');
+      expect(result.message).not.toContain('PathUtils.translatePath is not available');
+    });
+
+    it('should not report PathUtils.translatePath error for delete action', async () => {
+      const result = await approvalsHandler(
+        {
+          action: 'delete',
+          approvalId: 'test-id'
+        },
+        mockContext
+      );
+      
+      // The actual error should be about path validation, not about PathUtils
+      expect(result.success).toBe(false);
+      expect(result.message).not.toContain('PathUtils.translatePath is not a function');
+      expect(result.message).not.toContain('PathUtils.translatePath is not available');
+    });
   });
 });
