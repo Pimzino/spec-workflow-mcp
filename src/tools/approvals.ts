@@ -6,6 +6,27 @@ import { validateProjectPath, PathUtils } from '../core/path-utils.js';
 import { readFile } from 'fs/promises';
 import { validateTasksMarkdown, formatValidationErrors } from '../core/task-validator.js';
 
+/**
+ * Safely translate a path, with defensive checks to provide better error messages
+ * in case of module loading issues.
+ * 
+ * Note: The original issue reported "PathUtils.translatePath is not a function" on Windows.
+ * While we couldn't reproduce it, this defensive check ensures a clear error message
+ * is provided if such edge cases occur.
+ */
+function safeTranslatePath(path: string): string {
+  // Defensive check: ensure translatePath method exists and is callable
+  // This handles edge cases where the class might be partially initialized
+  if (typeof PathUtils?.translatePath !== 'function') {
+    throw new Error(
+      `PathUtils.translatePath is not available (got ${typeof PathUtils?.translatePath}). ` +
+      'This may indicate a module loading issue. Please reinstall the package with: ' +
+      'npm uninstall @pimzino/spec-workflow-mcp && npm install @pimzino/spec-workflow-mcp'
+    );
+  }
+  return PathUtils.translatePath(path);
+}
+
 export const approvalsTool: Tool = {
   name: 'approvals',
   description: `Manage approval requests through the dashboard interface.
@@ -183,7 +204,7 @@ async function handleRequestApproval(
     // Validate and resolve project path
     const validatedProjectPath = await validateProjectPath(projectPath);
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
-    const translatedPath = PathUtils.translatePath(validatedProjectPath);
+    const translatedPath = safeTranslatePath(validatedProjectPath);
 
     const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
     await approvalStorage.start();
@@ -297,7 +318,7 @@ async function handleGetApprovalStatus(
     // Validate and resolve project path
     const validatedProjectPath = await validateProjectPath(projectPath);
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
-    const translatedPath = PathUtils.translatePath(validatedProjectPath);
+    const translatedPath = safeTranslatePath(validatedProjectPath);
 
     const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
     await approvalStorage.start();
@@ -420,7 +441,7 @@ async function handleDeleteApproval(
     // Validate and resolve project path
     const validatedProjectPath = await validateProjectPath(projectPath);
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
-    const translatedPath = PathUtils.translatePath(validatedProjectPath);
+    const translatedPath = safeTranslatePath(validatedProjectPath);
 
     const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
     await approvalStorage.start();
