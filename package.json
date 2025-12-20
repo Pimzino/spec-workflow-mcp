@@ -1,6 +1,6 @@
 {
   "name": "@pimzino/spec-workflow-mcp",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "main": "dist/index.js",
   "type": "module",
@@ -72,7 +72,8 @@
     "react-router-dom": "^6.26.2",
     "simple-git": "^3.28.0",
     "tailwind-merge": "^3.3.1",
-    "toml": "^3.0.0"
+    "toml": "^3.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
