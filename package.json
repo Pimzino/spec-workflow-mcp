@@ -72,7 +72,8 @@
     "react-router-dom": "^6.26.2",
     "simple-git": "^3.28.0",
     "tailwind-merge": "^3.3.1",
-    "toml": "^3.0.0"
+    "toml": "^3.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
