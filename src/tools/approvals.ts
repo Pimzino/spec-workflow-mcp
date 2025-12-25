@@ -78,6 +78,10 @@ CRITICAL: Only provide filePath parameter for requests - the dashboard reads fil
       }
     },
     required: ['action']
+  },
+  annotations: {
+    title: 'Approvals',
+    destructiveHint: true,
   }
 };
 
