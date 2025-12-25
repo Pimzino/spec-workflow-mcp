@@ -11,6 +11,10 @@ Call this tool FIRST when users request spec creation, feature development, or m
     type: 'object',
     properties: {},
     additionalProperties: false
+  },
+  annotations: {
+    title: 'Spec Workflow Guide',
+    readOnlyHint: true,
   }
 };
 

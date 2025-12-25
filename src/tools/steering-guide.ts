@@ -11,6 +11,10 @@ Call ONLY when user explicitly requests steering document creation or asks about
     type: 'object',
     properties: {},
     additionalProperties: false
+  },
+  annotations: {
+    title: 'Steering Guide',
+    readOnlyHint: true,
   }
 };
 

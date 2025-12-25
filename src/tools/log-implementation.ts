@@ -283,6 +283,10 @@ Task: "Implemented logs dashboard with real-time updates"
       }
     },
     required: ['specName', 'taskId', 'summary', 'filesModified', 'filesCreated', 'statistics', 'artifacts']
+  },
+  annotations: {
+    title: 'Log Implementation',
+    destructiveHint: true,
   }
 };
 
