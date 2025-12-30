@@ -1,9 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hexToColorObject, isValidHex } from './colors';
 import { MDXEditorWrapper } from '../mdx-editor';
 import { TextInputModal } from '../modals/TextInputModal';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
+import {
+  findTextInMarkdown,
+  getTextContextBefore,
+  getTextContextAfter,
+  TextSelector
+} from './annotationUtils';
 
 export type ApprovalComment = {
   type: 'general' | 'selection';
@@ -15,6 +21,8 @@ export type ApprovalComment = {
   // Position-based fields for precise highlighting
   startOffset?: number;  // Character offset from start of content
   endOffset?: number;    // Character offset for end of selection
+  // Fuzzy matching selector for rendered markdown annotation
+  textSelector?: TextSelector;  // Context-based text selector for better matching
 };
 
 // Modal component for adding/editing comments
@@ -265,6 +273,8 @@ export function renderContentWithAnnotations(content: string, comments: Approval
 export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMode, setViewMode }:
   { content: string; comments: ApprovalComment[]; onCommentsChange: (c: ApprovalComment[]) => void; viewMode: 'preview' | 'annotate'; setViewMode: (m: 'preview' | 'annotate') => void; }) {
   const { t } = useTranslation();
+  const renderedContentRef = useRef<HTMLDivElement>(null);
+  const [annotateViewMode, setAnnotateViewMode] = useState<'rendered' | 'source'>('rendered');
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     selectedText: string;
@@ -272,6 +282,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
     editingComment?: ApprovalComment;
     startOffset?: number;  // Character offset from start of content
     endOffset?: number;    // Character offset for end of selection
+    textSelector?: TextSelector;  // Context-based selector for rendered markdown
   }>({ isOpen: false, selectedText: '', isEditing: false });
   const [generalCommentModalOpen, setGeneralCommentModalOpen] = useState(false);
   const [deleteModalState, setDeleteModalState] = useState<{ isOpen: boolean; commentIndex: number }>({ isOpen: false, commentIndex: -1 });
@@ -279,6 +290,46 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
   // Generate unique ID for new comments
   const generateCommentId = () => `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+  // Handler for text selection on rendered markdown (new)
+  function handleRenderedSelectionMouseUp(e: React.MouseEvent<HTMLDivElement>) {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim() || '';
+
+    if (!selectedText || !selection?.rangeCount) return;
+
+    try {
+      const range = selection.getRangeAt(0);
+
+      // Get context for fuzzy matching
+      const prefix = getTextContextBefore(range, 50);
+      const suffix = getTextContextAfter(range, 50);
+
+      // Find position in markdown source
+      const position = findTextInMarkdown(
+        { exact: selectedText, prefix, suffix },
+        content
+      );
+
+      // Open modal for adding comment
+      setModalState({
+        isOpen: true,
+        selectedText,
+        isEditing: false,
+        startOffset: position?.startOffset,
+        endOffset: position?.endOffset,
+        textSelector: { exact: selectedText, prefix, suffix }
+      });
+
+      // Clear selection after a brief delay
+      setTimeout(() => {
+        try { selection?.removeAllRanges(); } catch {}
+      }, 50);
+    } catch (error) {
+      console.error('Failed to handle selection:', error);
+    }
+  }
+
+  // Handler for text selection on source markdown (original)
   function handleSelectionMouseUp(e: React.MouseEvent<HTMLPreElement>) {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim() || '';
@@ -348,7 +399,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
       );
       onCommentsChange(updatedComments);
     } else {
-      // Add new comment with position offsets
+      // Add new comment with position offsets and text selector
       const newComment: ApprovalComment = {
         type: 'selection',
         comment: commentText,
@@ -357,7 +408,8 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         highlightColor: color,
         id: generateCommentId(),
         startOffset: modalState.startOffset,
-        endOffset: modalState.endOffset
+        endOffset: modalState.endOffset,
+        textSelector: modalState.textSelector
       };
       onCommentsChange([...comments, newComment]);
     }
@@ -390,9 +442,13 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
     onCommentsChange(dup);
   }
 
-  const annotatedHtml = useMemo(() => renderContentWithAnnotations(content || '', comments, handleHighlightClick, t('approvals.annotator.tooltips.viewEditComment')), [content, comments, t]);
+  // Annotated HTML for source mode
+  const annotatedHtml = useMemo(
+    () => renderContentWithAnnotations(content || '', comments, handleHighlightClick, t('approvals.annotator.tooltips.viewEditComment')),
+    [content, comments, t]
+  );
 
-  // Handle clicks on highlighted text
+  // Handle clicks on highlighted text (for source mode)
   function handleContentClick(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     if (target.classList.contains('highlight-clickable')) {
@@ -411,30 +467,62 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
 
         {/* Content Display */}
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-          {viewMode === 'preview' ? (
-            <div className="p-4 sm:p-6">
-              <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-img:max-w-full prose-img:h-auto prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-pre:bg-gray-50 dark:prose-pre:bg-gray-900 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300">
+          <div className="p-4 sm:p-6">
+            {/* Instruction note for annotate mode */}
+            {viewMode === 'annotate' && (
+              <>
+                <div className="mb-2 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                  <p className="text-xs text-blue-700 dark:text-blue-300 m-0 flex items-start gap-2">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="leading-relaxed break-words">
+                      <strong>{t('approvals.annotator.instructions.title')}</strong><br className="hidden sm:block" />
+                      <span className="block sm:inline">{t('approvals.annotator.instructions.mobile', 'Select any text below to add an annotation')}</span>
+                    </span>
+                  </p>
+                </div>
+                {/* View toggle: Rendered / Source */}
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">View:</span>
+                  <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-md p-0.5">
+                    <button
+                      onClick={() => setAnnotateViewMode('rendered')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                        annotateViewMode === 'rendered'
+                          ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      Rendered
+                    </button>
+                    <button
+                      onClick={() => setAnnotateViewMode('source')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                        annotateViewMode === 'source'
+                          ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      Source
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Content display based on mode */}
+            {viewMode === 'preview' || (viewMode === 'annotate' && annotateViewMode === 'rendered') ? (
+              /* Rendered markdown content with selection handler */
+              <div
+                ref={renderedContentRef}
+                onMouseUp={viewMode === 'annotate' ? handleRenderedSelectionMouseUp : undefined}
+                className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-img:max-w-full prose-img:h-auto prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-pre:bg-gray-50 dark:prose-pre:bg-gray-900 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300"
+              >
                 <MDXEditorWrapper content={content || ""} mode="view" enableMermaid={true} />
               </div>
-            </div>
-          ) : (
-            <div className="p-4">
-              {/* Instruction note */}
-              <div className="mb-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-                <p className="text-xs text-blue-700 dark:text-blue-300 m-0 flex items-start gap-2">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="leading-relaxed break-words">
-                    <strong>{t('approvals.annotator.instructions.title')}</strong><br className="hidden sm:block" />
-                    <span className="block sm:hidden">{t('approvals.annotator.instructions.mobile')}</span>
-                    <span className="hidden sm:block">{t('approvals.annotator.instructions.step1')}</span><br className="hidden sm:block" />
-                    <span className="hidden sm:block">{t('approvals.annotator.instructions.step2')}</span><br className="hidden sm:block" />
-                    <span className="hidden sm:block">{t('approvals.annotator.instructions.step3')}</span>
-                  </span>
-                </p>
-              </div>
-
+            ) : (
+              /* Source markdown with annotations (for annotate mode with source view) */
               <div className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 min-w-0">
                 <pre
                   className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed select-text cursor-text font-mono text-gray-900 dark:text-gray-100 overflow-x-auto break-words max-w-full"
@@ -443,8 +531,8 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                   dangerouslySetInnerHTML={{ __html: annotatedHtml }}
                 />
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
