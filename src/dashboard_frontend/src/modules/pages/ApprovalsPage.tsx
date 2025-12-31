@@ -755,10 +755,15 @@ function Content() {
       }
     } catch (error) {
       console.error('Batch action failed:', error);
+      showNotification({
+        type: 'error',
+        title: 'Batch action failed',
+        message: 'There was a problem processing the selected items. Please try again.'
+      });
     } finally {
       setBatchLoading(false);
     }
-  }, [selectedIds, approvalsActionBatch, reloadAll, exitSelectionMode]);
+  }, [selectedIds, approvalsActionBatch, reloadAll, exitSelectionMode, showNotification]);
 
   const handleConfirmBatchAction = useCallback(async () => {
     if (pendingAction) {
