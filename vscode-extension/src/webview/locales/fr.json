@@ -78,7 +78,16 @@
     "openInEditor": "Ouvrir dans l'Éditeur",
     "noPending": "Aucune approbation en attente pour cette spécification",
     "noPendingDocuments": "Aucun document avec approbations en attente trouvé",
-    "selectCategory": "Sélectionner une catégorie ci-dessus pour voir les approbations en attente"
+    "selectCategory": "Sélectionner une catégorie ci-dessus pour voir les approbations en attente",
+    "select": "Sélectionner",
+    "cancel": "Annuler",
+    "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner",
+    "selectedCount": "{{count}} sélectionnés",
+    "pendingCount": "{{count}} en attente",
+    "approveAll": "Tout approuver",
+    "revisionAll": "Tout réviser",
+    "rejectAll": "Tout rejeter"
   },
   "specs": {
     "active": "Actif",

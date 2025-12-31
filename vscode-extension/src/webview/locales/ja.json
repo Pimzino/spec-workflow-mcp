@@ -86,6 +86,7 @@
     "selectedCount": "{{count}}件選択中",
     "pendingCount": "{{count}}件保留中",
     "approveAll": "すべて承認",
+    "revisionAll": "すべて修正依頼",
     "rejectAll": "すべて拒否"
   },
   "specs": {

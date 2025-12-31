@@ -73,7 +73,16 @@
     "openInEditor": "在编辑器中打开",
     "noPending": "此规范没有待处理的审批",
     "noPendingDocuments": "未找到有待处理审批的文档",
-    "selectCategory": "请在上方选择类别以查看待处理的审批"
+    "selectCategory": "请在上方选择类别以查看待处理的审批",
+    "select": "选择",
+    "cancel": "取消",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "selectedCount": "已选择 {{count}} 项",
+    "pendingCount": "{{count}} 项待处理",
+    "approveAll": "全部批准",
+    "revisionAll": "全部请求修订",
+    "rejectAll": "全部拒绝"
   },
   "specs": {
     "active": "活跃",

@@ -25,7 +25,8 @@ import {
   FileText,
   Check,
   X,
-  Minus
+  Minus,
+  RotateCcw
 } from 'lucide-react';
 import { vscodeApi, type SpecData, type TaskProgressData, type ApprovalData, type SteeringStatus, type DocumentInfo, type SoundNotificationConfig } from '@/lib/vscode-api';
 import { cn, formatDistanceToNow } from '@/lib/utils';
@@ -177,7 +178,7 @@ function App() {
   };
 
   const handleBatchApprove = () => {
-    if (selectedApprovalIds.size === 0) return;
+    if (selectedApprovalIds.size === 0) {return;}
     setBatchProcessing(true);
     vscodeApi.batchApprove(Array.from(selectedApprovalIds), t('approvals.response.approved'));
     setTimeout(() => {
@@ -188,7 +189,7 @@ function App() {
   };
 
   const handleBatchReject = () => {
-    if (selectedApprovalIds.size === 0) return;
+    if (selectedApprovalIds.size === 0) {return;}
     setBatchProcessing(true);
     vscodeApi.batchReject(Array.from(selectedApprovalIds), t('approvals.response.rejected'));
     setTimeout(() => {
@@ -199,7 +200,7 @@ function App() {
   };
 
   const handleBatchRevision = () => {
-    if (selectedApprovalIds.size === 0) return;
+    if (selectedApprovalIds.size === 0) {return;}
     setBatchProcessing(true);
     vscodeApi.batchRequestRevision(Array.from(selectedApprovalIds), t('approvals.response.needsRevision'));
     setTimeout(() => {
@@ -1122,7 +1123,7 @@ Review the existing steering documents (if any) and help me improve or complete 
                     approval.status === 'pending' && approval.categoryName === selectedApprovalCategory
                   );
 
-              if (pendingApprovals.length === 0) return null;
+              if (pendingApprovals.length === 0) {return null;}
 
               const allSelected = pendingApprovals.length > 0 &&
                 pendingApprovals.every(a => selectedApprovalIds.has(a.id));
@@ -1323,7 +1324,7 @@ Review the existing steering documents (if any) and help me improve or complete 
                 <div className="flex gap-1">
                   <Button
                     size="sm"
-                    className="h-7 px-3 text-xs bg-green-600 hover:bg-green-700"
+                    className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700"
                     disabled={batchProcessing}
                     onClick={handleBatchApprove}
                   >
@@ -1333,7 +1334,17 @@ Review the existing steering documents (if any) and help me improve or complete 
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 px-3 text-xs border-red-300 text-red-600 hover:bg-red-50"
+                    className="h-6 px-2 text-xs border-amber-400 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                    disabled={batchProcessing}
+                    onClick={handleBatchRevision}
+                  >
+                    <RotateCcw className="w-3 h-3 mr-1" />
+                    {batchProcessing ? t('approvals.processing') : t('approvals.revisionAll')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 px-2 text-xs border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                     disabled={batchProcessing}
                     onClick={handleBatchReject}
                   >

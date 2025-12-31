@@ -252,7 +252,7 @@ export class ImplementationLogService {
       // Helper function to normalize markdown keys to camelCase
       const normalizeKey = (key: string): string => {
         const words = key.toLowerCase().trim().split(/\s+/);
-        if (words.length === 0) return '';
+        if (words.length === 0) {return '';}
         return words[0] + words.slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
       };
 
@@ -266,9 +266,9 @@ export class ImplementationLogService {
 
       // Helper function to convert string values to appropriate types
       const convertValue = (key: string, value: string): any => {
-        if (value === 'Yes' || value === 'yes') return true;
-        if (value === 'No' || value === 'no') return false;
-        if (value === 'N/A' || value === 'n/a') return '';
+        if (value === 'Yes' || value === 'yes') {return true;}
+        if (value === 'No' || value === 'no') {return false;}
+        if (value === 'N/A' || value === 'n/a') {return '';}
         return value;
       };
 
@@ -327,7 +327,7 @@ export class ImplementationLogService {
         // Parse artifact subsections (### headers)
         else if (line.startsWith('### ')) {
           if (Object.keys(currentItem).length > 0 && currentArtifactType) {
-            if (!artifacts[currentArtifactType]) artifacts[currentArtifactType] = [];
+            if (!artifacts[currentArtifactType]) {artifacts[currentArtifactType] = [];}
             (artifacts[currentArtifactType] as any).push(currentItem);
             currentItem = {};
           }
@@ -348,7 +348,7 @@ export class ImplementationLogService {
         // Parse artifact item headers (#### for individual items)
         else if (line.startsWith('#### ') && currentArtifactType) {
           if (Object.keys(currentItem).length > 0) {
-            if (!artifacts[currentArtifactType]) artifacts[currentArtifactType] = [];
+            if (!artifacts[currentArtifactType]) {artifacts[currentArtifactType] = [];}
             (artifacts[currentArtifactType] as any).push(currentItem);
           }
           currentItem = {};
@@ -396,7 +396,7 @@ export class ImplementationLogService {
 
       // Save last artifact item
       if (Object.keys(currentItem).length > 0 && currentArtifactType) {
-        if (!artifacts[currentArtifactType]) artifacts[currentArtifactType] = [];
+        if (!artifacts[currentArtifactType]) {artifacts[currentArtifactType] = [];}
         (artifacts[currentArtifactType] as any).push(currentItem);
       }
 
