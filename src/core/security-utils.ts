@@ -35,7 +35,7 @@ export function generateAllowedOrigins(port: number): string[] {
 
   // In development, also allow Vite dev server origin (port 5173)
   // The Vite proxy forwards requests but preserves the Origin header
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV === 'development') {
     origins.push(`http://localhost:${VITE_DEV_PORT}`, `http://127.0.0.1:${VITE_DEV_PORT}`);
   }
 
