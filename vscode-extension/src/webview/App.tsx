@@ -63,6 +63,8 @@ function App() {
   const [selectionMode, setSelectionMode] = useState<boolean>(false);
   const [selectedApprovalIds, setSelectedApprovalIds] = useState<Set<string>>(new Set());
   const [batchProcessing, setBatchProcessing] = useState<boolean>(false);
+  // Track if we're expecting a batch operation completion - used to detect backend confirmation
+  const pendingBatchOperation = useRef<boolean>(false);
   const [copiedSteering, setCopiedSteering] = useState<boolean>(false);
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set());
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -181,19 +183,34 @@ function App() {
     }
   };
 
+  // Helper to start a batch operation with proper tracking
+  const startBatchOperation = (
+    apiCall: () => void
+  ) => {
+    setBatchProcessing(true);
+    pendingBatchOperation.current = true;
+    apiCall();
+    // Fallback timeout in case backend notification doesn't arrive (e.g., network issue)
+    // The notification handler will clear state earlier if confirmation arrives
+    setTimeout(() => {
+      if (pendingBatchOperation.current) {
+        pendingBatchOperation.current = false;
+        setBatchProcessing(false);
+        setSelectedApprovalIds(new Set());
+        setSelectionMode(false);
+      }
+    }, BATCH_OPERATION_FEEDBACK_DELAY * 5); // 10 seconds fallback
+  };
+
   const handleBatchApprove = () => {
     if (selectedApprovalIds.size === 0) {return;}
     if (selectedApprovalIds.size > BATCH_SIZE_LIMIT) {
       setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
       return;
     }
-    setBatchProcessing(true);
-    vscodeApi.batchApprove(Array.from(selectedApprovalIds), t('approvals.response.approved'));
-    setTimeout(() => {
-      setBatchProcessing(false);
-      setSelectedApprovalIds(new Set());
-      setSelectionMode(false);
-    }, BATCH_OPERATION_FEEDBACK_DELAY);
+    startBatchOperation(() =>
+      vscodeApi.batchApprove(Array.from(selectedApprovalIds), t('approvals.response.approved'))
+    );
   };
 
   const handleBatchReject = () => {
@@ -202,13 +219,9 @@ function App() {
       setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
       return;
     }
-    setBatchProcessing(true);
-    vscodeApi.batchReject(Array.from(selectedApprovalIds), t('approvals.response.rejected'));
-    setTimeout(() => {
-      setBatchProcessing(false);
-      setSelectedApprovalIds(new Set());
-      setSelectionMode(false);
-    }, BATCH_OPERATION_FEEDBACK_DELAY);
+    startBatchOperation(() =>
+      vscodeApi.batchReject(Array.from(selectedApprovalIds), t('approvals.response.rejected'))
+    );
   };
 
   const handleBatchRevision = () => {
@@ -217,13 +230,9 @@ function App() {
       setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
       return;
     }
-    setBatchProcessing(true);
-    vscodeApi.batchRequestRevision(Array.from(selectedApprovalIds), t('approvals.response.needsRevision'));
-    setTimeout(() => {
-      setBatchProcessing(false);
-      setSelectedApprovalIds(new Set());
-      setSelectionMode(false);
-    }, BATCH_OPERATION_FEEDBACK_DELAY);
+    startBatchOperation(() =>
+      vscodeApi.batchRequestRevision(Array.from(selectedApprovalIds), t('approvals.response.needsRevision'))
+    );
   };
 
   // Language change handler
@@ -365,6 +374,17 @@ Review the existing steering documents (if any) and help me improve or complete 
         setNotification({ message: message.message, level: message.level });
         // Auto-hide notification after 3 seconds
         setTimeout(() => setNotification(null), 3000);
+
+        // Handle batch operation completion - detect by checking if we're expecting one
+        // and if the notification indicates a batch result (contains "requests" or "failed")
+        if (pendingBatchOperation.current &&
+            (message.message.includes('requests') || message.message.includes('failed'))) {
+          // Backend confirmed the batch operation - clear state immediately
+          pendingBatchOperation.current = false;
+          setBatchProcessing(false);
+          setSelectedApprovalIds(new Set());
+          setSelectionMode(false);
+        }
       }),
       vscodeApi.onMessage('config-updated', (message: any) => {
         setSoundConfig(message.data || {

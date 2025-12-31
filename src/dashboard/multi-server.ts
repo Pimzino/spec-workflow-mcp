@@ -662,8 +662,6 @@ export class MultiProjectDashboardServer {
     this.app.post('/api/projects/:projectId/approvals/:id/:action', async (request, reply) => {
       try {
         const { projectId, id, action } = request.params as { projectId: string; id: string; action: string };
-        console.error(`[DEBUG] Approval request: projectId=${projectId}, id=${id}, action=${action}`);
-        console.error(`[DEBUG] Request body:`, JSON.stringify(request.body));
 
         const { response, annotations, comments } = (request.body || {}) as {
           response: string;
@@ -673,10 +671,8 @@ export class MultiProjectDashboardServer {
 
         const project = this.projectManager.getProject(projectId);
         if (!project) {
-          console.error(`[DEBUG] Project not found: ${projectId}`);
           return reply.code(404).send({ error: 'Project not found' });
         }
-        console.error(`[DEBUG] Project found: ${project.projectPath}`);
 
         const validActions = ['approve', 'reject', 'needs-revision'];
         if (!validActions.includes(action)) {
@@ -691,12 +687,9 @@ export class MultiProjectDashboardServer {
         };
         const status = actionToStatus[action];
 
-        console.error(`[DEBUG] Calling updateApproval with id=${id}, status=${status}`);
         await project.approvalStorage.updateApproval(id, status, response, annotations, comments);
-        console.error(`[DEBUG] updateApproval succeeded`);
         return { success: true };
       } catch (error: any) {
-        console.error(`[DEBUG] Error in approval handler:`, error);
         return reply.code(500).send({ error: error.message || 'Internal server error' });
       }
     });
@@ -741,25 +734,22 @@ export class MultiProjectDashboardServer {
         failed: []
       };
 
-      const successfulUpdates: string[] = [];
-
       for (const id of ids) {
         try {
           // Revert to pending status, clear response and respondedAt
           await project.approvalStorage.revertToPending(id);
           results.succeeded.push(id);
-          successfulUpdates.push(id);
         } catch (error: any) {
           results.failed.push({ id, error: error.message });
         }
       }
 
       // Broadcast WebSocket update for successful undos
-      if (successfulUpdates.length > 0) {
+      if (results.succeeded.length > 0) {
         this.broadcastToProject(projectId, {
           type: 'batch-approval-undo',
-          ids: successfulUpdates,
-          count: successfulUpdates.length
+          ids: results.succeeded,
+          count: results.succeeded.length
         });
       }
 
