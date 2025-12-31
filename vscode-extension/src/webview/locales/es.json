@@ -78,7 +78,19 @@
     "openInEditor": "Abrir en Editor",
     "noPending": "No hay aprobaciones pendientes para esta especificación",
     "noPendingDocuments": "No se encontraron documentos con aprobaciones pendientes",
-    "selectCategory": "Selecciona una categoría arriba para ver aprobaciones pendientes"
+    "selectCategory": "Selecciona una categoría arriba para ver aprobaciones pendientes",
+    "select": "Seleccionar",
+    "cancel": "Cancelar",
+    "selectAll": "Seleccionar todo",
+    "deselectAll": "Deseleccionar todo",
+    "selectedCount": "{{count}} seleccionados",
+    "pendingCount": "{{count}} pendientes",
+    "approveAll": "Aprobar todo",
+    "revisionAll": "Revisar todo",
+    "rejectAll": "Rechazar todo",
+    "batch": {
+      "tooMany": "No se pueden procesar más de {{limit}} elementos a la vez"
+    }
   },
   "specs": {
     "active": "Activas",

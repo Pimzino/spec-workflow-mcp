@@ -303,6 +303,32 @@ export class ApprovalStorage extends EventEmitter {
     await fs.writeFile(filePath, JSON.stringify(approval, null, 2), 'utf-8');
   }
 
+  /**
+   * Revert an approval back to pending status, clearing response and timestamp
+   * Used for undo operations after batch approvals/rejections
+   */
+  async revertToPending(id: string): Promise<void> {
+    const approval = await this.getApproval(id);
+    if (!approval) {
+      throw new Error(`Approval ${id} not found`);
+    }
+
+    // Revert to pending state
+    approval.status = 'pending';
+
+    // Clear response fields
+    delete approval.response;
+    delete approval.respondedAt;
+    delete approval.annotations;
+    delete approval.comments;
+
+    const filePath = await this.findApprovalPath(id);
+    if (!filePath) {
+      throw new Error(`Approval ${id} file not found`);
+    }
+    await fs.writeFile(filePath, JSON.stringify(approval, null, 2), 'utf-8');
+  }
+
   async createRevision(
     originalId: string,
     newContent: string,
