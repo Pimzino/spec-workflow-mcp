@@ -827,26 +827,24 @@ export class MultiProjectDashboardServer {
         failed: []
       };
 
-      // Debounce WebSocket broadcasts - collect all updates first
-      const successfulUpdates: string[] = [];
+      // Debounce WebSocket broadcasts - collect all updates first (use results.succeeded)
 
       for (const id of ids) {
         try {
           await project.approvalStorage.updateApproval(id, status, batchResponse);
           results.succeeded.push(id);
-          successfulUpdates.push(id);
         } catch (error: any) {
           results.failed.push({ id, error: error.message });
         }
       }
 
       // Single consolidated WebSocket broadcast for all successful updates
-      if (successfulUpdates.length > 0) {
+      if (results.succeeded.length > 0) {
         this.broadcastToProject(projectId, {
           type: 'batch-approval-update',
           action: action,
-          ids: successfulUpdates,
-          count: successfulUpdates.length
+          ids: results.succeeded,
+          count: results.succeeded.length
         });
       }
 
