@@ -22,13 +22,24 @@ export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
   allowedOrigins: [`http://localhost:${DEFAULT_DASHBOARD_PORT}`, `http://127.0.0.1:${DEFAULT_DASHBOARD_PORT}`]
 };
 
+// Default Vite dev server port (used when running frontend in dev mode)
+export const VITE_DEV_PORT = 5173;
+
 /**
  * Generate allowed origins for CORS based on the actual port
  * @param port - The port the dashboard is running on
  * @returns Array of allowed origin URLs
  */
 export function generateAllowedOrigins(port: number): string[] {
-  return [`http://localhost:${port}`, `http://127.0.0.1:${port}`];
+  const origins = [`http://localhost:${port}`, `http://127.0.0.1:${port}`];
+
+  // In development, also allow Vite dev server origin (port 5173)
+  // The Vite proxy forwards requests but preserves the Origin header
+  if (process.env.NODE_ENV !== 'production') {
+    origins.push(`http://localhost:${VITE_DEV_PORT}`, `http://127.0.0.1:${VITE_DEV_PORT}`);
+  }
+
+  return origins;
 }
 
 /**
@@ -254,6 +265,14 @@ export class AuditLogger {
 export function createSecurityHeadersMiddleware(port?: number) {
   const actualPort = port || DEFAULT_DASHBOARD_PORT;
 
+  // Build connect-src directive with WebSocket endpoints
+  let connectSrc = `'self' ws://localhost:${actualPort} ws://127.0.0.1:${actualPort}`;
+
+  // In development, also allow Vite dev server connections
+  if (process.env.NODE_ENV !== 'production') {
+    connectSrc += ` ws://localhost:${VITE_DEV_PORT} ws://127.0.0.1:${VITE_DEV_PORT}`;
+  }
+
   return async (request: FastifyRequest, reply: FastifyReply) => {
     // Add security headers
     reply.header('X-Content-Type-Options', 'nosniff'); // Prevent MIME type sniffing
@@ -266,7 +285,7 @@ export function createSecurityHeadersMiddleware(port?: number) {
     // connect-src allows WebSocket connections to the dashboard on the actual port
     reply.header(
       'Content-Security-Policy',
-      `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' ws://localhost:${actualPort} ws://127.0.0.1:${actualPort};`
+      `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src ${connectSrc};`
     );
   };
 }
