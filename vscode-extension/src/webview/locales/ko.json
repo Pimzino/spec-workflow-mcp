@@ -78,7 +78,16 @@
     "openInEditor": "편집기에서 열기",
     "noPending": "이 명세서에 대한 대기 중인 승인이 없습니다",
     "noPendingDocuments": "승인 대기 중인 문서를 찾을 수 없습니다",
-    "selectCategory": "승인 대기 중인 항목을 보려면 위에서 카테고리를 선택하세요"
+    "selectCategory": "승인 대기 중인 항목을 보려면 위에서 카테고리를 선택하세요",
+    "select": "선택",
+    "cancel": "취소",
+    "selectAll": "모두 선택",
+    "deselectAll": "모두 해제",
+    "selectedCount": "{{count}}개 선택됨",
+    "pendingCount": "{{count}}개 대기 중",
+    "approveAll": "모두 승인",
+    "revisionAll": "모두 수정 요청",
+    "rejectAll": "모두 거부"
   },
   "specs": {
     "active": "활성",

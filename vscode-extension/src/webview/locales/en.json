@@ -86,6 +86,7 @@
     "selectedCount": "{{count}} selected",
     "pendingCount": "{{count}} pending",
     "approveAll": "Approve All",
+    "revisionAll": "Revise All",
     "rejectAll": "Reject All"
   },
   "specs": {
