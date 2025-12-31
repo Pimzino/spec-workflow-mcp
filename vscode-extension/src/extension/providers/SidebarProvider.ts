@@ -471,18 +471,40 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async batchApprove(ids: string[], response: string) {
+  // Batch size limit to prevent abuse (matches dashboard backend limit)
+  private static readonly BATCH_SIZE_LIMIT = 100;
+
+  /**
+   * Generic batch operation handler - DRY refactoring of batch methods
+   * @param ids - Array of approval IDs to process
+   * @param action - The action function to call for each ID
+   * @param actionVerb - The verb to use in notifications (e.g., 'approved', 'rejected')
+   * @param actionPastTense - Past tense for mixed results (e.g., 'approved', 'rejected')
+   */
+  private async executeBatchOperation(
+    ids: string[],
+    action: (id: string, response: string) => Promise<void>,
+    actionVerb: string,
+    actionPastTense: string,
+    response: string
+  ): Promise<void> {
+    // Backend batch size validation
+    if (ids.length > SidebarProvider.BATCH_SIZE_LIMIT) {
+      this.sendError(`Batch size exceeds limit. Maximum ${SidebarProvider.BATCH_SIZE_LIMIT} items allowed.`);
+      return;
+    }
+
     try {
-      console.log(`SidebarProvider: Batch approving ${ids.length} requests`);
+      console.log(`SidebarProvider: Batch ${actionVerb} ${ids.length} requests`);
       let successCount = 0;
       let failedCount = 0;
 
       for (const id of ids) {
         try {
-          await this._specWorkflowService.approveRequest(id, response);
+          await action(id, response);
           successCount++;
         } catch (error) {
-          console.error(`Failed to approve request ${id}:`, error);
+          console.error(`Failed to ${actionVerb} request ${id}:`, error);
           failedCount++;
         }
       }
@@ -491,71 +513,43 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       await this.sendApprovalCategories();
 
       if (failedCount === 0) {
-        this.sendNotification(`${successCount} requests approved`, 'success');
+        this.sendNotification(`${successCount} requests ${actionPastTense}`, 'success');
       } else {
-        this.sendNotification(`${successCount} approved, ${failedCount} failed`, 'warning');
+        this.sendNotification(`${successCount} ${actionPastTense}, ${failedCount} failed`, 'warning');
       }
     } catch (error) {
-      this.sendError('Failed to batch approve: ' + (error as Error).message);
+      this.sendError(`Failed to batch ${actionVerb}: ` + (error as Error).message);
     }
+  }
+
+  private async batchApprove(ids: string[], response: string) {
+    await this.executeBatchOperation(
+      ids,
+      (id, resp) => this._specWorkflowService.approveRequest(id, resp),
+      'approving',
+      'approved',
+      response
+    );
   }
 
   private async batchReject(ids: string[], response: string) {
-    try {
-      console.log(`SidebarProvider: Batch rejecting ${ids.length} requests`);
-      let successCount = 0;
-      let failedCount = 0;
-
-      for (const id of ids) {
-        try {
-          await this._specWorkflowService.rejectRequest(id, response);
-          successCount++;
-        } catch (error) {
-          console.error(`Failed to reject request ${id}:`, error);
-          failedCount++;
-        }
-      }
-
-      await this.sendApprovals();
-      await this.sendApprovalCategories();
-
-      if (failedCount === 0) {
-        this.sendNotification(`${successCount} requests rejected`, 'success');
-      } else {
-        this.sendNotification(`${successCount} rejected, ${failedCount} failed`, 'warning');
-      }
-    } catch (error) {
-      this.sendError('Failed to batch reject: ' + (error as Error).message);
-    }
+    await this.executeBatchOperation(
+      ids,
+      (id, resp) => this._specWorkflowService.rejectRequest(id, resp),
+      'rejecting',
+      'rejected',
+      response
+    );
   }
 
   private async batchRequestRevision(ids: string[], response: string) {
-    try {
-      console.log(`SidebarProvider: Batch requesting revision for ${ids.length} requests`);
-      let successCount = 0;
-      let failedCount = 0;
-
-      for (const id of ids) {
-        try {
-          await this._specWorkflowService.requestRevisionRequest(id, response);
-          successCount++;
-        } catch (error) {
-          console.error(`Failed to request revision for ${id}:`, error);
-          failedCount++;
-        }
-      }
-
-      await this.sendApprovals();
-      await this.sendApprovalCategories();
-
-      if (failedCount === 0) {
-        this.sendNotification(`Revision requested for ${successCount} items`, 'success');
-      } else {
-        this.sendNotification(`${successCount} revised, ${failedCount} failed`, 'warning');
-      }
-    } catch (error) {
-      this.sendError('Failed to batch request revision: ' + (error as Error).message);
-    }
+    await this.executeBatchOperation(
+      ids,
+      (id, resp) => this._specWorkflowService.requestRevisionRequest(id, resp),
+      'requesting revision for',
+      'revised',
+      response
+    );
   }
 
   private async sendApprovalContent(id: string) {

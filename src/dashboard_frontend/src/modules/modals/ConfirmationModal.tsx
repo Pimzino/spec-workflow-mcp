@@ -23,14 +23,26 @@ export function ConfirmationModal({
   variant = 'default'
 }: ConfirmationModalProps) {
   const { t } = useTranslation();
-  
+
   const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Clear error when modal is closed/reopened
+  React.useEffect(() => {
+    if (isOpen) {
+      setError(null);
+    }
+  }, [isOpen]);
 
   const handleConfirm = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       await onConfirm();
       onClose();
+    } catch (err: any) {
+      // Keep modal open and show error to user
+      setError(err?.message || 'An error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -80,6 +92,11 @@ export function ConfirmationModal({
           <p className="text-[var(--text-secondary)]">
             {message}
           </p>
+          {error && (
+            <div className="mt-4 p-3 text-sm text-red-700 bg-red-100 dark:text-red-200 dark:bg-red-900/30 rounded-md">
+              {error}
+            </div>
+          )}
         </div>
 
         {/* Footer */}

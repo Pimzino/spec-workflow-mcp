@@ -5,7 +5,9 @@ import { tmpdir } from 'os';
 import {
   isLocalhostAddress,
   getSecurityConfig,
+  generateAllowedOrigins,
   DEFAULT_SECURITY_CONFIG,
+  VITE_DEV_PORT,
   RateLimiter,
   AuditLogger,
   AuditLogEntry,
@@ -63,6 +65,49 @@ describe('security-utils', () => {
       expect(DEFAULT_SECURITY_CONFIG.corsEnabled).toBe(true);
       expect(DEFAULT_SECURITY_CONFIG.allowedOrigins).toContain('http://localhost:5000');
       expect(DEFAULT_SECURITY_CONFIG.allowedOrigins).toContain('http://127.0.0.1:5000');
+    });
+  });
+
+  describe('generateAllowedOrigins', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalNodeEnv;
+    });
+
+    it('should include dashboard port origins', () => {
+      const origins = generateAllowedOrigins(5000);
+      expect(origins).toContain('http://localhost:5000');
+      expect(origins).toContain('http://127.0.0.1:5000');
+    });
+
+    it('should include Vite dev port in non-production environments', () => {
+      process.env.NODE_ENV = 'development';
+      const origins = generateAllowedOrigins(5000);
+      expect(origins).toContain(`http://localhost:${VITE_DEV_PORT}`);
+      expect(origins).toContain(`http://127.0.0.1:${VITE_DEV_PORT}`);
+    });
+
+    it('should include Vite dev port when NODE_ENV is undefined', () => {
+      // This is the key test - when NODE_ENV is not set, we should still include Vite dev port
+      // because we check !== 'production' rather than === 'development'
+      delete process.env.NODE_ENV;
+      const origins = generateAllowedOrigins(5000);
+      expect(origins).toContain(`http://localhost:${VITE_DEV_PORT}`);
+      expect(origins).toContain(`http://127.0.0.1:${VITE_DEV_PORT}`);
+    });
+
+    it('should NOT include Vite dev port in production', () => {
+      process.env.NODE_ENV = 'production';
+      const origins = generateAllowedOrigins(5000);
+      expect(origins).not.toContain(`http://localhost:${VITE_DEV_PORT}`);
+      expect(origins).not.toContain(`http://127.0.0.1:${VITE_DEV_PORT}`);
+    });
+
+    it('should use custom port for dashboard origins', () => {
+      const origins = generateAllowedOrigins(3000);
+      expect(origins).toContain('http://localhost:3000');
+      expect(origins).toContain('http://127.0.0.1:3000');
     });
   });
 
