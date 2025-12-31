@@ -375,7 +375,8 @@
       "quickReject": "即時却下",
       "reject": "却下",
       "requestRevisions": "修正を依頼",
-      "revisions": "修正"
+      "revisions": "修正",
+      "useBatchActions": "複数アイテムにはバッチアクションを使用"
     },
     "tooltips": {
       "goToAnnotations": "注釈に移動",
@@ -397,6 +398,11 @@
       "placeholder": "却下する理由やフィードバックを入力してください...",
       "submit": "却下"
     },
+    "batchReject": {
+      "title": "{{count}}件のアイテムを却下",
+      "placeholder": "選択したすべてのアイテムに適用される却下理由を入力してください（例：'主任エンジニアのレビューが必要'）...",
+      "submit": "すべて却下"
+    },
     "approvalWarning": {
       "title": "承認できません",
       "message": "コメントが存在する場合は承認できません。\"修正を依頼\"を使用してフィードバックを送信してください。"
@@ -404,6 +410,36 @@
     "revision": {
       "noCommentsTitle": "コメントが追加されていません",
       "noCommentsMessage": "修正を依頼する前に少なくとも1つコメントを追加してください。"
+    },
+    "selection": {
+      "enterMode": "項目を選択",
+      "exitMode": "選択をキャンセル",
+      "select": "選択",
+      "selectAll": "すべて選択",
+      "selectedCount_one": "{{count}}件選択",
+      "selectedCount_other": "{{count}}件選択",
+      "selectItem": "{{title}}を選択",
+      "approveSelected": "選択項目を承認",
+      "rejectSelected": "選択項目を却下"
+    },
+    "batchConfirm": {
+      "title": "一括操作の確認",
+      "message": "{{count}}件の項目を{{action}}しようとしています。この操作は取り消せません。続行しますか？",
+      "confirm": "はい、続行します"
+    },
+    "batchResult": {
+      "title": "{{total}}件中{{succeeded}}件処理完了",
+      "failedCount_one": "{{count}}件失敗",
+      "failedCount_other": "{{count}}件失敗",
+      "undo": "元に戻す"
+    },
+    "notifications": {
+      "approved": "「{{title}}」が承認されました",
+      "approveFailed": "「{{title}}」の承認に失敗しました",
+      "rejected": "「{{title}}」が却下されました",
+      "rejectFailed": "「{{title}}」の却下に失敗しました",
+      "revisionRequested": "「{{title}}」の修正が要求されました",
+      "revisionFailed": "「{{title}}」の修正要求に失敗しました"
     }
   },
   "logsPage": {

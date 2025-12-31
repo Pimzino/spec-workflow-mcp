@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useApi, DocumentSnapshot, DiffResult } from '../api/api';
-import { ApprovalsAnnotator, ApprovalComment, ViewMode } from '../approvals/ApprovalsAnnotator';
-import { NotificationProvider } from '../notifications/NotificationProvider';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { useApi, DocumentSnapshot, DiffResult, BatchApprovalResult } from '../api/api';
+import { ApprovalsAnnotator, ApprovalComment } from '../approvals/ApprovalsAnnotator';
+import { useNotifications } from '../notifications/NotificationProvider';
 import { TextInputModal } from '../modals/TextInputModal';
 import { AlertModal } from '../modals/AlertModal';
+import { ConfirmationModal } from '../modals/ConfirmationModal';
 import { DiffViewer } from '../diff/DiffViewer';
 import { DiffStats, DiffStatsBadge } from '../diff/DiffStats';
 import { formatSnapshotTimestamp, createVersionLabel, hasDiffChanges, getSnapshotTriggerDescription } from '../diff/utils';
@@ -20,8 +21,17 @@ function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
 }
 
 
-function ApprovalItem({ a }: { a: any }) {
-  const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff } = useApi();
+interface ApprovalItemProps {
+  a: any;
+  selectionMode: boolean;
+  isSelected: boolean;
+  selectedCount: number;
+  onToggleSelection: (id: string) => void;
+}
+
+function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection }: ApprovalItemProps) {
+  const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll } = useApi();
+  const { showNotification } = useNotifications();
   const { t } = useTranslation();
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -131,9 +141,17 @@ function ApprovalItem({ a }: { a: any }) {
     }
     setActionLoading('approve');
     try {
-      await approvalsAction(a.id, 'approve', { response: t('approvalsPage.messages.approvedViaDashboard') });
-      setOpen(false);
+      const result = await approvalsAction(a.id, 'approve', { response: t('approvalsPage.messages.approvedViaDashboard') });
+      if (result.ok) {
+        showNotification(t('approvalsPage.notifications.approved', { title: a.title }), 'success');
+        setOpen(false);
+        await reloadAll();
+      } else {
+        showNotification(t('approvalsPage.notifications.approveFailed', { title: a.title }), 'error');
+        console.error('Approval failed with status:', result.status);
+      }
     } catch (error) {
+      showNotification(t('approvalsPage.notifications.approveFailed', { title: a.title }), 'error');
       console.error('Failed to approve:', error);
     } finally {
       setActionLoading(null);
@@ -147,9 +165,17 @@ function ApprovalItem({ a }: { a: any }) {
   const handleRejectWithFeedback = async (feedback: string) => {
     setActionLoading('reject');
     try {
-      await approvalsAction(a.id, 'reject', { response: feedback });
-      setOpen(false);
+      const result = await approvalsAction(a.id, 'reject', { response: feedback });
+      if (result.ok) {
+        showNotification(t('approvalsPage.notifications.rejected', { title: a.title }), 'success');
+        setOpen(false);
+        await reloadAll();
+      } else {
+        showNotification(t('approvalsPage.notifications.rejectFailed', { title: a.title }), 'error');
+        console.error('Rejection failed with status:', result.status);
+      }
     } catch (error) {
+      showNotification(t('approvalsPage.notifications.rejectFailed', { title: a.title }), 'error');
       console.error('Failed to reject:', error);
     } finally {
       setActionLoading(null);
@@ -193,10 +219,18 @@ function ApprovalItem({ a }: { a: any }) {
 
     setActionLoading('revision');
     try {
-      await approvalsAction(a.id, 'needs-revision', payload);
-      setOpen(false);
-      setComments([]);
+      const result = await approvalsAction(a.id, 'needs-revision', payload);
+      if (result.ok) {
+        showNotification(t('approvalsPage.notifications.revisionRequested', { title: a.title }), 'success');
+        setOpen(false);
+        setComments([]);
+        await reloadAll();
+      } else {
+        showNotification(t('approvalsPage.notifications.revisionFailed', { title: a.title }), 'error');
+        console.error('Request revision failed with status:', result.status);
+      }
     } catch (error) {
+      showNotification(t('approvalsPage.notifications.revisionFailed', { title: a.title }), 'error');
       console.error('Failed to request revision:', error);
     } finally {
       setActionLoading(null);
@@ -204,9 +238,21 @@ function ApprovalItem({ a }: { a: any }) {
   };
 
   return (
-    <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg transition-colors overflow-hidden max-w-full">
+    <div className={`bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg transition-colors overflow-hidden max-w-full ${isSelected ? 'ring-2 ring-blue-500' : ''}`}>
       <div className="p-3 sm:p-4 md:p-6 lg:p-8 min-w-0 max-w-full overflow-x-hidden">
         <div className="flex items-start justify-between">
+          {/* Selection Checkbox */}
+          {selectionMode && (
+            <div className="flex-shrink-0 mr-3 pt-1">
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => onToggleSelection(a.id)}
+                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                aria-label={t('approvalsPage.selection.selectItem', { title: a.title })}
+              />
+            </div>
+          )}
           <div className="flex-1 min-w-0">
             <h3 className="text-base sm:text-lg md:text-xl font-medium text-[var(--text-primary)] mb-2 truncate">
               {a.title}
@@ -277,7 +323,8 @@ function ApprovalItem({ a }: { a: any }) {
 
               <button
                 onClick={handleApprove}
-                disabled={!!actionLoading}
+                disabled={!!actionLoading || selectedCount > 1}
+                title={selectedCount > 1 ? t('approvalsPage.actions.useBatchActions') : undefined}
                 className="btn bg-green-600 hover:bg-green-700 focus:ring-green-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 min-w-0 touch-manipulation"
               >
                 {actionLoading === 'approve' ? (
@@ -296,7 +343,8 @@ function ApprovalItem({ a }: { a: any }) {
 
               <button
                 onClick={handleReject}
-                disabled={!!actionLoading}
+                disabled={!!actionLoading || selectedCount > 1}
+                title={selectedCount > 1 ? t('approvalsPage.actions.useBatchActions') : undefined}
                 className="btn bg-red-600 hover:bg-red-700 focus:ring-red-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 min-w-0 touch-manipulation"
               >
                 {actionLoading === 'reject' ? (
@@ -584,9 +632,21 @@ function ApprovalItem({ a }: { a: any }) {
 }
 
 function Content() {
-  const { approvals } = useApi();
+  const { approvals, approvalsActionBatch, approvalsUndoBatch, reloadAll } = useApi();
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const { t } = useTranslation();
+
+  // Selection Mode state
+  const [selectionMode, setSelectionMode] = useState<boolean>(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [batchLoading, setBatchLoading] = useState<boolean>(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
+  const [batchRejectModalOpen, setBatchRejectModalOpen] = useState<boolean>(false);
+  const [pendingAction, setPendingAction] = useState<'approve' | 'reject' | null>(null);
+  const [batchResult, setBatchResult] = useState<BatchApprovalResult | null>(null);
+  const [showResultToast, setShowResultToast] = useState<boolean>(false);
+  const [lastBatchOperation, setLastBatchOperation] = useState<{ ids: string[]; action: string } | null>(null);
+  const [undoTimeoutId, setUndoTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   // Get unique categories from approvals
   const categories = useMemo(() => {
@@ -603,11 +663,11 @@ function Content() {
   // Filter approvals based on selected category and status (only show pending)
   const filteredApprovals = useMemo(() => {
     let filtered = approvals.filter(a => a.status === 'pending');
-    
+
     if (filterCategory !== 'all') {
       filtered = filtered.filter(a => (a as any).categoryName === filterCategory);
     }
-    
+
     return filtered;
   }, [approvals, filterCategory]);
 
@@ -615,6 +675,134 @@ function Content() {
   const pendingCount = useMemo(() => {
     return filteredApprovals.filter(a => a.status === 'pending').length;
   }, [filteredApprovals]);
+
+  // Selection handlers
+  const handleToggleSelection = useCallback((id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedIds.size === filteredApprovals.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredApprovals.map(a => a.id)));
+    }
+  }, [filteredApprovals, selectedIds.size]);
+
+  const exitSelectionMode = useCallback(() => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  }, []);
+
+  // Batch action handlers
+  const handleBatchAction = useCallback(async (action: 'approve' | 'reject') => {
+    // For reject, always show feedback modal to collect reason
+    if (action === 'reject') {
+      setBatchRejectModalOpen(true);
+      return;
+    }
+
+    // For approve: require confirmation for >5 items
+    if (selectedIds.size > 5) {
+      setPendingAction(action);
+      setConfirmModalOpen(true);
+      return;
+    }
+    await executeBatchAction(action);
+  }, [selectedIds.size]);
+
+  const executeBatchAction = useCallback(async (action: 'approve' | 'reject', feedback?: string) => {
+    setBatchLoading(true);
+    try {
+      const idsArray = Array.from(selectedIds);
+      const result = await approvalsActionBatch(
+        idsArray,
+        action,
+        feedback || `Batch ${action}d via dashboard`
+      );
+
+      if (result.ok && result.data) {
+        setBatchResult(result.data);
+        setShowResultToast(true);
+
+        // Store operation for undo (only successful IDs)
+        if (result.data.succeeded.length > 0) {
+          setLastBatchOperation({
+            ids: result.data.succeeded,
+            action: action
+          });
+        }
+
+        // Set up undo timeout - 30 seconds for undo window
+        const timeoutId = setTimeout(() => {
+          setShowResultToast(false);
+          setLastBatchOperation(null);
+        }, 30000);
+        setUndoTimeoutId(timeoutId);
+
+        // Clear selection and reload
+        setSelectedIds(new Set());
+        exitSelectionMode();
+        await reloadAll();
+      }
+    } catch (error) {
+      console.error('Batch action failed:', error);
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [selectedIds, approvalsActionBatch, reloadAll, exitSelectionMode]);
+
+  const handleConfirmBatchAction = useCallback(async () => {
+    if (pendingAction) {
+      await executeBatchAction(pendingAction);
+    }
+    // Modal closes itself after async operation completes
+    setPendingAction(null);
+  }, [pendingAction, executeBatchAction]);
+
+  const handleBatchRejectWithFeedback = useCallback(async (feedback: string) => {
+    setBatchRejectModalOpen(false);
+    await executeBatchAction('reject', feedback);
+  }, [executeBatchAction]);
+
+  const handleUndo = useCallback(async () => {
+    if (!lastBatchOperation) return;
+
+    // Clear the timeout
+    if (undoTimeoutId) {
+      clearTimeout(undoTimeoutId);
+      setUndoTimeoutId(null);
+    }
+
+    // Hide toast immediately
+    setShowResultToast(false);
+
+    setBatchLoading(true);
+    try {
+      const result = await approvalsUndoBatch(lastBatchOperation.ids);
+      if (result.ok) {
+        // Clear the last operation
+        setLastBatchOperation(null);
+        setBatchResult(null);
+        await reloadAll();
+      }
+    } catch (error) {
+      console.error('Undo failed:', error);
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [lastBatchOperation, undoTimeoutId, approvalsUndoBatch, reloadAll]);
+
+  const isAllSelected = filteredApprovals.length > 0 && selectedIds.size === filteredApprovals.length;
+  const isSomeSelected = selectedIds.size > 0 && selectedIds.size < filteredApprovals.length;
 
   return (
     <div className="grid gap-4 max-w-full overflow-x-hidden">
@@ -628,16 +816,95 @@ function Content() {
                 {t('approvalsPage.header.subtitle')}
               </p>
             </div>
-            <div className="flex items-center gap-3 text-sm text-[var(--text-muted)]">
-              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                 pendingCount > 0
                   ? 'bg-[var(--status-warning-muted)] text-[var(--status-warning)]'
                   : 'bg-[var(--status-success-muted)] text-[var(--status-success)]'
               }`}>
                 {t('approvalsPage.pendingCount', { count: pendingCount })}
               </span>
+
+              {/* Selection Mode Toggle */}
+              {filteredApprovals.length > 0 && (
+                <button
+                  onClick={() => selectionMode ? exitSelectionMode() : setSelectionMode(true)}
+                  className={`btn text-xs sm:text-sm flex items-center gap-1.5 ${
+                    selectionMode
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  <span className="hidden sm:inline">
+                    {selectionMode ? t('approvalsPage.selection.exitMode') : t('approvalsPage.selection.enterMode')}
+                  </span>
+                  <span className="sm:hidden">
+                    {selectionMode ? t('common.cancel') : t('approvalsPage.selection.select')}
+                  </span>
+                </button>
+              )}
             </div>
           </div>
+
+          {/* Selection Mode Toolbar */}
+          {selectionMode && (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-3">
+                {/* Select All Checkbox */}
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected}
+                    ref={(el) => {
+                      if (el) el.indeterminate = isSomeSelected;
+                    }}
+                    onChange={handleSelectAll}
+                    className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('approvalsPage.selection.selectAll')}
+                  </span>
+                </label>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('approvalsPage.selection.selectedCount', { count: selectedIds.size })}
+                </span>
+              </div>
+
+              {/* Batch Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleBatchAction('approve')}
+                  disabled={selectedIds.size === 0 || batchLoading}
+                  className="btn bg-green-600 hover:bg-green-700 focus:ring-green-500 text-white text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  {batchLoading ? (
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  <span>{t('approvalsPage.selection.approveSelected')}</span>
+                </button>
+                <button
+                  onClick={() => handleBatchAction('reject')}
+                  disabled={selectedIds.size === 0 || batchLoading}
+                  className="btn bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>{t('approvalsPage.selection.rejectSelected')}</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Filter Dropdown */}
           {categories.length > 1 && (
@@ -675,8 +942,103 @@ function Content() {
       ) : (
         <div className="space-y-3 sm:space-y-4 max-w-full overflow-x-hidden">
           {filteredApprovals.map((a) => (
-            <ApprovalItem key={a.id} a={a} />
+            <ApprovalItem
+              key={a.id}
+              a={a}
+              selectionMode={selectionMode}
+              isSelected={selectedIds.has(a.id)}
+              selectedCount={selectedIds.size}
+              onToggleSelection={handleToggleSelection}
+            />
           ))}
+        </div>
+      )}
+
+      {/* Batch Confirmation Modal (for >5 items) */}
+      <ConfirmationModal
+        isOpen={confirmModalOpen}
+        onClose={() => {
+          setConfirmModalOpen(false);
+          setPendingAction(null);
+        }}
+        onConfirm={handleConfirmBatchAction}
+        title={t('approvalsPage.batchConfirm.title')}
+        message={t('approvalsPage.batchConfirm.message', {
+          count: selectedIds.size,
+          action: pendingAction === 'approve' ? t('approvalsPage.actions.approve').toLowerCase() : t('approvalsPage.actions.reject').toLowerCase()
+        })}
+        confirmText={t('approvalsPage.batchConfirm.confirm')}
+        cancelText={t('common.cancel')}
+        variant={pendingAction === 'reject' ? 'danger' : 'default'}
+      />
+
+      {/* Batch Rejection Feedback Modal */}
+      <TextInputModal
+        isOpen={batchRejectModalOpen}
+        onClose={() => setBatchRejectModalOpen(false)}
+        onSubmit={handleBatchRejectWithFeedback}
+        title={t('approvalsPage.batchReject.title', { count: selectedIds.size })}
+        placeholder={t('approvalsPage.batchReject.placeholder')}
+        submitText={t('approvalsPage.batchReject.submit')}
+        multiline={true}
+      />
+
+      {/* Batch Result Toast */}
+      {showResultToast && batchResult && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+          <div className={`p-4 rounded-lg shadow-lg ${
+            batchResult.failed.length > 0
+              ? 'bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-800'
+              : 'bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-800'
+          }`}>
+            <div className="flex items-start gap-3">
+              {batchResult.failed.length > 0 ? (
+                <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              <div className="flex-1">
+                <p className={`text-sm font-medium ${
+                  batchResult.failed.length > 0
+                    ? 'text-yellow-800 dark:text-yellow-200'
+                    : 'text-green-800 dark:text-green-200'
+                }`}>
+                  {t('approvalsPage.batchResult.title', {
+                    succeeded: batchResult.succeeded.length,
+                    total: batchResult.total
+                  })}
+                </p>
+                {batchResult.failed.length > 0 && (
+                  <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                    {t('approvalsPage.batchResult.failedCount', { count: batchResult.failed.length })}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {lastBatchOperation && (
+                  <button
+                    onClick={handleUndo}
+                    className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
+                    disabled={batchLoading}
+                  >
+                    {t('approvalsPage.batchResult.undo')}
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowResultToast(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

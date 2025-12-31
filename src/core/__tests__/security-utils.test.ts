@@ -69,7 +69,15 @@ describe('security-utils', () => {
   describe('getSecurityConfig', () => {
     it('should return defaults when no config provided', () => {
       const config = getSecurityConfig();
-      expect(config).toEqual(DEFAULT_SECURITY_CONFIG);
+      // In non-production, dynamic origins include Vite dev server ports
+      expect(config.rateLimitEnabled).toBe(DEFAULT_SECURITY_CONFIG.rateLimitEnabled);
+      expect(config.rateLimitPerMinute).toBe(DEFAULT_SECURITY_CONFIG.rateLimitPerMinute);
+      expect(config.auditLogEnabled).toBe(DEFAULT_SECURITY_CONFIG.auditLogEnabled);
+      expect(config.auditLogRetentionDays).toBe(DEFAULT_SECURITY_CONFIG.auditLogRetentionDays);
+      expect(config.corsEnabled).toBe(DEFAULT_SECURITY_CONFIG.corsEnabled);
+      // allowedOrigins includes default port + Vite dev port (5173) in non-production
+      expect(config.allowedOrigins).toContain('http://localhost:5000');
+      expect(config.allowedOrigins).toContain('http://127.0.0.1:5000');
     });
 
     it('should merge user config with defaults', () => {

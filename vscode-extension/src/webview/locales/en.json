@@ -78,7 +78,15 @@
     "openInEditor": "Open in Editor",
     "noPending": "No pending approvals for this specification",
     "noPendingDocuments": "No documents with pending approvals found",
-    "selectCategory": "Select a category above to view pending approvals"
+    "selectCategory": "Select a category above to view pending approvals",
+    "select": "Select",
+    "cancel": "Cancel",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "selectedCount": "{{count}} selected",
+    "pendingCount": "{{count}} pending",
+    "approveAll": "Approve All",
+    "rejectAll": "Reject All"
   },
   "specs": {
     "active": "Active",

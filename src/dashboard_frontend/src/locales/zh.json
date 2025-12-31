@@ -375,7 +375,8 @@
       "quickReject": "快速拒绝",
       "reject": "拒绝",
       "requestRevisions": "请求修订",
-      "revisions": "修订"
+      "revisions": "修订",
+      "useBatchActions": "使用批量操作处理多个项目"
     },
     "tooltips": {
       "goToAnnotations": "跳转到注释",
@@ -397,6 +398,11 @@
       "placeholder": "请输入拒绝原因或反馈...",
       "submit": "拒绝"
     },
+    "batchReject": {
+      "title": "拒绝 {{count}} 项",
+      "placeholder": "输入将应用于所有选定项的拒绝原因（例如：'需要首席工程师审核'）...",
+      "submit": "全部拒绝"
+    },
     "approvalWarning": {
       "title": "无法批准",
       "message": "存在评论时无法批准。请使用“请求修订”发送反馈。"
@@ -404,6 +410,36 @@
     "revision": {
       "noCommentsTitle": "尚未添加评论",
       "noCommentsMessage": "在请求修订之前，请至少添加一条评论。"
+    },
+    "selection": {
+      "enterMode": "选择项目",
+      "exitMode": "取消选择",
+      "select": "选择",
+      "selectAll": "全选",
+      "selectedCount_one": "已选择 {{count}} 项",
+      "selectedCount_other": "已选择 {{count}} 项",
+      "selectItem": "选择 {{title}}",
+      "approveSelected": "批准所选",
+      "rejectSelected": "拒绝所选"
+    },
+    "batchConfirm": {
+      "title": "确认批量操作",
+      "message": "您即将{{action}} {{count}} 个项目。此操作无法撤销。确定要继续吗？",
+      "confirm": "是的，继续"
+    },
+    "batchResult": {
+      "title": "已处理 {{succeeded}}/{{total}} 个项目",
+      "failedCount_one": "{{count}} 项失败",
+      "failedCount_other": "{{count}} 项失败",
+      "undo": "撤销"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" 已批准",
+      "approveFailed": "批准 \"{{title}}\" 失败",
+      "rejected": "\"{{title}}\" 已拒绝",
+      "rejectFailed": "拒绝 \"{{title}}\" 失败",
+      "revisionRequested": "已请求修订 \"{{title}}\"",
+      "revisionFailed": "请求修订 \"{{title}}\" 失败"
     }
   },
   "logsPage": {

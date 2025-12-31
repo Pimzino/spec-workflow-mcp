@@ -375,7 +375,8 @@
       "quickReject": "رفض سريع",
       "reject": "رفض",
       "requestRevisions": "طلب مراجعات",
-      "revisions": "مراجعات"
+      "revisions": "مراجعات",
+      "useBatchActions": "استخدم الإجراءات المجمعة للعناصر المتعددة"
     },
     "tooltips": {
       "goToAnnotations": "الذهاب للتعليقات التوضيحية",
@@ -397,6 +398,11 @@
       "placeholder": "يرجى تقديم تغذية راجعة توضح سبب الرفض...",
       "submit": "رفض"
     },
+    "batchReject": {
+      "title": "رفض {{count}} عنصر",
+      "placeholder": "أدخل سبب الرفض الذي سيتم تطبيقه على جميع العناصر المحددة (مثال: 'يتطلب مراجعة المهندس الرئيسي')...",
+      "submit": "رفض الكل"
+    },
     "approvalWarning": {
       "title": "لا يمكن الموافقة",
       "message": "لا يمكن الموافقة عند وجود تعليقات. استخدم \"طلب مراجعات\" لإرسال التغذية الراجعة."
@@ -404,6 +410,36 @@
     "revision": {
       "noCommentsTitle": "لم تُضاف تعليقات",
       "noCommentsMessage": "يرجى إضافة تعليق واحد على الأقل قبل طلب المراجعات."
+    },
+    "selection": {
+      "enterMode": "تحديد العناصر",
+      "exitMode": "إلغاء التحديد",
+      "select": "تحديد",
+      "selectAll": "تحديد الكل",
+      "selectedCount_one": "{{count}} محدد",
+      "selectedCount_other": "{{count}} محددة",
+      "selectItem": "تحديد {{title}}",
+      "approveSelected": "الموافقة على المحدد",
+      "rejectSelected": "رفض المحدد"
+    },
+    "batchConfirm": {
+      "title": "تأكيد الإجراء المجمع",
+      "message": "أنت على وشك {{action}} {{count}} عناصر. لا يمكن التراجع عن هذا الإجراء. هل أنت متأكد أنك تريد المتابعة؟",
+      "confirm": "نعم، تابع"
+    },
+    "batchResult": {
+      "title": "تمت معالجة {{succeeded}} من {{total}} عنصر",
+      "failedCount_one": "فشل {{count}} عنصر",
+      "failedCount_other": "فشل {{count}} عناصر",
+      "undo": "تراجع"
+    },
+    "notifications": {
+      "approved": "تمت الموافقة على \"{{title}}\"",
+      "approveFailed": "فشل في الموافقة على \"{{title}}\"",
+      "rejected": "تم رفض \"{{title}}\"",
+      "rejectFailed": "فشل في رفض \"{{title}}\"",
+      "revisionRequested": "تم طلب مراجعات لـ \"{{title}}\"",
+      "revisionFailed": "فشل في طلب مراجعات لـ \"{{title}}\""
     }
   },
   "logsPage": {

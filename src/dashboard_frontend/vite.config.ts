@@ -16,6 +16,18 @@ async function createConfig() {
       outDir: 'dist',
       emptyOutDir: true,
     },
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:5002',
+          changeOrigin: true,
+        },
+        '/ws': {
+          target: 'ws://localhost:5002',
+          ws: true,
+        },
+      },
+    },
   };
 }
 

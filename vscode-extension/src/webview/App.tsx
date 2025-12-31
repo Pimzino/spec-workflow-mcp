@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import {
   Activity,
   CheckSquare,
+  Square,
   AlertCircle,
   RefreshCw,
   BookOpen,
@@ -21,7 +22,10 @@ import {
   ChevronDown,
   ChevronRight,
   Bot,
-  FileText
+  FileText,
+  Check,
+  X,
+  Minus
 } from 'lucide-react';
 import { vscodeApi, type SpecData, type TaskProgressData, type ApprovalData, type SteeringStatus, type DocumentInfo, type SoundNotificationConfig } from '@/lib/vscode-api';
 import { cn, formatDistanceToNow } from '@/lib/utils';
@@ -49,6 +53,11 @@ function App() {
   const [notification, setNotification] = useState<{message: string, level: 'info' | 'warning' | 'error' | 'success'} | null>(null);
   const [processingApproval, setProcessingApproval] = useState<string | null>(null);
   const [copiedTaskId, setCopiedTaskId] = useState<string | null>(null);
+
+  // Batch selection mode state
+  const [selectionMode, setSelectionMode] = useState<boolean>(false);
+  const [selectedApprovalIds, setSelectedApprovalIds] = useState<Set<string>>(new Set());
+  const [batchProcessing, setBatchProcessing] = useState<boolean>(false);
   const [copiedSteering, setCopiedSteering] = useState<boolean>(false);
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set());
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -134,6 +143,70 @@ function App() {
     }
     
     document.body.removeChild(textArea);
+  };
+
+  // Batch selection mode handlers
+  const toggleSelectionMode = () => {
+    if (selectionMode) {
+      // Exiting selection mode - clear selections
+      setSelectedApprovalIds(new Set());
+    }
+    setSelectionMode(!selectionMode);
+  };
+
+  const toggleApprovalSelection = (id: string) => {
+    setSelectedApprovalIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const selectAllApprovals = (approvalIds: string[]) => {
+    if (selectedApprovalIds.size === approvalIds.length) {
+      // All selected, deselect all
+      setSelectedApprovalIds(new Set());
+    } else {
+      // Select all
+      setSelectedApprovalIds(new Set(approvalIds));
+    }
+  };
+
+  const handleBatchApprove = () => {
+    if (selectedApprovalIds.size === 0) return;
+    setBatchProcessing(true);
+    vscodeApi.batchApprove(Array.from(selectedApprovalIds), t('approvals.response.approved'));
+    setTimeout(() => {
+      setBatchProcessing(false);
+      setSelectedApprovalIds(new Set());
+      setSelectionMode(false);
+    }, 2000);
+  };
+
+  const handleBatchReject = () => {
+    if (selectedApprovalIds.size === 0) return;
+    setBatchProcessing(true);
+    vscodeApi.batchReject(Array.from(selectedApprovalIds), t('approvals.response.rejected'));
+    setTimeout(() => {
+      setBatchProcessing(false);
+      setSelectedApprovalIds(new Set());
+      setSelectionMode(false);
+    }, 2000);
+  };
+
+  const handleBatchRevision = () => {
+    if (selectedApprovalIds.size === 0) return;
+    setBatchProcessing(true);
+    vscodeApi.batchRequestRevision(Array.from(selectedApprovalIds), t('approvals.response.needsRevision'));
+    setTimeout(() => {
+      setBatchProcessing(false);
+      setSelectedApprovalIds(new Set());
+      setSelectionMode(false);
+    }, 2000);
   };
 
   // Language change handler
@@ -1012,8 +1085,9 @@ Review the existing steering documents (if any) and help me improve or complete 
         </TabsContent>
 
         {/* Approvals Tab */}
-        <TabsContent value="approvals" className="space-y-3">
+        <TabsContent value="approvals" className="space-y-3 relative">
           <div className="space-y-3">
+            {/* Category Filter */}
             <div className="flex items-center space-x-2">
               <label className="text-sm font-medium">{t('approvals.docLabel')}:</label>
               <Select value={selectedApprovalCategory} onValueChange={setSelectedApprovalCategory}>
@@ -1026,8 +1100,8 @@ Review the existing steering documents (if any) and help me improve or complete 
                       <div className="flex items-center justify-between w-full">
                         <span>{category.label}</span>
                         {category.count > 0 && (
-                          <Badge 
-                            variant="secondary" 
+                          <Badge
+                            variant="secondary"
                             className="ml-2 h-4 w-4 p-0 text-xs flex items-center justify-center rounded-full min-w-[16px]"
                           >
                             {category.count}
@@ -1039,95 +1113,193 @@ Review the existing steering documents (if any) and help me improve or complete 
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Selection Mode Header */}
+            {selectedApprovalCategory && (() => {
+              const pendingApprovals = selectedApprovalCategory === 'all'
+                ? approvals.filter(approval => approval.status === 'pending')
+                : approvals.filter(approval =>
+                    approval.status === 'pending' && approval.categoryName === selectedApprovalCategory
+                  );
+
+              if (pendingApprovals.length === 0) return null;
+
+              const allSelected = pendingApprovals.length > 0 &&
+                pendingApprovals.every(a => selectedApprovalIds.has(a.id));
+              const someSelected = pendingApprovals.some(a => selectedApprovalIds.has(a.id));
+
+              return (
+                <div className="flex items-center justify-between p-2 bg-muted rounded-md">
+                  <div className="flex items-center gap-2">
+                    {selectionMode && (
+                      <button
+                        onClick={() => selectAllApprovals(pendingApprovals.map(a => a.id))}
+                        className="flex items-center justify-center w-4 h-4 rounded border border-gray-400 hover:border-primary transition-colors"
+                        title={allSelected ? t('approvals.deselectAll') : t('approvals.selectAll')}
+                      >
+                        {allSelected ? (
+                          <Check className="w-3 h-3 text-primary" />
+                        ) : someSelected ? (
+                          <Minus className="w-3 h-3 text-primary" />
+                        ) : null}
+                      </button>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {selectionMode
+                        ? t('approvals.selectedCount', { count: selectedApprovalIds.size })
+                        : t('approvals.pendingCount', { count: pendingApprovals.length })
+                      }
+                    </span>
+                  </div>
+                  <Button
+                    variant={selectionMode ? 'outline' : 'secondary'}
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={toggleSelectionMode}
+                  >
+                    {selectionMode ? (
+                      <>
+                        <X className="w-3 h-3 mr-1" />
+                        {t('approvals.cancel')}
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-3 h-3 mr-1" />
+                        {t('approvals.select')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              );
+            })()}
           </div>
 
           {selectedApprovalCategory ? (
             (() => {
               // Filter approvals based on selected category
-              const pendingApprovals = selectedApprovalCategory === 'all' 
+              const pendingApprovals = selectedApprovalCategory === 'all'
                 ? approvals.filter(approval => approval.status === 'pending')
-                : approvals.filter(approval => 
+                : approvals.filter(approval =>
                     approval.status === 'pending' && approval.categoryName === selectedApprovalCategory
                   );
-              
+
               return pendingApprovals.length > 0 ? (
-                <div className="space-y-2">
-                  {pendingApprovals.map(approval => (
-                    <Card key={approval.id}>
-                      <CardContent className="p-3">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-medium text-sm">{approval.title}</h3>
-                            <Badge variant="secondary" className="text-xs">
-                              {t('approvals.status.pending')}
-                            </Badge>
-                          </div>
-                          {approval.description && (
-                            <p className="text-xs text-muted-foreground">{approval.description}</p>
-                          )}
-                          {approval.filePath && (
-                            <p className="text-xs text-muted-foreground font-mono">
-                              {approval.filePath}
-                            </p>
-                          )}
-                          <div className="text-xs text-muted-foreground">
-                            {t('approvals.created', { time: formatDistanceToNow(approval.createdAt) })}
-                          </div>
-                          
-                          <div className="flex gap-1 flex-wrap">
-                            <Button
-                              size="sm"
-                              className="h-6 px-2 text-xs"
-                              disabled={processingApproval === approval.id}
-                              onClick={() => {
-                                setProcessingApproval(approval.id);
-                                vscodeApi.approveRequest(approval.id, t('approvals.response.approved'));
-                                setTimeout(() => setProcessingApproval(null), 2000);
-                              }}
-                            >
-                              {processingApproval === approval.id ? t('approvals.processing') : t('approvals.approve')}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-6 px-2 text-xs"
-                              disabled={processingApproval === approval.id}
-                              onClick={() => {
-                                setProcessingApproval(approval.id);
-                                vscodeApi.rejectRequest(approval.id, t('approvals.response.rejected'));
-                                setTimeout(() => setProcessingApproval(null), 2000);
-                              }}
-                            >
-                              {processingApproval === approval.id ? t('approvals.processing') : t('approvals.reject')}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-6 px-2 text-xs"
-                              disabled={processingApproval === approval.id}
-                              onClick={() => {
-                                setProcessingApproval(approval.id);
-                                vscodeApi.requestRevisionRequest(approval.id, t('approvals.response.needsRevision'));
-                                setTimeout(() => setProcessingApproval(null), 2000);
-                              }}
-                            >
-                              {processingApproval === approval.id ? t('approvals.processing') : t('approvals.requestRevision')}
-                            </Button>
+                <div className={cn("space-y-2", selectionMode && selectedApprovalIds.size > 0 && "pb-16")}>
+                  {pendingApprovals.map(approval => {
+                    const isSelected = selectedApprovalIds.has(approval.id);
+
+                    return (
+                      <Card
+                        key={approval.id}
+                        className={cn(
+                          "transition-colors cursor-pointer",
+                          selectionMode && isSelected && "border-primary bg-primary/5"
+                        )}
+                        onClick={selectionMode ? () => toggleApprovalSelection(approval.id) : undefined}
+                      >
+                        <CardContent className="p-3">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              {/* Selection Checkbox */}
+                              {selectionMode && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleApprovalSelection(approval.id);
+                                  }}
+                                  className={cn(
+                                    "flex items-center justify-center w-4 h-4 rounded border transition-colors flex-shrink-0",
+                                    isSelected
+                                      ? "bg-primary border-primary"
+                                      : "border-gray-400 hover:border-primary"
+                                  )}
+                                >
+                                  {isSelected && <Check className="w-3 h-3 text-white" />}
+                                </button>
+                              )}
+                              <div className="flex items-center justify-between flex-1 min-w-0">
+                                <h3 className="font-medium text-sm truncate">{approval.title}</h3>
+                                <Badge variant="secondary" className="text-xs flex-shrink-0 ml-2">
+                                  {t('approvals.status.pending')}
+                                </Badge>
+                              </div>
+                            </div>
+                            {approval.description && (
+                              <p className="text-xs text-muted-foreground">{approval.description}</p>
+                            )}
                             {approval.filePath && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-6 px-2 text-xs"
-                                onClick={() => vscodeApi.getApprovalContent(approval.id)}
-                              >
-                                {t('approvals.openInEditor')}
-                              </Button>
+                              <p className="text-xs text-muted-foreground font-mono truncate">
+                                {approval.filePath}
+                              </p>
+                            )}
+                            <div className="text-xs text-muted-foreground">
+                              {t('approvals.created', { time: formatDistanceToNow(approval.createdAt) })}
+                            </div>
+
+                            {/* Individual action buttons - hidden in selection mode */}
+                            {!selectionMode && (
+                              <div className="flex gap-1 flex-wrap">
+                                <Button
+                                  size="sm"
+                                  className="h-6 px-2 text-xs"
+                                  disabled={processingApproval === approval.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setProcessingApproval(approval.id);
+                                    vscodeApi.approveRequest(approval.id, t('approvals.response.approved'));
+                                    setTimeout(() => setProcessingApproval(null), 2000);
+                                  }}
+                                >
+                                  {processingApproval === approval.id ? t('approvals.processing') : t('approvals.approve')}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs"
+                                  disabled={processingApproval === approval.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setProcessingApproval(approval.id);
+                                    vscodeApi.rejectRequest(approval.id, t('approvals.response.rejected'));
+                                    setTimeout(() => setProcessingApproval(null), 2000);
+                                  }}
+                                >
+                                  {processingApproval === approval.id ? t('approvals.processing') : t('approvals.reject')}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs"
+                                  disabled={processingApproval === approval.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setProcessingApproval(approval.id);
+                                    vscodeApi.requestRevisionRequest(approval.id, t('approvals.response.needsRevision'));
+                                    setTimeout(() => setProcessingApproval(null), 2000);
+                                  }}
+                                >
+                                  {processingApproval === approval.id ? t('approvals.processing') : t('approvals.requestRevision')}
+                                </Button>
+                                {approval.filePath && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      vscodeApi.getApprovalContent(approval.id);
+                                    }}
+                                  >
+                                    {t('approvals.openInEditor')}
+                                  </Button>
+                                )}
+                              </div>
                             )}
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center text-muted-foreground text-sm py-8">
@@ -1138,6 +1310,38 @@ Review the existing steering documents (if any) and help me improve or complete 
           ) : (
             <div className="text-center text-muted-foreground text-sm py-8">
               {approvalCategories.length <= 1 ? t('approvals.noPendingDocuments') : t('approvals.selectCategory')}
+            </div>
+          )}
+
+          {/* Sticky Footer for Batch Actions */}
+          {selectionMode && selectedApprovalIds.size > 0 && (
+            <div className="fixed bottom-0 left-0 right-0 p-3 bg-background border-t shadow-lg z-10">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-medium">
+                  {t('approvals.selectedCount', { count: selectedApprovalIds.size })}
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    className="h-7 px-3 text-xs bg-green-600 hover:bg-green-700"
+                    disabled={batchProcessing}
+                    onClick={handleBatchApprove}
+                  >
+                    <Check className="w-3 h-3 mr-1" />
+                    {batchProcessing ? t('approvals.processing') : t('approvals.approveAll')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs border-red-300 text-red-600 hover:bg-red-50"
+                    disabled={batchProcessing}
+                    onClick={handleBatchReject}
+                  >
+                    <X className="w-3 h-3 mr-1" />
+                    {batchProcessing ? t('approvals.processing') : t('approvals.rejectAll')}
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </TabsContent>

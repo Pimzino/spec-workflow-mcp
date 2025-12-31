@@ -105,6 +105,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         case 'request-revision-request':
           await this.requestRevisionRequest(message.id, message.response, message.annotations, message.comments);
           break;
+        case 'batch-approve':
+          await this.batchApprove(message.ids, message.response);
+          break;
+        case 'batch-reject':
+          await this.batchReject(message.ids, message.response);
+          break;
+        case 'batch-request-revision':
+          await this.batchRequestRevision(message.ids, message.response);
+          break;
         case 'get-approval-content':
           await this.sendApprovalContent(message.id);
           break;
@@ -459,6 +468,93 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       this.sendNotification('Revision requested', 'success');
     } catch (error) {
       this.sendError('Failed to request revision: ' + (error as Error).message);
+    }
+  }
+
+  private async batchApprove(ids: string[], response: string) {
+    try {
+      console.log(`SidebarProvider: Batch approving ${ids.length} requests`);
+      let successCount = 0;
+      let failedCount = 0;
+
+      for (const id of ids) {
+        try {
+          await this._specWorkflowService.approveRequest(id, response);
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to approve request ${id}:`, error);
+          failedCount++;
+        }
+      }
+
+      await this.sendApprovals();
+      await this.sendApprovalCategories();
+
+      if (failedCount === 0) {
+        this.sendNotification(`${successCount} requests approved`, 'success');
+      } else {
+        this.sendNotification(`${successCount} approved, ${failedCount} failed`, 'warning');
+      }
+    } catch (error) {
+      this.sendError('Failed to batch approve: ' + (error as Error).message);
+    }
+  }
+
+  private async batchReject(ids: string[], response: string) {
+    try {
+      console.log(`SidebarProvider: Batch rejecting ${ids.length} requests`);
+      let successCount = 0;
+      let failedCount = 0;
+
+      for (const id of ids) {
+        try {
+          await this._specWorkflowService.rejectRequest(id, response);
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to reject request ${id}:`, error);
+          failedCount++;
+        }
+      }
+
+      await this.sendApprovals();
+      await this.sendApprovalCategories();
+
+      if (failedCount === 0) {
+        this.sendNotification(`${successCount} requests rejected`, 'success');
+      } else {
+        this.sendNotification(`${successCount} rejected, ${failedCount} failed`, 'warning');
+      }
+    } catch (error) {
+      this.sendError('Failed to batch reject: ' + (error as Error).message);
+    }
+  }
+
+  private async batchRequestRevision(ids: string[], response: string) {
+    try {
+      console.log(`SidebarProvider: Batch requesting revision for ${ids.length} requests`);
+      let successCount = 0;
+      let failedCount = 0;
+
+      for (const id of ids) {
+        try {
+          await this._specWorkflowService.requestRevisionRequest(id, response);
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to request revision for ${id}:`, error);
+          failedCount++;
+        }
+      }
+
+      await this.sendApprovals();
+      await this.sendApprovalCategories();
+
+      if (failedCount === 0) {
+        this.sendNotification(`Revision requested for ${successCount} items`, 'success');
+      } else {
+        this.sendNotification(`${successCount} revised, ${failedCount} failed`, 'warning');
+      }
+    } catch (error) {
+      this.sendError('Failed to batch request revision: ' + (error as Error).message);
     }
   }
 

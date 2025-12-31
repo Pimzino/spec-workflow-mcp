@@ -375,7 +375,8 @@
       "quickReject": "Schnell ablehnen",
       "reject": "Ablehnen",
       "requestRevisions": "Überarbeitungen anfordern",
-      "revisions": "Überarbeitungen"
+      "revisions": "Überarbeitungen",
+      "useBatchActions": "Batch-Aktionen für mehrere Elemente verwenden"
     },
     "tooltips": {
       "goToAnnotations": "Zu Annotationen gehen",
@@ -397,6 +398,11 @@
       "placeholder": "Bitte geben Sie Feedback an warum dies abgelehnt wird...",
       "submit": "Ablehnen"
     },
+    "batchReject": {
+      "title": "{{count}} Elemente ablehnen",
+      "placeholder": "Geben Sie einen Ablehnungsgrund ein, der für alle ausgewählten Elemente gilt (z.B. 'Benötigt Überprüfung durch leitenden Ingenieur')...",
+      "submit": "Alle ablehnen"
+    },
     "approvalWarning": {
       "title": "Kann nicht genehmigen",
       "message": "Kann nicht genehmigen wenn Kommentare existieren. Verwenden Sie \"Überarbeitungen anfordern\" um Feedback zu senden."
@@ -404,6 +410,36 @@
     "revision": {
       "noCommentsTitle": "Keine Kommentare hinzugefügt",
       "noCommentsMessage": "Bitte fügen Sie mindestens einen Kommentar hinzu bevor Sie Überarbeitungen anfordern."
+    },
+    "selection": {
+      "enterMode": "Elemente Auswählen",
+      "exitMode": "Auswahl Abbrechen",
+      "select": "Auswählen",
+      "selectAll": "Alle Auswählen",
+      "selectedCount_one": "{{count}} ausgewählt",
+      "selectedCount_other": "{{count}} ausgewählt",
+      "selectItem": "{{title}} auswählen",
+      "approveSelected": "Ausgewählte Genehmigen",
+      "rejectSelected": "Ausgewählte Ablehnen"
+    },
+    "batchConfirm": {
+      "title": "Massenaktion Bestätigen",
+      "message": "Sie sind dabei, {{count}} Elemente zu {{action}}. Diese Aktion kann nicht rückgängig gemacht werden. Sind Sie sicher, dass Sie fortfahren möchten?",
+      "confirm": "Ja, fortfahren"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} von {{total}} Elementen verarbeitet",
+      "failedCount_one": "{{count}} Element fehlgeschlagen",
+      "failedCount_other": "{{count}} Elemente fehlgeschlagen",
+      "undo": "Rückgängig"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" wurde genehmigt",
+      "approveFailed": "Genehmigung von \"{{title}}\" fehlgeschlagen",
+      "rejected": "\"{{title}}\" wurde abgelehnt",
+      "rejectFailed": "Ablehnung von \"{{title}}\" fehlgeschlagen",
+      "revisionRequested": "Überarbeitung für \"{{title}}\" angefordert",
+      "revisionFailed": "Anforderung der Überarbeitung für \"{{title}}\" fehlgeschlagen"
     }
   },
   "logsPage": {

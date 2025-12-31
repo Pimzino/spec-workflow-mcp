@@ -375,7 +375,8 @@
       "quickReject": "Rejeição Rápida",
       "reject": "Rejeitar",
       "requestRevisions": "Solicitar Revisões",
-      "revisions": "Revisões"
+      "revisions": "Revisões",
+      "useBatchActions": "Usar ações em lote para vários itens"
     },
     "tooltips": {
       "goToAnnotations": "Ir para anotações",
@@ -397,6 +398,11 @@
       "placeholder": "Por favor, forneça feedback explicando por que isso está sendo rejeitado...",
       "submit": "Rejeitar"
     },
+    "batchReject": {
+      "title": "Rejeitar {{count}} itens",
+      "placeholder": "Digite um motivo de rejeição que será aplicado a todos os itens selecionados (ex.: 'Necessita revisão do Engenheiro Principal')...",
+      "submit": "Rejeitar tudo"
+    },
     "approvalWarning": {
       "title": "Não É Possível Aprovar",
       "message": "Não é possível aprovar quando existem comentários. Use \"Solicitar Revisões\" para enviar feedback."
@@ -404,6 +410,36 @@
     "revision": {
       "noCommentsTitle": "Nenhum Comentário Adicionado",
       "noCommentsMessage": "Por favor, adicione pelo menos um comentário antes de solicitar revisões."
+    },
+    "selection": {
+      "enterMode": "Selecionar Itens",
+      "exitMode": "Cancelar Seleção",
+      "select": "Selecionar",
+      "selectAll": "Selecionar Tudo",
+      "selectedCount_one": "{{count}} selecionado",
+      "selectedCount_other": "{{count}} selecionados",
+      "selectItem": "Selecionar {{title}}",
+      "approveSelected": "Aprovar Selecionados",
+      "rejectSelected": "Rejeitar Selecionados"
+    },
+    "batchConfirm": {
+      "title": "Confirmar Ação em Lote",
+      "message": "Você está prestes a {{action}} {{count}} itens. Esta ação não pode ser desfeita. Tem certeza de que deseja continuar?",
+      "confirm": "Sim, continuar"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} de {{total}} itens processados",
+      "failedCount_one": "{{count}} item falhou",
+      "failedCount_other": "{{count}} itens falharam",
+      "undo": "Desfazer"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" foi aprovado",
+      "approveFailed": "Falha ao aprovar \"{{title}}\"",
+      "rejected": "\"{{title}}\" foi rejeitado",
+      "rejectFailed": "Falha ao rejeitar \"{{title}}\"",
+      "revisionRequested": "Revisões solicitadas para \"{{title}}\"",
+      "revisionFailed": "Falha ao solicitar revisões para \"{{title}}\""
     }
   },
   "logsPage": {

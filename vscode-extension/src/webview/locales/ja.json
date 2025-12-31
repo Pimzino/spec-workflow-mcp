@@ -78,7 +78,15 @@
     "openInEditor": "エディタで開く",
     "noPending": "この仕様書には保留中の承認はありません",
     "noPendingDocuments": "保留中の承認があるドキュメントが見つかりません",
-    "selectCategory": "保留中の承認を表示するには、上のカテゴリを選択してください"
+    "selectCategory": "保留中の承認を表示するには、上のカテゴリを選択してください",
+    "select": "選択",
+    "cancel": "キャンセル",
+    "selectAll": "すべて選択",
+    "deselectAll": "すべて解除",
+    "selectedCount": "{{count}}件選択中",
+    "pendingCount": "{{count}}件保留中",
+    "approveAll": "すべて承認",
+    "rejectAll": "すべて拒否"
   },
   "specs": {
     "active": "アクティブ",

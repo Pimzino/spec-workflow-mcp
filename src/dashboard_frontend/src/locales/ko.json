@@ -375,7 +375,8 @@
       "quickReject": "빠른 거부",
       "reject": "거부",
       "requestRevisions": "수정 요청",
-      "revisions": "수정"
+      "revisions": "수정",
+      "useBatchActions": "여러 항목에는 일괄 작업 사용"
     },
     "tooltips": {
       "goToAnnotations": "주석으로 이동",
@@ -397,6 +398,11 @@
       "placeholder": "이것이 거부되는 이유에 대한 피드백을 제공해 주세요...",
       "submit": "거부"
     },
+    "batchReject": {
+      "title": "{{count}}개 항목 거부",
+      "placeholder": "선택한 모든 항목에 적용될 거부 사유를 입력하세요 (예: '수석 엔지니어 검토 필요')...",
+      "submit": "모두 거부"
+    },
     "approvalWarning": {
       "title": "승인할 수 없음",
       "message": "코멘트가 있을 때는 승인할 수 없습니다. 피드백을 보내려면 \"수정 요청\"을 사용하세요."
@@ -404,6 +410,36 @@
     "revision": {
       "noCommentsTitle": "추가된 코멘트 없음",
       "noCommentsMessage": "수정을 요청하기 전에 최소 하나의 코멘트를 추가해 주세요."
+    },
+    "selection": {
+      "enterMode": "항목 선택",
+      "exitMode": "선택 취소",
+      "select": "선택",
+      "selectAll": "모두 선택",
+      "selectedCount_one": "{{count}}개 선택됨",
+      "selectedCount_other": "{{count}}개 선택됨",
+      "selectItem": "{{title}} 선택",
+      "approveSelected": "선택 항목 승인",
+      "rejectSelected": "선택 항목 거부"
+    },
+    "batchConfirm": {
+      "title": "일괄 작업 확인",
+      "message": "{{count}}개 항목을 {{action}}하려고 합니다. 이 작업은 취소할 수 없습니다. 계속하시겠습니까?",
+      "confirm": "예, 계속합니다"
+    },
+    "batchResult": {
+      "title": "{{total}}개 중 {{succeeded}}개 처리 완료",
+      "failedCount_one": "{{count}}개 실패",
+      "failedCount_other": "{{count}}개 실패",
+      "undo": "실행 취소"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\"이(가) 승인되었습니다",
+      "approveFailed": "\"{{title}}\" 승인에 실패했습니다",
+      "rejected": "\"{{title}}\"이(가) 거부되었습니다",
+      "rejectFailed": "\"{{title}}\" 거부에 실패했습니다",
+      "revisionRequested": "\"{{title}}\"에 대한 수정이 요청되었습니다",
+      "revisionFailed": "\"{{title}}\" 수정 요청에 실패했습니다"
     }
   },
   "logsPage": {
