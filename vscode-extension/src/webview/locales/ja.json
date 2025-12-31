@@ -87,7 +87,10 @@
     "pendingCount": "{{count}}件保留中",
     "approveAll": "すべて承認",
     "revisionAll": "すべて修正依頼",
-    "rejectAll": "すべて拒否"
+    "rejectAll": "すべて拒否",
+    "batch": {
+      "tooMany": "一度に{{limit}}件を超えるアイテムを処理することはできません"
+    }
   },
   "specs": {
     "active": "アクティブ",

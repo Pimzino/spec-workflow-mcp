@@ -87,7 +87,10 @@
     "pendingCount": "{{count}} ожидает",
     "approveAll": "Одобрить все",
     "revisionAll": "Доработать все",
-    "rejectAll": "Отклонить все"
+    "rejectAll": "Отклонить все",
+    "batch": {
+      "tooMany": "Невозможно обработать более {{limit}} элементов за раз"
+    }
   },
   "specs": {
     "active": "Активные",

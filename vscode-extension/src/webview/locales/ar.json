@@ -87,7 +87,10 @@
     "pendingCount": "{{count}} معلق",
     "approveAll": "موافقة على الكل",
     "revisionAll": "مراجعة الكل",
-    "rejectAll": "رفض الكل"
+    "rejectAll": "رفض الكل",
+    "batch": {
+      "tooMany": "لا يمكن معالجة أكثر من {{limit}} عنصر في المرة الواحدة"
+    }
   },
   "specs": {
     "active": "نشط",
