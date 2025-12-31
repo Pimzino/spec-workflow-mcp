@@ -82,7 +82,10 @@
     "pendingCount": "{{count}} 项待处理",
     "approveAll": "全部批准",
     "revisionAll": "全部请求修订",
-    "rejectAll": "全部拒绝"
+    "rejectAll": "全部拒绝",
+    "batch": {
+      "tooMany": "一次不能处理超过{{limit}}个项目"
+    }
   },
   "specs": {
     "active": "活跃",

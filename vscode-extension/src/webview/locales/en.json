@@ -87,7 +87,10 @@
     "pendingCount": "{{count}} pending",
     "approveAll": "Approve All",
     "revisionAll": "Revise All",
-    "rejectAll": "Reject All"
+    "rejectAll": "Reject All",
+    "batch": {
+      "tooMany": "Cannot process more than {{limit}} items at once"
+    }
   },
   "specs": {
     "active": "Active",

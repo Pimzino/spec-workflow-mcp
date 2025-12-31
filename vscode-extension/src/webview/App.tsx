@@ -34,6 +34,10 @@ import { useVSCodeTheme } from '@/hooks/useVSCodeTheme';
 import { useSoundNotifications } from '@/hooks/useSoundNotifications';
 import { LogsPage } from '@/pages/LogsPage';
 
+// Constants for batch operations - matches dashboard limits
+const BATCH_SIZE_LIMIT = 100;
+const BATCH_OPERATION_FEEDBACK_DELAY = 2000;
+
 function App() {
   const { t, i18n } = useTranslation();
   console.log('=== WEBVIEW APP.TSX STARTING ===');
@@ -179,35 +183,47 @@ function App() {
 
   const handleBatchApprove = () => {
     if (selectedApprovalIds.size === 0) {return;}
+    if (selectedApprovalIds.size > BATCH_SIZE_LIMIT) {
+      setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
+      return;
+    }
     setBatchProcessing(true);
     vscodeApi.batchApprove(Array.from(selectedApprovalIds), t('approvals.response.approved'));
     setTimeout(() => {
       setBatchProcessing(false);
       setSelectedApprovalIds(new Set());
       setSelectionMode(false);
-    }, 2000);
+    }, BATCH_OPERATION_FEEDBACK_DELAY);
   };
 
   const handleBatchReject = () => {
     if (selectedApprovalIds.size === 0) {return;}
+    if (selectedApprovalIds.size > BATCH_SIZE_LIMIT) {
+      setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
+      return;
+    }
     setBatchProcessing(true);
     vscodeApi.batchReject(Array.from(selectedApprovalIds), t('approvals.response.rejected'));
     setTimeout(() => {
       setBatchProcessing(false);
       setSelectedApprovalIds(new Set());
       setSelectionMode(false);
-    }, 2000);
+    }, BATCH_OPERATION_FEEDBACK_DELAY);
   };
 
   const handleBatchRevision = () => {
     if (selectedApprovalIds.size === 0) {return;}
+    if (selectedApprovalIds.size > BATCH_SIZE_LIMIT) {
+      setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
+      return;
+    }
     setBatchProcessing(true);
     vscodeApi.batchRequestRevision(Array.from(selectedApprovalIds), t('approvals.response.needsRevision'));
     setTimeout(() => {
       setBatchProcessing(false);
       setSelectedApprovalIds(new Set());
       setSelectionMode(false);
-    }, 2000);
+    }, BATCH_OPERATION_FEEDBACK_DELAY);
   };
 
   // Language change handler

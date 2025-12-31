@@ -33,9 +33,10 @@ export const VITE_DEV_PORT = 5173;
 export function generateAllowedOrigins(port: number): string[] {
   const origins = [`http://localhost:${port}`, `http://127.0.0.1:${port}`];
 
-  // In development, also allow Vite dev server origin (port 5173)
+  // In non-production environments, also allow Vite dev server origin (port 5173)
   // The Vite proxy forwards requests but preserves the Origin header
-  if (process.env.NODE_ENV === 'development') {
+  // Use !== 'production' to be permissive by default for local dev tools
+  if (process.env.NODE_ENV !== 'production') {
     origins.push(`http://localhost:${VITE_DEV_PORT}`, `http://127.0.0.1:${VITE_DEV_PORT}`);
   }
 
@@ -268,8 +269,8 @@ export function createSecurityHeadersMiddleware(port?: number) {
   // Build connect-src directive with WebSocket endpoints
   let connectSrc = `'self' ws://localhost:${actualPort} ws://127.0.0.1:${actualPort}`;
 
-  // In development, also allow Vite dev server connections
-  if (process.env.NODE_ENV === 'development') {
+  // In non-production environments, also allow Vite dev server connections
+  if (process.env.NODE_ENV !== 'production') {
     connectSrc += ` ws://localhost:${VITE_DEV_PORT} ws://127.0.0.1:${VITE_DEV_PORT}`;
   }
 

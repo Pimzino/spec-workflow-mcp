@@ -87,7 +87,10 @@
     "pendingCount": "{{count}}개 대기 중",
     "approveAll": "모두 승인",
     "revisionAll": "모두 수정 요청",
-    "rejectAll": "모두 거부"
+    "rejectAll": "모두 거부",
+    "batch": {
+      "tooMany": "한 번에 {{limit}}개 이상의 항목을 처리할 수 없습니다"
+    }
   },
   "specs": {
     "active": "활성",

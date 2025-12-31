@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useApi, DocumentSnapshot, DiffResult, BatchApprovalResult } from '../api/api';
 import { ApprovalsAnnotator, ApprovalComment } from '../approvals/ApprovalsAnnotator';
-import { NotificationProvider, useNotifications } from '../notifications/NotificationProvider';
+import { useNotifications } from '../notifications/NotificationProvider';
 import { TextInputModal } from '../modals/TextInputModal';
 import { AlertModal } from '../modals/AlertModal';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
@@ -619,6 +619,7 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
 
 function Content() {
   const { approvals, approvalsActionBatch, approvalsUndoBatch, reloadAll } = useApi();
+  const { showNotification } = useNotifications();
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const { t } = useTranslation();
 
@@ -661,6 +662,15 @@ function Content() {
   const pendingCount = useMemo(() => {
     return filteredApprovals.filter(a => a.status === 'pending').length;
   }, [filteredApprovals]);
+
+  // Cleanup undo timeout on unmount to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (undoTimeoutId) {
+        clearTimeout(undoTimeoutId);
+      }
+    };
+  }, [undoTimeoutId]);
 
   // Selection handlers
   const handleToggleSelection = useCallback((id: string) => {
@@ -727,6 +737,11 @@ function Content() {
           });
         }
 
+        // Clear any existing undo timeout before setting new one (prevents race condition)
+        if (undoTimeoutId) {
+          clearTimeout(undoTimeoutId);
+        }
+
         // Set up undo timeout - 30 seconds for undo window
         const timeoutId = setTimeout(() => {
           setShowResultToast(false);
@@ -749,7 +764,7 @@ function Content() {
     } finally {
       setBatchLoading(false);
     }
-  }, [selectedIds, approvalsActionBatch, reloadAll, exitSelectionMode, showNotification]);
+  }, [selectedIds, approvalsActionBatch, reloadAll, exitSelectionMode, showNotification, undoTimeoutId]);
 
   const handleConfirmBatchAction = useCallback(async () => {
     if (pendingAction) {
@@ -787,10 +802,14 @@ function Content() {
       }
     } catch (error) {
       console.error('Undo failed:', error);
+      showNotification({
+        type: 'error',
+        message: 'Failed to undo the last batch operation. Please try again.'
+      });
     } finally {
       setBatchLoading(false);
     }
-  }, [lastBatchOperation, undoTimeoutId, approvalsUndoBatch, reloadAll]);
+  }, [lastBatchOperation, undoTimeoutId, approvalsUndoBatch, reloadAll, showNotification]);
 
   const isAllSelected = filteredApprovals.length > 0 && selectedIds.size === filteredApprovals.length;
   const isSomeSelected = selectedIds.size > 0 && selectedIds.size < filteredApprovals.length;

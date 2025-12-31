@@ -87,7 +87,10 @@
     "pendingCount": "{{count}} pendientes",
     "approveAll": "Aprobar todo",
     "revisionAll": "Revisar todo",
-    "rejectAll": "Rechazar todo"
+    "rejectAll": "Rechazar todo",
+    "batch": {
+      "tooMany": "No se pueden procesar más de {{limit}} elementos a la vez"
+    }
   },
   "specs": {
     "active": "Activas",
