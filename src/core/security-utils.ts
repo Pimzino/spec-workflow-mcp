@@ -269,7 +269,7 @@ export function createSecurityHeadersMiddleware(port?: number) {
   let connectSrc = `'self' ws://localhost:${actualPort} ws://127.0.0.1:${actualPort}`;
 
   // In development, also allow Vite dev server connections
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV === 'development') {
     connectSrc += ` ws://localhost:${VITE_DEV_PORT} ws://127.0.0.1:${VITE_DEV_PORT}`;
   }
 
