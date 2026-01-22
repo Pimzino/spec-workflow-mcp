@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 300
 
 #### С сервером MCP
 ```bash
-# Автоматический запуск с MCP
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard
+# Запустить сервер MCP и панель управления отдельно (рекомендуется)
+# Терминал 1: Запустить панель управления
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# Терминал 2: Запустить сервер MCP
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/project
 ```
 
 ### Функции панели управления

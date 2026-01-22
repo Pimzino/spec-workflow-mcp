@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /ruta/a/proyecto --dashboard --port 300
 
 #### Con Servidor MCP
 ```bash
-# Auto-inicio con MCP
-npx -y @pimzino/spec-workflow-mcp@latest /ruta/a/proyecto --AutoStartDashboard
+# Ejecutar servidor MCP y panel de control por separado (recomendado)
+# Terminal 1: Iniciar panel de control
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# Terminal 2: Iniciar servidor MCP
+npx -y @pimzino/spec-workflow-mcp@latest /ruta/a/proyecto
 ```
 
 ### Características del Panel de Control

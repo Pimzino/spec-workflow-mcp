@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /chemin/vers/projet --dashboard --port 
 
 #### Avec serveur MCP
 ```bash
-# Démarrage automatique avec MCP
-npx -y @pimzino/spec-workflow-mcp@latest /chemin/vers/projet --AutoStartDashboard
+# Exécuter le serveur MCP et le tableau de bord séparément (recommandé)
+# Terminal 1: Démarrer le tableau de bord
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# Terminal 2: Démarrer le serveur MCP
+npx -y @pimzino/spec-workflow-mcp@latest /chemin/vers/projet
 ```
 
 ### Fonctionnalités du tableau de bord

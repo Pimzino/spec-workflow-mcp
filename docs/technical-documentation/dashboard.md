@@ -69,16 +69,15 @@ cd /path/to/project
 npx -y @pimzino/spec-workflow-mcp@latest --dashboard
 ```
 
-### Auto-Start with MCP Server
-```json
-{
-  "mcpServers": {
-    "spec-workflow": {
-      "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/project/path", "--AutoStartDashboard"]
-    }
-  }
-}
+### With MCP Server
+The dashboard runs separately from MCP servers. Start the dashboard first, then MCP servers will automatically register with it:
+
+```bash
+# Terminal 1: Start dashboard (once)
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# Terminal 2+: Start MCP servers for your projects
+npx -y @pimzino/spec-workflow-mcp@latest /project/path
 ```
 
 ### Development Mode

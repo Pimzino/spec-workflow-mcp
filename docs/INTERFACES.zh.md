@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 300
 
 #### 与 MCP 服务器一起
 ```bash
-# 使用 MCP 自动启动
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard
+# 分别运行 MCP 服务器和仪表板（推荐）
+# 终端 1: 启动仪表板
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# 终端 2: 启动 MCP 服务器
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/project
 ```
 
 ### 仪表板功能

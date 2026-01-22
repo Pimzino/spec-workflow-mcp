@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **الحلول**:
 1. تأكد من تشغيل لوحة التحكم جنبًا إلى جنب مع خادم MCP:
    ```bash
-   # إما استخدم البدء التلقائي
-   npx -y @pimzino/spec-workflow-mcp@latest /path --AutoStartDashboard
-
-   # أو قم بتشغيل كليهما بشكل منفصل
-   # النافذة الطرفية 1:
+   # قم بتشغيل كليهما بشكل منفصل
+   # النافذة الطرفية 1: تشغيل لوحة التحكم
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # النافذة الطرفية 2: تشغيل خادم MCP
    npx -y @pimzino/spec-workflow-mcp@latest /path
-   # النافذة الطرفية 2:
-   npx -y @pimzino/spec-workflow-mcp@latest /path --dashboard
    ```
 2. تحقق من وجود دليل الموافقة:
    ```bash

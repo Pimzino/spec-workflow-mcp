@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **Soluciones**:
 1. Asegurar que el panel se ejecute junto con el servidor MCP:
    ```bash
-   # Ya sea usar auto-inicio
-   npx -y @pimzino/spec-workflow-mcp@latest /ruta --AutoStartDashboard
-
-   # O ejecutar ambos por separado
-   # Terminal 1:
+   # Ejecutar ambos por separado
+   # Terminal 1: Iniciar panel de control
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # Terminal 2: Iniciar servidor MCP
    npx -y @pimzino/spec-workflow-mcp@latest /ruta
-   # Terminal 2:
-   npx -y @pimzino/spec-workflow-mcp@latest /ruta --dashboard
    ```
 2. Verificar que el directorio de aprobación exista:
    ```bash

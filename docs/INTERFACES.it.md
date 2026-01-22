@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 300
 
 #### Con Server MCP
 ```bash
-# Auto-start con MCP
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard
+# Eseguire server MCP e dashboard separatamente (consigliato)
+# Terminal 1: Avviare dashboard
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# Terminal 2: Avviare server MCP
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/project
 ```
 
 ### Funzionalità Dashboard

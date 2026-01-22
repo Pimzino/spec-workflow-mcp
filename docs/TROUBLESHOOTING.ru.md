@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **Решения**:
 1. Убедитесь, что панель управления запущена вместе с сервером MCP:
    ```bash
-   # Либо используйте автозапуск
-   npx -y @pimzino/spec-workflow-mcp@latest /path --AutoStartDashboard
-
-   # Или запустите оба отдельно
-   # Терминал 1:
+   # Запустите оба отдельно
+   # Терминал 1: Запустить панель управления
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # Терминал 2: Запустить сервер MCP
    npx -y @pimzino/spec-workflow-mcp@latest /path
-   # Терминал 2:
-   npx -y @pimzino/spec-workflow-mcp@latest /path --dashboard
    ```
 2. Проверьте существование каталога утверждений:
    ```bash

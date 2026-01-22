@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **Lösungen**:
 1. Sicherstellen, dass Dashboard neben MCP-Server läuft:
    ```bash
-   # Entweder Auto-Start verwenden
-   npx -y @pimzino/spec-workflow-mcp@latest /pfad --AutoStartDashboard
-
-   # Oder beide separat ausführen
-   # Terminal 1:
+   # Beide separat ausführen
+   # Terminal 1: Dashboard starten
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # Terminal 2: MCP-Server starten
    npx -y @pimzino/spec-workflow-mcp@latest /pfad
-   # Terminal 2:
-   npx -y @pimzino/spec-workflow-mcp@latest /pfad --dashboard
    ```
 2. Freigabe-Verzeichnis existiert überprüfen:
    ```bash

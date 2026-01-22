@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **Solutions** :
 1. Assurer que le tableau de bord s'exécute avec le serveur MCP :
    ```bash
-   # Soit utiliser le démarrage automatique
-   npx -y @pimzino/spec-workflow-mcp@latest /chemin --AutoStartDashboard
-
-   # Ou exécuter les deux séparément
-   # Terminal 1:
+   # Exécuter les deux séparément
+   # Terminal 1: Démarrer le tableau de bord
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # Terminal 2: Démarrer le serveur MCP
    npx -y @pimzino/spec-workflow-mcp@latest /chemin
-   # Terminal 2:
-   npx -y @pimzino/spec-workflow-mcp@latest /chemin --dashboard
    ```
 2. Vérifier que le répertoire d'approbation existe :
    ```bash

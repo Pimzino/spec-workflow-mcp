@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **解決策**:
 1. ダッシュボードがMCPサーバーと一緒に実行されていることを確認:
    ```bash
-   # 自動起動を使用
-   npx -y @pimzino/spec-workflow-mcp@latest /path --AutoStartDashboard
-
-   # または両方を別々に実行
-   # ターミナル1:
+   # 両方を別々に実行
+   # ターミナル1: ダッシュボードを起動
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # ターミナル2: MCPサーバーを起動
    npx -y @pimzino/spec-workflow-mcp@latest /path
-   # ターミナル2:
-   npx -y @pimzino/spec-workflow-mcp@latest /path --dashboard
    ```
 2. 承認ディレクトリが存在するか確認:
    ```bash

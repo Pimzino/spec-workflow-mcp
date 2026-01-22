@@ -26,10 +26,15 @@
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/project", "--AutoStartDashboard"]
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/project"]
     }
   }
 }
+```
+
+**Note**: To use the dashboard, start it separately in a terminal:
+```bash
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
 ```
 
 ### For Local Development

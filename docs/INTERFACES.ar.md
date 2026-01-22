@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 300
 
 #### مع خادم MCP
 ```bash
-# البدء التلقائي مع MCP
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard
+# تشغيل خادم MCP ولوحة التحكم بشكل منفصل (موصى به)
+# النافذة الطرفية 1: تشغيل لوحة التحكم
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# النافذة الطرفية 2: تشغيل خادم MCP
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/project
 ```
 
 ### ميزات لوحة التحكم

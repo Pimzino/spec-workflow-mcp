@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **해결 방법**:
 1. MCP 서버와 함께 대시보드가 실행 중인지 확인:
    ```bash
-   # 자동 시작 사용
-   npx -y @pimzino/spec-workflow-mcp@latest /path --AutoStartDashboard
-
-   # 또는 별도로 실행
-   # 터미널 1:
+   # 별도로 실행
+   # 터미널 1: 대시보드 시작
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # 터미널 2: MCP 서버 시작
    npx -y @pimzino/spec-workflow-mcp@latest /path
-   # 터미널 2:
-   npx -y @pimzino/spec-workflow-mcp@latest /path --dashboard
    ```
 2. 승인 디렉토리 존재 확인:
    ```bash

@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **解决方案**：
 1. 确保仪表板与 MCP 服务器一起运行：
    ```bash
-   # 使用自动启动
-   npx -y @pimzino/spec-workflow-mcp@latest /path --AutoStartDashboard
-
-   # 或分别运行两者
-   # 终端 1：
+   # 分别运行两者
+   # 终端 1: 启动仪表板
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # 终端 2: 启动 MCP 服务器
    npx -y @pimzino/spec-workflow-mcp@latest /path
-   # 终端 2：
-   npx -y @pimzino/spec-workflow-mcp@latest /path --dashboard
    ```
 2. 检查审批目录是否存在：
    ```bash

@@ -214,14 +214,11 @@ netstat -an | findstr :3000  # Windows
 **Solutions**:
 1. Ensure dashboard is running alongside MCP server:
    ```bash
-   # Either use auto-start
-   npx -y @pimzino/spec-workflow-mcp@latest /path --AutoStartDashboard
-
-   # Or run both separately
-   # Terminal 1:
+   # Run both separately
+   # Terminal 1: Start dashboard
+   npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+   # Terminal 2: Start MCP server
    npx -y @pimzino/spec-workflow-mcp@latest /path
-   # Terminal 2:
-   npx -y @pimzino/spec-workflow-mcp@latest /path --dashboard
    ```
 2. Check approval directory exists:
    ```bash

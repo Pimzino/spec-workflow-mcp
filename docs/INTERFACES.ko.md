@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 300
 
 #### MCP 서버와 함께
 ```bash
-# MCP와 함께 자동 시작
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard
+# MCP 서버와 대시보드를 별도로 실행 (권장)
+# 터미널 1: 대시보드 시작
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# 터미널 2: MCP 서버 시작
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/project
 ```
 
 ### 대시보드 기능

@@ -30,8 +30,12 @@ npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 300
 
 #### MCPサーバーと一緒に
 ```bash
-# MCPと自動起動
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --AutoStartDashboard
+# MCPサーバーとダッシュボードを別々に実行（推奨）
+# ターミナル1: ダッシュボードを起動
+npx -y @pimzino/spec-workflow-mcp@latest --dashboard
+
+# ターミナル2: MCPサーバーを起動
+npx -y @pimzino/spec-workflow-mcp@latest /path/to/project
 ```
 
 ### ダッシュボード機能
