@@ -314,6 +314,7 @@
       "saveShort": "Save",
       "tooltips": {
         "viewEditComment": "Click to view/edit comment",
+        "editComment": "Edit comment",
         "deleteComment": "Delete comment"
       },
       "badge": {
@@ -335,7 +336,20 @@
       "switchHelp": "Switch to Annotate mode to add comments by selecting text or add general feedback.",
       "viewMode": {
         "preview": "Preview",
-        "annotate": "Annotate"
+        "annotate": "Annotate",
+        "sideBySide": "Side by Side"
+      },
+      "sideBySide": {
+        "title": "Side by Side View",
+        "buttonLabel": "Side by Side",
+        "tooltip": "View source and preview side by side",
+        "sourceLabel": "Source (Annotate)",
+        "previewLabel": "Preview",
+        "syncEnabled": "Scroll sync is enabled",
+        "syncDisabled": "Scroll sync is disabled",
+        "syncOn": "Sync On",
+        "syncOff": "Sync Off",
+        "instructions": "Select text in the source panel (left) to add comments. The preview panel (right) shows the rendered document."
       },
       "delete": {
         "title": "Delete Comment",

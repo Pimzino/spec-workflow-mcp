@@ -335,7 +335,20 @@
       "switchHelp": "Passa alla modalità Annota per aggiungere commenti selezionando testo o aggiungi feedback generale.",
       "viewMode": {
         "preview": "Anteprima",
-        "annotate": "Annota"
+        "annotate": "Annota",
+        "sideBySide": "Affiancato"
+      },
+      "sideBySide": {
+        "title": "Vista Affiancata",
+        "buttonLabel": "Affiancato",
+        "tooltip": "Visualizza sorgente e anteprima affiancati",
+        "sourceLabel": "Sorgente (Annota)",
+        "previewLabel": "Anteprima",
+        "syncEnabled": "Sincronizzazione scorrimento attiva",
+        "syncDisabled": "Sincronizzazione scorrimento disattiva",
+        "syncOn": "Sinc. Attiva",
+        "syncOff": "Sinc. Disattiva",
+        "instructions": "Seleziona testo nel pannello sorgente (sinistra) per aggiungere commenti. Il pannello anteprima (destra) mostra il documento renderizzato."
       },
       "delete": {
         "title": "Elimina Commento",

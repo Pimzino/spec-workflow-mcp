@@ -335,7 +335,20 @@
       "switchHelp": "Zum Annotationsmodus wechseln um Kommentare durch Textauswahl hinzuzufügen oder allgemeines Feedback hinzuzufügen.",
       "viewMode": {
         "preview": "Vorschau",
-        "annotate": "Annotieren"
+        "annotate": "Annotieren",
+        "sideBySide": "Nebeneinander"
+      },
+      "sideBySide": {
+        "title": "Nebeneinander-Ansicht",
+        "buttonLabel": "Nebeneinander",
+        "tooltip": "Quelle und Vorschau nebeneinander anzeigen",
+        "sourceLabel": "Quelle (Annotieren)",
+        "previewLabel": "Vorschau",
+        "syncEnabled": "Scroll-Synchronisierung aktiviert",
+        "syncDisabled": "Scroll-Synchronisierung deaktiviert",
+        "syncOn": "Sync An",
+        "syncOff": "Sync Aus",
+        "instructions": "Wählen Sie Text im Quellpanel (links) um Kommentare hinzuzufügen. Das Vorschaupanel (rechts) zeigt das gerenderte Dokument."
       },
       "delete": {
         "title": "Kommentar löschen",

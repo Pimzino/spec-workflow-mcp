@@ -335,7 +335,20 @@
       "switchHelp": "Cambia al modo Anotar para agregar comentarios seleccionando texto o agregar comentarios generales.",
       "viewMode": {
         "preview": "Vista previa",
-        "annotate": "Anotar"
+        "annotate": "Anotar",
+        "sideBySide": "Lado a Lado"
+      },
+      "sideBySide": {
+        "title": "Vista Lado a Lado",
+        "buttonLabel": "Lado a Lado",
+        "tooltip": "Ver fuente y vista previa lado a lado",
+        "sourceLabel": "Fuente (Anotar)",
+        "previewLabel": "Vista Previa",
+        "syncEnabled": "Sincronización de desplazamiento activada",
+        "syncDisabled": "Sincronización de desplazamiento desactivada",
+        "syncOn": "Sinc. Activada",
+        "syncOff": "Sinc. Desactivada",
+        "instructions": "Selecciona texto en el panel fuente (izquierda) para agregar comentarios. El panel de vista previa (derecha) muestra el documento renderizado."
       },
       "delete": {
         "title": "Eliminar Comentario",

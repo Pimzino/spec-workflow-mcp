@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.8] - 2026-01-22
+
+### Added
+- **Side-by-Side Annotation View** (GitHub Issue #179) - New view mode in the Approvals tab that displays source markdown and rendered preview side-by-side:
+  - Left panel shows source text with full annotation capability
+  - Right panel shows live rendered markdown preview using MDXEditorWrapper
+  - Bidirectional scroll synchronization between panels with toggle to enable/disable
+  - Full-width layout with comments section stacked below (not sidebar)
+  - Responsive design: panels stack vertically on mobile, side-by-side on tablet+
+  - New mode button in the Approvals tab mode switcher alongside Preview and Annotate
+
+- **Edit Button on Comment Cards** - Added edit button (pencil icon) to comment cards in the Comments & Feedback section for quick access to edit annotations
+
+### Changed
+- **Text Annotation Library Integration** - Replaced manual highlight implementation with `react-text-annotate-blend` library:
+  - More reliable text selection and offset calculation
+  - Consistent highlighting between Annotate and Side-by-Side modes
+  - Handles edge cases (line endings, special characters) automatically
+  - Shows annotation tag/ID inline with highlighted text
+
+- **Comment Card Redesign** - Improved comment card layout following design principles:
+  - Clean card structure with header (type badge + actions) and body sections
+  - Full comment ID displayed on separate line with monospace styling
+  - Full highlighted text displayed without truncation (was limited to 80 chars)
+  - Full comment text displayed without truncation
+  - Better visual hierarchy with proper spacing and typography
+  - White card background with subtle border for cleaner appearance
+
+### Fixed
+- **Highlight Click Handler** - Fixed clicking on highlights to open the edit modal:
+  - Improved mark click detection using background color matching
+  - Added fallback text-based matching for edge cases
+  - Works reliably in both Annotate and Side-by-Side modes
+
+### Dependencies
+- Added `react-text-annotate-blend` (^1.2.0) - React 18 compatible text annotation library
+
 ## [2.1.7] - 2025-12-20
 
 ### Fixed

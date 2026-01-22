@@ -335,7 +335,20 @@
       "switchHelp": "Basculer vers le mode Annotation pour ajouter des commentaires en sélectionnant du texte ou ajouter des commentaires généraux.",
       "viewMode": {
         "preview": "Aperçu",
-        "annotate": "Annoter"
+        "annotate": "Annoter",
+        "sideBySide": "Côte à Côte"
+      },
+      "sideBySide": {
+        "title": "Vue Côte à Côte",
+        "buttonLabel": "Côte à Côte",
+        "tooltip": "Voir source et aperçu côte à côte",
+        "sourceLabel": "Source (Annoter)",
+        "previewLabel": "Aperçu",
+        "syncEnabled": "Synchronisation du défilement activée",
+        "syncDisabled": "Synchronisation du défilement désactivée",
+        "syncOn": "Sync Activée",
+        "syncOff": "Sync Désactivée",
+        "instructions": "Sélectionnez du texte dans le panneau source (gauche) pour ajouter des commentaires. Le panneau d'aperçu (droite) affiche le document rendu."
       },
       "delete": {
         "title": "Supprimer le Commentaire",

@@ -335,7 +335,20 @@
       "switchHelp": "注釈モードに切り替えて、テキスト選択でコメントを追加するか、全般フィードバックを追加してください。",
       "viewMode": {
         "preview": "プレビュー",
-        "annotate": "注釈"
+        "annotate": "注釈",
+        "sideBySide": "並列表示"
+      },
+      "sideBySide": {
+        "title": "並列表示",
+        "buttonLabel": "並列表示",
+        "tooltip": "ソースとプレビューを並べて表示",
+        "sourceLabel": "ソース (注釈)",
+        "previewLabel": "プレビュー",
+        "syncEnabled": "スクロール同期が有効",
+        "syncDisabled": "スクロール同期が無効",
+        "syncOn": "同期オン",
+        "syncOff": "同期オフ",
+        "instructions": "左側のソースパネルでテキストを選択してコメントを追加します。右側のプレビューパネルにはレンダリングされたドキュメントが表示されます。"
       },
       "delete": {
         "title": "コメントを削除",

@@ -1,9 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TextAnnotate, AnnotateTag } from 'react-text-annotate-blend';
 import { hexToColorObject, isValidHex } from './colors';
 import { MDXEditorWrapper } from '../mdx-editor';
 import { TextInputModal } from '../modals/TextInputModal';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
+import { SideBySideView } from './SideBySideView';
+
+export type ViewMode = 'preview' | 'annotate' | 'side-by-side';
 
 export type ApprovalComment = {
   type: 'general' | 'selection';
@@ -11,11 +15,20 @@ export type ApprovalComment = {
   timestamp: string;
   selectedText?: string;
   highlightColor?: { bg: string; border: string; name: string };
-  id?: string; // Add unique ID for each comment
-  // Position-based fields for precise highlighting
-  startOffset?: number;  // Character offset from start of content
-  endOffset?: number;    // Character offset for end of selection
+  id?: string;
+  startOffset?: number;
+  endOffset?: number;
 };
+
+// Type for the TextAnnotate library's annotation format
+interface AnnotationSpan extends AnnotateTag {
+  start: number;
+  end: number;
+  text?: string;
+  color?: string;
+  tag?: string;
+  commentId?: string; // Link back to our ApprovalComment
+}
 
 // Modal component for adding/editing comments
 function CommentModal({
@@ -181,166 +194,105 @@ function CommentModal({
   );
 }
 
-// Helper function to escape HTML
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+// Convert ApprovalComments to TextAnnotate spans
+function commentsToSpans(comments: ApprovalComment[], content: string): AnnotationSpan[] {
+  const spans: AnnotationSpan[] = [];
 
-export function renderContentWithAnnotations(content: string, comments: ApprovalComment[], onHighlightClick?: (commentId: string) => void, tooltip?: string) {
-  const rawContent = content ?? '';
-  const selectionComments = comments.filter(
-    (c) => c.type === 'selection' && c.selectedText && c.highlightColor
-  );
+  for (const c of comments) {
+    if (c.type !== 'selection' || !c.selectedText || !c.highlightColor) continue;
 
-  // Separate comments with position data from those without
-  const positionedComments = selectionComments.filter(
-    c => c.startOffset !== undefined && c.endOffset !== undefined
-  );
-  const legacyComments = selectionComments.filter(
-    c => c.startOffset === undefined || c.endOffset === undefined
-  );
+    let start = c.startOffset;
+    let end = c.endOffset;
 
-  // Build highlight regions from positioned comments
-  // Sort by startOffset to process in order
-  const sortedPositioned = [...positionedComments].sort(
-    (a, b) => a.startOffset! - b.startOffset!
-  );
-
-  // Create a list of highlight regions (non-overlapping, earliest wins for overlaps)
-  type HighlightRegion = {
-    start: number;
-    end: number;
-    comment: ApprovalComment;
-  };
-
-  const regions: HighlightRegion[] = [];
-  for (const c of sortedPositioned) {
-    const start = c.startOffset!;
-    const end = c.endOffset!;
-
-    // Check for overlaps with existing regions and skip if overlapping
-    const overlaps = regions.some(r => !(end <= r.start || start >= r.end));
-    if (!overlaps && start < end && start >= 0 && end <= rawContent.length) {
-      regions.push({ start, end, comment: c });
+    // If offsets are missing or invalid, try to find the text
+    if (start === undefined || end === undefined || start < 0 || end > content.length || start >= end) {
+      const foundIndex = content.indexOf(c.selectedText);
+      if (foundIndex !== -1) {
+        start = foundIndex;
+        end = foundIndex + c.selectedText.length;
+      } else {
+        // Can't find text, skip this annotation
+        continue;
+      }
     }
+
+    spans.push({
+      start,
+      end,
+      text: c.selectedText,
+      color: c.highlightColor.bg,
+      tag: c.id || '',
+      commentId: c.id
+    });
   }
 
-  // Build result by inserting spans at exact positions
-  let result = '';
-  let lastEnd = 0;
-  const titleAttr = tooltip || 'Click to view/edit comment';
-
-  for (const region of regions) {
-    const c = region.comment;
-    // Add text before this annotation
-    result += escapeHtml(rawContent.slice(lastEnd, region.start));
-    // Add highlighted span
-    const style = `background-color: ${c.highlightColor!.bg}; border-bottom: 2px solid ${c.highlightColor!.border}; padding: 1px 2px; border-radius: 2px; cursor: pointer;`;
-    const clickHandler = onHighlightClick ? `data-comment-id="${c.id || ''}"` : '';
-    result += `<span style="${style}" class="highlight-${c.highlightColor!.name} highlight-clickable" ${clickHandler} title="${titleAttr}">${escapeHtml(rawContent.slice(region.start, region.end))}</span>`;
-    lastEnd = region.end;
-  }
-  // Add remaining text
-  result += escapeHtml(rawContent.slice(lastEnd));
-
-  // Handle legacy comments without position data (backward compatibility)
-  // For these, we highlight only the first occurrence (no 'g' flag)
-  for (const c of legacyComments) {
-    const escaped = escapeHtml(c.selectedText || '');
-    // Use regex without 'g' flag to match only the first occurrence
-    const regex = new RegExp(escaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const style = `background-color: ${c.highlightColor!.bg}; border-bottom: 2px solid ${c.highlightColor!.border}; padding: 1px 2px; border-radius: 2px; cursor: pointer;`;
-    const clickHandler = onHighlightClick ? `data-comment-id="${c.id || ''}"` : '';
-    result = result.replace(regex, `<span style="${style}" class="highlight-${c.highlightColor!.name} highlight-clickable" ${clickHandler} title="${titleAttr}">${escaped}</span>`);
-  }
-
-  return result;
+  return spans;
 }
 
 export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMode, setViewMode }:
-  { content: string; comments: ApprovalComment[]; onCommentsChange: (c: ApprovalComment[]) => void; viewMode: 'preview' | 'annotate'; setViewMode: (m: 'preview' | 'annotate') => void; }) {
+  { content: string; comments: ApprovalComment[]; onCommentsChange: (c: ApprovalComment[]) => void; viewMode: ViewMode; setViewMode: (m: ViewMode) => void; }) {
   const { t } = useTranslation();
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     selectedText: string;
     isEditing: boolean;
     editingComment?: ApprovalComment;
-    startOffset?: number;  // Character offset from start of content
-    endOffset?: number;    // Character offset for end of selection
+    startOffset?: number;
+    endOffset?: number;
   }>({ isOpen: false, selectedText: '', isEditing: false });
   const [generalCommentModalOpen, setGeneralCommentModalOpen] = useState(false);
   const [deleteModalState, setDeleteModalState] = useState<{ isOpen: boolean; commentIndex: number }>({ isOpen: false, commentIndex: -1 });
 
-  // Generate unique ID for new comments
   const generateCommentId = () => `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  function handleSelectionMouseUp(e: React.MouseEvent<HTMLPreElement>) {
-    const selection = window.getSelection();
-    const selectedText = selection?.toString().trim() || '';
-    if (!selectedText || !selection?.rangeCount) return;
+  // Convert comments to TextAnnotate format
+  const annotationSpans = useMemo(() => commentsToSpans(comments, content || ''), [comments, content]);
 
-    const range = selection.getRangeAt(0);
-    const preElement = e.currentTarget;
+  // Handle new selection from TextAnnotate
+  const handleAnnotationChange = useCallback((newSpans: AnnotationSpan[]) => {
+    // Find the new span (one that doesn't have a commentId yet)
+    const newSpan = newSpans.find(s => !s.commentId);
 
-    // Calculate offset relative to the pre element's text content
-    // We need to calculate the offset in the *original* content (before HTML escaping)
-    // Since the pre element contains escaped HTML, we need to work with the raw content
-    let startOffset: number | undefined;
-    let endOffset: number | undefined;
-
-    try {
-      // Create a range from the start of the pre element to the start of the selection
-      const preRange = document.createRange();
-      preRange.selectNodeContents(preElement);
-      preRange.setEnd(range.startContainer, range.startOffset);
-
-      // Get the text length from the pre element start to the selection start
-      // This gives us the offset within the displayed text
-      const displayedStartOffset = preRange.toString().length;
-
-      // The displayed text matches the original content (raw text is shown in the pre)
-      // So the offsets are directly usable
-      startOffset = displayedStartOffset;
-      endOffset = displayedStartOffset + selectedText.length;
-    } catch {
-      // If offset calculation fails, continue without offsets (fallback behavior)
-    }
-
-    // Open modal for adding comment
-    setModalState({
-      isOpen: true,
-      selectedText,
-      isEditing: false,
-      startOffset,
-      endOffset
-    });
-
-    // Clear selection after a brief delay to prevent flicker
-    setTimeout(() => {
-      try { selection?.removeAllRanges(); } catch {}
-    }, 50);
-  }
-
-  function handleHighlightClick(commentId: string) {
-    const comment = comments.find(c => c.id === commentId);
-    if (comment && comment.selectedText && comment.highlightColor) {
+    if (newSpan) {
+      // User made a new selection - open the comment modal
+      const selectedText = (content || '').slice(newSpan.start, newSpan.end);
       setModalState({
         isOpen: true,
-        selectedText: comment.selectedText,
-        isEditing: true,
-        editingComment: comment
+        selectedText,
+        isEditing: false,
+        startOffset: newSpan.start,
+        endOffset: newSpan.end
       });
     }
-  }
+  }, [content]);
+
+  // Handle clicking on an existing annotation
+  const handleAnnotationClick = useCallback((span: AnnotationSpan) => {
+    if (span.commentId) {
+      const comment = comments.find(c => c.id === span.commentId);
+      if (comment && comment.selectedText && comment.highlightColor) {
+        setModalState({
+          isOpen: true,
+          selectedText: comment.selectedText,
+          isEditing: true,
+          editingComment: comment,
+          startOffset: span.start,
+          endOffset: span.end
+        });
+      }
+    }
+  }, [comments]);
+
+  // Custom span renderer to make annotations clickable
+  const getSpan = useCallback((span: AnnotationSpan): AnnotationSpan => {
+    return {
+      ...span,
+      // Keep the span as-is, clicking will be handled separately
+    };
+  }, []);
 
   function handleModalSave(commentText: string, color: { bg: string; border: string; name: string }) {
     if (modalState.isEditing && modalState.editingComment) {
-      // Update existing comment (preserve original offsets)
       const updatedComments = comments.map(c =>
         c.id === modalState.editingComment!.id
           ? { ...c, comment: commentText, highlightColor: color, timestamp: new Date().toISOString() }
@@ -348,7 +300,6 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
       );
       onCommentsChange(updatedComments);
     } else {
-      // Add new comment with position offsets
       const newComment: ApprovalComment = {
         type: 'selection',
         comment: commentText,
@@ -390,26 +341,268 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
     onCommentsChange(dup);
   }
 
-  const annotatedHtml = useMemo(() => renderContentWithAnnotations(content || '', comments, handleHighlightClick, t('approvals.annotator.tooltips.viewEditComment')), [content, comments, t]);
+  // Edit a comment from the card
+  const editComment = useCallback((comment: ApprovalComment) => {
+    if (comment.selectedText && comment.highlightColor) {
+      setModalState({
+        isOpen: true,
+        selectedText: comment.selectedText,
+        isEditing: true,
+        editingComment: comment,
+        startOffset: comment.startOffset,
+        endOffset: comment.endOffset
+      });
+    }
+  }, []);
 
-  // Handle clicks on highlighted text
-  function handleContentClick(e: React.MouseEvent) {
+  // Custom Mark component to handle clicks on annotations
+  const handleMarkClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
-    if (target.classList.contains('highlight-clickable')) {
-      e.preventDefault();
-      const commentId = target.getAttribute('data-comment-id');
-      if (commentId) {
-        handleHighlightClick(commentId);
+    const mark = target.closest('mark');
+    if (mark) {
+      // The mark may contain the tag text as a sibling span, so we need to find by data attribute or position
+      // Find which span was clicked by checking the mark's background color and position
+      const markStyle = mark.getAttribute('style') || '';
+      const bgColorMatch = markStyle.match(/background(?:-color)?:\s*([^;]+)/i);
+      const bgColor = bgColorMatch ? bgColorMatch[1].trim() : '';
+
+      // Find the span with matching color
+      const clickedSpan = annotationSpans.find(s => {
+        const spanColor = s.color || '';
+        // Compare colors (they might have slight formatting differences)
+        return spanColor === bgColor ||
+               spanColor.replace(/\s/g, '') === bgColor.replace(/\s/g, '');
+      });
+
+      if (clickedSpan) {
+        handleAnnotationClick(clickedSpan);
+      } else {
+        // Fallback: find by text content (excluding the tag)
+        const markText = mark.textContent || '';
+        const foundSpan = annotationSpans.find(s => {
+          const expectedText = (content || '').slice(s.start, s.end);
+          // The mark text might include the tag, so check if it starts with expected text
+          return markText.includes(expectedText) || expectedText === markText;
+        });
+        if (foundSpan) {
+          handleAnnotationClick(foundSpan);
+        }
       }
     }
+  }, [annotationSpans, content, handleAnnotationClick]);
+
+  // Render comments list
+  const renderCommentsList = () => (
+    <>
+      {comments.length === 0 ? (
+        <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400 text-sm">
+          <svg className="mx-auto w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <p className="text-xs sm:text-sm font-medium">{t('approvals.annotator.empty.title')}</p>
+          <p className="text-xs mt-1">{t('approvals.annotator.empty.description')}</p>
+        </div>
+      ) : (
+        comments.map((c, idx) => (
+          <div
+            key={c.id || idx}
+            className="bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden"
+          >
+            {/* Card Header - Type badge + Actions */}
+            <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700/50">
+              <div className="flex items-center gap-2">
+                {/* Color indicator for selection comments */}
+                {c.type === 'selection' && c.highlightColor && (
+                  <div
+                    className="w-2.5 h-2.5 rounded-full border"
+                    style={{
+                      backgroundColor: c.highlightColor.bg,
+                      borderColor: c.highlightColor.border
+                    }}
+                  />
+                )}
+                {/* Comment type badge */}
+                <span className="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  {c.type === 'selection' ? t('approvals.annotator.badge.textSelection') : t('approvals.annotator.badge.generalComment')}
+                </span>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-0.5">
+                {c.type === 'selection' && c.selectedText && c.highlightColor && (
+                  <button
+                    onClick={() => editComment(c)}
+                    className="p-1.5 rounded text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                    title={t('approvals.annotator.tooltips.editComment')}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                )}
+                <button
+                  onClick={() => remove(idx)}
+                  className="p-1.5 rounded text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                  title={t('approvals.annotator.tooltips.deleteComment')}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Card Body */}
+            <div className="p-3 space-y-3">
+              {/* Comment ID - Full ID on its own line */}
+              {c.id && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500">ID</span>
+                  <code className="text-[11px] font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700/50 px-1.5 py-0.5 rounded">
+                    {c.id}
+                  </code>
+                </div>
+              )}
+
+              {/* Highlighted text excerpt - Full text */}
+              {c.selectedText && (
+                <div
+                  className="rounded-md border p-2.5 text-xs leading-relaxed"
+                  style={{
+                    backgroundColor: c.highlightColor?.bg || 'rgb(254, 249, 195)',
+                    borderColor: c.highlightColor?.border || '#F59E0B',
+                  }}
+                >
+                  <pre className="whitespace-pre-wrap font-mono text-gray-800 dark:text-gray-900 break-words m-0">
+                    {c.selectedText}
+                  </pre>
+                </div>
+              )}
+
+              {/* Comment text - Full text */}
+              <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                {c.comment}
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </>
+  );
+
+  // Common TextAnnotate component
+  const renderTextAnnotate = () => (
+    <div
+      onClick={handleMarkClick}
+      className="text-annotate-container"
+    >
+      <TextAnnotate
+        content={content || ''}
+        value={annotationSpans}
+        onChange={handleAnnotationChange}
+        getSpan={getSpan}
+        style={{
+          fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+          fontSize: '0.875rem',
+          lineHeight: '1.625',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+          color: 'inherit'
+        }}
+        markStyle={{
+          padding: '1px 2px',
+          borderRadius: '2px',
+          cursor: 'pointer'
+        }}
+      />
+    </div>
+  );
+
+  // Side-by-side layout
+  if (viewMode === 'side-by-side') {
+    return (
+      <div className="flex flex-col gap-4">
+        <div data-section="annotations" className="w-full">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <div className="h-[75vh] lg:h-[80vh]">
+              <SideBySideView
+                content={content || ""}
+                onAnnotationChange={handleAnnotationChange}
+                onAnnotationClick={handleAnnotationClick}
+                annotationSpans={annotationSpans}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          data-section="comments"
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col max-h-[50vh]"
+        >
+          <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
+            <h4 className="font-medium text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              Comments & Feedback
+            </h4>
+            <button
+              onClick={addGeneral}
+              className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 touch-manipulation"
+            >
+              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span className="hidden sm:inline">{t('approvals.annotator.addGeneralComment.button')}</span>
+              <span className="sm:hidden">{t('approvals.annotator.addCommentShort')}</span>
+            </button>
+          </div>
+
+          <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2 sm:space-y-3">
+            {renderCommentsList()}
+          </div>
+        </div>
+
+        {modalState.isOpen && modalState.selectedText && (
+          <CommentModal
+            isOpen={modalState.isOpen}
+            onClose={handleModalClose}
+            onSave={handleModalSave}
+            selectedText={modalState.selectedText}
+            highlightColor={modalState.editingComment?.highlightColor || { bg: 'rgba(255, 235, 59, 0.3)', border: '#FFEB3B', name: '#FFEB3B' }}
+            initialComment={modalState.editingComment?.comment || ''}
+            isEditing={modalState.isEditing}
+          />
+        )}
+
+        <TextInputModal
+          isOpen={generalCommentModalOpen}
+          onClose={() => setGeneralCommentModalOpen(false)}
+          onSubmit={handleGeneralCommentSubmit}
+          title={t('approvals.annotator.addGeneralComment.title')}
+          placeholder={t('approvals.annotator.addGeneralComment.placeholder')}
+          submitText={t('approvals.annotator.addGeneralComment.submit')}
+          multiline={true}
+        />
+
+        <ConfirmationModal
+          isOpen={deleteModalState.isOpen}
+          onClose={() => setDeleteModalState({ isOpen: false, commentIndex: -1 })}
+          onConfirm={handleDeleteConfirm}
+          title={t('approvals.annotator.delete.title')}
+          message={t('approvals.annotator.delete.message')}
+          confirmText={t('common.delete')}
+          cancelText={t('common.cancel')}
+          variant="danger"
+        />
+      </div>
+    );
   }
 
+  // Default layout (preview and annotate modes)
   return (
     <div className="grid gap-4 lg:grid-cols-3 lg:gap-6">
-      {/* Document Content - Takes 2 columns on desktop */}
       <div data-section="annotations" className="lg:col-span-2">
-
-        {/* Content Display */}
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
           {viewMode === 'preview' ? (
             <div className="p-4 sm:p-6">
@@ -419,7 +612,6 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
             </div>
           ) : (
             <div className="p-4">
-              {/* Instruction note */}
               <div className="mb-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
                 <p className="text-xs text-blue-700 dark:text-blue-300 m-0 flex items-start gap-2">
                   <svg className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,22 +627,15 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
                 </p>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 min-w-0">
-                <pre
-                  className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed select-text cursor-text font-mono text-gray-900 dark:text-gray-100 overflow-x-auto break-words max-w-full"
-                  onMouseUp={handleSelectionMouseUp}
-                  onClick={handleContentClick}
-                  dangerouslySetInnerHTML={{ __html: annotatedHtml }}
-                />
+              <div className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-700 min-w-0 text-gray-900 dark:text-gray-100">
+                {renderTextAnnotate()}
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Comments Sidebar - Right sidebar on desktop, bottom on mobile */}
       <div data-section="comments" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col max-h-[60vh] lg:max-h-[80vh] lg:col-span-1">
-        {/* Comments Header */}
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
           <h4 className="font-medium text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -459,17 +644,15 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
             Comments & Feedback
           </h4>
 
-          {/* Preview mode note */}
           {viewMode === 'preview' && (
             <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg text-xs sm:text-sm text-blue-800 dark:text-blue-200">
               <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 inline flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-            {t('approvals.annotator.switchHelp')}
+              {t('approvals.annotator.switchHelp')}
             </div>
           )}
 
-          {/* Add comment button (only in annotate mode) */}
           {viewMode === 'annotate' && (
             <button
               onClick={addGeneral}
@@ -482,82 +665,13 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
               <span className="sm:hidden">{t('approvals.annotator.addCommentShort')}</span>
             </button>
           )}
-
         </div>
 
-        {/* Comments List */}
         <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2 sm:space-y-3">
-          {comments.length === 0 ? (
-            <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400 text-sm">
-              <svg className="mx-auto w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <p className="text-xs sm:text-sm font-medium">{t('approvals.annotator.empty.title')}</p>
-              <p className="text-xs mt-1">{t('approvals.annotator.empty.description')}</p>
-            </div>
-          ) : (
-            comments.map((c, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-gray-900 p-2 sm:p-3 rounded-lg border border-gray-200 dark:border-gray-700 relative">
-                {/* Color indicator for selection comments */}
-                {c.type === 'selection' && c.highlightColor && (
-                  <div
-                    className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg"
-                    style={{ backgroundColor: c.highlightColor.border }}
-                  />
-                )}
-
-                <div className="flex items-start justify-between mb-1 sm:mb-2" style={{ marginLeft: c.type === 'selection' && c.highlightColor ? '8px' : '0' }}>
-                  <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
-                    {/* Color dot for selection comments */}
-                    {c.type === 'selection' && c.highlightColor && (
-                      <div
-                        className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border flex-shrink-0"
-                        style={{
-                          backgroundColor: c.highlightColor.bg,
-                          borderColor: c.highlightColor.border
-                        }}
-                        title={t('approvals.annotator.colorHighlight', { color: c.highlightColor.name })}
-                      />
-                    )}
-                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 truncate">
-                      <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      <span className="truncate">{c.type === 'selection' ? t('approvals.annotator.badge.textSelection') : t('approvals.annotator.badge.generalComment')}</span>
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => remove(idx)}
-                    className="text-gray-400 hover:text-red-500 text-xs p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors touch-manipulation flex-shrink-0 ml-2"
-                    title={t('approvals.annotator.tooltips.deleteComment')}
-                  >
-                    <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
-
-                {c.selectedText && (
-                  <div className="mb-1 sm:mb-2 p-1.5 sm:p-2 rounded text-xs italic leading-relaxed" style={{
-                    marginLeft: c.highlightColor ? '8px' : '0',
-                    backgroundColor: c.highlightColor?.bg || 'rgb(254, 249, 195)',
-                    borderColor: c.highlightColor?.border || '#F59E0B',
-                    borderWidth: '1px'
-                  }}>
-                    <span className="break-words">"{c.selectedText.substring(0, 80)}{c.selectedText.length > 80 ? '...' : ''}"</span>
-                  </div>
-                )}
-
-                <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed break-words" style={{ marginLeft: c.type === 'selection' && c.highlightColor ? '8px' : '0' }}>
-                  {c.comment}
-                </div>
-              </div>
-            ))
-          )}
+          {renderCommentsList()}
         </div>
       </div>
 
-      {/* Comment Modal */}
       {modalState.isOpen && modalState.selectedText && (
         <CommentModal
           isOpen={modalState.isOpen}
@@ -570,7 +684,6 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         />
       )}
 
-      {/* General Comment Modal */}
       <TextInputModal
         isOpen={generalCommentModalOpen}
         onClose={() => setGeneralCommentModalOpen(false)}
@@ -581,7 +694,6 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         multiline={true}
       />
 
-      {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={deleteModalState.isOpen}
         onClose={() => setDeleteModalState({ isOpen: false, commentIndex: -1 })}
@@ -595,5 +707,3 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
     </div>
   );
 }
-
-

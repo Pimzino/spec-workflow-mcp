@@ -335,7 +335,20 @@
       "switchHelp": "切换到注释模式以通过选择文本添加评论，或添加通用反馈。",
       "viewMode": {
         "preview": "预览",
-        "annotate": "注释"
+        "annotate": "注释",
+        "sideBySide": "并排视图"
+      },
+      "sideBySide": {
+        "title": "并排视图",
+        "buttonLabel": "并排",
+        "tooltip": "并排查看源码和预览",
+        "sourceLabel": "源码 (注释)",
+        "previewLabel": "预览",
+        "syncEnabled": "滚动同步已启用",
+        "syncDisabled": "滚动同步已禁用",
+        "syncOn": "同步开启",
+        "syncOff": "同步关闭",
+        "instructions": "在左侧源码面板中选择文本以添加评论。右侧预览面板显示渲染后的文档。"
       },
       "delete": {
         "title": "删除评论",

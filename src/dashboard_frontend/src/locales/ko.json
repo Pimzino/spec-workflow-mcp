@@ -335,7 +335,20 @@
       "switchHelp": "텍스트를 선택하여 코멘트를 추가하거나 일반 피드백을 추가하려면 주석 모드로 전환하세요.",
       "viewMode": {
         "preview": "미리보기",
-        "annotate": "주석"
+        "annotate": "주석",
+        "sideBySide": "나란히 보기"
+      },
+      "sideBySide": {
+        "title": "나란히 보기",
+        "buttonLabel": "나란히",
+        "tooltip": "소스와 미리보기를 나란히 보기",
+        "sourceLabel": "소스 (주석)",
+        "previewLabel": "미리보기",
+        "syncEnabled": "스크롤 동기화 활성화됨",
+        "syncDisabled": "스크롤 동기화 비활성화됨",
+        "syncOn": "동기화 켜기",
+        "syncOff": "동기화 끄기",
+        "instructions": "소스 패널(왼쪽)에서 텍스트를 선택하여 코멘트를 추가하세요. 미리보기 패널(오른쪽)에는 렌더링된 문서가 표시됩니다."
       },
       "delete": {
         "title": "코멘트 삭제",

@@ -1,6 +1,6 @@
 {
   "name": "@pimzino/spec-workflow-mcp",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "main": "dist/index.js",
   "type": "module",
@@ -70,6 +70,7 @@
     "react-dom": "^18.3.1",
     "react-i18next": "^15.7.3",
     "react-router-dom": "^6.26.2",
+    "react-text-annotate-blend": "^1.2.0",
     "simple-git": "^3.28.0",
     "tailwind-merge": "^3.3.1",
     "toml": "^3.0.0",
