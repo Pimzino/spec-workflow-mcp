@@ -62,24 +62,24 @@ export function ChangelogModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+      <div className="bg-[var(--surface-elevated)] border border-[var(--border-default)] rounded-lg shadow-[var(--shadow-overlay)] w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border-default)]">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">
               {t('changelog.modal.title', 'Changelog')}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               {t('changelog.modal.version', 'Version')} v{version}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="p-2 text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors rounded-lg hover:bg-[var(--surface-panel)]"
             aria-label={t('common.close', 'Close')}
           >
             <XMarkIcon className="w-6 h-6" />
@@ -90,7 +90,7 @@ export function ChangelogModal({
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-gray-500 dark:text-gray-400">
+              <div className="text-[var(--text-secondary)]">
                 {t('changelog.modal.loading', 'Loading changelog...')}
               </div>
             </div>
@@ -105,14 +105,14 @@ export function ChangelogModal({
               <MDXEditorWrapper content={content} mode="view" enableMermaid={true} />
             </div>
           ) : (
-            <div className="text-gray-500 dark:text-gray-400 text-center">
+            <div className="text-[var(--text-secondary)] text-center">
               {t('changelog.modal.notFound', 'Changelog not found for this version')}
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-700/50 rounded-b-lg flex justify-end">
+        <div className="border-t border-[var(--border-default)] p-6 bg-[var(--surface-panel)] rounded-b-lg flex justify-end gap-3">
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-md focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"

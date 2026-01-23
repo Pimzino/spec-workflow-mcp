@@ -34,7 +34,7 @@ function Content() {
   const renderSourceView = (content: string) => {
     const highlighted = hljs.highlight(content, { language: 'markdown' }).value;
     return (
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 max-h-[80vh] overflow-auto">
+      <div className="bg-[var(--surface-sunken)] rounded-lg border border-[var(--border-default)] p-4 max-h-[80vh] overflow-auto">
         <pre className="text-sm leading-relaxed whitespace-pre-wrap break-words font-mono">
           <code 
             className="language-markdown hljs" 
@@ -48,19 +48,19 @@ function Content() {
   return (
     <div className="grid gap-4">
       <div className="panel p-4 flex items-center justify-between">
-        <div className="font-semibold">
-          {t('specViewer.header.title')}: <span className="text-gray-600 dark:text-gray-400">{spec || t('common.unknown')}</span>
+        <div className="font-semibold text-[var(--text-primary)]">
+          {t('specViewer.header.title')}: <span className="text-[var(--text-secondary)]">{spec || t('common.unknown')}</span>
         </div>
         <div className="flex items-center gap-3">
           {/* Document Type Tabs */}
-          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <div className="flex items-center bg-[var(--surface-sunken)] rounded-lg p-1">
             {(['requirements', 'design', 'tasks'] as const).map((d) => (
-              <button 
-                key={d} 
+              <button
+                key={d}
                 className={`px-3 py-1 text-sm rounded-md transition-colors capitalize ${
-                  activeDoc === d 
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  activeDoc === d
+                    ? 'bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
                 onClick={() => setActiveDoc(d)}
               >
@@ -71,12 +71,12 @@ function Content() {
           
           {/* View Mode Toggle */}
           {current && (
-            <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-              <button 
+            <div className="flex items-center bg-[var(--surface-sunken)] rounded-lg p-1">
+              <button
                 className={`px-3 py-1 text-sm rounded-md transition-colors flex items-center gap-1 ${
-                  viewMode === 'rendered' 
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  viewMode === 'rendered'
+                    ? 'bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
                 onClick={() => setViewMode('rendered')}
                 title={t('specViewer.tooltips.viewRendered')}
@@ -87,11 +87,11 @@ function Content() {
                 </svg>
                 <span className="text-xs">{t('common.viewMode.rendered')}</span>
               </button>
-              <button 
+              <button
                 className={`px-3 py-1 text-sm rounded-md transition-colors flex items-center gap-1 ${
-                  viewMode === 'source' 
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  viewMode === 'source'
+                    ? 'bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
                 onClick={() => setViewMode('source')}
                 title={t('specViewer.tooltips.viewSource')}
@@ -106,7 +106,7 @@ function Content() {
         </div>
       </div>
       
-      <div className="panel p-6">
+      <div className="panel p-4">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -122,12 +122,12 @@ function Content() {
             renderSourceView(current.content)
           )
         ) : (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="text-center py-12 text-[var(--text-muted)]">
+            <svg className="mx-auto h-12 w-12 text-[var(--text-muted)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-lg font-medium">{t('common.noContentAvailable')}</p>
-            <p className="text-sm">{t('specViewer.empty.docNotCreated', { doc: t(`specsPage.documents.${activeDoc}`) })}</p>
+            <p className="text-lg font-medium text-[var(--text-primary)]">{t('common.noContentAvailable')}</p>
+            <p className="text-sm text-[var(--text-secondary)]">{t('specViewer.empty.docNotCreated', { doc: t(`specsPage.documents.${activeDoc}`) })}</p>
           </div>
         )}
       </div>

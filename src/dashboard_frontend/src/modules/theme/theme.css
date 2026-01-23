@@ -1,69 +1,516 @@
+/* =============================================================================
+   DESIGN TOKENS
+   Utility & Function Design System - Developer-focused, GitHub-inspired
+   4px grid | Sharp corners | Semantic colors only | Cool slate palette
+   ============================================================================= */
+
 :root {
-  --bg: #f8fafc;
-  --panel: #ffffff;
-  --text: #0f172a;
-  --muted: #475569;
-  --border: #e2e8f0;
-  --brand: #4f46e5;
+  /* -------------------------------------------------------------------------
+     SPACING SCALE (4px grid)
+     ------------------------------------------------------------------------- */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* -------------------------------------------------------------------------
+     TYPOGRAPHY
+     ------------------------------------------------------------------------- */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* -------------------------------------------------------------------------
+     BORDER RADIUS (Sharp - professional, not playful)
+     ------------------------------------------------------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* -------------------------------------------------------------------------
+     SHADOWS (Single subtle approach - borders + minimal shadow)
+     ------------------------------------------------------------------------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-overlay: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  /* -------------------------------------------------------------------------
+     TRANSITIONS
+     ------------------------------------------------------------------------- */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* -------------------------------------------------------------------------
+     LIGHT MODE COLORS (Cool slate/blue-gray palette)
+     ------------------------------------------------------------------------- */
+
+  /* Surfaces */
+  --surface-base: #f8fafc;        /* Page background */
+  --surface-panel: #ffffff;        /* Cards, panels */
+  --surface-elevated: #ffffff;     /* Modals, dropdowns */
+  --surface-inset: #f1f5f9;        /* Inset areas, icon backgrounds */
+  --surface-hover: #e2e8f0;        /* Hover states - visible on white */
+
+  /* Text Hierarchy (4 levels) */
+  --text-primary: #0f172a;         /* High emphasis */
+  --text-secondary: #334155;       /* Medium emphasis */
+  --text-muted: #64748b;           /* Low emphasis */
+  --text-faint: #94a3b8;           /* Minimal emphasis */
+
+  /* Borders */
+  --border-default: #e2e8f0;       /* Standard borders */
+  --border-strong: #cbd5e1;        /* Emphasized borders */
+  --border-focus: #6366f1;         /* Focus rings */
+
+  /* Interactive */
+  --interactive-primary: #4f46e5;  /* Primary buttons, links */
+  --interactive-primary-hover: #4338ca;
+  --interactive-secondary: #f1f5f9;
+  --interactive-secondary-hover: #e2e8f0;
+
+  /* Status Colors (semantic only - not decorative) */
+  --status-success: #16a34a;
+  --status-success-muted: #dcfce7;
+  --status-success-bg: #dcfce7;
+  --status-warning: #ca8a04;
+  --status-warning-muted: #fef9c3;
+  --status-error: #dc2626;
+  --status-error-muted: #fee2e2;
+  --status-error-bg: #fee2e2;
+  --status-error-border: #fca5a5;
+  --status-info: #2563eb;
+  --status-info-muted: #dbeafe;
+  --status-pending: #64748b;
+  --status-pending-muted: #f1f5f9;
+  --status-in-progress: #7c3aed;
+  --status-in-progress-muted: #ede9fe;
+
+  /* Accent Colors (for interactive highlights) */
+  --accent-primary: #4f46e5;
+  --accent-primary-hover: #4338ca;
+  --accent-primary-muted: #e0e7ff;
+  --accent-secondary: #7c3aed;
+  --accent-secondary-muted: #ede9fe;
+
+  /* Surface Aliases (for component compatibility) */
+  --surface-secondary: #f1f5f9;
+  --surface-sunken: #f1f5f9;
+  --surface-raised: #ffffff;
+  --surface-page: #f8fafc;
+
+  /* Border Aliases */
+  --border-subtle: #e2e8f0;
+
+  /* Text Aliases */
+  --text-tertiary: #94a3b8;
+  --text-accent: #4f46e5;
+
+  /* Legacy aliases for compatibility */
+  --bg: var(--surface-base);
+  --panel: var(--surface-panel);
+  --text: var(--text-primary);
+  --muted: var(--text-muted);
+  --border: var(--border-default);
+  --brand: var(--interactive-primary);
 }
 
-.dark:root {
-  --bg: #0f172a;
-  --panel: #111827;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --border: #1f2937;
-  --brand: #6366f1;
+/* ---------------------------------------------------------------------------
+   DARK MODE COLORS
+   --------------------------------------------------------------------------- */
+.dark:root,
+.dark {
+  /* Surfaces */
+  --surface-base: #0f172a;
+  --surface-panel: #1e293b;
+  --surface-elevated: #1e293b;
+  --surface-inset: #0f172a;
+  --surface-hover: #334155;
+
+  /* Text Hierarchy */
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+
+  /* Borders */
+  --border-default: #334155;
+  --border-strong: #475569;
+  --border-focus: #818cf8;
+
+  /* Interactive */
+  --interactive-primary: #6366f1;
+  --interactive-primary-hover: #818cf8;
+  --interactive-secondary: #334155;
+  --interactive-secondary-hover: #475569;
+
+  /* Status Colors */
+  --status-success: #22c55e;
+  --status-success-muted: rgba(34, 197, 94, 0.15);
+  --status-success-bg: rgba(34, 197, 94, 0.15);
+  --status-warning: #eab308;
+  --status-warning-muted: rgba(234, 179, 8, 0.15);
+  --status-error: #ef4444;
+  --status-error-muted: rgba(239, 68, 68, 0.15);
+  --status-error-bg: rgba(239, 68, 68, 0.15);
+  --status-error-border: rgba(239, 68, 68, 0.3);
+  --status-info: #3b82f6;
+  --status-info-muted: rgba(59, 130, 246, 0.15);
+  --status-pending: #94a3b8;
+  --status-pending-muted: rgba(148, 163, 184, 0.15);
+  --status-in-progress: #a78bfa;
+  --status-in-progress-muted: rgba(167, 139, 250, 0.15);
+
+  /* Accent Colors (for interactive highlights) */
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #818cf8;
+  --accent-primary-muted: rgba(99, 102, 241, 0.15);
+  --accent-secondary: #a78bfa;
+  --accent-secondary-muted: rgba(167, 139, 250, 0.15);
+
+  /* Surface Aliases (for component compatibility) */
+  --surface-secondary: #1e293b;
+  --surface-sunken: #0f172a;
+  --surface-raised: #334155;
+  --surface-page: #0f172a;
+
+  /* Border Aliases */
+  --border-subtle: #334155;
+
+  /* Text Aliases */
+  --text-tertiary: #64748b;
+  --text-accent: #818cf8;
+
+  /* Shadows (darker in dark mode) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-overlay: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+  /* Legacy aliases */
+  --bg: var(--surface-base);
+  --panel: var(--surface-panel);
+  --text: var(--text-primary);
+  --muted: var(--text-muted);
+  --border: var(--border-default);
+  --brand: var(--interactive-primary);
 }
 
-html, body, #root { height: 100%; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
 
-.app-container { display: flex; flex-direction: column; height: 100%; }
-.app-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--panel); position: sticky; top: 0; z-index: 10; }
-.app-header .left { display: flex; align-items: center; gap: 16px; }
-.app-title { font-weight: 700; }
-.nav a { color: var(--muted); text-decoration: none; margin-right: 12px; padding: 6px 8px; border-radius: 8px; }
-.nav a.active { background: color-mix(in srgb, var(--brand) 15%, transparent); color: var(--text); }
-.right { display: flex; align-items: center; gap: 10px; }
-.status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-.status-dot.ok { background: #22c55e; }
-.status-dot.err { background: #ef4444; }
-.theme-btn { background: var(--panel); border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
-.app-main { padding: 16px; max-width: 1200px; width: 100%; margin: 0 auto; }
+html, body, #root {
+  height: 100%;
+}
 
-.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-.grid { display: grid; gap: 16px; }
-.grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.stat { display: flex; flex-direction: column; gap: 4px; }
-.stat .label { color: var(--muted); font-size: 12px; }
-.stat .value { font-size: 24px; font-weight: 700; }
+body {
+  margin: 0;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-.select { padding: 8px 10px; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+/* =============================================================================
+   LAYOUT COMPONENTS
+   ============================================================================= */
 
-.progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
-.progress-bar > span { display: block; height: 100%; background: linear-gradient(90deg, #60a5fa, #a78bfa); }
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 
-.task { border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
-.task.header { background: color-mix(in srgb, var(--brand) 10%, var(--panel)); }
-.task.done { background: color-mix(in srgb, #22c55e 10%, var(--panel)); }
-.task.progress { background: color-mix(in srgb, #3b82f6 10%, var(--panel)); }
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  background: var(--surface-panel);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-.muted { color: var(--muted); }
+.app-header .left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
 
-/* Markdown styles (GitHub-like) */
-.markdown-content { line-height: 1.7; font-size: 16px; }
-.markdown-content pre { padding: 12px; border: 1px solid var(--border); border-radius: 8px; overflow: auto; background: color-mix(in srgb, var(--panel) 90%, #000); }
-.markdown-content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 { margin: 16px 0 8px; }
-.markdown-content table { border-collapse: collapse; width: 100%; }
-.markdown-content table th, .markdown-content table td { border: 1px solid var(--border); padding: 6px 10px; }
-.markdown-content .mermaid { text-align: center; margin: 20px 0; }
+.app-title {
+  font-weight: var(--font-bold);
+  font-size: var(--text-base);
+}
 
-/* Syntax highlighting for markdown source view */
+.nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-right: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+}
+
+.nav a:hover {
+  color: var(--text-secondary);
+  background: var(--surface-hover);
+}
+
+.nav a.active {
+  background: color-mix(in srgb, var(--interactive-primary) 12%, transparent);
+  color: var(--interactive-primary);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.app-main {
+  padding: var(--space-4);
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* =============================================================================
+   COMPONENT STYLES
+   ============================================================================= */
+
+/* Panel / Card */
+.panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+/* Status Indicators */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot.ok { background: var(--status-success); }
+.status-dot.err { background: var(--status-error); }
+.status-dot.pending { background: var(--status-pending); }
+.status-dot.in-progress { background: var(--status-in-progress); }
+
+/* Buttons */
+.theme-btn {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.theme-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Stats */
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stat .label {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.stat .value {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Form Elements */
+.select {
+  padding: var(--space-2);
+  background: var(--surface-panel);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  transition: var(--transition-fast);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--border-focus) 20%, transparent);
+}
+
+/* Progress Bar (solid color, no gradient) */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-inset);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--interactive-primary);
+  transition: width var(--transition-normal);
+}
+
+/* Task Cards */
+.task {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--surface-panel);
+  transition: var(--transition-fast);
+}
+
+.task:hover {
+  border-color: var(--border-strong);
+}
+
+.task.header {
+  border-left: 3px solid var(--interactive-primary);
+}
+
+.task.done {
+  border-left: 3px solid var(--status-success);
+}
+
+.task.progress {
+  border-left: 3px solid var(--status-in-progress);
+}
+
+/* Utility Classes */
+.muted {
+  color: var(--text-muted);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* =============================================================================
+   MARKDOWN STYLES (GitHub-like)
+   ============================================================================= */
+
+.markdown-content {
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-lg);
+}
+
+.markdown-content pre {
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: auto;
+  background: var(--surface-inset);
+  font-family: var(--font-mono);
+}
+
+.markdown-content code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.markdown-content :not(pre) > code {
+  padding: 2px 6px;
+  background: var(--surface-inset);
+  border-radius: var(--radius-sm);
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-weight: var(--font-semibold);
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.markdown-content table th,
+.markdown-content table td {
+  border: 1px solid var(--border-default);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+
+.markdown-content table th {
+  background: var(--surface-inset);
+  font-weight: var(--font-medium);
+}
+
+.markdown-content .mermaid {
+  text-align: center;
+  margin: var(--space-5) 0;
+}
+
+/* =============================================================================
+   SYNTAX HIGHLIGHTING (GitHub-like)
+   ============================================================================= */
+
 .hljs {
   background: transparent !important;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .hljs-comment,
@@ -163,5 +610,3 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: system
 .dark .hljs-link {
   color: #79c0ff;
 }
-
-

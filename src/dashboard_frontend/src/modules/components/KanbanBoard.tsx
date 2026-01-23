@@ -167,10 +167,11 @@ export function KanbanBoard({
     const configs = {
       pending: {
         title: t('tasksPage.statusPill.pending', 'Pending'),
-        bgColor: 'bg-gray-50 dark:bg-gray-900/50',
-        borderColor: 'border-gray-200 dark:border-gray-700',
-        headerBg: 'bg-gray-100 dark:bg-gray-800',
-        textColor: 'text-gray-700 dark:text-gray-300',
+        bgColor: 'bg-[var(--surface-base)]',
+        borderColor: 'border-[var(--border-default)]',
+        headerBg: 'bg-[var(--surface-panel)]',
+        textColor: 'text-[var(--text-secondary)]',
+        dotColor: 'bg-gray-400',
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -179,10 +180,11 @@ export function KanbanBoard({
       },
       'in-progress': {
         title: t('tasksPage.statusPill.inProgress', 'In Progress'),
-        bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-        borderColor: 'border-orange-200 dark:border-orange-700',
-        headerBg: 'bg-orange-100 dark:bg-orange-800',
-        textColor: 'text-orange-700 dark:text-orange-300',
+        bgColor: 'bg-[var(--surface-base)]',
+        borderColor: 'border-[var(--border-default)]',
+        headerBg: 'bg-[var(--surface-panel)]',
+        textColor: 'text-[var(--text-secondary)]',
+        dotColor: 'bg-orange-500',
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -191,10 +193,11 @@ export function KanbanBoard({
       },
       completed: {
         title: t('tasksPage.statusPill.completed', 'Completed'),
-        bgColor: 'bg-green-50 dark:bg-green-900/20',
-        borderColor: 'border-green-200 dark:border-green-700',
-        headerBg: 'bg-green-100 dark:bg-green-800',
-        textColor: 'text-green-700 dark:text-green-300',
+        bgColor: 'bg-[var(--surface-base)]',
+        borderColor: 'border-[var(--border-default)]',
+        headerBg: 'bg-[var(--surface-panel)]',
+        textColor: 'text-[var(--text-secondary)]',
+        dotColor: 'bg-green-500',
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -226,7 +229,7 @@ export function KanbanBoard({
         ref={setNodeRef}
         key={status}
         className={`
-          w-72 snap-center flex-shrink-0 rounded-lg border flex flex-col
+          w-72 snap-center flex-shrink-0 rounded-md border flex flex-col
           sm:w-80 md:w-80
           lg:flex-1 lg:min-w-80
           ${config.borderColor} ${config.bgColor}
@@ -234,17 +237,15 @@ export function KanbanBoard({
         `}
       >
         {/* Column Header */}
-        <div className={`px-4 py-3 rounded-t-lg ${config.headerBg} border-b ${config.borderColor}`}>
+        <div className={`px-4 py-3 rounded-t-md ${config.headerBg} border-b ${config.borderColor}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className={config.textColor}>
-                {config.icon}
-              </div>
+              <div className={`w-2 h-2 rounded-full ${config.dotColor}`} />
               <h3 className={`text-sm font-medium ${config.textColor}`}>
                 {config.title}
               </h3>
             </div>
-            <span className={`text-sm ${config.textColor} bg-white dark:bg-gray-800 px-2 py-1 rounded-full`}>
+            <span className={`text-sm ${config.textColor} bg-[var(--surface-base)] px-2 py-1 rounded-md`}>
               {columnTasks.length}
             </span>
           </div>

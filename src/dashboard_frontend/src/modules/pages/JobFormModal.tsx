@@ -156,18 +156,18 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-        <div className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+      <div className="bg-[var(--surface-panel)] rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
+        <div className="px-6 pt-6 pb-4 border-b border-[var(--border-default)]">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
             {isEditMode ? 'Edit Automation Job' : 'Create New Automation Job'}
           </h2>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <form id="job-form" onSubmit={handleSubmit} className="space-y-6">
+          <form id="job-form" onSubmit={handleSubmit} className="space-y-4">
           {/* Job Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Job Name *
             </label>
             <input
@@ -175,32 +175,32 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Weekly Cleanup"
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white ${
-                errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              className={`w-full px-3 py-2 bg-[var(--surface-panel)] border rounded-md text-[var(--text-primary)] ${
+                errors.name ? 'border-[var(--status-error)]' : 'border-[var(--border-default)]'
               }`}
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-[var(--status-error)] text-sm mt-1">{errors.name}</p>}
           </div>
 
           {/* Job Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Job Type *
             </label>
             <div className="space-y-2">
               {JOB_TYPES.map((jobType) => (
-                <label key={jobType.value} className="flex items-start cursor-pointer p-3 border rounded-lg dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <label key={jobType.value} className="flex items-start cursor-pointer p-3 border border-[var(--border-default)] rounded-md hover:bg-[var(--surface-hover)] transition-colors">
                   <input
                     type="radio"
                     name="type"
                     value={jobType.value}
                     checked={formData.type === jobType.value}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                    className="mt-1 mr-3"
+                    className="mt-1 mr-3 accent-[var(--accent-primary)]"
                   />
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">{jobType.label}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">{jobType.description}</div>
+                    <div className="font-medium text-[var(--text-primary)]">{jobType.label}</div>
+                    <div className="text-sm text-[var(--text-muted)]">{jobType.description}</div>
                   </div>
                 </label>
               ))}
@@ -213,14 +213,14 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               <button
                 type="button"
                 onClick={() => setShowTemplateSelector(!showTemplateSelector)}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-2"
+                className="text-sm text-[var(--accent-primary)] hover:underline mb-2"
               >
                 {showTemplateSelector ? 'Hide Templates' : 'Use Template'}
               </button>
 
               {showTemplateSelector && (
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg space-y-2">
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-400 mb-3">
+                <div className="p-3 bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 rounded-md space-y-2">
+                  <p className="text-sm font-medium text-[var(--accent-primary)] mb-4">
                     Quick Templates for {formData.type === 'cleanup-approvals' ? 'Approvals' : formData.type === 'cleanup-specs' ? 'Specs' : 'Archived Specs'}:
                   </p>
                   <div className="space-y-2">
@@ -229,12 +229,12 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
                         key={template.name}
                         type="button"
                         onClick={() => applyTemplate(template.name)}
-                        className="w-full text-left p-2 bg-white dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded transition-colors"
+                        className="w-full text-left p-2 bg-[var(--surface-panel)] hover:bg-[var(--surface-hover)] rounded-md transition-colors"
                       >
-                        <div className="font-medium text-sm text-gray-900 dark:text-white">
+                        <div className="font-medium text-sm text-[var(--text-primary)]">
                           {template.name}
                         </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                        <div className="text-xs text-[var(--text-muted)]">
                           {template.description}
                         </div>
                       </button>
@@ -247,7 +247,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
 
           {/* Days Old */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Delete records older than (days) *
             </label>
             <input
@@ -256,26 +256,26 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               max="3650"
               value={formData.daysOld}
               onChange={(e) => setFormData({ ...formData, daysOld: parseInt(e.target.value) || 0 })}
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white ${
-                errors.daysOld ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              className={`w-full px-3 py-2 bg-[var(--surface-panel)] border rounded-md text-[var(--text-primary)] ${
+                errors.daysOld ? 'border-[var(--status-error)]' : 'border-[var(--border-default)]'
               }`}
             />
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               Records created {formData.daysOld} or more days ago will be deleted
             </p>
-            {errors.daysOld && <p className="text-red-500 text-sm mt-1">{errors.daysOld}</p>}
+            {errors.daysOld && <p className="text-[var(--status-error)] text-sm mt-1">{errors.daysOld}</p>}
           </div>
 
           {/* Schedule (Cron Expression) */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium text-[var(--text-secondary)]">
                 Schedule (Cron Expression) *
               </label>
               <button
                 type="button"
                 onClick={() => setShowCronHelper(!showCronHelper)}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs text-[var(--accent-primary)] hover:underline"
               >
                 {showCronHelper ? 'Hide Helper' : 'Show Helper'}
               </button>
@@ -283,8 +283,8 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
 
             {/* Cron Presets */}
             {showCronHelper && (
-              <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="mb-4 p-3 bg-[var(--surface-secondary)] rounded-md space-y-2">
+                <p className="text-xs font-medium text-[var(--text-secondary)] mb-2">
                   Common Schedules:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -299,10 +299,10 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
                         }
                       }}
                       disabled={!preset.value}
-                      className={`text-left px-2 py-1 text-xs rounded transition-colors ${
+                      className={`text-left px-2 py-1 text-xs rounded-md transition-colors ${
                         preset.value
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50'
-                          : 'text-gray-500 dark:text-gray-400 cursor-default'
+                          ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/20'
+                          : 'text-[var(--text-muted)] cursor-default'
                       }`}
                     >
                       <div className="font-medium">{preset.label}</div>
@@ -312,14 +312,14 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
                     </button>
                   ))}
                 </div>
-                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
+                  <p className="text-xs text-[var(--text-muted)] mb-2">
                     <strong>Cron Format:</strong> minute hour day month day-of-week
                   </p>
-                  <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                    <li>• <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">0 2 * * *</code> = Daily at 2 AM</li>
-                    <li>• <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">0 */6 * * *</code> = Every 6 hours</li>
-                    <li>• <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">0 2 1 * *</code> = Monthly on 1st at 2 AM</li>
+                  <ul className="text-xs text-[var(--text-muted)] space-y-1">
+                    <li>* <code className="bg-[var(--surface-secondary)] px-1 rounded">0 2 * * *</code> = Daily at 2 AM</li>
+                    <li>* <code className="bg-[var(--surface-secondary)] px-1 rounded">0 */6 * * *</code> = Every 6 hours</li>
+                    <li>* <code className="bg-[var(--surface-secondary)] px-1 rounded">0 2 1 * *</code> = Monthly on 1st at 2 AM</li>
                   </ul>
                 </div>
               </div>
@@ -330,48 +330,48 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               value={formData.schedule}
               onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
               placeholder="e.g., 0 2 * * * (daily at 2 AM)"
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white font-mono text-sm ${
-                errors.schedule ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              className={`w-full px-3 py-2 bg-[var(--surface-panel)] border rounded-md text-[var(--text-primary)] font-mono text-sm ${
+                errors.schedule ? 'border-[var(--status-error)]' : 'border-[var(--border-default)]'
               }`}
             />
-            {errors.schedule && <p className="text-red-500 text-sm mt-1">{errors.schedule}</p>}
+            {errors.schedule && <p className="text-[var(--status-error)] text-sm mt-1">{errors.schedule}</p>}
           </div>
 
           {/* Enabled Toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.enabled}
                 onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
-                className="w-5 h-5 rounded"
+                className="w-5 h-5 rounded-md accent-[var(--accent-primary)]"
               />
-              <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="ml-2 text-sm font-medium text-[var(--text-secondary)]">
                 Enabled
               </span>
             </label>
-            <span className="text-xs text-gray-600 dark:text-gray-400">
+            <span className="text-xs text-[var(--text-muted)]">
               {formData.enabled ? 'This job will run according to its schedule' : 'This job is disabled and will not run'}
             </span>
           </div>
 
           {/* Submit Errors */}
           {errors.submit && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-700 dark:text-red-400">{errors.submit}</p>
+            <div className="p-3 bg-[var(--status-error-bg)] border border-[var(--status-error-border)] rounded-md">
+              <p className="text-sm text-[var(--status-error)]">{errors.submit}</p>
             </div>
           )}
           </form>
         </div>
 
         {/* Sticky Footer with Action Buttons */}
-        <div className="px-6 pb-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div className="px-6 pb-6 pt-4 border-t border-[var(--border-default)] bg-[var(--surface-panel)]">
           <div className="flex gap-2">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-[var(--surface-secondary)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] rounded-md transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -379,7 +379,7 @@ export function JobFormModal({ isOpen, onClose, onSubmit, initialJob, isLoading 
               type="submit"
               form="job-form"
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] text-white rounded-md transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading && <span className="animate-spin">⟳</span>}
               {isEditMode ? 'Update Job' : 'Create Job'}

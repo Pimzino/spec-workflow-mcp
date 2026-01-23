@@ -204,17 +204,17 @@ function ApprovalItem({ a }: { a: any }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow rounded-lg transition-colors overflow-hidden max-w-full">
+    <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg transition-colors overflow-hidden max-w-full">
       <div className="p-3 sm:p-4 md:p-6 lg:p-8 min-w-0 max-w-full overflow-x-hidden">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <h3 className="text-base sm:text-lg md:text-xl font-medium text-gray-900 dark:text-white mb-2 truncate">
+            <h3 className="text-base sm:text-lg md:text-xl font-medium text-[var(--text-primary)] mb-2 truncate">
               {a.title}
             </h3>
 
             {/* File Path */}
             {a.filePath && (
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1 min-w-0 max-w-full">
+              <div className="text-sm text-[var(--text-muted)] mb-2 flex items-center gap-1 min-w-0 max-w-full">
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -223,15 +223,15 @@ function ApprovalItem({ a }: { a: any }) {
             )}
 
             {/* Approval Status */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm mb-3">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            <div className="flex flex-wrap items-center gap-3 text-sm mb-3">
+              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                 a.status === 'pending'
-                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                  ? 'bg-[var(--status-warning-muted)] text-[var(--status-warning)]'
                   : a.status === 'needs-revision'
-                  ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                  ? 'bg-[var(--status-warning-muted)] text-[var(--status-warning)]'
                   : a.status === 'approved'
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                  ? 'bg-[var(--status-success-muted)] text-[var(--status-success)]'
+                  : 'bg-[var(--status-error-muted)] text-[var(--status-error)]'
               }`}>
                 <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {a.status === 'pending' && (
@@ -250,7 +250,7 @@ function ApprovalItem({ a }: { a: any }) {
                 {a.status === 'needs-revision' ? t('approvals.status.needsRevision') : t(`approvals.status.${a.status}`)}
               </span>
 
-              <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              <span className="text-[var(--text-faint)] flex items-center gap-1 font-mono tabular-nums">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-6 0h6M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2" />
                 </svg>
@@ -259,7 +259,7 @@ function ApprovalItem({ a }: { a: any }) {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex flex-wrap items-center gap-3 min-w-0">
               <button
                 onClick={() => setOpen(!open)}
                 className="btn text-xs sm:text-sm flex items-center gap-1 min-w-0 touch-manipulation"
@@ -342,19 +342,19 @@ function ApprovalItem({ a }: { a: any }) {
       </div>
 
       {open && (
-        <div className="border-t border-gray-200 dark:border-gray-700 p-2 sm:p-3 md:p-4 lg:p-6 min-w-0 max-w-full overflow-x-hidden relative">
+        <div className="border-t border-[var(--border-default)] p-2 sm:p-3 md:p-4 lg:p-6 min-w-0 max-w-full overflow-x-hidden relative">
 
           {/* View Controls */}
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* View Mode Tabs */}
             <div className="space-y-2">
-              <div className="flex items-center bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center bg-[var(--surface-panel)] rounded-lg p-1 shadow-sm border border-[var(--border-default)]">
               <button
                 onClick={() => setViewMode('preview')}
                 className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-colors flex items-center justify-center gap-1 ${
                   viewMode === 'preview'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-[var(--accent-primary)] text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -367,8 +367,8 @@ function ApprovalItem({ a }: { a: any }) {
                 onClick={() => setViewMode('annotate')}
                 className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-colors flex items-center justify-center gap-1 ${
                   viewMode === 'annotate'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-[var(--accent-primary)] text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,8 +380,8 @@ function ApprovalItem({ a }: { a: any }) {
                 onClick={() => setViewMode('side-by-side')}
                 className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-colors flex items-center justify-center gap-1 ${
                   viewMode === 'side-by-side'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-[var(--accent-primary)] text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
                 title={t('approvals.annotator.sideBySide.tooltip')}
               >
@@ -395,8 +395,8 @@ function ApprovalItem({ a }: { a: any }) {
                   onClick={() => setViewMode('diff')}
                   className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-colors flex items-center justify-center gap-1 ${
                     viewMode === 'diff'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      ? 'bg-[var(--accent-primary)] text-white'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -414,11 +414,11 @@ function ApprovalItem({ a }: { a: any }) {
                 {/* Two-dropdown comparison selector */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 min-w-0 w-full sm:w-auto">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">From:</label>
+                    <label className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">From:</label>
                     <select
                       value={selectedSnapshotVersion}
                       onChange={(e) => setSelectedSnapshotVersion(parseInt(e.target.value, 10))}
-                      className="block w-full sm:w-auto max-w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="block w-full sm:w-auto max-w-full rounded-lg border-[var(--border-default)] bg-[var(--surface-panel)] text-sm focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                     >
                       {snapshots.map((snapshot) => (
                         <option key={snapshot.version} value={snapshot.version}>
@@ -429,7 +429,7 @@ function ApprovalItem({ a }: { a: any }) {
                   </div>
 
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 min-w-0 w-full sm:w-auto">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">To:</label>
+                    <label className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">To:</label>
                     <div
                       className="px-3 py-1.5 text-sm bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md border border-blue-200 dark:border-blue-800 truncate max-w-[200px]"
                       title={a.filePath}
@@ -452,7 +452,7 @@ function ApprovalItem({ a }: { a: any }) {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span className="ml-2 text-gray-600 dark:text-gray-400">Loading changes...</span>
+                  <span className="ml-2 text-[var(--text-muted)]">Loading changes...</span>
                 </div>
               )}
 
@@ -461,33 +461,33 @@ function ApprovalItem({ a }: { a: any }) {
                   <div className="flex items-center justify-between mb-3">
                     <DiffStats diff={diff} showDetails={true} />
                     {/* View Mode Toggle */}
-                    <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-md p-0.5">
+                    <div className="flex items-center bg-[var(--surface-inset)] rounded-lg p-0.5">
                       <button
                         onClick={() => setDiffViewMode('split')}
-                        className={`px-2 py-1 text-xs rounded transition-colors ${
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
                           diffViewMode === 'split'
-                            ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm'
+                            : 'text-[var(--text-muted)]'
                         }`}
                       >
                         Split
                       </button>
                       <button
                         onClick={() => setDiffViewMode('unified')}
-                        className={`px-2 py-1 text-xs rounded transition-colors ${
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
                           diffViewMode === 'unified'
-                            ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm'
+                            : 'text-[var(--text-muted)]'
                         }`}
                       >
                         Unified
                       </button>
                       <button
                         onClick={() => setDiffViewMode('inline')}
-                        className={`px-2 py-1 text-xs rounded transition-colors ${
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
                           diffViewMode === 'inline'
-                            ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
+                            ? 'bg-[var(--surface-panel)] text-[var(--text-primary)] shadow-sm'
+                            : 'text-[var(--text-muted)]'
                         }`}
                       >
                         Inline
@@ -503,8 +503,8 @@ function ApprovalItem({ a }: { a: any }) {
               )}
 
               {!diffLoading && diff && !hasDiffChanges(diff) && (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <svg className="mx-auto w-8 h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="text-center py-8 text-[var(--text-muted)]">
+                  <svg className="mx-auto w-8 h-8 text-[var(--text-faint)] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <p className="font-medium">No changes detected</p>
@@ -619,20 +619,20 @@ function Content() {
   return (
     <div className="grid gap-4 max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+      <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">{t('approvalsPage.header.title')}</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--text-primary)]">{t('approvalsPage.header.title')}</h2>
+              <p className="text-sm text-[var(--text-muted)] mt-1">
                 {t('approvalsPage.header.subtitle')}
               </p>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            <div className="flex items-center gap-3 text-sm text-[var(--text-muted)]">
+              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                 pendingCount > 0
-                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                  : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  ? 'bg-[var(--status-warning-muted)] text-[var(--status-warning)]'
+                  : 'bg-[var(--status-success-muted)] text-[var(--status-success)]'
               }`}>
                 {t('approvalsPage.pendingCount', { count: pendingCount })}
               </span>
@@ -641,12 +641,12 @@ function Content() {
 
           {/* Filter Dropdown */}
           {categories.length > 1 && (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 overflow-x-hidden">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('approvalsPage.filter.label')}</label>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 overflow-x-hidden">
+              <label className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">{t('approvalsPage.filter.label')}</label>
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="block w-full sm:w-auto max-w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:border-blue-500 focus:ring-blue-500"
+                className="block w-full sm:w-auto max-w-full rounded-lg border-[var(--border-default)] bg-[var(--surface-panel)] text-sm focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
               >
                 {categories.map(cat => (
                   <option key={cat} value={cat}>
@@ -663,13 +663,13 @@ function Content() {
 
       {/* Approvals List */}
       {filteredApprovals.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-3 sm:p-4 md:p-6 max-w-full overflow-x-hidden">
-          <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-gray-400">
-            <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3 sm:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg p-3 sm:p-4 md:p-6 max-w-full overflow-x-hidden">
+          <div className="text-center py-8 sm:py-12 text-[var(--text-muted)]">
+            <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-[var(--text-faint)] mb-3 sm:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-1 sm:mb-2">{t('approvalsPage.empty.title')}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">{t('approvalsPage.empty.description')}</p>
+            <p className="text-base sm:text-lg font-medium text-[var(--text-primary)] mb-1 sm:mb-2">{t('approvalsPage.empty.title')}</p>
+            <p className="text-sm text-[var(--text-muted)] max-w-sm mx-auto">{t('approvalsPage.empty.description')}</p>
           </div>
         </div>
       ) : (

@@ -207,13 +207,13 @@ function Content() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-[var(--surface-panel)] rounded-lg border border-[var(--border-default)] p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-1">
+            <h1 className="text-2xl font-semibold text-[var(--text-primary)] mb-1">
               {t('settings.title', 'Settings')}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-[var(--text-secondary)]">
               {t('settings.description', 'Manage automated cleanup jobs that run across all connected projects')}
             </p>
           </div>
@@ -222,17 +222,17 @@ function Content() {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-          <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+        <div className="bg-[var(--status-error-bg)] border border-[var(--status-error-border)] rounded-lg p-4">
+          <p className="text-sm text-[var(--status-error)]">{error}</p>
         </div>
       )}
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8">
+        <div className="bg-[var(--surface-panel)] rounded-lg border border-[var(--border-default)] p-8">
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600 dark:text-gray-400">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent-primary)]"></div>
+            <span className="ml-3 text-[var(--text-secondary)]">
               {t('settings.loading', 'Loading jobs...')}
             </span>
           </div>
@@ -240,16 +240,16 @@ function Content() {
       )}
 
       {/* Automated Cleanup Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-[var(--surface-panel)] rounded-lg border border-[var(--border-default)] overflow-hidden">
         {/* Section Header */}
         <button
           onClick={() => toggleSectionExpanded('automatedCleanup')}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-[var(--surface-hover)] transition-colors"
         >
-          <div className="flex items-center gap-3 flex-1 text-left">
-            <ChevronRightIcon className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform ${expandedSections.has('automatedCleanup') ? 'rotate-90' : ''}`} />
+          <div className="flex items-center gap-4 flex-1 text-left">
+            <ChevronRightIcon className={`w-5 h-5 text-[var(--text-muted)] transition-transform ${expandedSections.has('automatedCleanup') ? 'rotate-90' : ''}`} />
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">
                 {t('settings.section.automatedCleanup', 'Automated Cleanup')}
               </h2>
             </div>
@@ -258,8 +258,8 @@ function Content() {
 
         {/* Section Description and Content */}
         {expandedSections.has('automatedCleanup') && (
-          <div className="border-t border-gray-200 dark:border-gray-700 p-6 space-y-6">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="border-t border-[var(--border-default)] p-6 space-y-6">
+            <p className="text-sm text-[var(--text-secondary)]">
               {t('settings.section.automatedCleanupDesc', 'Automatically delete old approval records, specifications, and archived specifications based on a schedule. Configure cleanup jobs to run on a recurring basis across all connected projects.')}
             </p>
 
@@ -270,7 +270,7 @@ function Content() {
                   setEditingJob(null);
                   setShowFormModal(true);
                 }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] text-white text-sm font-medium rounded-md transition-colors"
               >
                 {t('settings.addJob', 'Add Job')}
               </button>
@@ -278,15 +278,15 @@ function Content() {
 
             {/* Jobs List */}
             {!loading && jobs.length === 0 && (
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-8">
+              <div className="bg-[var(--surface-secondary)] rounded-lg border border-[var(--border-default)] p-8">
                 <div className="text-center">
-                  <svg className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+                  <h3 className="text-lg font-medium text-[var(--text-primary)] mb-1">
                     {t('settings.noJobs', 'No automation jobs')}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                  <p className="text-sm text-[var(--text-secondary)] mb-6">
                     {t('settings.noJobsDesc', 'Create your first automation job to get started')}
                   </p>
                   <button
@@ -294,7 +294,7 @@ function Content() {
                       setEditingJob(null);
                       setShowFormModal(true);
                     }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="px-4 py-2 bg-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] text-white text-sm font-medium rounded-md transition-colors"
                   >
                     {t('settings.createFirst', 'Create First Job')}
                   </button>
@@ -306,17 +306,17 @@ function Content() {
             {!loading && jobs.length > 0 && (
               <div className="grid grid-cols-1 gap-4">
                 {jobs.map((job) => (
-          <div key={job.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div key={job.id} className="bg-[var(--surface-panel)] rounded-lg border border-[var(--border-default)] overflow-hidden">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{job.name}</h3>
-                  <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded">
+                <div className="flex items-center gap-4 mb-2">
+                  <h3 className="text-lg font-semibold text-[var(--text-primary)]">{job.name}</h3>
+                  <span className="px-2 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] text-xs font-medium rounded-md">
                     {getJobTypeLabel(job.type)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                <p className="text-sm text-[var(--text-secondary)] mb-4">
                   {t('settings.jobDescription', 'Delete records older than {{days}} days on schedule: {{schedule}}', {
                     days: job.daysOld,
                     schedule: job.schedule
@@ -325,16 +325,16 @@ function Content() {
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="text-xs font-medium text-gray-600 dark:text-gray-400 block mb-1">
+                    <label className="text-xs font-medium text-[var(--text-muted)] block mb-1">
                       {t('settings.lastRun', 'Last Run')}
                     </label>
-                    <p className="text-sm text-gray-900 dark:text-white">{formatLastRun(job.lastRun)}</p>
+                    <p className="text-sm text-[var(--text-primary)]">{formatLastRun(job.lastRun)}</p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-600 dark:text-gray-400 block mb-1">
+                    <label className="text-xs font-medium text-[var(--text-muted)] block mb-1">
                       {t('settings.schedule', 'Schedule')}
                     </label>
-                    <p className="text-sm text-gray-900 dark:text-white font-mono">{job.schedule}</p>
+                    <p className="text-sm text-[var(--text-primary)] font-mono">{job.schedule}</p>
                   </div>
                 </div>
               </div>
@@ -344,7 +344,7 @@ function Content() {
                 <button
                   type="button"
                   onClick={() => toggleJobExpanded(job.id)}
-                  className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  className="flex items-center gap-1 text-sm text-[var(--accent-primary)] hover:underline"
                 >
                   {expandedJobs.has(job.id) ? (
                     <ChevronDownIcon className="w-4 h-4" />
@@ -358,9 +358,9 @@ function Content() {
                     type="checkbox"
                     checked={job.enabled}
                     onChange={() => handleToggleJob(job.id, job.enabled)}
-                    className="w-5 h-5 rounded"
+                    className="w-5 h-5 rounded-md accent-[var(--accent-primary)]"
                   />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <span className="text-sm font-medium text-[var(--text-secondary)]">
                     {job.enabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </label>
@@ -369,11 +369,11 @@ function Content() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex gap-2 pt-4 border-t border-[var(--border-default)]">
               <button
                 onClick={() => handleRunJob(job.id)}
                 disabled={running[job.id] || !job.enabled}
-                className="flex-1 px-3 py-2 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400 text-sm font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-3 py-2 bg-[var(--status-success-bg)] hover:opacity-80 text-[var(--status-success)] text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {running[job.id] ? (
                   <>
@@ -400,7 +400,7 @@ function Content() {
                   setEditingJob(fullJob);
                   setShowFormModal(true);
                 }}
-                className="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded transition-colors"
+                className="flex-1 px-3 py-2 bg-[var(--surface-secondary)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] text-sm font-medium rounded-md transition-colors"
               >
                 {t('settings.edit', 'Edit')}
               </button>
@@ -409,7 +409,7 @@ function Content() {
                   setJobToDelete(job.id);
                   setShowDeleteModal(true);
                 }}
-                className="flex-1 px-3 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 text-sm font-medium rounded transition-colors"
+                className="flex-1 px-3 py-2 bg-[var(--status-error-bg)] hover:opacity-80 text-[var(--status-error)] text-sm font-medium rounded-md transition-colors"
               >
                 {t('settings.delete', 'Delete')}
               </button>
@@ -440,11 +440,11 @@ function Content() {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && jobToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-[var(--surface-panel)] rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
               {t('settings.deleteJob', 'Delete Job')}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-[var(--text-secondary)] mb-6">
               {t('settings.deleteConfirm', 'Are you sure you want to delete this automation job? This action cannot be undone.')}
             </p>
             <div className="flex gap-2">
@@ -453,13 +453,13 @@ function Content() {
                   setShowDeleteModal(false);
                   setJobToDelete(null);
                 }}
-                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors"
+                className="flex-1 px-4 py-2 bg-[var(--surface-secondary)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] rounded-md transition-colors"
               >
                 {t('settings.cancel', 'Cancel')}
               </button>
               <button
                 onClick={handleDeleteJob}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                className="flex-1 px-4 py-2 bg-[var(--status-error)] hover:opacity-80 text-white rounded-md transition-colors"
               >
                 {t('settings.delete', 'Delete')}
               </button>

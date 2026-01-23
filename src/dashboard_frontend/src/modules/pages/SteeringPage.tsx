@@ -163,14 +163,14 @@ function SteeringModal({ document, isOpen, onClose }: { document: SteeringDocume
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-7xl overflow-hidden flex flex-col h-[95vh] max-h-[95vh]">
+      <div className="bg-[var(--surface-panel)] rounded-lg shadow-xl w-full max-w-7xl overflow-hidden flex flex-col h-[95vh] max-h-[95vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--border-default)]">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)] truncate">
               {t('steeringPage.modal.title', { name: document.displayName })}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 hidden sm:block">
+            <p className="text-sm text-[var(--text-secondary)] mt-1 hidden sm:block">
               {t('common.lastModified', { date: formatDate(document.lastModified, t) })}
             </p>
           </div>
@@ -210,7 +210,7 @@ function SteeringDocumentRow({ document, onOpenModal }: { document: SteeringDocu
   const { t } = useTranslation();
   return (
     <tr
-      className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+      className="hover:bg-[var(--surface-hover)] cursor-pointer transition-colors"
       onClick={() => onOpenModal(document)}
     >
       <td className="px-4 py-4">
@@ -221,10 +221,10 @@ function SteeringDocumentRow({ document, onOpenModal }: { document: SteeringDocu
             </svg>
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900 dark:text-white">
+            <div className="text-sm font-medium text-[var(--text-primary)]">
               {document.displayName}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-[var(--text-secondary)]">
               {document.name}.md
             </div>
           </div>
@@ -239,7 +239,7 @@ function SteeringDocumentRow({ document, onOpenModal }: { document: SteeringDocu
           {document.exists ? t('steeringPage.badge.available') : t('steeringPage.badge.notCreated')}
         </span>
       </td>
-      <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+      <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
         {formatDate(document.lastModified, t)}
       </td>
       <td className="px-4 py-4">
@@ -282,11 +282,11 @@ function Content() {
 
   return (
     <div className="grid gap-4">
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6">
+      <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">{t('steeringPage.header.title')}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">{t('steeringPage.header.title')}</h2>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               {t('steeringPage.header.subtitle')}
             </p>
           </div>
@@ -294,24 +294,24 @@ function Content() {
 
         {/* Documents Table - Desktop */}
         <div className="overflow-x-auto hidden lg:block">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+          <table className="min-w-full border border-[var(--border-default)] rounded-lg overflow-hidden">
+            <thead className="bg-[var(--surface-sunken)]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('steeringPage.table.document')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('steeringPage.table.status')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('steeringPage.table.lastModified')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('steeringPage.table.actions')}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-[var(--surface-panel)] divide-y divide-[var(--border-default)]">
               {documents.map((doc) => (
                 <SteeringDocumentRow
                   key={doc.name}
@@ -329,7 +329,7 @@ function Content() {
             <div
               key={doc.name}
               onClick={() => setSelectedDocument(doc)}
-              className="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4 md:p-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="bg-[var(--surface-panel)] rounded-lg border border-[var(--border-default)] p-4 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-center flex-1 min-w-0">
@@ -340,7 +340,7 @@ function Content() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-white truncate">
+                      <h3 className="text-base md:text-lg font-medium text-[var(--text-primary)] truncate">
                         {doc.displayName}
                       </h3>
                       <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -352,11 +352,11 @@ function Content() {
                       </span>
                     </div>
                     <div className="flex items-center mt-1">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-[var(--text-secondary)]">
                         {doc.name}.md
                       </p>
-                      <span className="mx-2 text-gray-300 dark:text-gray-600">•</span>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="mx-2 text-[var(--text-muted)]">•</span>
+                      <p className="text-sm text-[var(--text-secondary)]">
                         {formatDate(doc.lastModified, t)}
                       </p>
                     </div>
@@ -374,12 +374,12 @@ function Content() {
 
         {/* Empty State */}
         {!documents.some(doc => doc.exists) && (
-          <div className="text-center py-12 mt-8 border-t border-gray-200 dark:border-gray-700">
-            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="text-center py-12 mt-8 border-t border-[var(--border-default)]">
+            <svg className="mx-auto h-12 w-12 text-[var(--text-muted)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('steeringPage.empty.title')}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-lg font-medium text-[var(--text-primary)] mb-2">{t('steeringPage.empty.title')}</p>
+            <p className="text-sm text-[var(--text-secondary)]">
               {t('steeringPage.empty.description')}
             </p>
           </div>

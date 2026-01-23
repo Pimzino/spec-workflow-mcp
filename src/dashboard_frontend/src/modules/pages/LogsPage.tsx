@@ -103,7 +103,7 @@ function ArtifactSection({
       </button>
 
       {isExpanded && (
-        <div className="mt-3 space-y-2 pt-3 border-t border-gray-200 dark:border-gray-600">
+        <div className="mt-3 space-y-2 pt-3 border-t border-[var(--border-default)]">
           {items.map((item, idx) => (
             <div key={idx} className="text-sm">
               {type === 'api' && (
@@ -111,18 +111,18 @@ function ArtifactSection({
                   <div className="font-mono text-xs">
                     <span className="font-bold text-blue-600 dark:text-blue-400">{item.method}</span> {item.path}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                  <div className="text-[var(--text-muted)]">{item.purpose}</div>
                   {item.requestFormat && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                    <div className="text-xs text-[var(--text-faint)]">
                       {t('logsPage.artifacts.details.request')} {item.requestFormat}
                     </div>
                   )}
                   {item.responseFormat && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                    <div className="text-xs text-[var(--text-faint)]">
                       {t('logsPage.artifacts.details.response')} {item.responseFormat}
                     </div>
                   )}
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <div className="text-xs bg-[var(--surface-inset)] px-2 py-1 rounded-lg font-mono w-fit">
                     {item.location}
                   </div>
                 </div>
@@ -133,19 +133,19 @@ function ArtifactSection({
                   <div className="font-mono text-xs font-bold text-purple-600 dark:text-purple-400">
                     {item.name}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400 text-xs">{item.type}</div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                  <div className="text-[var(--text-muted)] text-xs">{item.type}</div>
+                  <div className="text-[var(--text-muted)]">{item.purpose}</div>
                   {item.props && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                    <div className="text-xs text-[var(--text-faint)]">
                       {t('logsPage.artifacts.details.props')} {item.props}
                     </div>
                   )}
                   {item.exports && item.exports.length > 0 && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                    <div className="text-xs text-[var(--text-faint)]">
                       {t('logsPage.artifacts.details.exports')} {item.exports.join(', ')}
                     </div>
                   )}
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <div className="text-xs bg-[var(--surface-inset)] px-2 py-1 rounded-lg font-mono w-fit">
                     {item.location}
                   </div>
                 </div>
@@ -156,9 +156,9 @@ function ArtifactSection({
                   <div className="font-mono text-xs font-bold text-green-600 dark:text-green-400">
                     {item.name}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                  <div className="text-[var(--text-muted)]">{item.purpose}</div>
                   {item.signature && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500 font-mono bg-gray-100 dark:bg-gray-700 p-1 rounded">
+                    <div className="text-xs text-[var(--text-faint)] font-mono bg-[var(--surface-inset)] p-1 rounded-lg">
                       {item.signature}
                     </div>
                   )}
@@ -166,10 +166,10 @@ function ArtifactSection({
                     {item.isExported ? (
                       <span className="text-green-600 dark:text-green-400 font-semibold">{t('logsPage.artifacts.details.exported')}</span>
                     ) : (
-                      <span className="text-gray-500 dark:text-gray-400">{t('logsPage.artifacts.details.private')}</span>
+                      <span className="text-[var(--text-muted)]">{t('logsPage.artifacts.details.private')}</span>
                     )}
                   </div>
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <div className="text-xs bg-[var(--surface-inset)] px-2 py-1 rounded-lg font-mono w-fit">
                     {item.location}
                   </div>
                 </div>
@@ -180,9 +180,9 @@ function ArtifactSection({
                   <div className="font-mono text-xs font-bold text-orange-600 dark:text-orange-400">
                     {item.name}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400">{item.purpose}</div>
+                  <div className="text-[var(--text-muted)]">{item.purpose}</div>
                   {item.methods && item.methods.length > 0 && (
-                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                    <div className="text-xs text-[var(--text-faint)]">
                       {t('logsPage.artifacts.details.methods')} {item.methods.join(', ')}
                     </div>
                   )}
@@ -190,10 +190,10 @@ function ArtifactSection({
                     {item.isExported ? (
                       <span className="text-green-600 dark:text-green-400 font-semibold">{t('logsPage.artifacts.details.exported')}</span>
                     ) : (
-                      <span className="text-gray-500 dark:text-gray-400">{t('logsPage.artifacts.details.private')}</span>
+                      <span className="text-[var(--text-muted)]">{t('logsPage.artifacts.details.private')}</span>
                     )}
                   </div>
-                  <div className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded font-mono w-fit">
+                  <div className="text-xs bg-[var(--surface-inset)] px-2 py-1 rounded-lg font-mono w-fit">
                     {item.location}
                   </div>
                 </div>
@@ -201,14 +201,14 @@ function ArtifactSection({
 
               {type === 'integration' && (
                 <div className="space-y-1">
-                  <div className="text-gray-600 dark:text-gray-400 font-medium">{item.description}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">
+                  <div className="text-[var(--text-muted)] font-medium">{item.description}</div>
+                  <div className="text-xs text-[var(--text-faint)]">
                     {t('logsPage.artifacts.details.component')} {item.frontendComponent}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-500">
+                  <div className="text-xs text-[var(--text-faint)]">
                     {t('logsPage.artifacts.details.endpoint')} {item.backendEndpoint}
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-1 rounded">
+                  <div className="text-xs text-[var(--text-muted)] bg-[var(--surface-inset)] p-1 rounded-lg">
                     {t('logsPage.artifacts.details.flow')} {item.dataFlow}
                   </div>
                 </div>
@@ -263,7 +263,7 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[200px] md:min-w-[240px] px-3 py-2 md:px-4 md:py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        className="flex items-center justify-between w-full sm:w-auto md:w-auto min-w-[200px] md:min-w-[240px] px-3 py-2 md:px-4 md:py-3 bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] hover:bg-[var(--surface-hover)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-colors"
       >
         <span className="truncate">
           {selectedSpec ? selectedSpec.displayName : t('logsPage.specDropdown.selectPlaceholder')}
@@ -279,14 +279,14 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 w-full sm:w-80 md:w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
-          <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-600">
+        <div className="absolute top-full mt-1 w-full sm:w-80 md:w-96 bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+          <div className="p-3 md:p-4 border-b border-[var(--border-default)]">
             <input
               type="text"
               placeholder={t('logsPage.specDropdown.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-sm bg-[var(--surface-inset)] border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-faint)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)]"
               autoFocus
             />
           </div>
@@ -295,14 +295,14 @@ function SearchableSpecDropdown({ specs, selected, onSelect }: { specs: any[]; s
               <button
                 key={spec.name}
                 onClick={() => handleSelect(spec)}
-                className="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors"
+                className="w-full text-left px-4 py-3 hover:bg-[var(--surface-hover)] border-b border-[var(--border-subtle)] last:border-b-0 transition-colors"
               >
-                <div className="font-medium text-gray-900 dark:text-white">{spec.displayName}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{spec.name}</div>
+                <div className="font-medium text-[var(--text-primary)]">{spec.displayName}</div>
+                <div className="text-sm text-[var(--text-muted)]">{spec.name}</div>
               </button>
             ))}
             {filteredSpecs.length === 0 && (
-              <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+              <div className="px-4 py-8 text-center text-[var(--text-faint)]">
                 {t('logsPage.specDropdown.noSpecsFound')}
               </div>
             )}
@@ -322,23 +322,23 @@ function LogEntryCard({ entry }: LogEntryProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-3">
+    <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg mb-3">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-start justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        className="w-full flex items-start justify-between p-4 hover:bg-[var(--surface-hover)] transition-colors"
       >
         <div className="flex-1 text-left">
-          <div className="flex items-center gap-2">
-            <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded text-xs font-medium">
+          <div className="flex items-center gap-3">
+            <span className="inline-block px-2 py-0.5 bg-[var(--status-info-muted)] text-[var(--status-info)] rounded-lg text-xs font-medium">
               {t('logsPage.taskBadge', 'Task')} {entry.taskId}
             </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-[var(--text-faint)] font-mono tabular-nums">
               {formatDate(entry.timestamp)}
             </span>
           </div>
-          <p className="mt-2 text-gray-900 dark:text-white font-medium">{entry.summary}</p>
+          <p className="mt-2 text-[var(--text-primary)] font-medium">{entry.summary}</p>
         </div>
-        <div className="ml-4 text-gray-500 dark:text-gray-400 flex-shrink-0">
+        <div className="ml-4 text-[var(--text-muted)] flex-shrink-0">
           {isExpanded ? (
             <ChevronDownIcon className="w-5 h-5" />
           ) : (
@@ -348,26 +348,26 @@ function LogEntryCard({ entry }: LogEntryProps) {
       </button>
 
       {isExpanded && (
-        <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-4">
+        <div className="border-t border-[var(--border-default)] p-4 space-y-4">
           {/* Code Statistics */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('logsPage.stats.title')}</h4>
+            <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-2">{t('logsPage.stats.title')}</h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-green-50 dark:bg-green-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.linesAdded')}</div>
-                <div className="text-lg font-semibold text-green-600 dark:text-green-400">+{entry.statistics.linesAdded}</div>
+              <div className="bg-[var(--status-success-muted)] rounded-lg p-2">
+                <div className="text-xs text-[var(--text-muted)]">{t('logsPage.stats.linesAdded')}</div>
+                <div className="text-lg font-semibold text-[var(--status-success)] font-mono tabular-nums">+{entry.statistics.linesAdded}</div>
               </div>
-              <div className="bg-red-50 dark:bg-red-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.linesRemoved')}</div>
-                <div className="text-lg font-semibold text-red-600 dark:text-red-400">-{entry.statistics.linesRemoved}</div>
+              <div className="bg-[var(--status-error-muted)] rounded-lg p-2">
+                <div className="text-xs text-[var(--text-muted)]">{t('logsPage.stats.linesRemoved')}</div>
+                <div className="text-lg font-semibold text-[var(--status-error)] font-mono tabular-nums">-{entry.statistics.linesRemoved}</div>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.filesChanged')}</div>
-                <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">{entry.statistics.filesChanged}</div>
+              <div className="bg-[var(--status-info-muted)] rounded-lg p-2">
+                <div className="text-xs text-[var(--text-muted)]">{t('logsPage.stats.filesChanged')}</div>
+                <div className="text-lg font-semibold text-[var(--status-info)] font-mono tabular-nums">{entry.statistics.filesChanged}</div>
               </div>
-              <div className="bg-purple-50 dark:bg-purple-900/20 rounded p-2">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('logsPage.stats.netChange')}</div>
-                <div className="text-lg font-semibold text-purple-600 dark:text-purple-400">{entry.statistics.linesAdded - entry.statistics.linesRemoved}</div>
+              <div className="bg-[var(--accent-secondary-muted)] rounded-lg p-2">
+                <div className="text-xs text-[var(--text-muted)]">{t('logsPage.stats.netChange')}</div>
+                <div className="text-lg font-semibold text-[var(--accent-secondary)] font-mono tabular-nums">{entry.statistics.linesAdded - entry.statistics.linesRemoved}</div>
               </div>
             </div>
           </div>
@@ -375,12 +375,12 @@ function LogEntryCard({ entry }: LogEntryProps) {
           {/* Files Modified */}
           {entry.filesModified.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('logsPage.files.modified')} ({entry.filesModified.length})</h4>
+              <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-2">{t('logsPage.files.modified')} ({entry.filesModified.length})</h4>
               <div className="space-y-1">
                 {entry.filesModified.map((file, idx) => (
-                  <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                    <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
-                    <code className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                  <div key={idx} className="text-sm text-[var(--text-muted)] flex items-center">
+                    <span className="inline-block w-1.5 h-1.5 bg-[var(--status-info)] rounded-full mr-2"></span>
+                    <code className="font-mono text-xs bg-[var(--surface-inset)] px-2 py-1 rounded-lg">
                       {file}
                     </code>
                   </div>
@@ -392,12 +392,12 @@ function LogEntryCard({ entry }: LogEntryProps) {
           {/* Files Created */}
           {entry.filesCreated.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('logsPage.files.created')} ({entry.filesCreated.length})</h4>
+              <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-2">{t('logsPage.files.created')} ({entry.filesCreated.length})</h4>
               <div className="space-y-1">
                 {entry.filesCreated.map((file, idx) => (
-                  <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                    <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                    <code className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                  <div key={idx} className="text-sm text-[var(--text-muted)] flex items-center">
+                    <span className="inline-block w-1.5 h-1.5 bg-[var(--status-success)] rounded-full mr-2"></span>
+                    <code className="font-mono text-xs bg-[var(--surface-inset)] px-2 py-1 rounded-lg">
                       {file}
                     </code>
                   </div>
@@ -409,7 +409,7 @@ function LogEntryCard({ entry }: LogEntryProps) {
           {/* Artifacts */}
           {hasAnyArtifacts(entry.artifacts) && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">
                 {t('logsPage.artifacts.title')} ({getTotalArtifactCount(entry.artifacts)})
               </h4>
               <div className="space-y-2">
@@ -689,10 +689,10 @@ export function LogsPage() {
   ];
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="w-full h-full flex flex-col bg-[var(--surface-page)]">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">{t('logsPage.header.title')}</h1>
+      <div className="bg-[var(--surface-panel)] border-b border-[var(--border-default)] p-4 md:p-6">
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-6">{t('logsPage.header.title')}</h1>
 
         {/* Controls */}
         <div className="space-y-4">
@@ -707,7 +707,7 @@ export function LogsPage() {
               placeholder={t('logsPage.search.placeholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-4 py-2 bg-[var(--surface-inset)] border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-faint)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)]"
             />
             <SortDropdown
               currentSort={sortBy}
@@ -721,16 +721,16 @@ export function LogsPage() {
           {/* Task Filter */}
           {uniqueTasks.length > 0 && (
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+              <label className="text-sm font-medium text-[var(--text-secondary)] block mb-2">
                 {t('logsPage.filter.label')}
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => setTaskFilter('')}
-                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                     !taskFilter
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                      ? 'bg-[var(--accent-primary)] text-white'
+                      : 'bg-[var(--surface-inset)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]'
                   }`}
                 >
                   {t('logsPage.filter.all')} ({logs.length})
@@ -741,10 +741,10 @@ export function LogsPage() {
                     <button
                       key={taskId}
                       onClick={() => setTaskFilter(taskId)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                         taskFilter === taskId
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          ? 'bg-[var(--accent-primary)] text-white'
+                          : 'bg-[var(--surface-inset)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]'
                       }`}
                     >
                       {t('logsPage.filter.taskPrefix')} {taskId} ({count})
@@ -759,23 +759,23 @@ export function LogsPage() {
 
       {/* Stats */}
       {selectedSpec && logs.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.totalEntries')}</div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.totalEntries}</div>
+        <div className="bg-[var(--surface-panel)] border-b border-[var(--border-default)] px-4 md:px-6 py-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-[var(--status-info-muted)] rounded-lg p-3">
+              <div className="text-xs text-[var(--text-muted)] font-medium">{t('logsPage.stats.totalEntries')}</div>
+              <div className="text-2xl font-bold text-[var(--status-info)] font-mono tabular-nums">{stats.totalEntries}</div>
             </div>
-            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesAdded')}</div>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">+{stats.totalLinesAdded}</div>
+            <div className="bg-[var(--status-success-muted)] rounded-lg p-3">
+              <div className="text-xs text-[var(--text-muted)] font-medium">{t('logsPage.stats.linesAdded')}</div>
+              <div className="text-2xl font-bold text-[var(--status-success)] font-mono tabular-nums">+{stats.totalLinesAdded}</div>
             </div>
-            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.linesRemoved')}</div>
-              <div className="text-2xl font-bold text-red-600 dark:text-red-400">-{stats.totalLinesRemoved}</div>
+            <div className="bg-[var(--status-error-muted)] rounded-lg p-3">
+              <div className="text-xs text-[var(--text-muted)] font-medium">{t('logsPage.stats.linesRemoved')}</div>
+              <div className="text-2xl font-bold text-[var(--status-error)] font-mono tabular-nums">-{stats.totalLinesRemoved}</div>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
-              <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('logsPage.stats.filesChanged')}</div>
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.totalFiles}</div>
+            <div className="bg-[var(--accent-secondary-muted)] rounded-lg p-3">
+              <div className="text-xs text-[var(--text-muted)] font-medium">{t('logsPage.stats.filesChanged')}</div>
+              <div className="text-2xl font-bold text-[var(--accent-secondary)] font-mono tabular-nums">{stats.totalFiles}</div>
             </div>
           </div>
         </div>
@@ -786,21 +786,21 @@ export function LogsPage() {
         {!selectedSpec ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <p className="text-gray-500 dark:text-gray-400">{t('logsPage.empty.selectSpec')}</p>
+              <p className="text-[var(--text-muted)]">{t('logsPage.empty.selectSpec')}</p>
             </div>
           </div>
         ) : error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
+          <div className="bg-[var(--status-error-muted)] border border-[var(--status-error)] rounded-lg p-4">
+            <p className="text-[var(--status-error)]">{error}</p>
           </div>
         ) : loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="text-gray-500 dark:text-gray-400">{t('logsPage.loading')}</div>
+            <div className="text-[var(--text-muted)]">{t('logsPage.loading')}</div>
           </div>
         ) : filteredAndSortedLogs.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-[var(--text-muted)]">
                 {search || taskFilter
                   ? t('logsPage.empty.noResults')
                   : t('logsPage.empty.noLogs')}

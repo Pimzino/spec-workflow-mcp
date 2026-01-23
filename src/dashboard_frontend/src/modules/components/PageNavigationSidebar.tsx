@@ -167,23 +167,23 @@ export function PageNavigationSidebar({
         fixed lg:sticky inset-y-0 lg:top-0 left-0 z-50 lg:z-auto
         ${isCollapsed ? 'lg:w-16' : 'lg:w-64'} w-64
         lg:h-screen
-        bg-white dark:bg-gray-900
-        border-r border-gray-200 dark:border-gray-800
+        bg-[var(--surface-panel)]
+        border-r border-[var(--border-default)]
         flex flex-col
         transition-all duration-200 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
       `}
       >
         {/* Header - Desktop collapse toggle */}
-        <div className="hidden lg:flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="hidden lg:flex items-center justify-between p-4 border-b border-[var(--border-default)]">
           {!isCollapsed && (
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
               Spec Workflow MCP
             </h2>
           )}
           <button
             onClick={onToggleCollapse}
-            className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 ml-auto"
+            className="p-1.5 rounded-md hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] ml-auto"
             aria-label={isCollapsed ? t('nav.expand', 'Expand sidebar') : t('nav.collapse', 'Collapse sidebar')}
             title={isCollapsed ? t('nav.expand', 'Expand sidebar') : t('nav.collapse', 'Collapse sidebar')}
           >
@@ -204,13 +204,13 @@ export function PageNavigationSidebar({
         </div>
 
         {/* Header - Mobile close button */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-[var(--border-default)]">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
             Spec Workflow MCP
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
+            className="p-1 rounded-md hover:bg-[var(--surface-hover)] text-[var(--text-secondary)]"
             aria-label={t('nav.close', 'Close sidebar')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,11 +238,11 @@ export function PageNavigationSidebar({
                   }
                 }}
                 className={({ isActive }) => `
-                  flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors
+                  flex items-center gap-3 py-2 px-3 rounded-md transition-colors
                   ${
                     isActive
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'bg-[color-mix(in_srgb,var(--interactive-primary)_10%,transparent)] text-[var(--interactive-primary)]'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]'
                   }
                   ${isCollapsed ? 'lg:justify-center' : ''}
                 `}

@@ -7,41 +7,458 @@
   color-scheme: light dark;
 }
 
+/* =============================================================================
+   CARD COMPONENTS
+   Using design tokens for consistent borders, radius, and shadows
+   ============================================================================= */
+
 .card {
-  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .card-hover {
-  @apply transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+.card-hover:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* =============================================================================
+   BUTTON COMPONENTS
+   Following 4px grid for padding, sharp radius
+   ============================================================================= */
+
 .btn {
-  @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-transparent bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: var(--interactive-primary);
+  color: #ffffff;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.btn:hover {
+  background: var(--interactive-primary-hover);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--surface-base), 0 0 0 4px var(--border-focus);
 }
 
 .btn-secondary {
-  @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--interactive-secondary);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
-.muted { @apply text-gray-500 dark:text-gray-400; }
+.btn-secondary:hover {
+  background: var(--interactive-secondary-hover);
+  border-color: var(--border-strong);
+}
 
-/* Drag and Drop utilities */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-ghost:hover {
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: var(--status-error);
+  color: #ffffff;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* =============================================================================
+   TEXT UTILITIES
+   4-level text hierarchy
+   ============================================================================= */
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.muted { color: var(--text-muted); }
+.text-faint { color: var(--text-faint); }
+
+/* =============================================================================
+   DATA DISPLAY UTILITIES
+   Monospace + tabular-nums for IDs, numbers, timestamps
+   ============================================================================= */
+
+.data-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.task-id {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.timestamp {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+
+.percentage {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* =============================================================================
+   STATUS BADGES
+   Compact, semantic colors only (not full decorative backgrounds)
+   ============================================================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  line-height: 1.4;
+}
+
+.status-badge-success {
+  background: var(--status-success-muted);
+  color: var(--status-success);
+}
+
+.status-badge-warning {
+  background: var(--status-warning-muted);
+  color: var(--status-warning);
+}
+
+.status-badge-error {
+  background: var(--status-error-muted);
+  color: var(--status-error);
+}
+
+.status-badge-info {
+  background: var(--status-info-muted);
+  color: var(--status-info);
+}
+
+.status-badge-pending {
+  background: var(--status-pending-muted);
+  color: var(--status-pending);
+}
+
+.status-badge-in-progress {
+  background: var(--status-in-progress-muted);
+  color: var(--status-in-progress);
+}
+
+/* Status dot indicator (small circle only) */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.status-indicator-success { background: var(--status-success); }
+.status-indicator-warning { background: var(--status-warning); }
+.status-indicator-error { background: var(--status-error); }
+.status-indicator-info { background: var(--status-info); }
+.status-indicator-pending { background: var(--status-pending); }
+.status-indicator-in-progress { background: var(--status-in-progress); }
+
+/* =============================================================================
+   FORM COMPONENTS
+   Consistent input styling
+   ============================================================================= */
+
+.input {
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-panel);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input:hover {
+  border-color: var(--border-strong);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--border-focus) 15%, transparent);
+}
+
+.input::placeholder {
+  color: var(--text-faint);
+}
+
+/* =============================================================================
+   DRAG AND DROP
+   ============================================================================= */
+
 .draggable {
-  @apply touch-none select-none;
+  touch-action: none;
+  user-select: none;
 }
 
 .dragging {
-  @apply cursor-grabbing opacity-75 scale-105 rotate-1 z-50;
+  cursor: grabbing;
+  opacity: 0.85;
+  z-index: 50;
+  box-shadow: var(--shadow-lg);
 }
 
 .drag-overlay {
-  @apply pointer-events-none;
+  pointer-events: none;
 }
 
 .drop-zone {
-  @apply transition-colors duration-200;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .drop-zone-active {
-  @apply ring-2 ring-blue-400 bg-blue-50 dark:bg-blue-900/10;
+  border-color: var(--interactive-primary);
+  background: color-mix(in srgb, var(--interactive-primary) 5%, transparent);
+}
+
+/* =============================================================================
+   SURFACE UTILITIES
+   ============================================================================= */
+
+.surface-base { background: var(--surface-base); }
+.surface-panel { background: var(--surface-panel); }
+.surface-elevated { background: var(--surface-elevated); }
+.surface-inset { background: var(--surface-inset); }
+
+/* =============================================================================
+   BORDER UTILITIES
+   ============================================================================= */
+
+.border-default { border-color: var(--border-default); }
+.border-strong { border-color: var(--border-strong); }
+
+/* =============================================================================
+   SPACING UTILITIES (using design tokens)
+   ============================================================================= */
+
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+.p-1 { padding: var(--space-1); }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+
+/* =============================================================================
+   MODAL OVERLAY
+   ============================================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-content {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-overlay);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+/* =============================================================================
+   TABLE STYLING
+   ============================================================================= */
+
+.table-header {
+  background: var(--surface-inset);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.table-row {
+  border-bottom: 1px solid var(--border-default);
+  transition: background var(--transition-fast);
+}
+
+.table-row:hover {
+  background: var(--surface-hover);
+}
+
+.table-cell {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+/* =============================================================================
+   PROGRESS COMPONENTS
+   Solid colors, no gradients
+   ============================================================================= */
+
+.progress-track {
+  height: 6px;
+  background: var(--surface-inset);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--interactive-primary);
+  transition: width var(--transition-normal);
+}
+
+.progress-fill-success { background: var(--status-success); }
+.progress-fill-warning { background: var(--status-warning); }
+.progress-fill-error { background: var(--status-error); }
+
+/* =============================================================================
+   NAVIGATION
+   ============================================================================= */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-item:hover {
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+}
+
+.nav-item-active {
+  background: color-mix(in srgb, var(--interactive-primary) 10%, transparent);
+  color: var(--interactive-primary);
+}
+
+/* =============================================================================
+   KANBAN COLUMNS
+   Neutral surfaces, status indicated by dots/badges only
+   ============================================================================= */
+
+.kanban-column {
+  background: var(--surface-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  min-height: 200px;
+}
+
+.kanban-column-header {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kanban-column-content {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* =============================================================================
+   ANIMATIONS
+   Using design token timing
+   ============================================================================= */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) ease;
+}
+
+.animate-slide-up {
+  animation: slideUp var(--transition-normal) ease;
 }

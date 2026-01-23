@@ -49,13 +49,13 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
 
   return (
     <>
-      <header className="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-[var(--surface-panel)]/60 border-b border-[var(--border-default)]">
         <div className="w-full px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Page Navigation Sidebar Toggle Button */}
             <button
               onClick={toggleSidebar}
-              className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="lg:hidden p-2 rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-hover)] transition-colors"
               title={t('nav.toggleSidebar', 'Toggle navigation sidebar')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
             {info?.version && (
               <button
                 onClick={() => setShowChangelog(true)}
-                className="hidden lg:inline text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+                className="hidden lg:inline text-xs px-2 py-1 bg-[var(--surface-inset)] text-[var(--text-muted)] rounded-full hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
                 title={t('changelog.viewChangelog', 'View changelog')}
               >
                 v{info.version}
@@ -79,7 +79,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className={`inline-block w-2.5 h-2.5 rounded-full ${connected ? 'bg-emerald-500' : 'bg-rose-500'}`} title={connected ? t('connectionStatus.connected') : t('connectionStatus.disconnected')} />
+            <span className={`inline-block w-2.5 h-2.5 rounded-full ${connected ? 'bg-[var(--status-success)]' : 'bg-[var(--status-error)]'}`} title={connected ? t('connectionStatus.connected') : t('connectionStatus.disconnected')} />
 
             {/* Desktop Controls */}
             <div className="hidden lg:flex items-center gap-3">
@@ -95,7 +95,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
                 href="https://buymeacoffee.com/pimzino"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-sm font-medium rounded-lg transition-colors"
+                className="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-sm font-medium rounded-md transition-colors"
                 title={t('support.project')}
               >
                 {t('support.me')}
@@ -105,7 +105,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
             {/* Mobile/Tablet Settings Menu Button */}
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="lg:hidden p-2 rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-hover)] transition-colors"
               title={t('mobile.settings', 'Settings')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,18 +123,18 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
           className="fixed inset-0 z-50 lg:hidden"
           onClick={closeMobileMenu}
         >
-          <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" />
+          <div className="absolute inset-0 bg-black/50 transition-opacity" />
 
           <div
-            className="absolute right-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-xl transform transition-transform"
+            className="absolute right-0 top-0 h-full w-64 bg-[var(--surface-panel)] shadow-[var(--shadow-overlay)] transform transition-transform"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="text-lg font-semibold">{t('mobile.settings', 'Settings')}</div>
+              <div className="flex items-center justify-between p-4 border-b border-[var(--border-default)]">
+                <div className="text-lg font-semibold text-[var(--text-primary)]">{t('mobile.settings', 'Settings')}</div>
                 <button
                   onClick={closeMobileMenu}
-                  className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-hover)] transition-colors"
                   aria-label={t('mobile.closeMenu')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,18 +146,18 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
               {/* Controls Section */}
               <div className="flex-1 px-4 py-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">{t('mobile.notificationVolume')}</span>
+                  <span className="text-sm text-[var(--text-secondary)]">{t('mobile.notificationVolume')}</span>
                   <VolumeControl />
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">{t('language.select')}</span>
+                  <span className="text-sm text-[var(--text-secondary)]">{t('language.select')}</span>
                   <LanguageSelector className="w-32" />
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">{t('mobile.theme')}</span>
-                  <button onClick={toggleTheme} className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                  <span className="text-sm text-[var(--text-secondary)]">{t('mobile.theme')}</span>
+                  <button onClick={toggleTheme} className="px-3 py-1.5 bg-[var(--surface-inset)] text-[var(--text-secondary)] rounded-md text-sm hover:bg-[var(--surface-hover)] transition-colors">
                     {theme === 'dark' ? t('theme.dark') : t('theme.light')}
                   </button>
                 </div>
@@ -167,7 +167,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
                     href="https://buymeacoffee.com/pimzino"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center px-4 py-3 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-sm font-medium rounded-lg transition-colors"
+                    className="w-full inline-flex items-center justify-center px-4 py-3 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-sm font-medium rounded-md transition-colors"
                     title={t('support.project')}
                   >
                     {t('support.me')}
@@ -175,14 +175,14 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
                 </div>
 
                 {info?.version && (
-                  <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="pt-2 border-t border-[var(--border-default)]">
                     <div className="text-center">
                       <button
                         onClick={() => {
                           setShowChangelog(true);
                           setMobileMenuOpen(false);
                         }}
-                        className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors cursor-pointer"
+                        className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
                         title={t('changelog.viewChangelog', 'View changelog')}
                       >
                         Spec-Workflow-MCP v{info.version}
@@ -242,7 +242,7 @@ function AppInner() {
   return (
     <ApiProvider initial={initial} projectId={currentProjectId}>
       <NotificationProvider>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 lg:flex">
+        <div className="min-h-screen bg-[var(--surface-base)] text-[var(--text-primary)] lg:flex">
           {/* Page Navigation Sidebar */}
           <PageNavigationSidebar
             isOpen={sidebarOpen}
@@ -269,14 +269,14 @@ function AppInner() {
             ) : (
               <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                  <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4">
                     No Projects Available
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  <p className="text-[var(--text-secondary)] mb-6">
                     Start MCP servers to see projects here.
                   </p>
-                  <div className="text-sm text-gray-500 dark:text-gray-500">
-                    Run: <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">npx @pimzino/spec-workflow-mcp /path/to/project</code>
+                  <div className="text-sm text-[var(--text-muted)]">
+                    Run: <code className="px-2 py-1 bg-[var(--surface-inset)] rounded-md">npx @pimzino/spec-workflow-mcp /path/to/project</code>
                   </div>
                 </div>
               </div>

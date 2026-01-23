@@ -176,7 +176,7 @@ function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: b
 
     if (!content && !editContent) {
       return (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-12 text-[var(--text-muted)]">
           {t('common.noContentAvailable')}
         </div>
       );
@@ -200,12 +200,12 @@ function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: b
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4 md:p-6">
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-7xl flex flex-col h-[95vh] max-h-[95vh] overflow-hidden`}>
+      <div className={`bg-[var(--surface-panel)] rounded-lg shadow-xl w-full max-w-7xl flex flex-col h-[95vh] max-h-[95vh] overflow-hidden`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 md:p-8 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 sm:p-6 md:p-8 border-b border-[var(--border-default)]">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-white truncate">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--text-primary)] truncate">
                 {spec.displayName}
               </h2>
               {isArchived && (
@@ -217,7 +217,7 @@ function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: b
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 hidden sm:block">
+            <p className="text-sm text-[var(--text-secondary)] mt-1 hidden sm:block">
               {isArchived ? `${t('specsPage.modal.archivedNotice')} • ` : ''}{t('common.lastModified', { date: formatDate(spec.lastModified, t) })}
             </p>
           </div>
@@ -233,12 +233,12 @@ function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: b
         </div>
 
         {/* Document Switcher */}
-        <div className="flex items-center gap-2 p-3 sm:p-4 md:p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('specsPage.modal.docLabel')}</label>
+        <div className="flex items-center gap-2 p-4 border-b border-[var(--border-default)] bg-[var(--surface-sunken)]">
+          <label className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">{t('specsPage.modal.docLabel')}</label>
           <select
             value={selectedDoc}
             onChange={(e) => setSelectedDoc(e.target.value)}
-            className="flex-1 sm:flex-none px-3 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-lg border border-[var(--border-default)] bg-[var(--surface-panel)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--interactive-primary)] focus:border-[var(--interactive-primary)]"
             aria-label={t('specsPage.modal.docSelectAria')}
           >
             {availableDocs.map(doc => (
@@ -252,7 +252,7 @@ function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: b
         {/* Content - MDX Editor handles its own toolbar with source toggle */}
         <div className="flex-1 overflow-hidden">
           {availableDocs.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-12 text-[var(--text-muted)]">
               <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
@@ -306,26 +306,26 @@ function SpecCard({ spec, onOpenModal, isArchived }: { spec: any; onOpenModal: (
   };
   
   return (
-    <div 
-      className={`bg-white dark:bg-gray-800 shadow rounded-lg cursor-pointer hover:shadow-lg transition-all ${
+    <div
+      className={`bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg cursor-pointer hover:bg-[var(--surface-hover)] transition-all ${
         spec.status === 'completed' ? 'opacity-75' : ''
       }`}
       onClick={() => onOpenModal(spec)}
     >
-      <div className="p-6">
+      <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className={`text-lg font-medium mb-2 ${
-              spec.status === 'completed' 
-                ? 'text-gray-600 dark:text-gray-400' 
-                : 'text-gray-900 dark:text-white'
+              spec.status === 'completed'
+                ? 'text-[var(--text-secondary)]'
+                : 'text-[var(--text-primary)]'
             }`}>
               {spec.displayName}
             </h3>
             <div className={`flex items-center space-x-4 text-sm ${
-              spec.status === 'completed' 
-                ? 'text-gray-400 dark:text-gray-500' 
-                : 'text-gray-500 dark:text-gray-400'
+              spec.status === 'completed'
+                ? 'text-[var(--text-muted)]'
+                : 'text-[var(--text-secondary)]'
             }`}>
               <span className="flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,13 +381,13 @@ function SpecCard({ spec, onOpenModal, isArchived }: { spec: any; onOpenModal: (
         {/* Progress bar */}
         {spec.taskProgress && spec.taskProgress.total > 0 && (
           <div className="mt-4">
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="w-full bg-[var(--surface-sunken)] rounded-full h-2">
               <div
-                className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
+                className="bg-[var(--interactive-primary)] h-2 rounded-full transition-all duration-300"
                 style={{"width": `${progress}%`} as React.CSSProperties}
               />
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               {t('common.percentComplete', { percent: progress })}
             </p>
           </div>
@@ -425,7 +425,7 @@ function SpecTableRow({ spec, onOpenModal, isArchived }: { spec: any; onOpenModa
 
   return (
     <tr
-      className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+      className="hover:bg-[var(--surface-hover)] cursor-pointer transition-colors"
       onClick={() => onOpenModal(spec)}
     >
       <td className="px-4 py-4">
@@ -438,12 +438,12 @@ function SpecTableRow({ spec, onOpenModal, isArchived }: { spec: any; onOpenModa
           <div className="ml-4">
             <div className={`text-sm font-medium ${
               spec.status === 'completed'
-                ? 'text-gray-600 dark:text-gray-400'
-                : 'text-gray-900 dark:text-white'
+                ? 'text-[var(--text-secondary)]'
+                : 'text-[var(--text-primary)]'
             }`}>
               {spec.displayName}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-[var(--text-secondary)]">
               {spec.name}
             </div>
           </div>
@@ -452,23 +452,23 @@ function SpecTableRow({ spec, onOpenModal, isArchived }: { spec: any; onOpenModa
       <td className="px-4 py-4">
         {spec.taskProgress && spec.taskProgress.total > 0 ? (
           <div className="flex items-center gap-2">
-            <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="w-20 bg-[var(--surface-sunken)] rounded-full h-2">
               <div
-                className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
+                className="bg-[var(--interactive-primary)] h-2 rounded-full transition-all duration-300"
                 style={{"width": `${progress}%`} as React.CSSProperties}
               />
             </div>
-            <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+            <span className="text-sm text-[var(--text-secondary)] whitespace-nowrap">
               {spec.taskProgress.completed}/{spec.taskProgress.total}
             </span>
           </div>
         ) : (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-[var(--text-muted)]">
             {t('specsPage.noTasks')}
           </span>
         )}
       </td>
-      <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+      <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
         {formatDate(spec.lastModified, t)}
       </td>
       <td className="px-4 py-4">
@@ -625,10 +625,10 @@ function Content() {
 
   return (
     <div className="grid gap-4">
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6">
+      <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg p-4">
         <div className="mb-4">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">{t('specsPage.header.title')}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">{t('specsPage.header.title')}</h2>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">
             {activeTab === 'active'
               ? t('specsPage.header.subtitle.active')
               : t('specsPage.header.subtitle.archived')
@@ -644,8 +644,8 @@ function Content() {
                 onClick={() => setActiveTab('active')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'active'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+                    ? 'border-[var(--interactive-primary)] text-[var(--interactive-primary)]'
+                    : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-default)]'
                 } transition-colors`}
               >
                 {t('specsPage.tabs.active')} ({specs.length})
@@ -654,8 +654,8 @@ function Content() {
                 onClick={() => setActiveTab('archived')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'archived'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+                    ? 'border-[var(--interactive-primary)] text-[var(--interactive-primary)]'
+                    : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-default)]'
                 } transition-colors`}
               >
                 {t('specsPage.tabs.archived')} ({archivedSpecs.length})
@@ -663,7 +663,7 @@ function Content() {
             </nav>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <input
-                className="min-w-[140px] md:min-w-[160px] px-3 py-2 md:px-4 md:py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="min-w-[140px] md:min-w-[160px] px-3 py-2 md:px-4 md:py-2 rounded-lg bg-[var(--surface-panel)] border border-[var(--border-default)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--interactive-primary)] focus:border-[var(--interactive-primary)] transition-colors"
                 placeholder={activeTab === 'active' ? t('specsPage.search.placeholder.active') : t('specsPage.search.placeholder.archived')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -681,24 +681,24 @@ function Content() {
 
         {/* Specs Table - Desktop */}
         <div className="overflow-x-auto hidden lg:block">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+          <table className="min-w-full border border-[var(--border-default)] rounded-lg overflow-hidden">
+            <thead className="bg-[var(--surface-sunken)]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('specsPage.table.name')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('specsPage.table.progress')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('specsPage.table.lastModified')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   {t('specsPage.table.actions')}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-[var(--surface-panel)] divide-y divide-[var(--border-default)]">
               {filtered.map((spec) => (
                 <SpecTableRow
                   key={spec.name}
@@ -725,14 +725,14 @@ function Content() {
 
         {/* Empty State */}
         {filtered.length === 0 && (
-          <div className="text-center py-12 mt-8 border-t border-gray-200 dark:border-gray-700">
-            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="text-center py-12 mt-8 border-t border-[var(--border-default)]">
+            <svg className="mx-auto h-12 w-12 text-[var(--text-muted)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <p className="text-lg font-medium text-[var(--text-primary)] mb-2">
               {query ? t('specsPage.empty.noResults') : t('specsPage.empty.title')}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-[var(--text-secondary)]">
               {query ? t('specsPage.empty.noResultsDescription') : t('specsPage.empty.description')}
             </p>
           </div>
