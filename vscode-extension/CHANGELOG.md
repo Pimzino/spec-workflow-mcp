@@ -4,6 +4,17 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.4] - 2026-01-23
+
+### Security
+- **Dependency Updates** - Fixed 6 vulnerabilities (3 high, 2 moderate, 1 low) via `npm audit fix`:
+  - `diff` - DoS vulnerability in parsePatch/applyPatch (GHSA-73rr-hh4g-fpgx)
+  - `glob` - Command injection via -c/--cmd (GHSA-5j98-mcp5-4vw2)
+  - `js-yaml` - Prototype pollution in merge (GHSA-mh29-5h37-fv8m)
+  - `preact` - JSON VNode Injection (GHSA-36hm-qxxp-pg3m)
+  - `tar` - Arbitrary file overwrite and symlink poisoning (GHSA-8qq5-rm4j-mr97, GHSA-r6q2-hw4h-h46w)
+  - `vite` - Multiple server.fs bypass vulnerabilities (GHSA-g4jq-h2w9-997c, GHSA-jqfw-vq24-v9c3, GHSA-93m4-6634-74q7)
+
 ## [1.1.3] - 2025-12-10
 
 ### Fixed
