@@ -93,6 +93,7 @@
     "keepEditing": "继续编辑",
     "cancel": "取消",
     "delete": "删除",
+    "processing": "处理中...",
     "closeModalAria": "关闭弹窗",
     "ok": "确定",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "正在运行...",
     "edit": "编辑",
     "delete": "删除",
+    "processing": "处理中...",
     "cancel": "取消",
     "close": "关闭",
     "jobDescription": "删除超过{{days}}天的记录，按计划{{schedule}}"

@@ -93,6 +93,7 @@
     "keepEditing": "متابعة التحرير",
     "cancel": "إلغاء",
     "delete": "حذف",
+    "processing": "جارٍ المعالجة...",
     "closeModalAria": "إغلاق النافذة المنبثقة",
     "ok": "OK",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "قيد التشغيل...",
     "edit": "تحرير",
     "delete": "حذف",
+    "processing": "جارٍ المعالجة...",
     "cancel": "إلغاء",
     "close": "إغلاق",
     "jobDescription": "حذف السجلات الأقدم من {{days}} يوم حسب الجدول الزمني: {{schedule}}"

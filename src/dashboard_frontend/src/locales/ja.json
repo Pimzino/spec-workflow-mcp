@@ -93,6 +93,7 @@
     "keepEditing": "編集を続ける",
     "cancel": "キャンセル",
     "delete": "削除",
+    "processing": "処理中...",
     "closeModalAria": "モーダルを閉じる",
     "ok": "OK",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "実行中...",
     "edit": "編集",
     "delete": "削除",
+    "processing": "処理中...",
     "cancel": "キャンセル",
     "close": "閉じる",
     "jobDescription": "{{schedule}}のスケジュールに従い、{{days}}日以上古いレコードを削除"

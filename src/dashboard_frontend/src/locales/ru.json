@@ -95,6 +95,7 @@
     "keepEditing": "Продолжить редактирование",
     "cancel": "Отмена",
     "delete": "Удалить",
+    "processing": "Обработка...",
     "closeModalAria": "Закрыть модальное окно",
     "ok": "ОК",
     "unsavedChanges": {
@@ -545,6 +546,7 @@
     "running": "Выполнение...",
     "edit": "Редактировать",
     "delete": "Удалить",
+    "processing": "Обработка...",
     "cancel": "Отмена",
     "close": "Закрыть",
     "jobDescription": "Удалить записи старше {{days}} дней по расписанию: {{schedule}}"

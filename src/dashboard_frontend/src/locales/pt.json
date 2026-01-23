@@ -93,6 +93,7 @@
     "keepEditing": "Continuar Editando",
     "cancel": "Cancelar",
     "delete": "Excluir",
+    "processing": "Processando...",
     "closeModalAria": "Fechar modal",
     "ok": "OK",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "Executando...",
     "edit": "Editar",
     "delete": "Excluir",
+    "processing": "Processando...",
     "cancel": "Cancelar",
     "close": "Fechar",
     "jobDescription": "Excluir registros com mais de {{days}} dias no cronograma: {{schedule}}"

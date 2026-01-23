@@ -93,6 +93,7 @@
     "keepEditing": "Continuer l'Édition",
     "cancel": "Annuler",
     "delete": "Supprimer",
+    "processing": "Traitement...",
     "closeModalAria": "Fermer la modale",
     "ok": "OK",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "Exécution...",
     "edit": "Modifier",
     "delete": "Supprimer",
+    "processing": "Traitement...",
     "cancel": "Annuler",
     "close": "Fermer",
     "jobDescription": "Supprimer les enregistrements de plus de {{days}} jours selon le calendrier: {{schedule}}"

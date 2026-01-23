@@ -93,6 +93,7 @@
     "keepEditing": "Continua Modifica",
     "cancel": "Annulla",
     "delete": "Elimina",
+    "processing": "Elaborazione...",
     "closeModalAria": "Chiudi modale",
     "ok": "OK",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "In esecuzione...",
     "edit": "Modifica",
     "delete": "Elimina",
+    "processing": "Elaborazione...",
     "cancel": "Annulla",
     "close": "Chiudi",
     "jobDescription": "Elimina i record più vecchi di {{days}} giorni secondo la pianificazione: {{schedule}}"

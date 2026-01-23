@@ -93,6 +93,7 @@
     "keepEditing": "Seguir Editando",
     "cancel": "Cancelar",
     "delete": "Eliminar",
+    "processing": "Procesando...",
     "closeModalAria": "Cerrar modal",
     "ok": "Aceptar",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "Ejecutando...",
     "edit": "Editar",
     "delete": "Eliminar",
+    "processing": "Procesando...",
     "cancel": "Cancelar",
     "close": "Cerrar",
     "jobDescription": "Eliminar registros más antiguos que {{days}} días según el horario: {{schedule}}"

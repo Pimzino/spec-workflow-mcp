@@ -93,6 +93,7 @@
     "keepEditing": "계속 편집",
     "cancel": "취소",
     "delete": "삭제",
+    "processing": "처리 중...",
     "closeModalAria": "모달 닫기",
     "ok": "OK",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "실행 중...",
     "edit": "편집",
     "delete": "삭제",
+    "processing": "처리 중...",
     "cancel": "취소",
     "close": "닫기",
     "jobDescription": "{{schedule}} 일정에 따라 {{days}}일 이상 된 레코드 삭제"

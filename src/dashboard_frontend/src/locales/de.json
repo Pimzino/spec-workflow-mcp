@@ -93,6 +93,7 @@
     "keepEditing": "Weiter bearbeiten",
     "cancel": "Abbrechen",
     "delete": "Löschen",
+    "processing": "Wird verarbeitet...",
     "closeModalAria": "Modal schließen",
     "ok": "OK",
     "unsavedChanges": {
@@ -536,6 +537,7 @@
     "running": "Läuft...",
     "edit": "Bearbeiten",
     "delete": "Löschen",
+    "processing": "Wird verarbeitet...",
     "cancel": "Abbrechen",
     "close": "Schließen",
     "jobDescription": "Löschen Sie Datensätze, die älter als {{days}} Tage sind, nach Zeitplan: {{schedule}}"
