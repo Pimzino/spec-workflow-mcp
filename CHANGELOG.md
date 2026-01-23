@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.9] - 2026-01-23
+
+### Added
+- **MCP Tool Annotations** (PR #176) - Added semantic metadata annotations to all 5 tools for improved LLM tool understanding:
+  - `readOnlyHint: true` for read-only tools (`spec-workflow-guide`, `steering-guide`, `spec-status`)
+  - `destructiveHint: true` for state-modifying tools (`approvals`, `log-implementation`)
+  - `title` annotations for human-readable tool display names
+  - Enables MCP clients like Claude Code to auto-approve read-only tools and prompt for confirmation on destructive operations
+
 ## [2.1.8] - 2026-01-22
 
 ### Added
