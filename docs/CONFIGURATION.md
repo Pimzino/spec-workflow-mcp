@@ -95,6 +95,46 @@ When running in sandboxed environments like Codex CLI with `sandbox_mode=workspa
 SPEC_WORKFLOW_HOME=/workspace/.spec-workflow-mcp npx -y @pimzino/spec-workflow-mcp@latest /workspace
 ```
 
+### SPEC_WORKFLOW_SHARED_ROOT
+
+Override the automatic git worktree detection. By default, when running in a git worktree, specs are stored in the main repository's `.spec-workflow/` directory so all worktrees share the same specs.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SPEC_WORKFLOW_SHARED_ROOT` | (auto-detected) | Override the project root for spec storage |
+
+**Automatic behavior (no env var set):**
+
+- **Main git repo**: Specs stored in `<project>/.spec-workflow/`
+- **Git worktree**: Specs stored in `<main-repo>/.spec-workflow/` (shared with all worktrees)
+- **Non-git directory**: Specs stored in `<project>/.spec-workflow/`
+
+**When to use this variable:**
+
+Use `SPEC_WORKFLOW_SHARED_ROOT` to override the automatic detection:
+
+```bash
+# Force specs to be stored in the current worktree (opt-out of sharing)
+SPEC_WORKFLOW_SHARED_ROOT=$(pwd) npx -y @pimzino/spec-workflow-mcp@latest .
+
+# Force a specific shared location
+SPEC_WORKFLOW_SHARED_ROOT=/path/to/shared/specs npx -y @pimzino/spec-workflow-mcp@latest ~/my-worktree
+```
+
+**Git worktree example:**
+
+```bash
+# In main repo: /home/user/myproject
+git worktree add ../myproject-feature feature-branch
+
+# Start MCP server in worktree - specs automatically shared with main repo
+cd ../myproject-feature
+npx -y @pimzino/spec-workflow-mcp@latest .
+# Output: Git worktree detected. Using main repo: /home/user/myproject
+
+# Both the main repo and worktree see the same specs in /home/user/myproject/.spec-workflow/
+```
+
 ## Dashboard Session Management
 
 The dashboard stores its session information in `~/.spec-workflow-mcp/activeSession.json` (or `$SPEC_WORKFLOW_HOME/activeSession.json` if set). This file:

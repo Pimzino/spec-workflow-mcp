@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.9] - 2026-01-23
 
 ### Added
+- **Git Worktree Support** (GitHub Issue #187) - Specs are now shared across git worktrees:
+  - Auto-detects git worktrees and stores specs in the main repository's `.spec-workflow/` directory
+  - All worktrees of the same repository share the same specs automatically
+  - New `SPEC_WORKFLOW_SHARED_ROOT` environment variable to override automatic detection
+  - Silent fallback for non-git directories or when git is unavailable
+  - Logs "Git worktree detected. Using main repo: <path>" when worktree is detected
+
 - **MCP Tool Annotations** (PR #176) - Added semantic metadata annotations to all 5 tools for improved LLM tool understanding:
   - `readOnlyHint: true` for read-only tools (`spec-workflow-guide`, `steering-guide`, `spec-status`)
   - `destructiveHint: true` for state-modifying tools (`approvals`, `log-implementation`)

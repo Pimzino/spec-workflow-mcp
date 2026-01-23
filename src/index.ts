@@ -8,6 +8,7 @@ import { WorkspaceInitializer } from './core/workspace-initializer.js';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { resolveGitRoot } from './core/git-utils.js';
 
 // Default dashboard port
 const DEFAULT_DASHBOARD_PORT = 5000;
@@ -95,6 +96,7 @@ function expandTildePath(path: string): string {
 
 function parseArguments(args: string[]): {
   projectPath: string;
+  expandedPath: string;
   isDashboardMode: boolean;
   port?: number;
   lang?: string;
@@ -168,7 +170,8 @@ function parseArguments(args: string[]): {
 
   // For dashboard-only mode, use cwd as default (dashboard doesn't need it)
   const rawProjectPath = filteredArgs[0] || process.cwd();
-  const projectPath = expandTildePath(rawProjectPath);
+  const expandedPath = expandTildePath(rawProjectPath);
+  const projectPath = resolveGitRoot(expandedPath);
 
   // Warn if no explicit path was provided and we're using cwd (but only for MCP server mode)
   if (!filteredArgs[0] && !isDashboardMode) {
@@ -176,7 +179,7 @@ function parseArguments(args: string[]): {
     console.warn('Consider specifying an explicit path for better clarity.');
   }
 
-  return { projectPath, isDashboardMode, port: customPort, lang: undefined, noOpen };
+  return { projectPath, expandedPath, isDashboardMode, port: customPort, lang: undefined, noOpen };
 }
 
 async function main() {
@@ -192,6 +195,11 @@ async function main() {
     // Parse command-line arguments
     const cliArgs = parseArguments(args);
     let projectPath = cliArgs.projectPath;
+
+    // Log if git worktree was detected and path changed
+    if (projectPath !== cliArgs.expandedPath) {
+      console.error(`Git worktree detected. Using main repo: ${projectPath}`);
+    }
 
     // Apply configuration from CLI args
     const isDashboardMode = cliArgs.isDashboardMode || false;
