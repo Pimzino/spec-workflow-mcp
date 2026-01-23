@@ -33,6 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added minimum height constraints to prevent collapsing to content height
   - Comments section now properly stretches to match the annotations panel height
 
+### Security
+- **Dependency Updates** - Fixed 8 vulnerabilities (6 high, 1 moderate, 1 low) via `npm audit fix`:
+  - `@modelcontextprotocol/sdk` - ReDoS vulnerability (GHSA-8r9q-7v3j-jr4g)
+  - `@remix-run/router` / `react-router` / `react-router-dom` - XSS via Open Redirects (GHSA-2w69-qvjg-hvjx)
+  - `diff` - DoS vulnerability in parsePatch/applyPatch (GHSA-73rr-hh4g-fpgx)
+  - `hono` - JWT algorithm confusion vulnerabilities (GHSA-3vhc-576x-3qv4, GHSA-f67f-6cw9-8mq4)
+  - `lodash-es` - Prototype Pollution in unset/omit functions (GHSA-xxjr-mmjv-4gpg)
+  - `qs` - DoS via memory exhaustion in arrayLimit (GHSA-6rw7-vpxm-498p)
+
 ## [2.1.8] - 2026-01-22
 
 ### Added
