@@ -21,6 +21,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `title` annotations for human-readable tool display names
   - Enables MCP clients like Claude Code to auto-approve read-only tools and prompt for confirmation on destructive operations
 
+### Changed
+- **Design Tokens Refactor** - Replaced hardcoded colors and styles with design tokens for improved consistency:
+  - Updated components including App, ApprovalsAnnotator, KanbanBoard, and others
+  - New CSS variables for background, text, and border colors
+  - Enhanced visual elements such as buttons, modals, and status indicators
+
+### Fixed
+- **Comments Section Height** - Improved height and layout of the Comments & Feedback section:
+  - Increased height from 50vh to 70vh for better visibility
+  - Added minimum height constraints to prevent collapsing to content height
+  - Comments section now properly stretches to match the annotations panel height
+
 ## [2.1.8] - 2026-01-22
 
 ### Added
