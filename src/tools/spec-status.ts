@@ -12,16 +12,20 @@ Call when resuming work on a spec or checking overall completion status. Shows w
   inputSchema: {
     type: 'object',
     properties: {
-      projectPath: { 
+      projectPath: {
         type: 'string',
         description: 'Absolute path to the project root (optional - uses server context path if not provided)'
       },
-      specName: { 
+      specName: {
         type: 'string',
         description: 'Name of the specification'
       }
     },
     required: ['specName']
+  },
+  annotations: {
+    title: 'Spec Status',
+    readOnlyHint: true,
   }
 };
 
