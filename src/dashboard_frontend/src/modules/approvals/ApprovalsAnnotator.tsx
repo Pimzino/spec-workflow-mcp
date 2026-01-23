@@ -601,9 +601,9 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
 
   // Default layout (preview and annotate modes)
   return (
-    <div className="grid gap-4 lg:grid-cols-3 lg:gap-6">
-      <div data-section="annotations" className="lg:col-span-2">
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+    <div className="grid gap-4 lg:grid-cols-3 lg:gap-6 lg:min-h-[70vh]">
+      <div data-section="annotations" className="lg:col-span-2 lg:self-stretch flex flex-col">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1">
           {viewMode === 'preview' ? (
             <div className="p-4 sm:p-6">
               <div className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-img:max-w-full prose-img:h-auto prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-pre:bg-gray-50 dark:prose-pre:bg-gray-900 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300">
@@ -635,7 +635,7 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         </div>
       </div>
 
-      <div data-section="comments" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col min-h-[60vh] lg:min-h-[70vh] max-h-[80vh] lg:max-h-[85vh] lg:col-span-1">
+      <div data-section="comments" className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col min-h-[60vh] lg:min-h-0 lg:self-stretch lg:col-span-1">
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
           <h4 className="font-medium text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
