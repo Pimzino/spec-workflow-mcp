@@ -770,11 +770,7 @@ function Content() {
       }
     } catch (error) {
       console.error('Batch action failed:', error);
-      showNotification({
-        type: 'error',
-        title: 'Batch action failed',
-        message: 'There was a problem processing the selected items. Please try again.'
-      });
+      showNotification('There was a problem processing the selected items. Please try again.', 'error');
     } finally {
       setBatchLoading(false);
     }
@@ -816,10 +812,7 @@ function Content() {
       }
     } catch (error) {
       console.error('Undo failed:', error);
-      showNotification({
-        type: 'error',
-        message: 'Failed to undo the last batch operation. Please try again.'
-      });
+      showNotification('Failed to undo the last batch operation. Please try again.', 'error');
     } finally {
       setBatchLoading(false);
     }
