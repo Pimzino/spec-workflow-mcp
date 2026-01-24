@@ -16,6 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `unicode-range` for efficient font subsetting
   - Updated `--font-sans` and `--font-mono` CSS variables with new fonts and fallback stack
 
+### Changed
+- **Utility Consolidation** - Eliminated duplicate utility functions across the codebase:
+  - Created shared `dateUtils.ts` with `formatDate()` and `formatDistanceToNow()` functions
+  - Consolidated 5 duplicate `formatDate` implementations from SpecsPage, TasksPage, LogsPage, ApprovalsPage, and SteeringPage
+  - Created shared `colorUtils.ts` for VSCode webview with `isValidHex()` and `hexToRgba()` functions
+  - Removed duplicate color validation logic from CommentModal component
+
+- **Design Token Migration** - Replaced hardcoded Tailwind colors with CSS variable design tokens:
+  - Updated DashboardStatistics to use `--text-primary`, `--text-secondary`, `--text-muted` tokens
+  - Updated SideBySideView to use `--surface-inset`, `--surface-panel`, `--border-default` tokens
+  - Updated ProjectDropdown to use design tokens for all gray color variants
+  - Improved theming consistency between light and dark modes
+
+- **ApprovalEditorService Refactor** - Extracted hardcoded decoration colors into constants:
+  - Created `APPROVAL_STATUS_COLORS` constant for pending, approved, rejected, needs-revision, and commented states
+  - Added `DECORATION_BORDER_RADIUS` constant for consistent styling
+
 ## [2.1.9] - 2026-01-23
 
 ### Added
