@@ -2,6 +2,36 @@
 
 This guide explains how to test the batch approval management feature for PR #181.
 
+## Screenshots
+
+### Selection Mode
+
+![Selection Mode](docs/screenshots/01-selection-mode.png)
+
+### Items Selected with Vertical Action Buttons
+
+![Items Selected](docs/screenshots/02-items-selected.png)
+
+### Select All
+
+![Select All](docs/screenshots/03-select-all.png)
+
+### Batch Reject Modal
+
+![Batch Reject Modal](docs/screenshots/04-batch-reject-modal.png)
+
+### Undo Toast (After Approve)
+
+![Undo Toast Approve](docs/screenshots/04-undo-toast-approve.png)
+
+### Undo Toast (After Reject)
+
+![Undo Toast Reject](docs/screenshots/05-undo-toast-reject.png)
+
+### After Undo - Items Restored
+
+![Undo Success](docs/screenshots/06-undo-success.png)
+
 ## Prerequisites
 
 - Node.js installed
