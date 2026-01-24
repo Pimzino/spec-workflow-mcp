@@ -78,7 +78,19 @@
     "openInEditor": "فتح في المحرر",
     "noPending": "لا توجد موافقات معلقة لهذه المواصفة",
     "noPendingDocuments": "لم توجد وثائق بموافقات معلقة",
-    "selectCategory": "اختر فئة أعلاه لعرض الموافقات المعلقة"
+    "selectCategory": "اختر فئة أعلاه لعرض الموافقات المعلقة",
+    "select": "تحديد",
+    "cancel": "إلغاء",
+    "selectAll": "تحديد الكل",
+    "deselectAll": "إلغاء تحديد الكل",
+    "selectedCount": "{{count}} محدد",
+    "pendingCount": "{{count}} معلق",
+    "approveAll": "موافقة على الكل",
+    "revisionAll": "مراجعة الكل",
+    "rejectAll": "رفض الكل",
+    "batch": {
+      "tooMany": "لا يمكن معالجة أكثر من {{limit}} عنصر في المرة الواحدة"
+    }
   },
   "specs": {
     "active": "نشط",

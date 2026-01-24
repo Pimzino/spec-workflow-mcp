@@ -78,7 +78,19 @@
     "openInEditor": "Im Editor öffnen",
     "noPending": "Keine ausstehenden Genehmigungen für diese Spezifikation",
     "noPendingDocuments": "Keine Dokumente mit ausstehenden Genehmigungen gefunden",
-    "selectCategory": "Wählen Sie oben eine Kategorie aus um ausstehende Genehmigungen anzuzeigen"
+    "selectCategory": "Wählen Sie oben eine Kategorie aus um ausstehende Genehmigungen anzuzeigen",
+    "select": "Auswählen",
+    "cancel": "Abbrechen",
+    "selectAll": "Alle auswählen",
+    "deselectAll": "Auswahl aufheben",
+    "selectedCount": "{{count}} ausgewählt",
+    "pendingCount": "{{count}} ausstehend",
+    "approveAll": "Alle genehmigen",
+    "revisionAll": "Alle überarbeiten",
+    "rejectAll": "Alle ablehnen",
+    "batch": {
+      "tooMany": "Es können nicht mehr als {{limit}} Elemente gleichzeitig verarbeitet werden"
+    }
   },
   "specs": {
     "active": "Aktiv",
