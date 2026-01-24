@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.11] - 2026-01-24
+## [2.1.10] - 2026-01-24
 
 ### Added
 - **Bulk Approval Management** (PR #181) - New batch selection and action system for managing multiple approval requests:
@@ -17,9 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Security Controls** - Batch size limit of 100 items, ID validation with alphanumeric regex pattern
   - **Full i18n Support** - Translations for all 11 supported locales
 
-## [2.1.10] - 2026-01-24
-
-### Added
 - **Custom Typography System** - Added locally-bundled fonts for improved readability and visual consistency:
   - **Inter** (400, 500, 600, 700 weights) - Modern sans-serif for UI text, designed for screens
   - **JetBrains Mono** (400, 500, 700 weights) - Developer-focused monospace for code and specs
