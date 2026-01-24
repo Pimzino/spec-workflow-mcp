@@ -93,6 +93,7 @@
     "keepEditing": "Seguir Editando",
     "cancel": "Cancelar",
     "delete": "Eliminar",
+    "processing": "Procesando...",
     "closeModalAria": "Cerrar modal",
     "ok": "Aceptar",
     "unsavedChanges": {
@@ -375,7 +376,8 @@
       "quickReject": "Rechazo Rápido",
       "reject": "Rechazar",
       "requestRevisions": "Solicitar Revisiones",
-      "revisions": "Revisiones"
+      "revisions": "Revisiones",
+      "useBatchActions": "Usar acciones por lotes para múltiples elementos"
     },
     "tooltips": {
       "goToAnnotations": "Ir a anotaciones",
@@ -397,6 +399,11 @@
       "placeholder": "Por favor proporciona comentarios explicando por qué esto está siendo rechazado...",
       "submit": "Rechazar"
     },
+    "batchReject": {
+      "title": "Rechazar {{count}} elementos",
+      "placeholder": "Ingrese un motivo de rechazo que se aplicará a todos los elementos seleccionados (ej.: 'Requiere revisión del Ingeniero Principal')...",
+      "submit": "Rechazar todo"
+    },
     "approvalWarning": {
       "title": "No Se Puede Aprobar",
       "message": "No se puede aprobar cuando existen comentarios. Usa \"Solicitar Revisiones\" para enviar comentarios."
@@ -404,6 +411,36 @@
     "revision": {
       "noCommentsTitle": "No Se Agregaron Comentarios",
       "noCommentsMessage": "Por favor agrega al menos un comentario antes de solicitar revisiones."
+    },
+    "selection": {
+      "enterMode": "Seleccionar Elementos",
+      "exitMode": "Cancelar Selección",
+      "select": "Seleccionar",
+      "selectAll": "Seleccionar Todo",
+      "selectedCount_one": "{{count}} seleccionado",
+      "selectedCount_other": "{{count}} seleccionados",
+      "selectItem": "Seleccionar {{title}}",
+      "approveSelected": "Aprobar Seleccionados",
+      "rejectSelected": "Rechazar Seleccionados"
+    },
+    "batchConfirm": {
+      "title": "Confirmar Acción en Lote",
+      "message": "Está a punto de {{action}} {{count}} elementos. Esta acción no se puede deshacer. ¿Está seguro de que desea continuar?",
+      "confirm": "Sí, continuar"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} de {{total}} elementos procesados",
+      "failedCount_one": "{{count}} elemento falló",
+      "failedCount_other": "{{count}} elementos fallaron",
+      "undo": "Deshacer"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" ha sido aprobado",
+      "approveFailed": "Error al aprobar \"{{title}}\"",
+      "rejected": "\"{{title}}\" ha sido rechazado",
+      "rejectFailed": "Error al rechazar \"{{title}}\"",
+      "revisionRequested": "Revisiones solicitadas para \"{{title}}\"",
+      "revisionFailed": "Error al solicitar revisiones para \"{{title}}\""
     }
   },
   "logsPage": {
@@ -500,6 +537,7 @@
     "running": "Ejecutando...",
     "edit": "Editar",
     "delete": "Eliminar",
+    "processing": "Procesando...",
     "cancel": "Cancelar",
     "close": "Cerrar",
     "jobDescription": "Eliminar registros más antiguos que {{days}} días según el horario: {{schedule}}"

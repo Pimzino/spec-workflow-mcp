@@ -339,3 +339,13 @@ body.vscode-high-contrast {
   min-width: min-content;
   width: max-content;
 }
+
+/* Undo toast progress bar animation */
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

@@ -660,11 +660,113 @@ export class MultiProjectDashboardServer {
 
     // Approval actions (approve, reject, needs-revision)
     this.app.post('/api/projects/:projectId/approvals/:id/:action', async (request, reply) => {
-      const { projectId, id, action } = request.params as { projectId: string; id: string; action: string };
-      const { response, annotations, comments } = request.body as {
-        response: string;
-        annotations?: string;
-        comments?: any[];
+      try {
+        const { projectId, id, action } = request.params as { projectId: string; id: string; action: string };
+
+        const { response, annotations, comments } = (request.body || {}) as {
+          response: string;
+          annotations?: string;
+          comments?: any[];
+        };
+
+        const project = this.projectManager.getProject(projectId);
+        if (!project) {
+          return reply.code(404).send({ error: 'Project not found' });
+        }
+
+        const validActions = ['approve', 'reject', 'needs-revision'];
+        if (!validActions.includes(action)) {
+          return reply.code(400).send({ error: 'Invalid action' });
+        }
+
+        // Convert action name to status value
+        const actionToStatus: Record<string, 'approved' | 'rejected' | 'needs-revision'> = {
+          'approve': 'approved',
+          'reject': 'rejected',
+          'needs-revision': 'needs-revision'
+        };
+        const status = actionToStatus[action];
+
+        await project.approvalStorage.updateApproval(id, status, response, annotations, comments);
+        return { success: true };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
+    // Undo batch operations - revert items back to pending
+    // IMPORTANT: This route MUST be defined BEFORE the /batch/:action route
+    // because Fastify matches routes in order of registration
+    this.app.post('/api/projects/:projectId/approvals/batch/undo', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const { ids } = request.body as { ids: string[] };
+
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      // Validate ids array
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return reply.code(400).send({ error: 'ids must be a non-empty array' });
+      }
+
+      // Batch size limit
+      const BATCH_SIZE_LIMIT = 100;
+      if (ids.length > BATCH_SIZE_LIMIT) {
+        return reply.code(400).send({
+          error: `Batch size exceeds limit. Maximum ${BATCH_SIZE_LIMIT} items allowed.`
+        });
+      }
+
+      // Validate ID format
+      const idPattern = /^[a-zA-Z0-9_-]+$/;
+      const invalidIds = ids.filter(id => !idPattern.test(id));
+      if (invalidIds.length > 0) {
+        return reply.code(400).send({
+          error: `Invalid ID format: ${invalidIds.slice(0, 3).join(', ')}${invalidIds.length > 3 ? '...' : ''}`
+        });
+      }
+
+      // Process all undo operations with continue-on-error
+      const results: { succeeded: string[]; failed: Array<{ id: string; error: string }> } = {
+        succeeded: [],
+        failed: []
+      };
+
+      for (const id of ids) {
+        try {
+          // Revert to pending status, clear response and respondedAt
+          await project.approvalStorage.revertToPending(id);
+          results.succeeded.push(id);
+        } catch (error: any) {
+          results.failed.push({ id, error: error.message });
+        }
+      }
+
+      // Broadcast WebSocket update for successful undos
+      if (results.succeeded.length > 0) {
+        this.broadcastToProject(projectId, {
+          type: 'batch-approval-undo',
+          ids: results.succeeded,
+          count: results.succeeded.length
+        });
+      }
+
+      return {
+        success: results.failed.length === 0,
+        total: ids.length,
+        succeeded: results.succeeded,
+        failed: results.failed
+      };
+    });
+
+    // Batch approval actions (approve, reject only - no batch needs-revision)
+    this.app.post('/api/projects/:projectId/approvals/batch/:action', async (request, reply) => {
+      const { projectId, action } = request.params as { projectId: string; action: string };
+      const { ids, response } = request.body as {
+        ids: string[];
+        response?: string;
       };
 
       const project = this.projectManager.getProject(projectId);
@@ -672,25 +774,76 @@ export class MultiProjectDashboardServer {
         return reply.code(404).send({ error: 'Project not found' });
       }
 
-      const validActions = ['approve', 'reject', 'needs-revision'];
-      if (!validActions.includes(action)) {
-        return reply.code(400).send({ error: 'Invalid action' });
+      // Only allow approve and reject for batch operations (UX recommendation)
+      const validBatchActions = ['approve', 'reject'];
+      if (!validBatchActions.includes(action)) {
+        return reply.code(400).send({
+          error: 'Invalid batch action. Only "approve" and "reject" are allowed for batch operations.'
+        });
       }
 
-      // Convert action name to status value
-      const actionToStatus: Record<string, 'approved' | 'rejected' | 'needs-revision'> = {
+      // Validate ids array
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return reply.code(400).send({ error: 'ids must be a non-empty array' });
+      }
+
+      // Batch size limit (PE recommendation)
+      const BATCH_SIZE_LIMIT = 100;
+      if (ids.length > BATCH_SIZE_LIMIT) {
+        return reply.code(400).send({
+          error: `Batch size exceeds limit. Maximum ${BATCH_SIZE_LIMIT} items allowed.`
+        });
+      }
+
+      // Validate ID format (PE recommendation - alphanumeric with hyphens/underscores)
+      const idPattern = /^[a-zA-Z0-9_-]+$/;
+      const invalidIds = ids.filter(id => !idPattern.test(id));
+      if (invalidIds.length > 0) {
+        return reply.code(400).send({
+          error: `Invalid ID format: ${invalidIds.slice(0, 3).join(', ')}${invalidIds.length > 3 ? '...' : ''}`
+        });
+      }
+
+      const actionToStatus: Record<string, 'approved' | 'rejected'> = {
         'approve': 'approved',
-        'reject': 'rejected',
-        'needs-revision': 'needs-revision'
+        'reject': 'rejected'
       };
       const status = actionToStatus[action];
+      const batchResponse = response || `Batch ${action}d`;
 
-      try {
-        await project.approvalStorage.updateApproval(id, status, response, annotations, comments);
-        return { success: true };
-      } catch (error: any) {
-        return reply.code(404).send({ error: error.message });
+      // Process all approvals with continue-on-error (PE recommendation)
+      const results: { succeeded: string[]; failed: Array<{ id: string; error: string }> } = {
+        succeeded: [],
+        failed: []
+      };
+
+      // Debounce WebSocket broadcasts - collect all updates first (use results.succeeded)
+
+      for (const id of ids) {
+        try {
+          await project.approvalStorage.updateApproval(id, status, batchResponse);
+          results.succeeded.push(id);
+        } catch (error: any) {
+          results.failed.push({ id, error: error.message });
+        }
       }
+
+      // Single consolidated WebSocket broadcast for all successful updates
+      if (results.succeeded.length > 0) {
+        this.broadcastToProject(projectId, {
+          type: 'batch-approval-update',
+          action: action,
+          ids: results.succeeded,
+          count: results.succeeded.length
+        });
+      }
+
+      return {
+        success: results.failed.length === 0,
+        total: ids.length,
+        succeeded: results.succeeded,
+        failed: results.failed
+      };
     });
 
     // Get all snapshots for an approval

@@ -78,7 +78,36 @@
     "openInEditor": "Open in Editor",
     "noPending": "No pending approvals for this specification",
     "noPendingDocuments": "No documents with pending approvals found",
-    "selectCategory": "Select a category above to view pending approvals"
+    "selectCategory": "Select a category above to view pending approvals",
+    "select": "Select",
+    "cancel": "Cancel",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "selectedCount": "{{count}} selected",
+    "pendingCount": "{{count}} pending",
+    "approveAll": "Approve All",
+    "revisionAll": "Revise All",
+    "rejectAll": "Reject All",
+    "clearSelection": "Clear",
+    "approveAllCount": "Approve All ({{count}})",
+    "revisionAllCount": "Revise All ({{count}})",
+    "rejectAllCount": "Reject All ({{count}})",
+    "batch": {
+      "tooMany": "Cannot process more than {{limit}} items at once",
+      "feedbackRequired": "Please provide a reason for rejection",
+      "rejectTitle": "Reject {{count}} Items",
+      "rejectDescription": "Please provide a reason for rejecting these items. This feedback will be recorded.",
+      "rejectPlaceholder": "Enter rejection reason...",
+      "confirmReject": "Reject All",
+      "undo": "Undo",
+      "undoApproved": "Approved {{count}} items",
+      "undoRejected": "Rejected {{count}} items",
+      "undoRevision": "Requested revision for {{count}} items"
+    }
+  },
+  "common": {
+    "dismiss": "Dismiss",
+    "scrollToTop": "Scroll to top"
   },
   "specs": {
     "active": "Active",

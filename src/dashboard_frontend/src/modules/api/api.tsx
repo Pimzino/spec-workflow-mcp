@@ -67,6 +67,13 @@ export interface DiffLine {
   content: string;
 }
 
+export interface BatchApprovalResult {
+  success: boolean;
+  total: number;
+  succeeded: string[];
+  failed: Array<{ id: string; error: string }>;
+}
+
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
@@ -76,6 +83,12 @@ async function getJson<T>(url: string): Promise<T> {
 async function postJson(url: string, body: any) {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   return { ok: res.ok, status: res.status };
+}
+
+async function postJsonWithData<T>(url: string, body: any): Promise<{ ok: boolean; status: number; data?: T }> {
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = res.ok ? await res.json() : undefined;
+  return { ok: res.ok, status: res.status, data };
 }
 
 async function putJson(url: string, body: any) {
@@ -102,6 +115,8 @@ type ApiActionsContextType = {
   getSpecTasksProgress: (name: string) => Promise<any>;
   updateTaskStatus: (specName: string, taskId: string, status: 'pending' | 'in-progress' | 'completed') => Promise<{ ok: boolean; status: number; data?: any }>;
   approvalsAction: (id: string, action: 'approve' | 'reject' | 'needs-revision', payload: any) => Promise<{ ok: boolean; status: number }>;
+  approvalsActionBatch: (ids: string[], action: 'approve' | 'reject', response?: string) => Promise<{ ok: boolean; status: number; data?: BatchApprovalResult }>;
+  approvalsUndoBatch: (ids: string[]) => Promise<{ ok: boolean; status: number; data?: BatchApprovalResult }>;
   getApprovalContent: (id: string) => Promise<{ content: string; filePath?: string }>;
   getApprovalSnapshots: (id: string) => Promise<DocumentSnapshot[]>;
   getApprovalSnapshot: (id: string, version: number) => Promise<DocumentSnapshot>;
@@ -270,6 +285,8 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
         getSpecTasksProgress: async () => ({}),
         updateTaskStatus: async () => ({ ok: false, status: 400 }),
         approvalsAction: async () => ({ ok: false, status: 400 }),
+        approvalsActionBatch: async () => ({ ok: false, status: 400 }),
+        approvalsUndoBatch: async () => ({ ok: false, status: 400 }),
         getApprovalContent: async () => ({ content: '' }),
         getApprovalSnapshots: async () => [],
         getApprovalSnapshot: async () => ({} as any),
@@ -298,6 +315,8 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
       updateTaskStatus: (specName: string, taskId: string, status: 'pending' | 'in-progress' | 'completed') =>
         putJson(`${prefix}/specs/${encodeURIComponent(specName)}/tasks/${encodeURIComponent(taskId)}/status`, { status }),
       approvalsAction: (id, action, body) => postJson(`${prefix}/approvals/${encodeURIComponent(id)}/${action}`, body),
+      approvalsActionBatch: (ids, action, response) => postJsonWithData<BatchApprovalResult>(`${prefix}/approvals/batch/${action}`, { ids, response }),
+      approvalsUndoBatch: (ids) => postJsonWithData<BatchApprovalResult>(`${prefix}/approvals/batch/undo`, { ids }),
       getApprovalContent: (id: string) => getJson(`${prefix}/approvals/${encodeURIComponent(id)}/content`),
       getApprovalSnapshots: (id: string) => getJson(`${prefix}/approvals/${encodeURIComponent(id)}/snapshots`),
       getApprovalSnapshot: (id: string, version: number) => getJson(`${prefix}/approvals/${encodeURIComponent(id)}/snapshots/${version}`),

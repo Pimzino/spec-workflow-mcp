@@ -78,7 +78,36 @@
     "openInEditor": "Im Editor öffnen",
     "noPending": "Keine ausstehenden Genehmigungen für diese Spezifikation",
     "noPendingDocuments": "Keine Dokumente mit ausstehenden Genehmigungen gefunden",
-    "selectCategory": "Wählen Sie oben eine Kategorie aus um ausstehende Genehmigungen anzuzeigen"
+    "selectCategory": "Wählen Sie oben eine Kategorie aus um ausstehende Genehmigungen anzuzeigen",
+    "select": "Auswählen",
+    "cancel": "Abbrechen",
+    "selectAll": "Alle auswählen",
+    "deselectAll": "Auswahl aufheben",
+    "selectedCount": "{{count}} ausgewählt",
+    "pendingCount": "{{count}} ausstehend",
+    "approveAll": "Alle genehmigen",
+    "revisionAll": "Alle überarbeiten",
+    "rejectAll": "Alle ablehnen",
+    "clearSelection": "Löschen",
+    "approveAllCount": "Alle genehmigen ({{count}})",
+    "revisionAllCount": "Alle überarbeiten ({{count}})",
+    "rejectAllCount": "Alle ablehnen ({{count}})",
+    "batch": {
+      "tooMany": "Es können nicht mehr als {{limit}} Elemente gleichzeitig verarbeitet werden",
+      "feedbackRequired": "Bitte geben Sie einen Ablehnungsgrund an",
+      "rejectTitle": "{{count}} Elemente ablehnen",
+      "rejectDescription": "Bitte geben Sie einen Grund für die Ablehnung dieser Elemente an. Dieses Feedback wird aufgezeichnet.",
+      "rejectPlaceholder": "Ablehnungsgrund eingeben...",
+      "confirmReject": "Alle ablehnen",
+      "undo": "Rückgängig",
+      "undoApproved": "{{count}} Elemente genehmigt",
+      "undoRejected": "{{count}} Elemente abgelehnt",
+      "undoRevision": "Überarbeitung für {{count}} Elemente angefordert"
+    }
+  },
+  "common": {
+    "dismiss": "Schließen",
+    "scrollToTop": "Nach oben scrollen"
   },
   "specs": {
     "active": "Aktiv",

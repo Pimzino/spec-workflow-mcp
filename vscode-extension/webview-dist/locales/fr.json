@@ -78,7 +78,36 @@
     "openInEditor": "Ouvrir dans l'Éditeur",
     "noPending": "Aucune approbation en attente pour cette spécification",
     "noPendingDocuments": "Aucun document avec approbations en attente trouvé",
-    "selectCategory": "Sélectionner une catégorie ci-dessus pour voir les approbations en attente"
+    "selectCategory": "Sélectionner une catégorie ci-dessus pour voir les approbations en attente",
+    "select": "Sélectionner",
+    "cancel": "Annuler",
+    "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner",
+    "selectedCount": "{{count}} sélectionnés",
+    "pendingCount": "{{count}} en attente",
+    "approveAll": "Tout approuver",
+    "revisionAll": "Tout réviser",
+    "rejectAll": "Tout rejeter",
+    "clearSelection": "Effacer",
+    "approveAllCount": "Tout approuver ({{count}})",
+    "revisionAllCount": "Tout réviser ({{count}})",
+    "rejectAllCount": "Tout rejeter ({{count}})",
+    "batch": {
+      "tooMany": "Impossible de traiter plus de {{limit}} éléments à la fois",
+      "feedbackRequired": "Veuillez fournir une raison de rejet",
+      "rejectTitle": "Rejeter {{count}} éléments",
+      "rejectDescription": "Veuillez fournir une raison pour rejeter ces éléments. Ces commentaires seront enregistrés.",
+      "rejectPlaceholder": "Entrez la raison du rejet...",
+      "confirmReject": "Tout rejeter",
+      "undo": "Annuler",
+      "undoApproved": "{{count}} éléments approuvés",
+      "undoRejected": "{{count}} éléments rejetés",
+      "undoRevision": "Révision demandée pour {{count}} éléments"
+    }
+  },
+  "common": {
+    "dismiss": "Fermer",
+    "scrollToTop": "Retour en haut"
   },
   "specs": {
     "active": "Actif",

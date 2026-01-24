@@ -93,6 +93,7 @@
     "keepEditing": "Continuer l'Édition",
     "cancel": "Annuler",
     "delete": "Supprimer",
+    "processing": "Traitement...",
     "closeModalAria": "Fermer la modale",
     "ok": "OK",
     "unsavedChanges": {
@@ -375,7 +376,8 @@
       "quickReject": "Rejet Rapide",
       "reject": "Rejeter",
       "requestRevisions": "Demander des Révisions",
-      "revisions": "Révisions"
+      "revisions": "Révisions",
+      "useBatchActions": "Utiliser les actions par lot pour plusieurs éléments"
     },
     "tooltips": {
       "goToAnnotations": "Aller aux annotations",
@@ -397,6 +399,11 @@
       "placeholder": "Veuillez fournir des commentaires expliquant pourquoi ceci est rejeté...",
       "submit": "Rejeter"
     },
+    "batchReject": {
+      "title": "Rejeter {{count}} éléments",
+      "placeholder": "Entrez un motif de rejet qui s'appliquera à tous les éléments sélectionnés (ex. : 'Nécessite une révision de l'ingénieur principal')...",
+      "submit": "Tout rejeter"
+    },
     "approvalWarning": {
       "title": "Impossible d'Approuver",
       "message": "Impossible d'approuver lorsque des commentaires existent. Utilisez \"Demander des Révisions\" pour envoyer des commentaires."
@@ -404,6 +411,36 @@
     "revision": {
       "noCommentsTitle": "Aucun Commentaire Ajouté",
       "noCommentsMessage": "Veuillez ajouter au moins un commentaire avant de demander des révisions."
+    },
+    "selection": {
+      "enterMode": "Sélectionner des Éléments",
+      "exitMode": "Annuler la Sélection",
+      "select": "Sélectionner",
+      "selectAll": "Tout Sélectionner",
+      "selectedCount_one": "{{count}} sélectionné",
+      "selectedCount_other": "{{count}} sélectionnés",
+      "selectItem": "Sélectionner {{title}}",
+      "approveSelected": "Approuver la Sélection",
+      "rejectSelected": "Rejeter la Sélection"
+    },
+    "batchConfirm": {
+      "title": "Confirmer l'Action Groupée",
+      "message": "Vous êtes sur le point de {{action}} {{count}} éléments. Cette action ne peut pas être annulée. Êtes-vous sûr de vouloir continuer ?",
+      "confirm": "Oui, continuer"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} sur {{total}} éléments traités",
+      "failedCount_one": "{{count}} élément a échoué",
+      "failedCount_other": "{{count}} éléments ont échoué",
+      "undo": "Annuler"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" a été approuvé",
+      "approveFailed": "Échec de l'approbation de \"{{title}}\"",
+      "rejected": "\"{{title}}\" a été rejeté",
+      "rejectFailed": "Échec du rejet de \"{{title}}\"",
+      "revisionRequested": "Révisions demandées pour \"{{title}}\"",
+      "revisionFailed": "Échec de la demande de révisions pour \"{{title}}\""
     }
   },
   "logsPage": {
@@ -500,6 +537,7 @@
     "running": "Exécution...",
     "edit": "Modifier",
     "delete": "Supprimer",
+    "processing": "Traitement...",
     "cancel": "Annuler",
     "close": "Fermer",
     "jobDescription": "Supprimer les enregistrements de plus de {{days}} jours selon le calendrier: {{schedule}}"

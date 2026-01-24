@@ -93,6 +93,7 @@
     "keepEditing": "Keep Editing",
     "cancel": "Cancel",
     "delete": "Delete",
+    "processing": "Processing...",
     "closeModalAria": "Close modal",
     "ok": "OK",
     "unsavedChanges": {
@@ -376,7 +377,8 @@
       "quickReject": "Quick Reject",
       "reject": "Reject",
       "requestRevisions": "Request Revisions",
-      "revisions": "Revisions"
+      "revisions": "Revisions",
+      "useBatchActions": "Use batch actions for multiple items"
     },
     "tooltips": {
       "goToAnnotations": "Go to annotations",
@@ -398,6 +400,11 @@
       "placeholder": "Please provide feedback explaining why this is being rejected...",
       "submit": "Reject"
     },
+    "batchReject": {
+      "title": "Reject {{count}} Items",
+      "placeholder": "Enter a rejection reason that will apply to all selected items (e.g., 'Needs Principal Engineer review')...",
+      "submit": "Reject All"
+    },
     "approvalWarning": {
       "title": "Cannot Approve",
       "message": "Cannot approve when comments exist. Use \"Request Revisions\" to send feedback."
@@ -405,6 +412,36 @@
     "revision": {
       "noCommentsTitle": "No Comments Added",
       "noCommentsMessage": "Please add at least one comment before requesting revisions."
+    },
+    "selection": {
+      "enterMode": "Select Items",
+      "exitMode": "Cancel Selection",
+      "select": "Select",
+      "selectAll": "Select All",
+      "selectedCount_one": "{{count}} selected",
+      "selectedCount_other": "{{count}} selected",
+      "selectItem": "Select {{title}}",
+      "approveSelected": "Approve Selected",
+      "rejectSelected": "Reject Selected"
+    },
+    "batchConfirm": {
+      "title": "Confirm Batch Action",
+      "message": "You are about to {{action}} {{count}} items. This action cannot be undone. Are you sure you want to continue?",
+      "confirm": "Yes, proceed"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} of {{total}} items processed",
+      "failedCount_one": "{{count}} item failed",
+      "failedCount_other": "{{count}} items failed",
+      "undo": "Undo"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" has been approved",
+      "approveFailed": "Failed to approve \"{{title}}\"",
+      "rejected": "\"{{title}}\" has been rejected",
+      "rejectFailed": "Failed to reject \"{{title}}\"",
+      "revisionRequested": "Revisions requested for \"{{title}}\"",
+      "revisionFailed": "Failed to request revisions for \"{{title}}\""
     }
   },
   "logsPage": {

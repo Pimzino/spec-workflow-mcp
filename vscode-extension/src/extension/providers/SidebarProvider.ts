@@ -18,6 +18,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     outputChannel: vscode.OutputChannel
   ) {
     this.logger = new Logger(outputChannel);
+
+    // Initialize _previousApprovals BEFORE setting up file watcher
+    // This prevents false "new approval" notifications on first change
+    this._specWorkflowService.getApprovals().then(approvals => {
+      this._previousApprovals = approvals;
+      console.log(`SidebarProvider: Initialized with ${approvals.length} existing approvals`);
+    }).catch(err => {
+      console.error('SidebarProvider: Failed to initialize previous approvals:', err);
+    });
+
     // Set up automatic approval updates when files change
     this._specWorkflowService.setOnApprovalsChanged(() => {
       this.handleApprovalChanges();
@@ -104,6 +114,18 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         case 'request-revision-request':
           await this.requestRevisionRequest(message.id, message.response, message.annotations, message.comments);
+          break;
+        case 'batch-approve':
+          await this.batchApprove(message.ids, message.response);
+          break;
+        case 'batch-reject':
+          await this.batchReject(message.ids, message.response);
+          break;
+        case 'batch-request-revision':
+          await this.batchRequestRevision(message.ids, message.response);
+          break;
+        case 'batch-undo':
+          await this.batchUndo(message.ids);
           break;
         case 'get-approval-content':
           await this.sendApprovalContent(message.id);
@@ -459,6 +481,112 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       this.sendNotification('Revision requested', 'success');
     } catch (error) {
       this.sendError('Failed to request revision: ' + (error as Error).message);
+    }
+  }
+
+  // Batch size limit to prevent abuse (matches dashboard backend limit)
+  private static readonly BATCH_SIZE_LIMIT = 100;
+
+  /**
+   * Generic batch operation handler - DRY refactoring of batch methods
+   * @param ids - Array of approval IDs to process
+   * @param action - The action function to call for each ID
+   * @param actionVerb - The verb to use in notifications (e.g., 'approved', 'rejected')
+   * @param actionPastTense - Past tense for mixed results (e.g., 'approved', 'rejected')
+   */
+  private async executeBatchOperation(
+    ids: string[],
+    action: (id: string, response: string) => Promise<void>,
+    actionVerb: string,
+    actionPastTense: string,
+    response: string
+  ): Promise<void> {
+    // Backend batch size validation
+    if (ids.length > SidebarProvider.BATCH_SIZE_LIMIT) {
+      this.sendError(`Batch size exceeds limit. Maximum ${SidebarProvider.BATCH_SIZE_LIMIT} items allowed.`);
+      return;
+    }
+
+    try {
+      console.log(`SidebarProvider: Batch ${actionVerb} ${ids.length} requests`);
+      let successCount = 0;
+      let failedCount = 0;
+
+      for (const id of ids) {
+        try {
+          await action(id, response);
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to ${actionVerb} request ${id}:`, error);
+          failedCount++;
+        }
+      }
+
+      await this.sendApprovals();
+      await this.sendApprovalCategories();
+
+      if (failedCount === 0) {
+        this.sendNotification(`${successCount} requests ${actionPastTense}`, 'success');
+      } else {
+        this.sendNotification(`${successCount} ${actionPastTense}, ${failedCount} failed`, 'warning');
+      }
+    } catch (error) {
+      this.sendError(`Failed to batch ${actionVerb}: ` + (error as Error).message);
+    }
+  }
+
+  private async batchApprove(ids: string[], response: string) {
+    await this.executeBatchOperation(
+      ids,
+      (id, resp) => this._specWorkflowService.approveRequest(id, resp),
+      'approving',
+      'approved',
+      response
+    );
+  }
+
+  private async batchReject(ids: string[], response: string) {
+    await this.executeBatchOperation(
+      ids,
+      (id, resp) => this._specWorkflowService.rejectRequest(id, resp),
+      'rejecting',
+      'rejected',
+      response
+    );
+  }
+
+  private async batchRequestRevision(ids: string[], response: string) {
+    await this.executeBatchOperation(
+      ids,
+      (id, resp) => this._specWorkflowService.requestRevisionRequest(id, resp),
+      'requesting revision for',
+      'revised',
+      response
+    );
+  }
+
+  private async batchUndo(ids: string[]) {
+    let succeeded = 0;
+    let failed = 0;
+
+    for (const id of ids) {
+      try {
+        await this._specWorkflowService.revertToPending(id);
+        succeeded++;
+      } catch (error) {
+        console.error(`Failed to undo approval ${id}:`, error);
+        failed++;
+      }
+    }
+
+    // Refresh approvals to update the UI
+    await this.sendApprovals();
+
+    // Show result notification
+    if (failed === 0) {
+      this.sendNotification(`Undone ${succeeded} requests`, 'success');
+    } else {
+      this.sendNotification(`Undone ${succeeded} requests, ${failed} failed`, 'warning');
     }
   }
 

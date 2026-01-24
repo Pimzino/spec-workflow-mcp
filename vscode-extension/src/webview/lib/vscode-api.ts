@@ -47,6 +47,10 @@ export type WebviewMessage =
   | { type: 'reject-request'; id: string; response: string }
   | { type: 'request-revision-request'; id: string; response: string; annotations?: string; comments?: any[] }
   | { type: 'get-approval-content'; id: string }
+  | { type: 'batch-approve'; ids: string[]; response: string }
+  | { type: 'batch-reject'; ids: string[]; response: string }
+  | { type: 'batch-request-revision'; ids: string[]; response: string }
+  | { type: 'batch-undo'; ids: string[] }
   | { type: 'get-selected-spec' }
   | { type: 'set-selected-spec'; specName: string }
   | { type: 'get-config' }
@@ -344,6 +348,23 @@ class VsCodeApiService {
 
   getApprovalContent(id: string) {
     this.postMessage({ type: 'get-approval-content', id });
+  }
+
+  // Batch approval methods
+  batchApprove(ids: string[], response: string) {
+    this.postMessage({ type: 'batch-approve', ids, response });
+  }
+
+  batchReject(ids: string[], response: string) {
+    this.postMessage({ type: 'batch-reject', ids, response });
+  }
+
+  batchRequestRevision(ids: string[], response: string) {
+    this.postMessage({ type: 'batch-request-revision', ids, response });
+  }
+
+  batchUndo(ids: string[]) {
+    this.postMessage({ type: 'batch-undo', ids });
   }
 
   getSteering() {

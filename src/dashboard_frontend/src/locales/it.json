@@ -93,6 +93,7 @@
     "keepEditing": "Continua Modifica",
     "cancel": "Annulla",
     "delete": "Elimina",
+    "processing": "Elaborazione...",
     "closeModalAria": "Chiudi modale",
     "ok": "OK",
     "unsavedChanges": {
@@ -375,7 +376,8 @@
       "quickReject": "Rifiuta Veloce",
       "reject": "Rifiuta",
       "requestRevisions": "Richiedi Revisioni",
-      "revisions": "Revisioni"
+      "revisions": "Revisioni",
+      "useBatchActions": "Usa azioni batch per più elementi"
     },
     "tooltips": {
       "goToAnnotations": "Vai alle annotazioni",
@@ -397,6 +399,11 @@
       "placeholder": "Fornisci feedback spiegando perché questo viene rifiutato...",
       "submit": "Rifiuta"
     },
+    "batchReject": {
+      "title": "Rifiuta {{count}} elementi",
+      "placeholder": "Inserisci un motivo di rifiuto che verrà applicato a tutti gli elementi selezionati (es. 'Richiede revisione dell'Ingegnere Principale')...",
+      "submit": "Rifiuta tutto"
+    },
     "approvalWarning": {
       "title": "Impossibile Approvare",
       "message": "Impossibile approvare quando esistono commenti. Usa \"Richiedi Revisioni\" per inviare feedback."
@@ -404,6 +411,36 @@
     "revision": {
       "noCommentsTitle": "Nessun Commento Aggiunto",
       "noCommentsMessage": "Aggiungi almeno un commento prima di richiedere revisioni."
+    },
+    "selection": {
+      "enterMode": "Seleziona Elementi",
+      "exitMode": "Annulla Selezione",
+      "select": "Seleziona",
+      "selectAll": "Seleziona Tutto",
+      "selectedCount_one": "{{count}} selezionato",
+      "selectedCount_other": "{{count}} selezionati",
+      "selectItem": "Seleziona {{title}}",
+      "approveSelected": "Approva Selezionati",
+      "rejectSelected": "Rifiuta Selezionati"
+    },
+    "batchConfirm": {
+      "title": "Conferma Azione di Massa",
+      "message": "Stai per {{action}} {{count}} elementi. Questa azione non può essere annullata. Sei sicuro di voler continuare?",
+      "confirm": "Sì, procedi"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} di {{total}} elementi elaborati",
+      "failedCount_one": "{{count}} elemento fallito",
+      "failedCount_other": "{{count}} elementi falliti",
+      "undo": "Annulla"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" è stato approvato",
+      "approveFailed": "Impossibile approvare \"{{title}}\"",
+      "rejected": "\"{{title}}\" è stato rifiutato",
+      "rejectFailed": "Impossibile rifiutare \"{{title}}\"",
+      "revisionRequested": "Revisioni richieste per \"{{title}}\"",
+      "revisionFailed": "Impossibile richiedere revisioni per \"{{title}}\""
     }
   },
   "logsPage": {
@@ -500,6 +537,7 @@
     "running": "In esecuzione...",
     "edit": "Modifica",
     "delete": "Elimina",
+    "processing": "Elaborazione...",
     "cancel": "Annulla",
     "close": "Chiudi",
     "jobDescription": "Elimina i record più vecchi di {{days}} giorni secondo la pianificazione: {{schedule}}"

@@ -59,6 +59,14 @@
 				"npm: watch-tests"
 			],
 			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "compile",
+			"group": "build",
+			"problemMatcher": ["$tsc", "$eslint-stylish"],
+			"label": "npm: compile",
+			"detail": "Compile extension (one-time build)"
 		}
 	]
 }

@@ -95,6 +95,7 @@
     "keepEditing": "Продолжить редактирование",
     "cancel": "Отмена",
     "delete": "Удалить",
+    "processing": "Обработка...",
     "closeModalAria": "Закрыть модальное окно",
     "ok": "ОК",
     "unsavedChanges": {
@@ -380,7 +381,8 @@
       "quickReject": "Быстро отклонить",
       "reject": "Отклонить",
       "requestRevisions": "Запросить доработки",
-      "revisions": "Доработки"
+      "revisions": "Доработки",
+      "useBatchActions": "Используйте пакетные действия для нескольких элементов"
     },
     "tooltips": {
       "goToAnnotations": "Перейти к аннотациям",
@@ -402,6 +404,11 @@
       "placeholder": "Пожалуйста, предоставьте отзыв объясняющий почему это отклоняется...",
       "submit": "Отклонить"
     },
+    "batchReject": {
+      "title": "Отклонить {{count}} элементов",
+      "placeholder": "Введите причину отклонения, которая будет применена ко всем выбранным элементам (например: 'Требуется проверка главным инженером')...",
+      "submit": "Отклонить все"
+    },
     "approvalWarning": {
       "title": "Невозможно одобрить",
       "message": "Невозможно одобрить когда существуют комментарии. Используйте \"Запросить доработки\" для отправки отзыва."
@@ -409,6 +416,40 @@
     "revision": {
       "noCommentsTitle": "Комментарии не добавлены",
       "noCommentsMessage": "Пожалуйста, добавьте хотя бы один комментарий перед запросом доработок."
+    },
+    "selection": {
+      "enterMode": "Выбрать элементы",
+      "exitMode": "Отменить выбор",
+      "select": "Выбрать",
+      "selectAll": "Выбрать все",
+      "selectedCount_one": "{{count}} выбран",
+      "selectedCount_few": "{{count}} выбрано",
+      "selectedCount_many": "{{count}} выбрано",
+      "selectedCount_other": "{{count}} выбрано",
+      "selectItem": "Выбрать {{title}}",
+      "approveSelected": "Одобрить выбранные",
+      "rejectSelected": "Отклонить выбранные"
+    },
+    "batchConfirm": {
+      "title": "Подтвердить массовое действие",
+      "message": "Вы собираетесь {{action}} {{count}} элементов. Это действие нельзя отменить. Вы уверены что хотите продолжить?",
+      "confirm": "Да, продолжить"
+    },
+    "batchResult": {
+      "title": "Обработано {{succeeded}} из {{total}} элементов",
+      "failedCount_one": "{{count}} элемент не удался",
+      "failedCount_few": "{{count}} элемента не удались",
+      "failedCount_many": "{{count}} элементов не удалось",
+      "failedCount_other": "{{count}} элементов не удалось",
+      "undo": "Отменить"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" одобрен",
+      "approveFailed": "Не удалось одобрить \"{{title}}\"",
+      "rejected": "\"{{title}}\" отклонён",
+      "rejectFailed": "Не удалось отклонить \"{{title}}\"",
+      "revisionRequested": "Запрошены исправления для \"{{title}}\"",
+      "revisionFailed": "Не удалось запросить исправления для \"{{title}}\""
     }
   },
   "logsPage": {
@@ -505,6 +546,7 @@
     "running": "Выполнение...",
     "edit": "Редактировать",
     "delete": "Удалить",
+    "processing": "Обработка...",
     "cancel": "Отмена",
     "close": "Закрыть",
     "jobDescription": "Удалить записи старше {{days}} дней по расписанию: {{schedule}}"

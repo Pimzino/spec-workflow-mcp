@@ -78,7 +78,36 @@
     "openInEditor": "Открыть в редакторе",
     "noPending": "Нет ожидающих одобрений для этой спецификации",
     "noPendingDocuments": "Документы с ожидающими одобрениями не найдены",
-    "selectCategory": "Выберите категорию выше для просмотра ожидающих одобрений"
+    "selectCategory": "Выберите категорию выше для просмотра ожидающих одобрений",
+    "select": "Выбрать",
+    "cancel": "Отмена",
+    "selectAll": "Выбрать всё",
+    "deselectAll": "Снять выделение",
+    "selectedCount": "{{count}} выбрано",
+    "pendingCount": "{{count}} ожидает",
+    "approveAll": "Одобрить все",
+    "revisionAll": "Доработать все",
+    "rejectAll": "Отклонить все",
+    "clearSelection": "Очистить",
+    "approveAllCount": "Одобрить все ({{count}})",
+    "revisionAllCount": "Доработать все ({{count}})",
+    "rejectAllCount": "Отклонить все ({{count}})",
+    "batch": {
+      "tooMany": "Невозможно обработать более {{limit}} элементов за раз",
+      "feedbackRequired": "Укажите причину отклонения",
+      "rejectTitle": "Отклонить {{count}} элементов",
+      "rejectDescription": "Укажите причину отклонения этих элементов. Этот отзыв будет записан.",
+      "rejectPlaceholder": "Введите причину отклонения...",
+      "confirmReject": "Отклонить все",
+      "undo": "Отменить",
+      "undoApproved": "{{count}} элементов одобрено",
+      "undoRejected": "{{count}} элементов отклонено",
+      "undoRevision": "Запрошена доработка для {{count}} элементов"
+    }
+  },
+  "common": {
+    "dismiss": "Закрыть",
+    "scrollToTop": "Наверх"
   },
   "specs": {
     "active": "Активные",
