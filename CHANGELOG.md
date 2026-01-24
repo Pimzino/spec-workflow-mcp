@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.10] - 2026-01-24
+
+### Added
+- **Custom Typography System** - Added locally-bundled fonts for improved readability and visual consistency:
+  - **Inter** (400, 500, 600, 700 weights) - Modern sans-serif for UI text, designed for screens
+  - **JetBrains Mono** (400, 500, 700 weights) - Developer-focused monospace for code and specs
+  - Fonts are bundled locally in the build (no CDN dependency)
+  - Added `font-display: swap` for optimal loading performance
+  - Added `unicode-range` for efficient font subsetting
+  - Updated `--font-sans` and `--font-mono` CSS variables with new fonts and fallback stack
+
 ## [2.1.9] - 2026-01-23
 
 ### Added

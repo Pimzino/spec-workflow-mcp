@@ -4,6 +4,16 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.5] - 2026-01-24
+
+### Added
+- **Custom Typography System** - Added locally-bundled fonts for improved readability and visual consistency:
+  - **Inter** (400, 500, 600, 700 weights) - Modern sans-serif for UI text
+  - **JetBrains Mono** (400, 500, 700 weights) - Developer-focused monospace for code
+  - Fonts are bundled locally in the extension (no CDN dependency)
+  - Updated Content Security Policy to allow font loading
+  - Updated Vite config to copy font assets during build
+
 ## [1.1.4] - 2026-01-23
 
 ### Security
