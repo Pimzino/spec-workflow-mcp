@@ -27,6 +27,7 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
+    "test:generate-approvals": "node scripts/generate-test-approvals.cjs",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

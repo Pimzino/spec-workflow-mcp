@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useApi, DocumentSnapshot, DiffResult, BatchApprovalResult } from '../api/api';
-import { ApprovalsAnnotator, ApprovalComment } from '../approvals/ApprovalsAnnotator';
+import { ApprovalsAnnotator, ApprovalComment, ViewMode } from '../approvals/ApprovalsAnnotator';
 import { useNotifications } from '../notifications/NotificationProvider';
 import { TextInputModal } from '../modals/TextInputModal';
 import { AlertModal } from '../modals/AlertModal';
@@ -462,8 +462,9 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
                 {/* Two-dropdown comparison selector */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 min-w-0 w-full sm:w-auto">
-                    <label className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">From:</label>
+                    <label htmlFor="snapshot-from-select" className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">From:</label>
                     <select
+                      id="snapshot-from-select"
                       value={selectedSnapshotVersion}
                       onChange={(e) => setSelectedSnapshotVersion(parseInt(e.target.value, 10))}
                       className="block w-full sm:w-auto max-w-full rounded-lg border-[var(--border-default)] bg-[var(--surface-panel)] text-sm focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
@@ -926,8 +927,9 @@ function Content() {
           {/* Filter Dropdown */}
           {categories.length > 1 && (
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 overflow-x-hidden">
-              <label className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">{t('approvalsPage.filter.label')}</label>
+              <label htmlFor="approvals-filter" className="text-sm font-medium text-[var(--text-secondary)] whitespace-nowrap">{t('approvalsPage.filter.label')}</label>
               <select
+                id="approvals-filter"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
                 className="block w-full sm:w-auto max-w-full rounded-lg border-[var(--border-default)] bg-[var(--surface-panel)] text-sm focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
@@ -1047,6 +1049,8 @@ function Content() {
                 )}
                 <button
                   onClick={() => setShowResultToast(false)}
+                  type="button"
+                  aria-label={t('common.close')}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

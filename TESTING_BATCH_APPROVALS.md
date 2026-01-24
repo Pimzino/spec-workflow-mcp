@@ -1,0 +1,197 @@
+# Testing Batch Approval Feature
+
+This guide explains how to test the batch approval management feature for PR #181.
+
+## Prerequisites
+
+- Node.js installed
+- VS Code installed (for extension testing)
+- Project dependencies installed (`npm install`)
+
+## Quick Start
+
+### 1. Generate Test Data
+
+Run the test data generation script:
+
+```bash
+# Generate 7 test approvals (default)
+npm run test:generate-approvals
+
+# Generate a custom number of approvals
+node scripts/generate-test-approvals.js 10
+
+# Clean and regenerate
+npm run test:generate-approvals -- --clean
+node scripts/generate-test-approvals.js 10 --clean
+```
+
+This will create test approval files in `.spec-workflow/approvals/spec/` and corresponding documents in `.spec-workflow/docs/`.
+
+### 2. Testing in Web Dashboard
+
+**Start the dashboard:**
+```bash
+npm run dev:dashboard
+```
+
+**Test the feature:**
+1. Open http://localhost:5173/ in your browser
+2. Navigate to **Approvals** page
+3. You should see the generated test approvals
+
+### 3. Testing in VS Code Extension
+
+**Option A: Launch Extension Development Host**
+
+1. Open the `vscode-extension` folder in VS Code:
+   ```bash
+   cd vscode-extension
+   code .
+   ```
+
+2. Press **F5** (or Run > Start Debugging)
+
+3. In the new **Extension Development Host** window:
+   - Open the project root folder: `/Applications/Development/Projects/spec-workflow-mcp`
+   - Open the Spec Workflow sidebar (click icon in Activity Bar)
+   - Navigate to Approvals section
+
+**Option B: Test with installed extension**
+
+If you have the extension installed from marketplace:
+1. Open this project folder in VS Code
+2. Open Spec Workflow sidebar
+3. Navigate to Approvals
+
+**Important:** The extension needs to be opened with a workspace that contains the `.spec-workflow` directory with the test approvals.
+
+## Test Scenarios
+
+### ✅ Enter Selection Mode
+- [ ] Click the "Select" or batch selection button
+- [ ] Verify checkboxes appear next to each approval item
+- [ ] Verify "Select All" checkbox appears in toolbar
+- [ ] Verify batch action buttons appear
+
+### ✅ Select Multiple Items
+- [ ] Click individual checkboxes to select 2-3 items
+- [ ] Verify selection count updates ("3 selected")
+- [ ] Verify batch action buttons are enabled
+- [ ] Verify individual action buttons are disabled when >1 item selected
+
+### ✅ Select All Functionality
+- [ ] Click "Select All" checkbox
+- [ ] Verify all items are selected
+- [ ] Click again to deselect all
+- [ ] Partially select items and verify indeterminate state
+
+### ✅ Batch Approve (≤5 items)
+- [ ] Select 3-5 approval items
+- [ ] Click "Approve Selected" button
+- [ ] Verify NO confirmation modal appears
+- [ ] Verify items are approved immediately
+- [ ] Verify success notification appears
+- [ ] Verify selection mode exits automatically
+
+### ✅ Batch Approve (>5 items)
+- [ ] Select 6 or more approval items
+- [ ] Click "Approve Selected" button
+- [ ] Verify confirmation modal appears with item count
+- [ ] Click "Confirm" button
+- [ ] Verify items are approved after confirmation
+- [ ] Verify success notification
+
+### ✅ Batch Reject
+- [ ] Select 2-3 approval items
+- [ ] Click "Reject Selected" button
+- [ ] Verify feedback modal ALWAYS appears (regardless of count)
+- [ ] Enter rejection reason/feedback
+- [ ] Submit and verify items are rejected
+- [ ] Verify success notification
+
+### ✅ Undo Operation
+- [ ] Perform any batch operation (approve or reject)
+- [ ] Verify toast notification appears with "Undo" button
+- [ ] Click "Undo" button within 30 seconds
+- [ ] Verify batch operation is reversed
+- [ ] Verify items return to previous state
+- [ ] Verify undo notification disappears
+
+### ✅ Error Handling
+- [ ] Verify error notifications use string-based format (not object)
+- [ ] Check browser console for any errors during operations
+- [ ] Verify graceful handling of failed operations
+
+### ✅ i18n Processing Text
+- [ ] During any batch operation loading state
+- [ ] Verify "Processing..." text is translated (not hardcoded English)
+- [ ] Test in different languages if possible
+
+### ✅ Exit Selection Mode
+- [ ] Enter selection mode and select some items
+- [ ] Click "Cancel" or "Exit Selection Mode" button
+- [ ] Verify checkboxes disappear
+- [ ] Verify selections are cleared
+- [ ] Verify batch action toolbar disappears
+
+## Expected Behavior
+
+### Batch Approve Threshold
+- **≤5 items:** Immediate approval without confirmation
+- **>5 items:** Confirmation modal required before approval
+
+### Batch Reject
+- **Always requires feedback modal** regardless of item count
+- User must provide a reason for batch rejection
+
+### Undo Window
+- 30-second window to undo batch operations
+- Toast notification with "Undo" button
+- After timeout or undo, toast disappears
+
+### Individual Actions
+- Individual approve/reject buttons should be **disabled** when multiple items are selected
+- Tooltip should indicate "Use batch actions" when disabled
+
+## Cleaning Up Test Data
+
+To remove test approvals and start fresh:
+
+```bash
+# Clean and regenerate
+node scripts/generate-test-approvals.js --clean
+
+# Or manually delete
+rm -rf .spec-workflow/approvals/spec/test-approval-*
+rm -rf .spec-workflow/docs/*.md
+```
+
+## Troubleshooting
+
+### Approvals not showing in VS Code extension
+1. Make sure you opened the correct workspace folder
+2. Check that `.spec-workflow/approvals/spec/` contains JSON files
+3. Reload the Extension Development Host window (Cmd+R / Ctrl+R)
+4. Check VS Code Developer Tools console for errors
+
+### Approvals not showing in web dashboard
+1. Verify dashboard is running (`npm run dev:dashboard`)
+2. Check browser console for errors
+3. Verify `.spec-workflow/approvals/spec/` directory exists and contains files
+4. Refresh the browser page
+
+### File watcher not picking up changes
+1. Restart the development server
+2. Check file permissions on `.spec-workflow/` directory
+3. Try manually creating an approval and check if it appears
+
+## Reporting Issues
+
+When reporting issues, please include:
+- Environment (web dashboard vs VS Code extension)
+- Steps to reproduce
+- Expected vs actual behavior
+- Browser/VS Code version
+- Console errors (if any)
+- Screenshots (if applicable)
