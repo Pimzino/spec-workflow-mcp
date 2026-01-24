@@ -88,9 +88,26 @@
     "approveAll": "Одобрить все",
     "revisionAll": "Доработать все",
     "rejectAll": "Отклонить все",
+    "clearSelection": "Очистить",
+    "approveAllCount": "Одобрить все ({{count}})",
+    "revisionAllCount": "Доработать все ({{count}})",
+    "rejectAllCount": "Отклонить все ({{count}})",
     "batch": {
-      "tooMany": "Невозможно обработать более {{limit}} элементов за раз"
+      "tooMany": "Невозможно обработать более {{limit}} элементов за раз",
+      "feedbackRequired": "Укажите причину отклонения",
+      "rejectTitle": "Отклонить {{count}} элементов",
+      "rejectDescription": "Укажите причину отклонения этих элементов. Этот отзыв будет записан.",
+      "rejectPlaceholder": "Введите причину отклонения...",
+      "confirmReject": "Отклонить все",
+      "undo": "Отменить",
+      "undoApproved": "{{count}} элементов одобрено",
+      "undoRejected": "{{count}} элементов отклонено",
+      "undoRevision": "Запрошена доработка для {{count}} элементов"
     }
+  },
+  "common": {
+    "dismiss": "Закрыть",
+    "scrollToTop": "Наверх"
   },
   "specs": {
     "active": "Активные",

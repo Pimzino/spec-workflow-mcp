@@ -83,9 +83,26 @@
     "approveAll": "全部批准",
     "revisionAll": "全部请求修订",
     "rejectAll": "全部拒绝",
+    "clearSelection": "清除",
+    "approveAllCount": "全部批准 ({{count}})",
+    "revisionAllCount": "全部请求修订 ({{count}})",
+    "rejectAllCount": "全部拒绝 ({{count}})",
     "batch": {
-      "tooMany": "一次不能处理超过{{limit}}个项目"
+      "tooMany": "一次不能处理超过{{limit}}个项目",
+      "feedbackRequired": "请提供拒绝原因",
+      "rejectTitle": "拒绝 {{count}} 项",
+      "rejectDescription": "请提供拒绝这些项目的原因。此反馈将被记录。",
+      "rejectPlaceholder": "输入拒绝原因...",
+      "confirmReject": "全部拒绝",
+      "undo": "撤销",
+      "undoApproved": "已批准 {{count}} 项",
+      "undoRejected": "已拒绝 {{count}} 项",
+      "undoRevision": "已请求修订 {{count}} 项"
     }
+  },
+  "common": {
+    "dismiss": "关闭",
+    "scrollToTop": "回到顶部"
   },
   "specs": {
     "active": "活跃",

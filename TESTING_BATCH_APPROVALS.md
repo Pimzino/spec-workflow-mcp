@@ -104,19 +104,68 @@ If you have the extension installed from marketplace:
 
 ### ✅ Batch Reject
 - [ ] Select 2-3 approval items
-- [ ] Click "Reject Selected" button
+- [ ] Click "Reject All (X)" button (VS Code) or "Reject Selected" (Dashboard)
 - [ ] Verify feedback modal ALWAYS appears (regardless of count)
-- [ ] Enter rejection reason/feedback
+- [ ] Verify modal shows item count in title ("Reject 2 Items")
+- [ ] Enter rejection reason/feedback in textarea
+- [ ] Verify "Reject All" button is disabled until feedback is entered
 - [ ] Submit and verify items are rejected
 - [ ] Verify success notification
 
-### ✅ Undo Operation
-- [ ] Perform any batch operation (approve or reject)
-- [ ] Verify toast notification appears with "Undo" button
+### ✅ Batch Request Revision
+- [ ] Select 2-3 approval items
+- [ ] Click "Revise All (X)" button
+- [ ] Verify items are marked for revision
+- [ ] Verify success notification appears
+- [ ] Verify selection mode exits automatically
+
+### ✅ Undo Operation (Batch Approve)
+
+- [ ] Select 2-3 pending approval items
+- [ ] Click "Approve All (X)" button
+- [ ] Verify undo toast appears at bottom of sidebar
+- [ ] Verify toast shows message: "Approved X items"
+- [ ] Verify progress bar animation (depleting over 30 seconds)
+- [ ] Verify checkmark icon appears in toast (green)
+- [ ] Click "Undo" button
+- [ ] Verify items return to pending status
+- [ ] Verify toast disappears immediately after undo
+- [ ] Verify success notification: "Undone X requests"
+
+### ✅ Undo Operation (Batch Reject)
+
+- [ ] Select 2-3 pending approval items
+- [ ] Click "Reject All (X)" button
+- [ ] Enter rejection reason and confirm
+- [ ] Verify undo toast appears
+- [ ] Verify toast shows message: "Rejected X items"
 - [ ] Click "Undo" button within 30 seconds
-- [ ] Verify batch operation is reversed
-- [ ] Verify items return to previous state
-- [ ] Verify undo notification disappears
+- [ ] Verify items return to pending status
+- [ ] Verify rejection reason is cleared from items
+
+### ✅ Undo Operation (Batch Revision)
+
+- [ ] Select 2-3 pending approval items
+- [ ] Click "Revise All (X)" button
+- [ ] Verify undo toast appears
+- [ ] Verify toast shows: "Requested revision for X items"
+- [ ] Click "Undo" button
+- [ ] Verify items return to pending status
+
+### ✅ Undo Toast UI
+
+- [ ] Verify toast appears above scroll-to-top FAB (not overlapping)
+- [ ] Verify dismiss button (X) closes toast without undo
+- [ ] Verify toast auto-dismisses after 30 seconds
+- [ ] Verify toast width fits within narrow sidebar
+- [ ] Verify undo button is clearly clickable (has border/styling)
+
+### ✅ Undo Window Expiry
+
+- [ ] Perform a batch approve operation
+- [ ] Wait 30 seconds without clicking undo
+- [ ] Verify toast automatically disappears
+- [ ] Verify undo is no longer possible after dismissal
 
 ### ✅ Error Handling
 - [ ] Verify error notifications use string-based format (not object)
@@ -135,24 +184,57 @@ If you have the extension installed from marketplace:
 - [ ] Verify selections are cleared
 - [ ] Verify batch action toolbar disappears
 
+### ✅ VS Code Extension: Vertical Button Layout
+- [ ] Enter selection mode in VS Code extension sidebar
+- [ ] Verify batch action buttons stack vertically (not horizontally)
+- [ ] Verify all button text is fully visible at any sidebar width
+- [ ] Verify buttons show count in label: "Approve All (2)", "Revise All (2)", "Reject All (2)"
+- [ ] Verify "Reject All" uses Trash icon (not X icon)
+- [ ] Verify "Clear" link appears next to selection count
+- [ ] Click "Clear" and verify all items are deselected
+
+### ✅ VS Code Extension: No False "New Approval" Notifications
+
+- [ ] Perform any batch operation (approve, reject, or revise)
+- [ ] Verify NO "New approval request" notification appears in VS Code
+- [ ] Only genuinely NEW approvals should trigger notifications
+- [ ] Status changes (pending → approved/rejected) should NOT trigger notifications
+
 ## Expected Behavior
 
 ### Batch Approve Threshold
+
 - **≤5 items:** Immediate approval without confirmation
 - **>5 items:** Confirmation modal required before approval
 
 ### Batch Reject
+
 - **Always requires feedback modal** regardless of item count
 - User must provide a reason for batch rejection
+- Submit button disabled until feedback text is entered
+
+### Batch Request Revision
+
+- Immediate processing without confirmation modal
+- Items marked for revision with default feedback message
 
 ### Undo Window
+
 - 30-second window to undo batch operations
 - Toast notification with "Undo" button
 - After timeout or undo, toast disappears
 
 ### Individual Actions
+
 - Individual approve/reject buttons should be **disabled** when multiple items are selected
 - Tooltip should indicate "Use batch actions" when disabled
+
+### VS Code Extension Button Layout
+
+- Buttons stack **vertically** in sticky footer for reliable display at any width
+- Each button shows selection count: "Approve All (2)"
+- "Reject All" uses **Trash icon** (not X) for clarity
+- "Clear" link allows quick deselection without exiting selection mode
 
 ## Cleaning Up Test Data
 
@@ -170,18 +252,21 @@ rm -rf .spec-workflow/docs/*.md
 ## Troubleshooting
 
 ### Approvals not showing in VS Code extension
+
 1. Make sure you opened the correct workspace folder
 2. Check that `.spec-workflow/approvals/spec/` contains JSON files
 3. Reload the Extension Development Host window (Cmd+R / Ctrl+R)
 4. Check VS Code Developer Tools console for errors
 
 ### Approvals not showing in web dashboard
+
 1. Verify dashboard is running (`npm run dev:dashboard`)
 2. Check browser console for errors
 3. Verify `.spec-workflow/approvals/spec/` directory exists and contains files
 4. Refresh the browser page
 
 ### File watcher not picking up changes
+
 1. Restart the development server
 2. Check file permissions on `.spec-workflow/` directory
 3. Try manually creating an approval and check if it appears
@@ -189,6 +274,7 @@ rm -rf .spec-workflow/docs/*.md
 ## Reporting Issues
 
 When reporting issues, please include:
+
 - Environment (web dashboard vs VS Code extension)
 - Steps to reproduce
 - Expected vs actual behavior

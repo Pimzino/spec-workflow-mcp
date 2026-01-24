@@ -88,9 +88,26 @@
     "approveAll": "موافقة على الكل",
     "revisionAll": "مراجعة الكل",
     "rejectAll": "رفض الكل",
+    "clearSelection": "مسح",
+    "approveAllCount": "موافقة على الكل ({{count}})",
+    "revisionAllCount": "مراجعة الكل ({{count}})",
+    "rejectAllCount": "رفض الكل ({{count}})",
     "batch": {
-      "tooMany": "لا يمكن معالجة أكثر من {{limit}} عنصر في المرة الواحدة"
+      "tooMany": "لا يمكن معالجة أكثر من {{limit}} عنصر في المرة الواحدة",
+      "feedbackRequired": "يرجى تقديم سبب للرفض",
+      "rejectTitle": "رفض {{count}} عناصر",
+      "rejectDescription": "يرجى تقديم سبب لرفض هذه العناصر. سيتم تسجيل هذه الملاحظات.",
+      "rejectPlaceholder": "أدخل سبب الرفض...",
+      "confirmReject": "رفض الكل",
+      "undo": "تراجع",
+      "undoApproved": "تمت الموافقة على {{count}} عناصر",
+      "undoRejected": "تم رفض {{count}} عناصر",
+      "undoRevision": "تم طلب مراجعة {{count}} عناصر"
     }
+  },
+  "common": {
+    "dismiss": "إغلاق",
+    "scrollToTop": "التمرير إلى الأعلى"
   },
   "specs": {
     "active": "نشط",

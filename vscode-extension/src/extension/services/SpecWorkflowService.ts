@@ -877,6 +877,41 @@ export class SpecWorkflowService {
     await this.updateApprovalStatus(id, 'needs-revision', response, annotations, comments);
   }
 
+  /**
+   * Revert an approval back to pending status, clearing response and timestamp
+   * Used for undo operations after batch approvals/rejections
+   */
+  async revertToPending(id: string): Promise<void> {
+    if (!await this.ensureSpecWorkflowExists()) {
+      throw new Error('Spec workflow directory not found');
+    }
+
+    const approvalPath = await this.findApprovalPath(id);
+    if (!approvalPath) {
+      throw new Error(`Approval ${id} not found`);
+    }
+
+    try {
+      const content = await fs.readFile(approvalPath, 'utf-8');
+      const approval = JSON.parse(content);
+
+      // Revert to pending state
+      approval.status = 'pending';
+
+      // Clear response fields
+      delete approval.response;
+      delete approval.respondedAt;
+      delete approval.annotations;
+      delete approval.comments;
+
+      await fs.writeFile(approvalPath, JSON.stringify(approval, null, 2), 'utf-8');
+      this.logger.log(`Reverted approval ${id} to pending`);
+    } catch (error) {
+      this.logger.error(`Error reverting approval ${id}:`, error);
+      throw error;
+    }
+  }
+
   async getApprovalContent(id: string): Promise<string | null> {
     if (!await this.ensureSpecWorkflowExists()) {
       return null;

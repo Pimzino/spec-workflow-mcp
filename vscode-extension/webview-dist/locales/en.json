@@ -88,9 +88,26 @@
     "approveAll": "Approve All",
     "revisionAll": "Revise All",
     "rejectAll": "Reject All",
+    "clearSelection": "Clear",
+    "approveAllCount": "Approve All ({{count}})",
+    "revisionAllCount": "Revise All ({{count}})",
+    "rejectAllCount": "Reject All ({{count}})",
     "batch": {
-      "tooMany": "Cannot process more than {{limit}} items at once"
+      "tooMany": "Cannot process more than {{limit}} items at once",
+      "feedbackRequired": "Please provide a reason for rejection",
+      "rejectTitle": "Reject {{count}} Items",
+      "rejectDescription": "Please provide a reason for rejecting these items. This feedback will be recorded.",
+      "rejectPlaceholder": "Enter rejection reason...",
+      "confirmReject": "Reject All",
+      "undo": "Undo",
+      "undoApproved": "Approved {{count}} items",
+      "undoRejected": "Rejected {{count}} items",
+      "undoRevision": "Requested revision for {{count}} items"
     }
+  },
+  "common": {
+    "dismiss": "Dismiss",
+    "scrollToTop": "Scroll to top"
   },
   "specs": {
     "active": "Active",

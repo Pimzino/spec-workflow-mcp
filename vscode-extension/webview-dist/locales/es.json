@@ -88,9 +88,26 @@
     "approveAll": "Aprobar todo",
     "revisionAll": "Revisar todo",
     "rejectAll": "Rechazar todo",
+    "clearSelection": "Borrar",
+    "approveAllCount": "Aprobar todo ({{count}})",
+    "revisionAllCount": "Revisar todo ({{count}})",
+    "rejectAllCount": "Rechazar todo ({{count}})",
     "batch": {
-      "tooMany": "No se pueden procesar más de {{limit}} elementos a la vez"
+      "tooMany": "No se pueden procesar más de {{limit}} elementos a la vez",
+      "feedbackRequired": "Por favor proporcione un motivo de rechazo",
+      "rejectTitle": "Rechazar {{count}} elementos",
+      "rejectDescription": "Por favor proporcione un motivo para rechazar estos elementos. Esta retroalimentación será registrada.",
+      "rejectPlaceholder": "Ingrese el motivo de rechazo...",
+      "confirmReject": "Rechazar todo",
+      "undo": "Deshacer",
+      "undoApproved": "{{count}} elementos aprobados",
+      "undoRejected": "{{count}} elementos rechazados",
+      "undoRevision": "Revisión solicitada para {{count}} elementos"
     }
+  },
+  "common": {
+    "dismiss": "Cerrar",
+    "scrollToTop": "Ir arriba"
   },
   "specs": {
     "active": "Activas",

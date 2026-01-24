@@ -88,9 +88,26 @@
     "approveAll": "모두 승인",
     "revisionAll": "모두 수정 요청",
     "rejectAll": "모두 거부",
+    "clearSelection": "지우기",
+    "approveAllCount": "모두 승인 ({{count}})",
+    "revisionAllCount": "모두 수정 요청 ({{count}})",
+    "rejectAllCount": "모두 거부 ({{count}})",
     "batch": {
-      "tooMany": "한 번에 {{limit}}개 이상의 항목을 처리할 수 없습니다"
+      "tooMany": "한 번에 {{limit}}개 이상의 항목을 처리할 수 없습니다",
+      "feedbackRequired": "거부 사유를 입력해 주세요",
+      "rejectTitle": "{{count}}개 항목 거부",
+      "rejectDescription": "이 항목들을 거부하는 사유를 입력해 주세요. 이 피드백은 기록됩니다.",
+      "rejectPlaceholder": "거부 사유 입력...",
+      "confirmReject": "모두 거부",
+      "undo": "실행 취소",
+      "undoApproved": "{{count}}개 항목 승인됨",
+      "undoRejected": "{{count}}개 항목 거부됨",
+      "undoRevision": "{{count}}개 항목 수정 요청됨"
     }
+  },
+  "common": {
+    "dismiss": "닫기",
+    "scrollToTop": "맨 위로"
   },
   "specs": {
     "active": "활성",

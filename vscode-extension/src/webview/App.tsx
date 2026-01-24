@@ -26,7 +26,9 @@ import {
   Check,
   X,
   Minus,
-  RotateCcw
+  RotateCcw,
+  Trash2,
+  Undo2
 } from 'lucide-react';
 import { vscodeApi, type SpecData, type TaskProgressData, type ApprovalData, type SteeringStatus, type DocumentInfo, type SoundNotificationConfig } from '@/lib/vscode-api';
 import { cn, formatDistanceToNow } from '@/lib/utils';
@@ -65,6 +67,17 @@ function App() {
   const [batchProcessing, setBatchProcessing] = useState<boolean>(false);
   // Track if we're expecting a batch operation completion - used to detect backend confirmation
   const pendingBatchOperation = useRef<boolean>(false);
+  // Store fallback timeout ID so we can clear it when operation completes early
+  const batchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Track details of the pending batch operation for undo
+  const pendingBatchDetailsRef = useRef<{ ids: string[]; action: string } | null>(null);
+  // Batch reject modal state
+  const [batchRejectModalOpen, setBatchRejectModalOpen] = useState<boolean>(false);
+  const [batchRejectFeedback, setBatchRejectFeedback] = useState<string>('');
+  // Undo state
+  const [lastBatchOperation, setLastBatchOperation] = useState<{ ids: string[]; action: string } | null>(null);
+  const [showUndoToast, setShowUndoToast] = useState<boolean>(false);
+  const undoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [copiedSteering, setCopiedSteering] = useState<boolean>(false);
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set());
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -154,6 +167,10 @@ function App() {
 
   // Batch selection mode handlers
   const toggleSelectionMode = () => {
+    // Prevent exiting selection mode while batch operation is in progress
+    if (selectionMode && batchProcessing) {
+      return;
+    }
     if (selectionMode) {
       // Exiting selection mode - clear selections
       setSelectedApprovalIds(new Set());
@@ -183,23 +200,84 @@ function App() {
     }
   };
 
+  // Helper to clear batch operation state and timeout
+  const clearBatchOperationState = (showUndo: boolean = false, action?: string, ids?: string[]) => {
+    pendingBatchOperation.current = false;
+    setBatchProcessing(false);
+    setSelectedApprovalIds(new Set());
+    setSelectionMode(false);
+    // Clear fallback timeout if it exists
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
+      batchTimeoutRef.current = null;
+    }
+
+    // Set up undo state if operation was successful
+    if (showUndo && action && ids && ids.length > 0) {
+      // Clear any existing undo timeout
+      if (undoTimeoutRef.current) {
+        clearTimeout(undoTimeoutRef.current);
+      }
+
+      setLastBatchOperation({ ids, action });
+      setShowUndoToast(true);
+
+      // Set up 30-second undo window
+      undoTimeoutRef.current = setTimeout(() => {
+        setShowUndoToast(false);
+        setLastBatchOperation(null);
+      }, 30000);
+    }
+  };
+
   // Helper to start a batch operation with proper tracking
   const startBatchOperation = (
-    apiCall: () => void
+    apiCall: () => void,
+    action: string,
+    ids: string[]
   ) => {
+    // Prevent double-submission if already processing
+    if (batchProcessing || pendingBatchOperation.current) {
+      return;
+    }
+
+    // Store the IDs and action for undo in ref so completion handlers can access it
+    pendingBatchDetailsRef.current = { ids: [...ids], action };
+
     setBatchProcessing(true);
     pendingBatchOperation.current = true;
     apiCall();
+
     // Fallback timeout in case backend notification doesn't arrive (e.g., network issue)
     // The notification handler will clear state earlier if confirmation arrives
-    setTimeout(() => {
+    // Store timeout ID so we can clear it when operation completes
+    batchTimeoutRef.current = setTimeout(() => {
       if (pendingBatchOperation.current) {
-        pendingBatchOperation.current = false;
-        setBatchProcessing(false);
-        setSelectedApprovalIds(new Set());
-        setSelectionMode(false);
+        const details = pendingBatchDetailsRef.current;
+        pendingBatchDetailsRef.current = null;
+        clearBatchOperationState(true, details?.action, details?.ids);
       }
     }, BATCH_OPERATION_FEEDBACK_DELAY * 5); // 10 seconds fallback
+  };
+
+  // Handle undo operation
+  const handleUndo = () => {
+    if (!lastBatchOperation) { return; }
+
+    // Clear the undo timeout
+    if (undoTimeoutRef.current) {
+      clearTimeout(undoTimeoutRef.current);
+      undoTimeoutRef.current = null;
+    }
+
+    // Hide toast immediately
+    setShowUndoToast(false);
+
+    // Execute undo
+    vscodeApi.batchUndo(lastBatchOperation.ids);
+
+    // Clear last operation
+    setLastBatchOperation(null);
   };
 
   const handleBatchApprove = () => {
@@ -208,8 +286,11 @@ function App() {
       setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
       return;
     }
-    startBatchOperation(() =>
-      vscodeApi.batchApprove(Array.from(selectedApprovalIds), t('approvals.response.approved'))
+    const ids = Array.from(selectedApprovalIds);
+    startBatchOperation(
+      () => vscodeApi.batchApprove(ids, t('approvals.response.approved')),
+      'approve',
+      ids
     );
   };
 
@@ -219,8 +300,22 @@ function App() {
       setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
       return;
     }
-    startBatchOperation(() =>
-      vscodeApi.batchReject(Array.from(selectedApprovalIds), t('approvals.response.rejected'))
+    // Always show feedback modal for reject - user must provide a reason
+    setBatchRejectFeedback('');
+    setBatchRejectModalOpen(true);
+  };
+
+  const handleBatchRejectWithFeedback = () => {
+    if (!batchRejectFeedback.trim()) {
+      setNotification({ message: t('approvals.batch.feedbackRequired'), level: 'warning' });
+      return;
+    }
+    setBatchRejectModalOpen(false);
+    const ids = Array.from(selectedApprovalIds);
+    startBatchOperation(
+      () => vscodeApi.batchReject(ids, batchRejectFeedback.trim()),
+      'reject',
+      ids
     );
   };
 
@@ -230,8 +325,11 @@ function App() {
       setNotification({ message: t('approvals.batch.tooMany', { limit: BATCH_SIZE_LIMIT }), level: 'warning' });
       return;
     }
-    startBatchOperation(() =>
-      vscodeApi.batchRequestRevision(Array.from(selectedApprovalIds), t('approvals.response.needsRevision'))
+    const ids = Array.from(selectedApprovalIds);
+    startBatchOperation(
+      () => vscodeApi.batchRequestRevision(ids, t('approvals.response.needsRevision')),
+      'revision',
+      ids
     );
   };
 
@@ -345,7 +443,31 @@ Review the existing steering documents (if any) and help me improve or complete 
         console.log('Approvals count:', message.data?.length || 0);
         console.log('Pending approvals:', message.data?.filter((a: any) => a.status === 'pending').length || 0);
         console.log('About to setApprovals - this should trigger badge counter update');
-        setApprovals(message.data || []);
+
+        const newApprovals = message.data || [];
+        setApprovals(newApprovals);
+
+        // If a batch operation was in progress, clear the state now that we have fresh data
+        if (pendingBatchOperation.current) {
+          const details = pendingBatchDetailsRef.current;
+          pendingBatchDetailsRef.current = null;
+          clearBatchOperationState(true, details?.action, details?.ids);
+        }
+
+        // Validate selected IDs - remove any that no longer exist in the new data
+        // This handles the case where approvals were processed by another user/process
+        if (selectedApprovalIds.size > 0) {
+          const validIds = new Set(newApprovals.map((a: ApprovalData) => a.id));
+          setSelectedApprovalIds(prev => {
+            const filtered = new Set([...prev].filter(id => validIds.has(id)));
+            // If all selections became invalid, exit selection mode
+            if (filtered.size === 0 && selectionMode) {
+              setSelectionMode(false);
+            }
+            return filtered;
+          });
+        }
+
         // Also refresh categories when approvals change
         vscodeApi.getApprovalCategories();
       }),
@@ -379,11 +501,10 @@ Review the existing steering documents (if any) and help me improve or complete 
         // and if the notification indicates a batch result (contains "requests" or "failed")
         if (pendingBatchOperation.current &&
             (message.message.includes('requests') || message.message.includes('failed'))) {
-          // Backend confirmed the batch operation - clear state immediately
-          pendingBatchOperation.current = false;
-          setBatchProcessing(false);
-          setSelectedApprovalIds(new Set());
-          setSelectionMode(false);
+          // Backend confirmed the batch operation - clear state and timeout with undo support
+          const details = pendingBatchDetailsRef.current;
+          pendingBatchDetailsRef.current = null;
+          clearBatchOperationState(true, details?.action, details?.ids);
         }
       }),
       vscodeApi.onMessage('config-updated', (message: any) => {
@@ -442,6 +563,16 @@ Review the existing steering documents (if any) and help me improve or complete 
 
     return () => {
       unsubscribes.forEach(unsub => unsub());
+      // Clean up batch operation timeout on unmount to prevent memory leak
+      if (batchTimeoutRef.current) {
+        clearTimeout(batchTimeoutRef.current);
+        batchTimeoutRef.current = null;
+      }
+      // Clean up undo timeout on unmount
+      if (undoTimeoutRef.current) {
+        clearTimeout(undoTimeoutRef.current);
+        undoTimeoutRef.current = null;
+      }
     };
   }, []);
 
@@ -1350,44 +1481,59 @@ Review the existing steering documents (if any) and help me improve or complete 
             </div>
           )}
 
-          {/* Sticky Footer for Batch Actions */}
+          {/* Sticky Footer for Batch Actions - Vertical Stack Design */}
           {selectionMode && selectedApprovalIds.size > 0 && (
             <div className="fixed bottom-0 left-0 right-0 p-3 bg-background border-t shadow-lg z-10">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium">
+              {/* Header row with count and clear */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-muted-foreground">
                   {t('approvals.selectedCount', { count: selectedApprovalIds.size })}
                 </span>
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700"
-                    disabled={batchProcessing}
-                    onClick={handleBatchApprove}
-                  >
-                    <Check className="w-3 h-3 mr-1" />
-                    {batchProcessing ? t('approvals.processing') : t('approvals.approveAll')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-6 px-2 text-xs border-amber-400 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
-                    disabled={batchProcessing}
-                    onClick={handleBatchRevision}
-                  >
-                    <RotateCcw className="w-3 h-3 mr-1" />
-                    {batchProcessing ? t('approvals.processing') : t('approvals.revisionAll')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-6 px-2 text-xs border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                    disabled={batchProcessing}
-                    onClick={handleBatchReject}
-                  >
-                    <X className="w-3 h-3 mr-1" />
-                    {batchProcessing ? t('approvals.processing') : t('approvals.rejectAll')}
-                  </Button>
-                </div>
+                <button
+                  className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+                  onClick={() => setSelectedApprovalIds(new Set())}
+                  disabled={batchProcessing}
+                >
+                  {t('approvals.clearSelection')}
+                </button>
+              </div>
+
+              {/* Vertical stack of action buttons */}
+              <div className="flex flex-col gap-1.5">
+                {/* Approve - safe action first */}
+                <Button
+                  size="sm"
+                  className="w-full h-7 text-xs justify-start bg-green-600 hover:bg-green-700"
+                  disabled={batchProcessing}
+                  onClick={handleBatchApprove}
+                >
+                  <Check className="w-3.5 h-3.5 mr-2 flex-shrink-0" aria-hidden="true" />
+                  {batchProcessing ? t('approvals.processing') : t('approvals.approveAllCount', { count: selectedApprovalIds.size })}
+                </Button>
+
+                {/* Revise - secondary action */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-7 text-xs justify-start border-amber-400 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                  disabled={batchProcessing}
+                  onClick={handleBatchRevision}
+                >
+                  <RotateCcw className="w-3.5 h-3.5 mr-2 flex-shrink-0" aria-hidden="true" />
+                  {batchProcessing ? t('approvals.processing') : t('approvals.revisionAllCount', { count: selectedApprovalIds.size })}
+                </Button>
+
+                {/* Reject - destructive action last */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-7 text-xs justify-start border-red-400 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30"
+                  disabled={batchProcessing}
+                  onClick={handleBatchReject}
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-2 flex-shrink-0" aria-hidden="true" />
+                  {batchProcessing ? t('approvals.processing') : t('approvals.rejectAllCount', { count: selectedApprovalIds.size })}
+                </Button>
               </div>
             </div>
           )}
@@ -1606,6 +1752,102 @@ Review the existing steering documents (if any) and help me improve or complete 
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
+        )}
+
+        {/* Undo Toast */}
+        {showUndoToast && lastBatchOperation && (
+          <div
+            role="alert"
+            aria-live="polite"
+            className="fixed bottom-16 left-2 right-2 z-50 bg-foreground text-background rounded-lg shadow-lg overflow-hidden mx-auto max-w-[95%]"
+          >
+            {/* Progress bar for countdown */}
+            <div className="h-1 bg-background/30">
+              <div
+                className="h-full bg-primary animate-[shrink_30s_linear]"
+                style={{ animation: 'shrink 30s linear forwards' }}
+              />
+            </div>
+            <div className="flex items-center justify-between p-3">
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-400 flex-shrink-0" aria-hidden="true" />
+                <span className="text-sm">
+                  {lastBatchOperation.action === 'approve' && t('approvals.batch.undoApproved', { count: lastBatchOperation.ids.length })}
+                  {lastBatchOperation.action === 'reject' && t('approvals.batch.undoRejected', { count: lastBatchOperation.ids.length })}
+                  {lastBatchOperation.action === 'revision' && t('approvals.batch.undoRevision', { count: lastBatchOperation.ids.length })}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <Button
+                  size="sm"
+                  className="h-7 px-2 text-xs bg-background/20 hover:bg-background/30 text-background border border-background/40"
+                  onClick={handleUndo}
+                >
+                  <Undo2 className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+                  {t('approvals.batch.undo')}
+                </Button>
+                <button
+                  onClick={() => {
+                    setShowUndoToast(false);
+                    setLastBatchOperation(null);
+                    if (undoTimeoutRef.current) {
+                      clearTimeout(undoTimeoutRef.current);
+                      undoTimeoutRef.current = null;
+                    }
+                  }}
+                  className="p-1 hover:bg-background/20 rounded"
+                  aria-label={t('common.dismiss')}
+                >
+                  <X className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Batch Reject Feedback Modal */}
+        {batchRejectModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setBatchRejectModalOpen(false)}
+            />
+            {/* Modal */}
+            <div className="relative bg-background border rounded-lg shadow-lg p-4 w-[90%] max-w-md mx-4">
+              <h3 className="text-sm font-semibold mb-3">
+                {t('approvals.batch.rejectTitle', { count: selectedApprovalIds.size })}
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                {t('approvals.batch.rejectDescription')}
+              </p>
+              <textarea
+                className="w-full h-24 p-2 text-sm border rounded bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder={t('approvals.batch.rejectPlaceholder')}
+                value={batchRejectFeedback}
+                onChange={(e) => setBatchRejectFeedback(e.target.value)}
+                autoFocus
+              />
+              <div className="flex justify-end gap-2 mt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBatchRejectModalOpen(false)}
+                >
+                  {t('approvals.cancel')}
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700"
+                  onClick={handleBatchRejectWithFeedback}
+                  disabled={!batchRejectFeedback.trim()}
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  {t('approvals.batch.confirmReject')}
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
       </Tabs>
     </div>

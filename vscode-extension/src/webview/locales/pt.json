@@ -88,9 +88,26 @@
     "approveAll": "Aprovar tudo",
     "revisionAll": "Revisar tudo",
     "rejectAll": "Rejeitar tudo",
+    "clearSelection": "Limpar",
+    "approveAllCount": "Aprovar tudo ({{count}})",
+    "revisionAllCount": "Revisar tudo ({{count}})",
+    "rejectAllCount": "Rejeitar tudo ({{count}})",
     "batch": {
-      "tooMany": "Não é possível processar mais de {{limit}} itens de uma vez"
+      "tooMany": "Não é possível processar mais de {{limit}} itens de uma vez",
+      "feedbackRequired": "Por favor forneça um motivo para a rejeição",
+      "rejectTitle": "Rejeitar {{count}} itens",
+      "rejectDescription": "Por favor forneça um motivo para rejeitar estes itens. Este feedback será registrado.",
+      "rejectPlaceholder": "Digite o motivo da rejeição...",
+      "confirmReject": "Rejeitar tudo",
+      "undo": "Desfazer",
+      "undoApproved": "{{count}} itens aprovados",
+      "undoRejected": "{{count}} itens rejeitados",
+      "undoRevision": "Revisão solicitada para {{count}} itens"
     }
+  },
+  "common": {
+    "dismiss": "Fechar",
+    "scrollToTop": "Voltar ao topo"
   },
   "specs": {
     "active": "Ativas",

@@ -88,9 +88,26 @@
     "approveAll": "すべて承認",
     "revisionAll": "すべて修正依頼",
     "rejectAll": "すべて拒否",
+    "clearSelection": "クリア",
+    "approveAllCount": "すべて承認 ({{count}})",
+    "revisionAllCount": "すべて修正依頼 ({{count}})",
+    "rejectAllCount": "すべて拒否 ({{count}})",
     "batch": {
-      "tooMany": "一度に{{limit}}件を超えるアイテムを処理することはできません"
+      "tooMany": "一度に{{limit}}件を超えるアイテムを処理することはできません",
+      "feedbackRequired": "拒否理由を入力してください",
+      "rejectTitle": "{{count}}件を拒否",
+      "rejectDescription": "これらのアイテムを拒否する理由を入力してください。このフィードバックは記録されます。",
+      "rejectPlaceholder": "拒否理由を入力...",
+      "confirmReject": "すべて拒否",
+      "undo": "元に戻す",
+      "undoApproved": "{{count}}件を承認しました",
+      "undoRejected": "{{count}}件を拒否しました",
+      "undoRevision": "{{count}}件の修正を依頼しました"
     }
+  },
+  "common": {
+    "dismiss": "閉じる",
+    "scrollToTop": "トップへ戻る"
   },
   "specs": {
     "active": "アクティブ",

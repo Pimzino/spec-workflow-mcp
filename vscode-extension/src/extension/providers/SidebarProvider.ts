@@ -18,6 +18,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     outputChannel: vscode.OutputChannel
   ) {
     this.logger = new Logger(outputChannel);
+
+    // Initialize _previousApprovals BEFORE setting up file watcher
+    // This prevents false "new approval" notifications on first change
+    this._specWorkflowService.getApprovals().then(approvals => {
+      this._previousApprovals = approvals;
+      console.log(`SidebarProvider: Initialized with ${approvals.length} existing approvals`);
+    }).catch(err => {
+      console.error('SidebarProvider: Failed to initialize previous approvals:', err);
+    });
+
     // Set up automatic approval updates when files change
     this._specWorkflowService.setOnApprovalsChanged(() => {
       this.handleApprovalChanges();
@@ -113,6 +123,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         case 'batch-request-revision':
           await this.batchRequestRevision(message.ids, message.response);
+          break;
+        case 'batch-undo':
+          await this.batchUndo(message.ids);
           break;
         case 'get-approval-content':
           await this.sendApprovalContent(message.id);
@@ -550,6 +563,31 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       'revised',
       response
     );
+  }
+
+  private async batchUndo(ids: string[]) {
+    let succeeded = 0;
+    let failed = 0;
+
+    for (const id of ids) {
+      try {
+        await this._specWorkflowService.revertToPending(id);
+        succeeded++;
+      } catch (error) {
+        console.error(`Failed to undo approval ${id}:`, error);
+        failed++;
+      }
+    }
+
+    // Refresh approvals to update the UI
+    await this.sendApprovals();
+
+    // Show result notification
+    if (failed === 0) {
+      this.sendNotification(`Undone ${succeeded} requests`, 'success');
+    } else {
+      this.sendNotification(`Undone ${succeeded} requests, ${failed} failed`, 'warning');
+    }
   }
 
   private async sendApprovalContent(id: string) {

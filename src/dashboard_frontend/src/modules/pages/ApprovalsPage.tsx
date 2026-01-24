@@ -687,6 +687,25 @@ function Content() {
     };
   }, [undoTimeoutId]);
 
+  // Validate selected IDs when approvals change - remove stale selections
+  useEffect(() => {
+    if (selectedIds.size === 0) return;
+
+    const validIds = new Set(filteredApprovals.map(a => a.id));
+    const hasInvalidIds = [...selectedIds].some(id => !validIds.has(id));
+
+    if (hasInvalidIds) {
+      setSelectedIds(prev => {
+        const filtered = new Set([...prev].filter(id => validIds.has(id)));
+        // If all selections became invalid, exit selection mode
+        if (filtered.size === 0 && selectionMode) {
+          setSelectionMode(false);
+        }
+        return filtered;
+      });
+    }
+  }, [filteredApprovals, selectedIds, selectionMode]);
+
   // Selection handlers
   const handleToggleSelection = useCallback((id: string) => {
     setSelectedIds(prev => {
@@ -709,9 +728,13 @@ function Content() {
   }, [filteredApprovals, selectedIds.size]);
 
   const exitSelectionMode = useCallback(() => {
+    // Prevent exiting while batch operation is in progress
+    if (batchLoading) {
+      return;
+    }
     setSelectionMode(false);
     setSelectedIds(new Set());
-  }, []);
+  }, [batchLoading]);
 
   // Batch action handlers
   const handleBatchAction = useCallback(async (action: 'approve' | 'reject') => {
@@ -731,6 +754,10 @@ function Content() {
   }, [selectedIds.size]);
 
   const executeBatchAction = useCallback(async (action: 'approve' | 'reject', feedback?: string) => {
+    // Prevent double-submission
+    if (batchLoading) {
+      return;
+    }
     setBatchLoading(true);
     try {
       const idsArray = Array.from(selectedIds);
@@ -775,7 +802,7 @@ function Content() {
     } finally {
       setBatchLoading(false);
     }
-  }, [selectedIds, approvalsActionBatch, reloadAll, exitSelectionMode, showNotification, undoTimeoutId]);
+  }, [selectedIds, approvalsActionBatch, reloadAll, exitSelectionMode, showNotification, undoTimeoutId, batchLoading]);
 
   const handleConfirmBatchAction = useCallback(async () => {
     if (pendingAction) {
