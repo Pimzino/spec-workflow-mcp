@@ -4,6 +4,17 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.6] - 2026-01-24
+
+### Added
+- **Bulk Approval Management** (PR #181) - New batch selection and action system for managing multiple approval requests:
+  - **Selection Mode** - Toggle to enable multi-select with visual checkboxes on approval items
+  - **Select All / Deselect All** - Quick controls to select or clear all visible approval items
+  - **Batch Actions** - Approve All or Reject All selected items in a single operation
+  - **Undo Operations** - 30-second undo window with visual progress bar countdown after batch actions
+  - **Continue-on-Error** - Batch operations process all items and report individual failures without stopping
+  - **Full i18n Support** - Translations for all 11 supported locales
+
 ## [1.1.5] - 2026-01-24
 
 ### Added

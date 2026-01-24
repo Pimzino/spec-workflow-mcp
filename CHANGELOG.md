@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.11] - 2026-01-24
+
+### Added
+- **Bulk Approval Management** (PR #181) - New batch selection and action system for managing multiple approval requests:
+  - **Selection Mode** - Toggle to enable multi-select with visual checkboxes on approval items
+  - **Select All / Deselect All** - Quick controls to select or clear all visible approval items
+  - **Batch Actions** - Approve All or Reject All selected items in a single operation
+  - **Undo Operations** - 30-second undo window with visual progress bar countdown after batch actions
+  - **Continue-on-Error** - Batch operations process all items and report individual failures without stopping
+  - **Security Controls** - Batch size limit of 100 items, ID validation with alphanumeric regex pattern
+  - **Full i18n Support** - Translations for all 11 supported locales
+
 ## [2.1.10] - 2026-01-24
 
 ### Added
