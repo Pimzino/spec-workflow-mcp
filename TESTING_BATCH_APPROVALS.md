@@ -99,136 +99,136 @@ If you have the extension installed from marketplace:
 ## Test Scenarios
 
 ### ✅ Enter Selection Mode
-- [ ] Click the "Select" or batch selection button
-- [ ] Verify checkboxes appear next to each approval item
-- [ ] Verify "Select All" checkbox appears in toolbar
-- [ ] Verify batch action buttons appear
+- [x] Click the "Select" or batch selection button
+- [x] Verify checkboxes appear next to each approval item
+- [x] Verify "Select All" checkbox appears in toolbar
+- [x] Verify batch action buttons appear
 
 ### ✅ Select Multiple Items
-- [ ] Click individual checkboxes to select 2-3 items
-- [ ] Verify selection count updates ("3 selected")
-- [ ] Verify batch action buttons are enabled
-- [ ] Verify individual action buttons are disabled when >1 item selected
+- [x] Click individual checkboxes to select 2-3 items
+- [x] Verify selection count updates ("3 selected")
+- [x] Verify batch action buttons are enabled
+- [x] Verify individual action buttons are disabled when >1 item selected
 
 ### ✅ Select All Functionality
-- [ ] Click "Select All" checkbox
-- [ ] Verify all items are selected
-- [ ] Click again to deselect all
-- [ ] Partially select items and verify indeterminate state
+- [x] Click "Select All" checkbox
+- [x] Verify all items are selected
+- [x] Click again to deselect all
+- [x] Partially select items and verify indeterminate state
 
 ### ✅ Batch Approve (≤5 items)
-- [ ] Select 3-5 approval items
-- [ ] Click "Approve Selected" button
-- [ ] Verify NO confirmation modal appears
-- [ ] Verify items are approved immediately
-- [ ] Verify success notification appears
-- [ ] Verify selection mode exits automatically
+- [x] Select 3-5 approval items
+- [x] Click "Approve Selected" button
+- [x] Verify NO confirmation modal appears
+- [x] Verify items are approved immediately
+- [x] Verify success notification appears
+- [x] Verify selection mode exits automatically
 
 ### ✅ Batch Approve (>5 items)
-- [ ] Select 6 or more approval items
-- [ ] Click "Approve Selected" button
-- [ ] Verify confirmation modal appears with item count
-- [ ] Click "Confirm" button
-- [ ] Verify items are approved after confirmation
-- [ ] Verify success notification
+- [x] Select 6 or more approval items
+- [x] Click "Approve Selected" button
+- [x] Verify confirmation modal appears with item count
+- [x] Click "Confirm" button
+- [x] Verify items are approved after confirmation
+- [x] Verify success notification
 
 ### ✅ Batch Reject
-- [ ] Select 2-3 approval items
-- [ ] Click "Reject All (X)" button (VS Code) or "Reject Selected" (Dashboard)
-- [ ] Verify feedback modal ALWAYS appears (regardless of count)
-- [ ] Verify modal shows item count in title ("Reject 2 Items")
-- [ ] Enter rejection reason/feedback in textarea
-- [ ] Verify "Reject All" button is disabled until feedback is entered
-- [ ] Submit and verify items are rejected
-- [ ] Verify success notification
+- [x] Select 2-3 approval items
+- [x] Click "Reject All (X)" button (VS Code) or "Reject Selected" (Dashboard)
+- [x] Verify feedback modal ALWAYS appears (regardless of count)
+- [x] Verify modal shows item count in title ("Reject 2 Items")
+- [x] Enter rejection reason/feedback in textarea
+- [x] Verify "Reject All" button is disabled until feedback is entered
+- [x] Submit and verify items are rejected
+- [x] Verify success notification
 
 ### ✅ Batch Request Revision
-- [ ] Select 2-3 approval items
-- [ ] Click "Revise All (X)" button
-- [ ] Verify items are marked for revision
-- [ ] Verify success notification appears
-- [ ] Verify selection mode exits automatically
+- [x] Select 2-3 approval items
+- [x] Click "Revise All (X)" button
+- [x] Verify items are marked for revision
+- [x] Verify success notification appears
+- [x] Verify selection mode exits automatically
 
 ### ✅ Undo Operation (Batch Approve)
 
-- [ ] Select 2-3 pending approval items
-- [ ] Click "Approve All (X)" button
-- [ ] Verify undo toast appears at bottom of sidebar
-- [ ] Verify toast shows message: "Approved X items"
-- [ ] Verify progress bar animation (depleting over 30 seconds)
-- [ ] Verify checkmark icon appears in toast (green)
-- [ ] Click "Undo" button
-- [ ] Verify items return to pending status
-- [ ] Verify toast disappears immediately after undo
-- [ ] Verify success notification: "Undone X requests"
+- [x] Select 2-3 pending approval items
+- [x] Click "Approve All (X)" button
+- [x] Verify undo toast appears at bottom of sidebar
+- [x] Verify toast shows message: "Approved X items"
+- [x] Verify progress bar animation (depleting over 30 seconds)
+- [x] Verify checkmark icon appears in toast (green)
+- [x] Click "Undo" button
+- [x] Verify items return to pending status
+- [x] Verify toast disappears immediately after undo
+- [x] Verify success notification: "Undone X requests"
 
 ### ✅ Undo Operation (Batch Reject)
 
-- [ ] Select 2-3 pending approval items
-- [ ] Click "Reject All (X)" button
-- [ ] Enter rejection reason and confirm
-- [ ] Verify undo toast appears
-- [ ] Verify toast shows message: "Rejected X items"
-- [ ] Click "Undo" button within 30 seconds
-- [ ] Verify items return to pending status
-- [ ] Verify rejection reason is cleared from items
+- [x] Select 2-3 pending approval items
+- [x] Click "Reject All (X)" button
+- [x] Enter rejection reason and confirm
+- [x] Verify undo toast appears
+- [x] Verify toast shows message: "Rejected X items"
+- [x] Click "Undo" button within 30 seconds
+- [x] Verify items return to pending status
+- [x] Verify rejection reason is cleared from items
 
 ### ✅ Undo Operation (Batch Revision)
 
-- [ ] Select 2-3 pending approval items
-- [ ] Click "Revise All (X)" button
-- [ ] Verify undo toast appears
-- [ ] Verify toast shows: "Requested revision for X items"
-- [ ] Click "Undo" button
-- [ ] Verify items return to pending status
+- [x] Select 2-3 pending approval items
+- [x] Click "Revise All (X)" button
+- [x] Verify undo toast appears
+- [x] Verify toast shows: "Requested revision for X items"
+- [x] Click "Undo" button
+- [x] Verify items return to pending status
 
 ### ✅ Undo Toast UI
 
-- [ ] Verify toast appears above scroll-to-top FAB (not overlapping)
-- [ ] Verify dismiss button (X) closes toast without undo
-- [ ] Verify toast auto-dismisses after 30 seconds
-- [ ] Verify toast width fits within narrow sidebar
-- [ ] Verify undo button is clearly clickable (has border/styling)
+- [x] Verify toast appears above scroll-to-top FAB (not overlapping)
+- [x] Verify dismiss button (X) closes toast without undo
+- [x] Verify toast auto-dismisses after 30 seconds
+- [x] Verify toast width fits within narrow sidebar
+- [x] Verify undo button is clearly clickable (has border/styling)
 
 ### ✅ Undo Window Expiry
 
-- [ ] Perform a batch approve operation
-- [ ] Wait 30 seconds without clicking undo
-- [ ] Verify toast automatically disappears
-- [ ] Verify undo is no longer possible after dismissal
+- [x] Perform a batch approve operation
+- [x] Wait 30 seconds without clicking undo
+- [x] Verify toast automatically disappears
+- [x] Verify undo is no longer possible after dismissal
 
 ### ✅ Error Handling
-- [ ] Verify error notifications use string-based format (not object)
-- [ ] Check browser console for any errors during operations
-- [ ] Verify graceful handling of failed operations
+- [x] Verify error notifications use string-based format (not object)
+- [x] Check browser console for any errors during operations
+- [x] Verify graceful handling of failed operations
 
 ### ✅ i18n Processing Text
-- [ ] During any batch operation loading state
-- [ ] Verify "Processing..." text is translated (not hardcoded English)
-- [ ] Test in different languages if possible
+- [x] During any batch operation loading state
+- [x] Verify "Processing..." text is translated (not hardcoded English)
+- [x] Test in different languages if possible
 
 ### ✅ Exit Selection Mode
-- [ ] Enter selection mode and select some items
-- [ ] Click "Cancel" or "Exit Selection Mode" button
-- [ ] Verify checkboxes disappear
-- [ ] Verify selections are cleared
-- [ ] Verify batch action toolbar disappears
+- [x] Enter selection mode and select some items
+- [x] Click "Cancel" or "Exit Selection Mode" button
+- [x] Verify checkboxes disappear
+- [x] Verify selections are cleared
+- [x] Verify batch action toolbar disappears
 
 ### ✅ VS Code Extension: Vertical Button Layout
-- [ ] Enter selection mode in VS Code extension sidebar
-- [ ] Verify batch action buttons stack vertically (not horizontally)
-- [ ] Verify all button text is fully visible at any sidebar width
-- [ ] Verify buttons show count in label: "Approve All (2)", "Revise All (2)", "Reject All (2)"
-- [ ] Verify "Reject All" uses Trash icon (not X icon)
-- [ ] Verify "Clear" link appears next to selection count
-- [ ] Click "Clear" and verify all items are deselected
+- [x] Enter selection mode in VS Code extension sidebar
+- [x] Verify batch action buttons stack vertically (not horizontally)
+- [x] Verify all button text is fully visible at any sidebar width
+- [x] Verify buttons show count in label: "Approve All (2)", "Revise All (2)", "Reject All (2)"
+- [x] Verify "Reject All" uses Trash icon (not X icon)
+- [x] Verify "Clear" link appears next to selection count
+- [x] Click "Clear" and verify all items are deselected
 
 ### ✅ VS Code Extension: No False "New Approval" Notifications
 
-- [ ] Perform any batch operation (approve, reject, or revise)
-- [ ] Verify NO "New approval request" notification appears in VS Code
-- [ ] Only genuinely NEW approvals should trigger notifications
-- [ ] Status changes (pending → approved/rejected) should NOT trigger notifications
+- [x] Perform any batch operation (approve, reject, or revise)
+- [x] Verify NO "New approval request" notification appears in VS Code
+- [x] Only genuinely NEW approvals should trigger notifications
+- [x] Status changes (pending → approved/rejected) should NOT trigger notifications
 
 ## Expected Behavior
 
