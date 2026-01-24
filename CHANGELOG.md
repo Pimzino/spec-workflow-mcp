@@ -33,6 +33,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Created `APPROVAL_STATUS_COLORS` constant for pending, approved, rejected, needs-revision, and commented states
   - Added `DECORATION_BORDER_RADIUS` constant for consistent styling
 
+- **Build Script Improvement** - Updated `build:dashboard` script to automatically run `copy-static`:
+  - Ensures dashboard builds are always copied to the correct serving location (`dist/dashboard/public/`)
+  - Prevents issues where dashboard changes don't appear after rebuild
+
+### Fixed
+- **Changelog Modal Rendering** - Fixed the changelog modal displaying blank content when clicking the version badge:
+  - Replaced complex MDXEditor component with lightweight custom markdown renderer
+  - Added proper rendering for headers, bullet lists, nested lists, and bold text
+  - Uses design token CSS variables for consistent theming in light/dark modes
+
 ## [2.1.9] - 2026-01-23
 
 ### Added

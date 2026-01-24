@@ -14,12 +14,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run validate:i18n && npm run clean && tsc && npm run build:dashboard && npm run copy-static",
+    "build": "npm run validate:i18n && npm run clean && tsc && npm run build:dashboard",
     "copy-static": "node scripts/copy-static.cjs",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "dev:dashboard": "vite --config src/dashboard_frontend/vite.config.ts",
-    "build:dashboard": "vite build --config src/dashboard_frontend/vite.config.ts",
+    "build:dashboard": "vite build --config src/dashboard_frontend/vite.config.ts && npm run copy-static",
     "clean": "rimraf dist",
     "validate:i18n": "node scripts/validate-i18n.js",
     "sync:plugin-version": "node scripts/sync-plugin-version.js",

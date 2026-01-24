@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { MDXEditorWrapper } from '../mdx-editor';
 
 interface ChangelogModalProps {
   isOpen: boolean;
@@ -101,8 +100,63 @@ export function ChangelogModal({
               </p>
             </div>
           ) : content ? (
-            <div className="prose dark:prose-invert max-w-none">
-              <MDXEditorWrapper content={content} mode="view" enableMermaid={true} />
+            <div className="changelog-content text-[var(--text-primary)]">
+              {content.split('\n').map((line, index) => {
+                // Handle headers
+                if (line.startsWith('## ')) {
+                  return (
+                    <h2 key={index} className="text-xl font-bold mt-6 mb-3 text-[var(--text-primary)] border-b border-[var(--border-default)] pb-2">
+                      {line.replace(/^## \[?|\].*$/g, '')}
+                    </h2>
+                  );
+                }
+                if (line.startsWith('### ')) {
+                  return (
+                    <h3 key={index} className="text-lg font-semibold mt-4 mb-2 text-[var(--text-primary)]">
+                      {line.replace('### ', '')}
+                    </h3>
+                  );
+                }
+                // Handle list items
+                if (line.startsWith('- ')) {
+                  const content = line.replace('- ', '');
+                  // Parse bold text
+                  const parts = content.split(/(\*\*[^*]+\*\*)/g);
+                  return (
+                    <div key={index} className="flex gap-2 ml-4 my-1">
+                      <span className="text-[var(--text-muted)]">•</span>
+                      <span className="text-[var(--text-secondary)]">
+                        {parts.map((part, i) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={i} className="text-[var(--text-primary)] font-semibold">{part.slice(2, -2)}</strong>;
+                          }
+                          return <span key={i}>{part}</span>;
+                        })}
+                      </span>
+                    </div>
+                  );
+                }
+                // Handle indented list items
+                if (line.startsWith('  - ')) {
+                  const content = line.replace('  - ', '');
+                  return (
+                    <div key={index} className="flex gap-2 ml-8 my-0.5">
+                      <span className="text-[var(--text-muted)]">◦</span>
+                      <span className="text-[var(--text-tertiary)] text-sm">{content}</span>
+                    </div>
+                  );
+                }
+                // Empty lines
+                if (line.trim() === '') {
+                  return <div key={index} className="h-2" />;
+                }
+                // Regular text
+                return (
+                  <p key={index} className="text-[var(--text-secondary)] my-1">
+                    {line}
+                  </p>
+                );
+              })}
             </div>
           ) : (
             <div className="text-[var(--text-secondary)] text-center">
