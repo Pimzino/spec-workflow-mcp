@@ -147,5 +147,5 @@ opencodetmp
 # Spec Workflow MCP
 .spec-workflow
 .claude-context
-.vscode/settings.json
+.vscode/
 spec-workflow-mcp.code-workspace
