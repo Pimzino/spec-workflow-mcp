@@ -63,7 +63,7 @@ export function ProjectDropdown() {
       {/* Dropdown Button */}
       <button
         onClick={toggleDropdown}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-900 dark:text-gray-100"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors text-[var(--text-primary)]"
         aria-label={t('projects.selectProject', 'Select project')}
       >
         <span className="text-sm font-medium">
@@ -84,27 +84,27 @@ export function ProjectDropdown() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-72 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-96 flex flex-col">
+        <div className="absolute left-0 mt-2 w-72 bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg shadow-lg z-50 max-h-96 flex flex-col">
           {/* Search Input */}
-          <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+          <div className="p-3 border-b border-[var(--border-default)]">
             <input
               ref={searchInputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('projects.search', 'Search projects...')}
-              className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 text-sm bg-[var(--surface-inset)] border border-[var(--border-default)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] text-[var(--text-primary)]"
             />
           </div>
 
           {/* Project List */}
           <div className="overflow-y-auto flex-1">
             {loading ? (
-              <div className="text-center text-gray-500 dark:text-gray-400 py-6 text-sm">
+              <div className="text-center text-[var(--text-muted)] py-6 text-sm">
                 {t('projects.loading', 'Loading projects...')}
               </div>
             ) : filteredProjects.length === 0 ? (
-              <div className="text-center text-gray-500 dark:text-gray-400 py-6 text-sm">
+              <div className="text-center text-[var(--text-muted)] py-6 text-sm">
                 {searchQuery
                   ? t('projects.noResults', 'No projects found')
                   : t('projects.noProjects', 'No projects available')}
@@ -117,7 +117,7 @@ export function ProjectDropdown() {
                     <button
                       key={project.projectId}
                       onClick={() => handleProjectSelect(project.projectId)}
-                      className={`w-full text-left px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-between ${
+                      className={`w-full text-left px-4 py-2.5 hover:bg-[var(--surface-hover)] transition-colors flex items-center justify-between ${
                         isCurrent ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''
                       }`}
                     >
@@ -126,20 +126,20 @@ export function ProjectDropdown() {
                           className={`w-2 h-2 rounded-full ${
                             isCurrent
                               ? 'bg-indigo-600 dark:bg-indigo-400'
-                              : 'bg-gray-400 dark:bg-gray-600'
+                              : 'bg-[var(--text-muted)]'
                           }`}
                         />
                         <span
                           className={`text-sm truncate ${
                             isCurrent
                               ? 'font-semibold text-indigo-900 dark:text-indigo-100'
-                              : 'text-gray-900 dark:text-gray-100'
+                              : 'text-[var(--text-primary)]'
                           }`}
                           title={project.projectName}
                         >
                           {project.projectName}
                           {project.instances?.length > 0 && (
-                            <span className="text-gray-500 dark:text-gray-400 ml-1 font-normal">
+                            <span className="text-[var(--text-muted)] ml-1 font-normal">
                               ({project.instances.length === 1
                                 ? `PID: ${project.instances[0].pid}`
                                 : `${project.instances.length} instances`})
@@ -171,7 +171,7 @@ export function ProjectDropdown() {
 
           {/* Footer */}
           {!loading && projects.length > 0 && (
-            <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+            <div className="px-4 py-2 border-t border-[var(--border-default)] text-xs text-[var(--text-muted)]">
               {t('projects.count', {
                 count: projects.length,
                 defaultValue: `${projects.length} project(s)`,

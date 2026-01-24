@@ -8,6 +8,16 @@ import { SpecWorkflowService } from './SpecWorkflowService';
 import { hexToColorObject, generateRandomColor } from '../utils/colorUtils';
 import { CommentModalService } from './CommentModalService';
 
+const APPROVAL_STATUS_COLORS = {
+  pending: { bg: 'rgba(255, 193, 7, 0.1)', border: 'rgba(255, 193, 7, 0.3)' },
+  approved: { bg: 'rgba(40, 167, 69, 0.1)', border: 'rgba(40, 167, 69, 0.3)' },
+  rejected: { bg: 'rgba(220, 53, 69, 0.1)', border: 'rgba(220, 53, 69, 0.3)' },
+  'needs-revision': { bg: 'rgba(255, 87, 34, 0.1)', border: 'rgba(255, 87, 34, 0.3)' },
+  commented: { bg: 'rgba(0, 123, 255, 0.1)', border: 'rgba(0, 123, 255, 0.3)' },
+} as const;
+
+const DECORATION_BORDER_RADIUS = '2px';
+
 export interface ApprovalEditorContext {
   approval: ApprovalData;
   document: vscode.TextDocument;
@@ -41,41 +51,41 @@ export class ApprovalEditorService {
   private initializeDecorationTypes() {
     // Decoration for pending approval sections
     this.decorationTypes.set('pending', vscode.window.createTextEditorDecorationType({
-      backgroundColor: 'rgba(255, 193, 7, 0.1)',
-      border: '1px solid rgba(255, 193, 7, 0.3)',
-      borderRadius: '2px',
+      backgroundColor: APPROVAL_STATUS_COLORS.pending.bg,
+      border: `1px solid ${APPROVAL_STATUS_COLORS.pending.border}`,
+      borderRadius: DECORATION_BORDER_RADIUS,
       isWholeLine: false
     }));
 
     // Decoration for approved sections
     this.decorationTypes.set('approved', vscode.window.createTextEditorDecorationType({
-      backgroundColor: 'rgba(40, 167, 69, 0.1)',
-      border: '1px solid rgba(40, 167, 69, 0.3)',
-      borderRadius: '2px',
+      backgroundColor: APPROVAL_STATUS_COLORS.approved.bg,
+      border: `1px solid ${APPROVAL_STATUS_COLORS.approved.border}`,
+      borderRadius: DECORATION_BORDER_RADIUS,
       isWholeLine: false
     }));
 
     // Decoration for rejected sections
     this.decorationTypes.set('rejected', vscode.window.createTextEditorDecorationType({
-      backgroundColor: 'rgba(220, 53, 69, 0.1)',
-      border: '1px solid rgba(220, 53, 69, 0.3)',
-      borderRadius: '2px',
+      backgroundColor: APPROVAL_STATUS_COLORS.rejected.bg,
+      border: `1px solid ${APPROVAL_STATUS_COLORS.rejected.border}`,
+      borderRadius: DECORATION_BORDER_RADIUS,
       isWholeLine: false
     }));
 
     // Decoration for sections needing revision
     this.decorationTypes.set('needs-revision', vscode.window.createTextEditorDecorationType({
-      backgroundColor: 'rgba(255, 87, 34, 0.1)',
-      border: '1px solid rgba(255, 87, 34, 0.3)',
-      borderRadius: '2px',
+      backgroundColor: APPROVAL_STATUS_COLORS['needs-revision'].bg,
+      border: `1px solid ${APPROVAL_STATUS_COLORS['needs-revision'].border}`,
+      borderRadius: DECORATION_BORDER_RADIUS,
       isWholeLine: false
     }));
 
     // Decoration for commented sections
     this.decorationTypes.set('commented', vscode.window.createTextEditorDecorationType({
-      backgroundColor: 'rgba(0, 123, 255, 0.1)',
-      border: '1px solid rgba(0, 123, 255, 0.3)',
-      borderRadius: '2px',
+      backgroundColor: APPROVAL_STATUS_COLORS.commented.bg,
+      border: `1px solid ${APPROVAL_STATUS_COLORS.commented.border}`,
+      borderRadius: DECORATION_BORDER_RADIUS,
       isWholeLine: false
     }));
   }
@@ -93,7 +103,7 @@ export class ApprovalEditorService {
     const decorationType = vscode.window.createTextEditorDecorationType({
       backgroundColor: color.bg,
       border: `1px solid ${color.border}`,
-      borderRadius: '2px',
+      borderRadius: DECORATION_BORDER_RADIUS,
       isWholeLine: false
     });
 

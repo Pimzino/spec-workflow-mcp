@@ -8,16 +8,7 @@ import { DiffViewer } from '../diff/DiffViewer';
 import { DiffStats, DiffStatsBadge } from '../diff/DiffStats';
 import { formatSnapshotTimestamp, createVersionLabel, hasDiffChanges, getSnapshotTriggerDescription } from '../diff/utils';
 import { useTranslation } from 'react-i18next';
-
-function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
-  if (!dateStr) return t ? t('common.unknown') : 'Unknown';
-  return new Date(dateStr).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
+import { formatDate } from '../../lib/dateUtils';
 
 
 function ApprovalItem({ a }: { a: any }) {
@@ -254,7 +245,7 @@ function ApprovalItem({ a }: { a: any }) {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-6 0h6M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2" />
                 </svg>
-                {formatDate(a.createdAt, t)}
+                {formatDate(a.createdAt, { fallbackKey: 'common.unknown', fallbackText: 'Unknown' }, t)}
               </span>
             </div>
 

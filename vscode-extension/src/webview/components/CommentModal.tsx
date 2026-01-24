@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Palette, Save, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isValidHex, hexToRgba } from '@/lib/colorUtils';
 import { useVSCodeTheme } from '@/hooks/useVSCodeTheme';
 import { useTranslation } from 'react-i18next';
 import iro from '@jaames/iro';
@@ -104,17 +105,10 @@ export function CommentModal({ selectedText, existingComment, onSave, onCancel }
     }
   };
 
-  const isValidHex = (hex: string): boolean => {
-    return /^#[0-9A-Fa-f]{6}$/.test(hex);
-  };
-
   const getColorPreviewStyle = () => {
     if (isValidHex(currentColor)) {
-      const r = parseInt(currentColor.slice(1, 3), 16);
-      const g = parseInt(currentColor.slice(3, 5), 16);
-      const b = parseInt(currentColor.slice(5, 7), 16);
       return {
-        backgroundColor: `rgba(${r}, ${g}, ${b}, 0.3)`,
+        backgroundColor: hexToRgba(currentColor, 0.3),
         borderColor: currentColor,
         borderWidth: '2px'
       };

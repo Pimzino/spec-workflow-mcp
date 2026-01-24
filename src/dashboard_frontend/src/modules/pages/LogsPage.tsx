@@ -14,16 +14,7 @@ import {
   ChevronRightIcon,
   ChevronDownIcon
 } from '@heroicons/react/24/solid';
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-}
+import { formatDate } from '../../lib/dateUtils';
 
 // Helper functions for artifacts
 function hasAnyArtifacts(artifacts: ImplementationLogEntry['artifacts']): boolean {
@@ -333,7 +324,7 @@ function LogEntryCard({ entry }: LogEntryProps) {
               {t('logsPage.taskBadge', 'Task')} {entry.taskId}
             </span>
             <span className="text-sm text-[var(--text-faint)] font-mono tabular-nums">
-              {formatDate(entry.timestamp)}
+              {formatDate(entry.timestamp, { includeSeconds: true })}
             </span>
           </div>
           <p className="mt-2 text-[var(--text-primary)] font-medium">{entry.summary}</p>

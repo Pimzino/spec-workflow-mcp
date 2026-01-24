@@ -4,16 +4,7 @@ import { MDXEditorWrapper } from '../mdx-editor';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
 import { SortDropdown } from '../components/SortDropdown';
 import { useTranslation } from 'react-i18next';
-
-function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
-  if (!dateStr) return t ? t('common.never') : 'Never';
-  return new Date(dateStr).toLocaleDateString(undefined, { 
-    month: 'short', 
-    day: 'numeric', 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
-}
+import { formatDate } from '../../lib/dateUtils';
 
 function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: boolean; onClose: () => void; isArchived?: boolean }) {
   const { getAllSpecDocuments, getAllArchivedSpecDocuments, saveSpecDocument, saveArchivedSpecDocument } = useApi();
@@ -218,7 +209,7 @@ function SpecModal({ spec, isOpen, onClose, isArchived }: { spec: any; isOpen: b
               )}
             </div>
             <p className="text-sm text-[var(--text-secondary)] mt-1 hidden sm:block">
-              {isArchived ? `${t('specsPage.modal.archivedNotice')} • ` : ''}{t('common.lastModified', { date: formatDate(spec.lastModified, t) })}
+              {isArchived ? `${t('specsPage.modal.archivedNotice')} • ` : ''}{t('common.lastModified', { date: formatDate(spec.lastModified, undefined, t) })}
             </p>
           </div>
           <button
@@ -469,7 +460,7 @@ function SpecTableRow({ spec, onOpenModal, isArchived }: { spec: any; onOpenModa
         )}
       </td>
       <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
-        {formatDate(spec.lastModified, t)}
+        {formatDate(spec.lastModified, undefined, t)}
       </td>
       <td className="px-4 py-4">
         <div className="flex items-center gap-2">

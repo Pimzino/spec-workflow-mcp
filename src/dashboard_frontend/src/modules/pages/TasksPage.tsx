@@ -6,16 +6,7 @@ import { useNotifications } from '../notifications/NotificationProvider';
 import { AlertModal } from '../modals/AlertModal';
 import { useTranslation } from 'react-i18next';
 import { KanbanBoard } from '../components/KanbanBoard';
-
-function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
-  if (!dateStr) return t ? t('common.never') : 'Never';
-  return new Date(dateStr).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
+import { formatDate } from '../../lib/dateUtils';
 
 function SearchableSpecDropdown({ specs, selected, onSelect, align = 'left' }: { specs: any[]; selected: string; onSelect: (value: string) => void; align?: 'left' | 'right' }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -398,7 +389,7 @@ function SpecCard({ spec, onSelect, isSelected }: { spec: any; onSelect: (spec: 
                 <svg className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {formatDate(spec.lastModified, t)}
+                {formatDate(spec.lastModified, undefined, t)}
               </span>
               {spec.taskProgress && (
                 <span className="flex items-center gap-1">

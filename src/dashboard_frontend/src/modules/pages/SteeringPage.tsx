@@ -3,16 +3,7 @@ import { useApi } from '../api/api';
 import { MDXEditorWrapper } from '../mdx-editor';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
 import { useTranslation } from 'react-i18next';
-
-function formatDate(dateStr?: string, t?: (k: string, o?: any) => string) {
-  if (!dateStr) return t ? t('common.never') : 'Never';
-  return new Date(dateStr).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
+import { formatDate } from '../../lib/dateUtils';
 
 type SteeringDocument = {
   name: string;
@@ -171,7 +162,7 @@ function SteeringModal({ document, isOpen, onClose }: { document: SteeringDocume
               {t('steeringPage.modal.title', { name: document.displayName })}
             </h2>
             <p className="text-sm text-[var(--text-secondary)] mt-1 hidden sm:block">
-              {t('common.lastModified', { date: formatDate(document.lastModified, t) })}
+              {t('common.lastModified', { date: formatDate(document.lastModified, undefined, t) })}
             </p>
           </div>
           <button
@@ -240,7 +231,7 @@ function SteeringDocumentRow({ document, onOpenModal }: { document: SteeringDocu
         </span>
       </td>
       <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
-        {formatDate(document.lastModified, t)}
+        {formatDate(document.lastModified, undefined, t)}
       </td>
       <td className="px-4 py-4">
         <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -357,7 +348,7 @@ function Content() {
                       </p>
                       <span className="mx-2 text-[var(--text-muted)]">•</span>
                       <p className="text-sm text-[var(--text-secondary)]">
-                        {formatDate(doc.lastModified, t)}
+                        {formatDate(doc.lastModified, undefined, t)}
                       </p>
                     </div>
                   </div>
