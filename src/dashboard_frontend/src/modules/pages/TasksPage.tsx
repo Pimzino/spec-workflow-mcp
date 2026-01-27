@@ -482,6 +482,7 @@ function TaskList({ specName }: { specName: string }) {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setData(null); // Clear old data immediately to prevent stale tasks from showing
     getSpecTasksProgress(specName)
       .then((d) => active && setData(d))
       .finally(() => active && setLoading(false));
