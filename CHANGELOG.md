@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Absolute paths (Unix and Windows) are returned unchanged to preserve existing worktree behavior
   - Added test coverage for relative path scenarios
 
+- **Task Prompt Spec Mismatch** (Issue #191) - Fixed copied task prompts using wrong spec name when switching between specs:
+  - When selecting a spec without tasks, stale tasks from the previous spec remained displayed
+  - Copying the prompt would incorrectly use the new spec name with old task data
+  - Now clears task data immediately when switching specs to prevent stale data display
+
 ## [2.1.10] - 2026-01-24
 
 ### Added
