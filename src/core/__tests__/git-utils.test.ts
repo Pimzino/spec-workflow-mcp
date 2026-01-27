@@ -104,6 +104,34 @@ describe('resolveGitRoot', () => {
     });
   });
 
+  describe('subdirectory with relative path', () => {
+    it('should resolve relative path when git returns relative .git path', () => {
+      // When running from a subdirectory, git returns relative paths like "../../.git"
+      mockedExecSync.mockReturnValue('../../.git');
+
+      const result = resolveGitRoot('/home/user/repo/src/core');
+
+      // Should resolve to the main repo path, not return "../.." which would fail path traversal check
+      expect(result).toBe('/home/user/repo');
+    });
+
+    it('should resolve deeply nested relative path', () => {
+      mockedExecSync.mockReturnValue('../../../.git');
+
+      const result = resolveGitRoot('/home/user/repo/src/lib/utils');
+
+      expect(result).toBe('/home/user/repo');
+    });
+
+    it('should resolve single level relative path', () => {
+      mockedExecSync.mockReturnValue('../.git');
+
+      const result = resolveGitRoot('/home/user/repo/src');
+
+      expect(result).toBe('/home/user/repo');
+    });
+  });
+
   describe('error handling', () => {
     it('should return original path when git command fails', () => {
       mockedExecSync.mockImplementation(() => {

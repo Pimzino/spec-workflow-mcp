@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.11] - 2026-01-27
+
+### Fixed
+- **Subdirectory Path Resolution** (Issue #189) - Fixed "Path traversal detected" error when starting the MCP server from a subdirectory within a git repository:
+  - `git rev-parse --git-common-dir` returns relative paths (e.g., `../../.git`) when run from subdirectories
+  - Updated `resolveGitRoot()` to use `path.resolve()` for converting relative paths to absolute paths
+  - Absolute paths (Unix and Windows) are returned unchanged to preserve existing worktree behavior
+  - Added test coverage for relative path scenarios
+
 ## [2.1.10] - 2026-01-24
 
 ### Added
