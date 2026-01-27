@@ -102,6 +102,14 @@ describe('resolveGitRoot', () => {
 
       expect(result).toBe('C:/Users/dev/main-repo');
     });
+
+    it('should resolve relative paths from git-common-dir', () => {
+      mockedExecSync.mockReturnValue('../../.git');
+
+      const result = resolveGitRoot('/home/user/repo/src/core');
+
+      expect(result).toBe('/home/user/repo');
+    });
   });
 
   describe('error handling', () => {

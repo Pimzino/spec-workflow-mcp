@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import { resolve, isAbsolute } from 'path';
 
 export const SPEC_WORKFLOW_SHARED_ROOT_ENV = 'SPEC_WORKFLOW_SHARED_ROOT';
 
@@ -30,11 +31,16 @@ export function resolveGitRoot(projectPath: string): string {
       return projectPath;
     }
 
-    // In worktree, returns absolute path like "/main/.git" or "/main/.git/worktrees/name"
-    // Extract the main repo path (parent of .git)
+    // In worktree, returns path like "/main/.git", "../../.git", or "C:/main/.git"
+    // Extract the main repo path (parent of .git) and resolve to absolute path
     const gitIndex = gitCommonDir.lastIndexOf('.git');
     if (gitIndex > 0) {
-      return gitCommonDir.substring(0, gitIndex - 1);
+      const mainRepoPath = gitCommonDir.substring(0, gitIndex - 1);
+      // If already absolute (Unix or Windows), return as-is; otherwise resolve relative to projectPath
+      if (isAbsolute(mainRepoPath) || /^[A-Za-z]:/.test(mainRepoPath)) {
+        return mainRepoPath;
+      }
+      return resolve(projectPath, mainRepoPath);
     }
 
     return projectPath;
