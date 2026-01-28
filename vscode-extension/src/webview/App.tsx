@@ -981,55 +981,6 @@ Review the existing steering documents (if any) and help me improve or complete 
             </CardContent>
           </Card>
 
-          {/* Workflow Root Configuration */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <FolderOpen className="h-4 w-4" />
-                {t('workflowRoot.title')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-xs text-muted-foreground">
-                {t('workflowRoot.description')}
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs">
-                  <span className="text-muted-foreground">{t('workflowRoot.current')}: </span>
-                  <span className="font-mono text-[10px] break-all">
-                    {workflowRoot.path || t('workflowRoot.notSet')}
-                  </span>
-                  {workflowRoot.isDefault && workflowRoot.path && (
-                    <Badge variant="secondary" className="ml-2 text-[10px]">
-                      {t('workflowRoot.default')}
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs"
-                    onClick={() => vscodeApi.browseWorkflowRoot()}
-                  >
-                    <FolderOpen className="h-3 w-3 mr-1" />
-                    {t('workflowRoot.browse')}
-                  </Button>
-                  {!workflowRoot.isDefault && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => vscodeApi.resetWorkflowRoot()}
-                    >
-                      <RotateCcw className="h-3 w-3 mr-1" />
-                      {t('workflowRoot.reset')}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
 
@@ -1800,6 +1751,46 @@ Review the existing steering documents (if any) and help me improve or complete 
           </Card>
         </TabsContent>
 
+        </div>
+
+        {/* Sticky Footer - Workflow Root */}
+        <div className="sidebar-sticky-footer">
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+            <div
+              className="flex items-center gap-1.5 min-w-0 flex-1 cursor-help"
+              title={t('workflowRoot.description')}
+            >
+              <FolderOpen className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate font-mono" title={workflowRoot.path || t('workflowRoot.notSet')}>
+                {workflowRoot.path || t('workflowRoot.notSet')}
+              </span>
+              {workflowRoot.isDefault && workflowRoot.path && (
+                <span className="text-[9px] text-muted-foreground/70">({t('workflowRoot.default')})</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-5 w-5 p-0"
+                onClick={() => vscodeApi.browseWorkflowRoot()}
+                title={t('workflowRoot.browse')}
+              >
+                <FolderOpen className="h-3 w-3" />
+              </Button>
+              {!workflowRoot.isDefault && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0"
+                  onClick={() => vscodeApi.resetWorkflowRoot()}
+                  title={t('workflowRoot.reset')}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Scroll to Top FAB */}

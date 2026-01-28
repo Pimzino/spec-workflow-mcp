@@ -171,6 +171,14 @@ body.vscode-high-contrast {
   min-height: 0;
 }
 
+.sidebar-sticky-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+  margin-top: 8px;
+  background: var(--vscode-sideBar-background);
+}
+
 /* Custom scrollbar for VSCode */
 ::-webkit-scrollbar {
   width: 10px;
