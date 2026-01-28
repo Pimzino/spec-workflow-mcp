@@ -22,5 +22,6 @@
   "config.language.auto.description": "Auto-detect based on VS Code settings",
   "config.language.en.description": "English",
   "config.language.ja.description": "Japanese (日本語)",
-  "config.language.zh.description": "Chinese (中文)"
+  "config.language.zh.description": "Chinese (中文)",
+  "config.workflowRoot.description": "Custom path to the .spec-workflow folder. Leave empty to use the workspace root. Useful for multi-root workspaces."
 }

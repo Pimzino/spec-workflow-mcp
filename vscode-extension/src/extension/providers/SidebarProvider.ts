@@ -178,6 +178,18 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         case 'search-logs':
           await this.searchLogs(message.specName, message.query);
           break;
+        case 'get-workflow-root':
+          await this.sendWorkflowRoot();
+          break;
+        case 'set-workflow-root':
+          await this.setWorkflowRoot(message.path);
+          break;
+        case 'browse-workflow-root':
+          await this.browseWorkflowRoot();
+          break;
+        case 'reset-workflow-root':
+          await this.resetWorkflowRoot();
+          break;
       }
     });
 
@@ -979,6 +991,98 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     } catch (error) {
       console.error('SidebarProvider: Failed to set language preference:', error);
       this.sendError('Failed to set language preference: ' + (error as Error).message);
+    }
+  }
+
+  private async sendWorkflowRoot() {
+    try {
+      const config = vscode.workspace.getConfiguration('specWorkflow');
+      const customPath = config.get<string>('workflowRoot', '');
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+
+      let currentPath: string;
+      let isDefault: boolean;
+
+      if (customPath) {
+        currentPath = customPath;
+        isDefault = false;
+      } else if (workspaceFolders && workspaceFolders.length > 0) {
+        currentPath = workspaceFolders[0].uri.fsPath;
+        isDefault = true;
+      } else {
+        currentPath = '';
+        isDefault = true;
+      }
+
+      this.postMessageToWebview({
+        type: 'workflow-root-updated',
+        data: { path: currentPath, isDefault }
+      });
+    } catch (error) {
+      console.error('SidebarProvider: Failed to get workflow root:', error);
+      this.sendError('Failed to get workflow root: ' + (error as Error).message);
+    }
+  }
+
+  private async setWorkflowRoot(path: string) {
+    try {
+      const config = vscode.workspace.getConfiguration('specWorkflow');
+      await config.update('workflowRoot', path, vscode.ConfigurationTarget.Workspace);
+
+      // Notify the SpecWorkflowService to update its root
+      await this._specWorkflowService.updateWorkflowRoot();
+
+      // Send updated root to webview
+      await this.sendWorkflowRoot();
+
+      // Refresh all data with the new root
+      await this.refreshAllData();
+
+      console.log(`SidebarProvider: Workflow root set to: ${path}`);
+    } catch (error) {
+      console.error('SidebarProvider: Failed to set workflow root:', error);
+      this.sendError('Failed to set workflow root: ' + (error as Error).message);
+    }
+  }
+
+  private async browseWorkflowRoot() {
+    try {
+      const result = await vscode.window.showOpenDialog({
+        canSelectFiles: false,
+        canSelectFolders: true,
+        canSelectMany: false,
+        openLabel: 'Select .spec-workflow Location',
+        title: 'Select folder containing .spec-workflow'
+      });
+
+      if (result && result.length > 0) {
+        const selectedPath = result[0].fsPath;
+        await this.setWorkflowRoot(selectedPath);
+      }
+    } catch (error) {
+      console.error('SidebarProvider: Failed to browse for workflow root:', error);
+      this.sendError('Failed to browse for workflow root: ' + (error as Error).message);
+    }
+  }
+
+  private async resetWorkflowRoot() {
+    try {
+      const config = vscode.workspace.getConfiguration('specWorkflow');
+      await config.update('workflowRoot', '', vscode.ConfigurationTarget.Workspace);
+
+      // Notify the SpecWorkflowService to update its root
+      await this._specWorkflowService.updateWorkflowRoot();
+
+      // Send updated root to webview
+      await this.sendWorkflowRoot();
+
+      // Refresh all data with the new root
+      await this.refreshAllData();
+
+      console.log('SidebarProvider: Workflow root reset to default');
+    } catch (error) {
+      console.error('SidebarProvider: Failed to reset workflow root:', error);
+      this.sendError('Failed to reset workflow root: ' + (error as Error).message);
     }
   }
 

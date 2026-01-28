@@ -2,7 +2,7 @@
   "name": "spec-workflow-mcp",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "publisher": "Pimzino",
   "license": "GPL-3.0",
   "icon": "icon.png",
@@ -201,6 +201,12 @@
           "default": "auto",
           "scope": "window",
           "description": "%config.language.description%"
+        },
+        "specWorkflow.workflowRoot": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "%config.workflowRoot.description%"
         }
       }
     }

@@ -441,15 +441,43 @@ export class SpecWorkflowService {
 
   private updateWorkspaceRoot() {
     const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders && workspaceFolders.length > 0) {
-      this.workspaceRoot = workspaceFolders[0].uri.fsPath;
-      this.specWorkflowRoot = path.join(this.workspaceRoot, '.spec-workflow');
-      // Update archive service with new workspace root
-      this.archiveService.setWorkspaceRoot(this.workspaceRoot);
+    const config = vscode.workspace.getConfiguration('specWorkflow');
+    const customRoot = config.get<string>('workflowRoot', '');
+
+    if (customRoot) {
+      // Use custom workflow root
+      this.workspaceRoot = customRoot;
+      this.specWorkflowRoot = path.join(customRoot, '.spec-workflow');
+      this.archiveService.setWorkspaceRoot(customRoot);
+      this.logger.log(`SpecWorkflowService: Using custom workflow root: ${customRoot}`);
+    } else if (workspaceFolders && workspaceFolders.length > 0) {
+      // Use default workspace root
+      const workspaceRoot = workspaceFolders[0].uri.fsPath;
+      this.workspaceRoot = workspaceRoot;
+      this.specWorkflowRoot = path.join(workspaceRoot, '.spec-workflow');
+      this.archiveService.setWorkspaceRoot(workspaceRoot);
     } else {
       this.workspaceRoot = null;
       this.specWorkflowRoot = null;
     }
+  }
+
+  /**
+   * Public method to update the workflow root when configuration changes
+   * Called from SidebarProvider when user changes the setting
+   */
+  async updateWorkflowRoot() {
+    this.updateWorkspaceRoot();
+    // Re-setup all watchers with the new root
+    this.setupApprovalWatcher();
+    this.setupTaskWatcher();
+    this.setupRequirementsWatcher();
+    this.setupDesignWatcher();
+    this.setupTasksDocWatcher();
+    this.setupSteeringDocumentsWatcher();
+    this.setupSpecsWatcher();
+    this.setupArchiveWatcher();
+    this.logger.log('SpecWorkflowService: Workflow root updated and watchers reinitialized');
   }
 
   private async ensureSpecWorkflowExists(): Promise<boolean> {

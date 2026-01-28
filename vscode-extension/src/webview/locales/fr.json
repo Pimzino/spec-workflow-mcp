@@ -216,5 +216,14 @@
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "Emplacement du Flux de Travail",
+    "description": "Configurez l'emplacement du dossier .spec-workflow pour les espaces de travail multi-racines.",
+    "current": "Actuel",
+    "notSet": "Non configuré",
+    "default": "par défaut",
+    "browse": "Parcourir",
+    "reset": "Réinitialiser"
   }
 }
