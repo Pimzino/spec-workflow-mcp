@@ -209,12 +209,21 @@
     "japanese": "日本語",
     "chinese": "中文",
     "spanish": "Español",
-    "portuguese": "Português", 
+    "portuguese": "Português",
     "german": "Deutsch",
     "french": "Français",
     "russian": "Русский",
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "워크플로우 위치",
+    "description": "다중 루트 작업 영역을 위한 .spec-workflow 폴더 위치를 구성합니다.",
+    "current": "현재",
+    "notSet": "구성되지 않음",
+    "default": "기본값",
+    "browse": "찾아보기",
+    "reset": "재설정"
   }
 }

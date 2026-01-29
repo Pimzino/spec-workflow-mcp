@@ -216,5 +216,14 @@
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "Workflow-Speicherort",
+    "description": "Konfigurieren Sie den Speicherort des .spec-workflow-Ordners für Multi-Root-Arbeitsbereiche.",
+    "current": "Aktuell",
+    "notSet": "Nicht konfiguriert",
+    "default": "Standard",
+    "browse": "Durchsuchen",
+    "reset": "Zurücksetzen"
   }
 }

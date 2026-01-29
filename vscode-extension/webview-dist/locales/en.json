@@ -216,5 +216,14 @@
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "Workflow Location",
+    "description": "Configure the location of the .spec-workflow folder for multi-root workspaces.",
+    "current": "Current",
+    "notSet": "Not configured",
+    "default": "default",
+    "browse": "Browse",
+    "reset": "Reset"
   }
 }

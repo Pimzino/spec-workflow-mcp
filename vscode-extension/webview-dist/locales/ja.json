@@ -216,5 +216,14 @@
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "ワークフローの場所",
+    "description": "マルチルートワークスペース用の .spec-workflow フォルダの場所を設定します。",
+    "current": "現在",
+    "notSet": "未設定",
+    "default": "デフォルト",
+    "browse": "参照",
+    "reset": "リセット"
   }
 }

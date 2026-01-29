@@ -216,5 +216,14 @@
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "Local do Fluxo de Trabalho",
+    "description": "Configure a localização da pasta .spec-workflow para espaços de trabalho multi-raiz.",
+    "current": "Atual",
+    "notSet": "Não configurado",
+    "default": "padrão",
+    "browse": "Procurar",
+    "reset": "Redefinir"
   }
 }
