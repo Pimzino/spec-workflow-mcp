@@ -269,28 +269,33 @@ async function handleRequestApproval(
 
     await approvalStorage.stop();
 
+    // Build deeplink URL that navigates directly to this specific approval
+    const deeplink = context.dashboardUrl
+      ? `${context.dashboardUrl}/approvals?id=${encodeURIComponent(approvalId)}`
+      : undefined;
+
     return {
       success: true,
-      message: `Approval request created successfully. Please review in dashboard: ${context.dashboardUrl || 'Start with: spec-workflow-mcp --dashboard'}`,
+      message: `Approval request created successfully. Please review in dashboard: ${deeplink || 'Start with: spec-workflow-mcp --dashboard'}`,
       data: {
         approvalId,
         title: args.title,
         filePath: args.filePath,
         type: args.type,
         status: 'pending',
-        dashboardUrl: context.dashboardUrl
+        dashboardUrl: deeplink
       },
       nextSteps: [
         'BLOCKING - Dashboard approval required',
         'VERBAL APPROVAL NOT ACCEPTED',
         'Do not proceed on verbal confirmation',
-        context.dashboardUrl ? `Use dashboard: ${context.dashboardUrl}` : 'Start the dashboard with: spec-workflow-mcp --dashboard',
+        deeplink ? `Use dashboard: ${deeplink}` : 'Start the dashboard with: spec-workflow-mcp --dashboard',
         `Poll status with: approvals action:"status" approvalId:"${approvalId}"`
       ],
       projectContext: {
         projectPath: validatedProjectPath,
         workflowRoot: join(validatedProjectPath, '.spec-workflow'),
-        dashboardUrl: context.dashboardUrl
+        dashboardUrl: deeplink
       }
     };
 
