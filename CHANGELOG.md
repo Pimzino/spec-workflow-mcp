@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.12] - 2026-01-29
+
+### Added
+- **Approval Deeplinks** (Issue #192) - Approval requests now return direct URLs to specific approvals:
+  - Dashboard URL includes approval ID as query parameter: `/approvals?id={approvalId}`
+  - Clicking a deeplink auto-scrolls to the specific approval and highlights it with an amber ring
+  - Approval is automatically expanded when navigating via deeplink
+  - Improves workflow when running multiple AI agents in parallel
+
 ## [2.1.11] - 2026-01-27
 
 ### Fixed
