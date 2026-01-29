@@ -54,7 +54,6 @@
     "@heroicons/react": "^2.2.0",
     "@mdxeditor/editor": "^3.50.0",
     "@modelcontextprotocol/sdk": "^1.24.3",
-    "@pimzino/sgrep": "^1.3.24",
     "@tailwindcss/vite": "^4.1.13",
     "@toon-format/toon": "^0.8.0",
     "chokidar": "^3.5.3",
