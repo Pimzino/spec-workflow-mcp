@@ -7,6 +7,7 @@ import { homedir } from 'os';
 import { resolveGitRoot, resolveGitWorkspaceRoot } from './core/git-utils.js';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { realpathSync } from 'fs';
 
 // Default dashboard port
 const DEFAULT_DASHBOARD_PORT = 5000;
@@ -353,9 +354,6 @@ async function main() {
       process.on('SIGINT', shutdown);
       process.on('SIGTERM', shutdown);
 
-      // Keep the process running
-      process.stdin.resume();
-
     } else {
       // MCP server mode
       console.error(`Starting Spec Workflow MCP Server for project: ${workflowRootPath}`);
@@ -394,9 +392,19 @@ async function main() {
   }
 }
 
-const entrypoint = process.argv[1] ? resolve(process.argv[1]) : undefined;
-const currentFile = fileURLToPath(import.meta.url);
+export function resolveEntrypoint(pathValue: string | undefined): string | undefined {
+  if (!pathValue) return undefined;
 
-if (entrypoint && currentFile === entrypoint) {
+  try {
+    return realpathSync(pathValue);
+  } catch {
+    return resolve(pathValue);
+  }
+}
+
+const entrypoint = resolveEntrypoint(process.argv[1]);
+const currentFile = resolveEntrypoint(fileURLToPath(import.meta.url));
+
+if (entrypoint && currentFile && currentFile === entrypoint) {
   main().catch(() => process.exit(1));
 }
