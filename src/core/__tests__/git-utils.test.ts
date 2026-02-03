@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { execSync } from 'child_process';
-import { resolveGitRoot, isGitWorktree, SPEC_WORKFLOW_SHARED_ROOT_ENV } from '../git-utils.js';
+import {
+  resolveGitRoot,
+  resolveGitWorkspaceRoot,
+  isGitWorktree,
+  SPEC_WORKFLOW_SHARED_ROOT_ENV
+} from '../git-utils.js';
 
 // Mock child_process
 vi.mock('child_process', () => ({
@@ -182,6 +187,39 @@ describe('resolveGitRoot', () => {
         })
       );
     });
+  });
+});
+
+describe('resolveGitWorkspaceRoot', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should return workspace root from git when available', () => {
+    mockedExecSync.mockReturnValue('/home/user/repo\n');
+
+    const result = resolveGitWorkspaceRoot('/home/user/repo/src/components');
+
+    expect(result).toBe('/home/user/repo');
+    expect(mockedExecSync).toHaveBeenCalledWith(
+      'git rev-parse --show-toplevel',
+      expect.objectContaining({
+        cwd: '/home/user/repo/src/components',
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+        timeout: 5000
+      })
+    );
+  });
+
+  it('should return original path when git fails', () => {
+    mockedExecSync.mockImplementation(() => {
+      throw new Error('not a git repository');
+    });
+
+    const result = resolveGitWorkspaceRoot('/not/a/repo');
+
+    expect(result).toBe('/not/a/repo');
   });
 });
 

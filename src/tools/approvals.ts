@@ -210,7 +210,10 @@ async function handleRequestApproval(
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
     const translatedPath = safeTranslatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, {
+      originalPath: validatedProjectPath,
+      fileResolutionPath: translatedPath
+    });
     await approvalStorage.start();
 
     // Validate tasks.md format before allowing approval request
@@ -329,7 +332,10 @@ async function handleGetApprovalStatus(
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
     const translatedPath = safeTranslatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, {
+      originalPath: validatedProjectPath,
+      fileResolutionPath: translatedPath
+    });
     await approvalStorage.start();
 
     const approval = await approvalStorage.getApproval(args.approvalId);
@@ -452,7 +458,10 @@ async function handleDeleteApproval(
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
     const translatedPath = safeTranslatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, {
+      originalPath: validatedProjectPath,
+      fileResolutionPath: translatedPath
+    });
     await approvalStorage.start();
 
     // Check if approval exists and its status
