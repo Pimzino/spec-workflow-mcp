@@ -17,6 +17,8 @@ npx -y @pimzino/spec-workflow-mcp@latest [project-path] [options]
 | `--help` | Show comprehensive usage information | `npx -y @pimzino/spec-workflow-mcp@latest --help` |
 | `--dashboard` | Run dashboard-only mode (default port: 5000) | `npx -y @pimzino/spec-workflow-mcp@latest --dashboard` |
 | `--port <number>` | Specify custom dashboard port (1024-65535) | `npx -y @pimzino/spec-workflow-mcp@latest --dashboard --port 8080` |
+| `--no-open` | Don't auto-open browser when starting dashboard | `npx -y @pimzino/spec-workflow-mcp@latest --dashboard --no-open` |
+| `--no-shared-worktree-specs` | Disable shared `.spec-workflow` in git worktrees (use workspace-local instead) | `npx -y @pimzino/spec-workflow-mcp@latest ~/worktree --no-shared-worktree-specs` |
 
 ### Important Notes
 
@@ -134,6 +136,54 @@ npx -y @pimzino/spec-workflow-mcp@latest .
 
 # Both the main repo and worktree see the same specs in /home/user/myproject/.spec-workflow/
 ```
+
+## Git Worktree Configuration
+
+Git worktrees are fully supported with two operating modes:
+
+### Default Mode: Shared Specs
+
+By default, all worktrees of a repository share the same `.spec-workflow/` directory (stored in the main repo). However, each worktree registers as its own project in the dashboard with a distinct identity.
+
+**Dashboard behavior:**
+- Each worktree appears as a separate project in the project dropdown
+- Project names show `repo · worktree` format (e.g., `myproject · feature-auth`)
+- Approval file resolution prioritizes the worktree path, then falls back to shared workflow root
+
+```bash
+# Main repo
+npx -y @pimzino/spec-workflow-mcp@latest ~/myproject
+# Dashboard shows: "myproject"
+
+# Worktree
+npx -y @pimzino/spec-workflow-mcp@latest ~/myproject-feature
+# Dashboard shows: "myproject · myproject-feature"
+# Specs are shared from ~/myproject/.spec-workflow/
+```
+
+### Isolated Mode: Workspace-Local Specs
+
+Use `--no-shared-worktree-specs` when you want each worktree to have its own independent `.spec-workflow/` directory:
+
+```bash
+npx -y @pimzino/spec-workflow-mcp@latest ~/myproject-feature --no-shared-worktree-specs
+# Output: Shared worktree specs disabled. Using workspace-local .spec-workflow.
+# Specs stored in ~/myproject-feature/.spec-workflow/
+```
+
+**When to use isolated mode:**
+- Different worktrees have completely different feature scopes
+- You want to experiment with specs without affecting other worktrees
+- Team members working on different worktrees need independent spec histories
+
+**Comparison:**
+
+| Aspect | Default (Shared) | `--no-shared-worktree-specs` |
+|--------|------------------|------------------------------|
+| `.spec-workflow/` location | Main repo | Each worktree |
+| Specs visible across worktrees | Yes | No |
+| Dashboard project identity | Separate per worktree | Separate per worktree |
+| Approval file resolution | Worktree → Main repo | Worktree only |
 
 ## Dashboard Session Management
 
