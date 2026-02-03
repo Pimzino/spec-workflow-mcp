@@ -28,6 +28,7 @@
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:worktree": "playwright test -c playwright.worktree.config.ts",
     "test:e2e:ui": "playwright test --ui",
     "test:generate-approvals": "node scripts/generate-test-approvals.cjs",
     "prepublishOnly": "npm run build"

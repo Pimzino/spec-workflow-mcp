@@ -63,6 +63,7 @@ export function ProjectDropdown() {
       {/* Dropdown Button */}
       <button
         onClick={toggleDropdown}
+        data-testid="project-dropdown-toggle"
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors text-[var(--text-primary)]"
         aria-label={t('projects.selectProject', 'Select project')}
       >
@@ -84,12 +85,16 @@ export function ProjectDropdown() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-72 bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg shadow-lg z-50 max-h-96 flex flex-col">
+        <div
+          data-testid="project-dropdown-menu"
+          className="absolute left-0 mt-2 w-72 bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg shadow-lg z-50 max-h-96 flex flex-col"
+        >
           {/* Search Input */}
           <div className="p-3 border-b border-[var(--border-default)]">
             <input
               ref={searchInputRef}
               type="text"
+              data-testid="project-dropdown-search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('projects.search', 'Search projects...')}
@@ -117,6 +122,7 @@ export function ProjectDropdown() {
                     <button
                       key={project.projectId}
                       onClick={() => handleProjectSelect(project.projectId)}
+                      data-testid={`project-dropdown-item-${project.projectId}`}
                       className={`w-full text-left px-4 py-2.5 hover:bg-[var(--surface-hover)] transition-colors flex items-center justify-between ${
                         isCurrent ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''
                       }`}
