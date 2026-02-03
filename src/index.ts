@@ -5,6 +5,8 @@ import { MultiProjectDashboardServer } from './dashboard/multi-server.js';
 import { DashboardSessionManager } from './core/dashboard-session.js';
 import { homedir } from 'os';
 import { resolveGitRoot, resolveGitWorkspaceRoot } from './core/git-utils.js';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 // Default dashboard port
 const DEFAULT_DASHBOARD_PORT = 5000;
@@ -93,7 +95,7 @@ function expandTildePath(path: string): string {
   return path;
 }
 
-function parseArguments(args: string[]): {
+export function parseArguments(args: string[]): {
   workspacePath: string;
   workflowRootPath: string;
   expandedPath: string;
@@ -392,4 +394,9 @@ async function main() {
   }
 }
 
-main().catch(() => process.exit(1));
+const entrypoint = process.argv[1] ? resolve(process.argv[1]) : undefined;
+const currentFile = fileURLToPath(import.meta.url);
+
+if (entrypoint && currentFile === entrypoint) {
+  main().catch(() => process.exit(1));
+}
