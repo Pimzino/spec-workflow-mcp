@@ -246,6 +246,7 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
     <div
       ref={itemRef}
       id={`approval-${a.id}`}
+      data-testid={`approval-item-${a.id}`}
       className={`bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg transition-all duration-500 overflow-hidden max-w-full ${isSelected ? 'ring-2 ring-blue-500' : ''} ${isHighlighted ? 'ring-2 ring-amber-500 shadow-lg shadow-amber-500/20' : ''}`}
     >
       <div className="p-3 sm:p-4 md:p-6 lg:p-8 min-w-0 max-w-full overflow-x-hidden">
@@ -1108,5 +1109,4 @@ function Content() {
 export function ApprovalsPage() {
   return <Content />;
 }
-
 

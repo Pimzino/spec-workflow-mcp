@@ -4,11 +4,9 @@ import { SpecWorkflowMCPServer } from './server.js';
 import { MultiProjectDashboardServer } from './dashboard/multi-server.js';
 import { DashboardSessionManager } from './core/dashboard-session.js';
 import { homedir } from 'os';
-import { WorkspaceInitializer } from './core/workspace-initializer.js';
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { resolveGitRoot, resolveGitWorkspaceRoot } from './core/git-utils.js';
+import { resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { resolveGitRoot } from './core/git-utils.js';
 
 // Default dashboard port
 const DEFAULT_DASHBOARD_PORT = 5000;
@@ -32,6 +30,9 @@ OPTIONS:
                          Only use if port 5000 is unavailable
   --no-open               Don't automatically open browser when starting dashboard
                          Useful in restricted environments where browser launch is blocked
+  --no-shared-worktree-specs
+                         Disable shared .spec-workflow in git worktrees
+                         Use workspace-local .spec-workflow instead of main repo
 
 IMPORTANT:
   Only ONE dashboard instance runs at a time. All MCP servers connect to the
@@ -94,20 +95,23 @@ function expandTildePath(path: string): string {
   return path;
 }
 
-function parseArguments(args: string[]): {
-  projectPath: string;
+export function parseArguments(args: string[]): {
+  workspacePath: string;
+  workflowRootPath: string;
   expandedPath: string;
   isDashboardMode: boolean;
+  noSharedWorktreeSpecs: boolean;
   port?: number;
   lang?: string;
   noOpen?: boolean;
 } {
   const isDashboardMode = args.includes('--dashboard');
   const noOpen = args.includes('--no-open');
+  const noSharedWorktreeSpecs = args.includes('--no-shared-worktree-specs');
   let customPort: number | undefined;
 
   // Check for invalid flags
-  const validFlags = ['--dashboard', '--port', '--help', '-h', '--no-open'];
+  const validFlags = ['--dashboard', '--port', '--help', '-h', '--no-open', '--no-shared-worktree-specs'];
   for (const arg of args) {
     if (arg.startsWith('--') && !arg.includes('=')) {
       if (!validFlags.includes(arg)) {
@@ -163,6 +167,7 @@ function parseArguments(args: string[]): {
     if (arg.startsWith('--port=')) return false;
     if (arg === '--port') return false;
     if (arg === '--no-open') return false;
+    if (arg === '--no-shared-worktree-specs') return false;
     // Check if this arg is a value following --port
     if (index > 0 && args[index - 1] === '--port') return false;
     return true;
@@ -171,15 +176,25 @@ function parseArguments(args: string[]): {
   // For dashboard-only mode, use cwd as default (dashboard doesn't need it)
   const rawProjectPath = filteredArgs[0] || process.cwd();
   const expandedPath = expandTildePath(rawProjectPath);
-  const projectPath = resolveGitRoot(expandedPath);
+  const workspacePath = resolveGitWorkspaceRoot(expandedPath);
+  const workflowRootPath = noSharedWorktreeSpecs ? workspacePath : resolveGitRoot(workspacePath);
 
   // Warn if no explicit path was provided and we're using cwd (but only for MCP server mode)
   if (!filteredArgs[0] && !isDashboardMode) {
-    console.warn(`Warning: No project path specified, using current directory: ${projectPath}`);
+    console.warn(`Warning: No project path specified, using current directory: ${workspacePath}`);
     console.warn('Consider specifying an explicit path for better clarity.');
   }
 
-  return { projectPath, expandedPath, isDashboardMode, port: customPort, lang: undefined, noOpen };
+  return {
+    workspacePath,
+    workflowRootPath,
+    expandedPath,
+    isDashboardMode,
+    noSharedWorktreeSpecs,
+    port: customPort,
+    lang: undefined,
+    noOpen
+  };
 }
 
 async function main() {
@@ -194,11 +209,18 @@ async function main() {
 
     // Parse command-line arguments
     const cliArgs = parseArguments(args);
-    let projectPath = cliArgs.projectPath;
+    const workspacePath = cliArgs.workspacePath;
+    const workflowRootPath = cliArgs.workflowRootPath;
+    const noSharedWorktreeSpecs = cliArgs.noSharedWorktreeSpecs;
 
-    // Log if git worktree was detected and path changed
-    if (projectPath !== cliArgs.expandedPath) {
-      console.error(`Git worktree detected. Using main repo: ${projectPath}`);
+    // Log worktree details when workspace and shared workflow roots differ
+    if (workspacePath !== workflowRootPath) {
+      console.error('Git worktree detected.');
+      console.error(`workspacePath=${workspacePath}`);
+      console.error(`workflowRootPath=${workflowRootPath}`);
+    } else if (noSharedWorktreeSpecs) {
+      console.error('Shared worktree specs disabled. Using workspace-local .spec-workflow.');
+      console.error(`workspacePath=${workspacePath}`);
     }
 
     // Apply configuration from CLI args
@@ -336,12 +358,13 @@ async function main() {
 
     } else {
       // MCP server mode
-      console.error(`Starting Spec Workflow MCP Server for project: ${projectPath}`);
+      console.error(`Starting Spec Workflow MCP Server for project: ${workflowRootPath}`);
+      console.error(`Workspace path: ${workspacePath}`);
       console.error(`Working directory: ${process.cwd()}`);
 
       const server = new SpecWorkflowMCPServer();
 
-      await server.initialize(projectPath, lang);
+      await server.initialize(workflowRootPath, workspacePath, lang);
 
       // Handle graceful shutdown
       process.on('SIGINT', async () => {
@@ -371,4 +394,9 @@ async function main() {
   }
 }
 
-main().catch(() => process.exit(1));
+const entrypoint = process.argv[1] ? resolve(process.argv[1]) : undefined;
+const currentFile = fileURLToPath(import.meta.url);
+
+if (entrypoint && currentFile === entrypoint) {
+  main().catch(() => process.exit(1));
+}

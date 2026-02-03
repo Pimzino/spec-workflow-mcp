@@ -625,15 +625,31 @@ export class MultiProjectDashboardServer {
           return reply.code(404).send({ error: 'Approval not found or no file path' });
         }
 
-        const candidates: string[] = [];
+        const candidateSet = new Set<string>();
         const p = approval.filePath;
-        candidates.push(join(project.projectPath, p));
-        if (p.startsWith('/') || p.match(/^[A-Za-z]:[\\\/]/)) {
-          candidates.push(p);
+        const isAbsolutePath = p.startsWith('/') || p.match(/^[A-Za-z]:[\\\/]/);
+
+        if (!isAbsolutePath) {
+          // 1) Resolve against workspace/worktree first
+          candidateSet.add(join(project.workspacePath, p));
         }
-        if (!p.includes('.spec-workflow')) {
-          candidates.push(join(project.projectPath, '.spec-workflow', p));
+
+        // 2) Absolute path as-is
+        if (isAbsolutePath) {
+          candidateSet.add(p);
         }
+
+        if (!isAbsolutePath) {
+          // 3) Resolve against workflow root
+          candidateSet.add(join(project.projectPath, p));
+
+          // 4) Legacy fallback for historical paths
+          if (!p.includes('.spec-workflow')) {
+            candidateSet.add(join(project.projectPath, '.spec-workflow', p));
+          }
+        }
+
+        const candidates = Array.from(candidateSet);
 
         let content: string | null = null;
         let resolvedPath: string | null = null;

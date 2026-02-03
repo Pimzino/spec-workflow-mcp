@@ -20,7 +20,8 @@ import { fileURLToPath } from 'url';
 
 export class SpecWorkflowMCPServer {
   private server: Server;
-  private projectPath!: string;
+  private projectPath!: string;   // workflowRootPath for .spec-workflow operations
+  private workspacePath!: string; // workspace/worktree path for identity in registry
   private projectRegistry: ProjectRegistry;
   private lang?: string;
 
@@ -55,13 +56,15 @@ export class SpecWorkflowMCPServer {
     this.projectRegistry = new ProjectRegistry();
   }
 
-  async initialize(projectPath: string, lang?: string) {
+  async initialize(projectPath: string, workspacePath: string, lang?: string) {
     this.projectPath = projectPath;
+    this.workspacePath = workspacePath;
     this.lang = lang;
 
     try {
       // Validate project path
       await validateProjectPath(this.projectPath);
+      await validateProjectPath(this.workspacePath);
 
       // Initialize workspace
       const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -71,7 +74,9 @@ export class SpecWorkflowMCPServer {
       await workspaceInitializer.initializeWorkspace();
 
       // Register this project in the global registry
-      const projectId = await this.projectRegistry.registerProject(this.projectPath, process.pid);
+      const projectId = await this.projectRegistry.registerProject(this.workspacePath, process.pid, {
+        workflowRootPath: this.projectPath
+      });
       console.error(`Project registered: ${projectId}`);
 
       // Try to get the dashboard URL from session manager
@@ -180,7 +185,7 @@ export class SpecWorkflowMCPServer {
       if (!this.isDockerMode()) {
         try {
           // Pass current PID to only remove this specific instance
-          await this.projectRegistry.unregisterProject(this.projectPath, process.pid);
+          await this.projectRegistry.unregisterProject(this.workspacePath, process.pid);
           console.error('Project instance unregistered from global registry');
         } catch (error) {
           // Ignore errors during cleanup

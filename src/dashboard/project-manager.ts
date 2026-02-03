@@ -4,13 +4,16 @@ import { SpecParser } from './parser.js';
 import { SpecWatcher } from './watcher.js';
 import { ApprovalStorage } from './approval-storage.js';
 import { SpecArchiveService } from '../core/archive-service.js';
-import { ProjectRegistry, ProjectRegistryEntry, ProjectInstance, generateProjectId } from '../core/project-registry.js';
+import { ProjectRegistry, ProjectRegistryEntry, ProjectInstance } from '../core/project-registry.js';
 import { PathUtils } from '../core/path-utils.js';
+import { resolveGitRoot, resolveGitWorkspaceRoot } from '../core/git-utils.js';
 
 export interface ProjectContext {
   projectId: string;
-  projectPath: string;           // Translated path for local file access
-  originalProjectPath: string;   // Original host path for display/registry
+  projectPath: string;           // Translated workflow root path for specs/.spec-workflow access
+  workspacePath: string;         // Translated workspace/worktree path for file artifact resolution
+  originalProjectPath: string;   // Original workspace path for display/registry
+  workflowRootPath: string;      // Original workflow root path for display/debugging
   projectName: string;
   instances: ProjectInstance[];  // Active MCP server instances for this project
   parser: SpecParser;
@@ -107,6 +110,11 @@ export class ProjectManager extends EventEmitter {
           // Update instances for existing project
           const project = this.projects.get(entry.projectId);
           if (project) {
+            project.projectName = entry.projectName;
+            project.originalProjectPath = entry.projectPath;
+            project.workflowRootPath = entry.workflowRootPath;
+            project.projectPath = PathUtils.translatePath(entry.workflowRootPath);
+            project.workspacePath = PathUtils.translatePath(entry.projectPath);
             project.instances = entry.instances || [];
           }
         }
@@ -131,13 +139,17 @@ export class ProjectManager extends EventEmitter {
    */
   private async addProject(entry: ProjectRegistryEntry): Promise<void> {
     try {
-      // Translate path once at entry point (components should not know about Docker)
-      const translatedPath = PathUtils.translatePath(entry.projectPath);
+      // Translate paths once at entry point (components should not know about Docker)
+      const translatedWorkspacePath = PathUtils.translatePath(entry.projectPath);
+      const translatedWorkflowRootPath = PathUtils.translatePath(entry.workflowRootPath);
 
-      const parser = new SpecParser(translatedPath);
-      const watcher = new SpecWatcher(translatedPath, parser);
-      const approvalStorage = new ApprovalStorage(translatedPath, entry.projectPath);
-      const archiveService = new SpecArchiveService(translatedPath);
+      const parser = new SpecParser(translatedWorkflowRootPath);
+      const watcher = new SpecWatcher(translatedWorkflowRootPath, parser);
+      const approvalStorage = new ApprovalStorage(translatedWorkflowRootPath, {
+        originalPath: entry.workflowRootPath,
+        fileResolutionPath: translatedWorkspacePath
+      });
+      const archiveService = new SpecArchiveService(translatedWorkflowRootPath);
 
       // Start watchers
       await watcher.start();
@@ -162,8 +174,10 @@ export class ProjectManager extends EventEmitter {
 
       const context: ProjectContext = {
         projectId: entry.projectId,
-        projectPath: translatedPath,            // Use translated path for file access
-        originalProjectPath: entry.projectPath, // Keep original for display/registry
+        projectPath: translatedWorkflowRootPath,
+        workspacePath: translatedWorkspacePath,
+        originalProjectPath: entry.projectPath, // Keep workspace path for display/registry
+        workflowRootPath: entry.workflowRootPath,
         projectName: entry.projectName,
         instances: entry.instances || [],       // Track MCP server instances
         parser,
@@ -243,7 +257,10 @@ export class ProjectManager extends EventEmitter {
    * Manually add a project by path
    */
   async addProjectByPath(projectPath: string): Promise<string> {
-    const entry = await this.registry.getProject(projectPath);
+    const workspacePath = resolveGitWorkspaceRoot(projectPath);
+    const workflowRootPath = resolveGitRoot(workspacePath);
+
+    const entry = await this.registry.getProject(workspacePath);
     if (entry) {
       // Already registered
       if (!this.projects.has(entry.projectId)) {
@@ -253,7 +270,9 @@ export class ProjectManager extends EventEmitter {
     }
 
     // Register new project (with dummy PID since it's manual)
-    const projectId = await this.registry.registerProject(projectPath, process.pid);
+    const projectId = await this.registry.registerProject(workspacePath, process.pid, {
+      workflowRootPath
+    });
 
     // Get the entry and add it
     const newEntry = await this.registry.getProjectById(projectId);
