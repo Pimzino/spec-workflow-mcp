@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-02-03
+
+### Added
+- **Git Worktree Support** (PR #194) - Separate worktree identity from shared `.spec-workflow` root:
+  - Each git worktree now registers as its own project identity in the dashboard
+  - Project labels reflect worktree context with `repo · worktree` naming format
+  - `.spec-workflow` remains shared by default across worktrees (existing behavior preserved)
+  - Artifact/approval content resolution now prioritizes workspace/worktree paths with workflow root fallback
+  - New `--no-shared-worktree-specs` CLI flag to opt-out of sharing and use workspace-local `.spec-workflow`
+  - Added `resolveGitWorkspaceRoot()` helper using `git rev-parse --show-toplevel`
+  - Backward compatible: legacy registry entries without `workflowRootPath` are normalized automatically
+
+### Added (Testing)
+- Comprehensive test coverage for worktree functionality:
+  - Unit tests for CLI argument parsing, git-utils, project-registry, and approval-storage path resolution
+  - Integration tests for multi-server approval content resolution
+  - E2E Playwright tests for no-shared worktree dashboard flow
+  - New `test:e2e:worktree` npm script with dedicated Playwright config
+
 ## [2.1.12] - 2026-01-29
 
 ### Added
