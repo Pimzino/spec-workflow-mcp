@@ -6,6 +6,7 @@ import {
   quotePlugin,
   linkPlugin,
   tablePlugin,
+  thematicBreakPlugin,
   codeBlockPlugin,
   codeMirrorPlugin,
   markdownShortcutPlugin,
@@ -15,6 +16,7 @@ import {
   BlockTypeSelect,
   CreateLink,
   InsertTable,
+  InsertThematicBreak,
   ListsToggle,
   UndoRedo,
   CodeToggle,
@@ -235,6 +237,7 @@ export function MDXEditorWrapper({
       quotePlugin(),
       linkPlugin(),
       tablePlugin(),
+      thematicBreakPlugin(),
       codeBlockPlugin({
         codeBlockEditorDescriptors: [
           mermaidCodeBlockDescriptor,      // Mermaid diagrams (priority 1)
@@ -285,6 +288,7 @@ export function MDXEditorWrapper({
               <Separator />
               <CreateLink />
               <InsertTable />
+              <InsertThematicBreak />
               <Separator />
               <SourceToggle />
             </>
