@@ -1,6 +1,6 @@
 {
   "name": "@pimzino/spec-workflow-mcp",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "main": "dist/index.js",
   "type": "module",
@@ -55,7 +55,10 @@
     "@heroicons/react": "^2.2.0",
     "@mdxeditor/editor": "^3.50.0",
     "@modelcontextprotocol/sdk": "^1.24.3",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "@tailwindcss/vite": "^4.1.13",
+    "zod": "^3.25.0",
     "@toon-format/toon": "^0.8.0",
     "chokidar": "^3.5.3",
     "class-variance-authority": "^0.7.1",
