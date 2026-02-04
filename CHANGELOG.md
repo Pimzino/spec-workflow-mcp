@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.2] - 2026-02-04
+
+### Fixed
+- **NPX Entrypoint Execution** (PR #195) - Fixed CLI silently not executing when invoked via `npx`:
+  - Resolved symlinked paths using `realpathSync()` for proper entrypoint detection
+  - `process.argv[1]` returns symlink path while `import.meta.url` returns real path, causing comparison to fail
+  - Removed `process.stdin.resume()` in dashboard mode which could suspend the process in some shells
+
+### Added
+- **Markdown Thematic Breaks** - Added support for horizontal rules (`---`) in the dashboard editor:
+  - Enabled `thematicBreakPlugin` in MDX editor
+  - Added toolbar button for inserting thematic breaks
+
 ## [2.2.1] - 2026-02-04
 
 ### Fixed
