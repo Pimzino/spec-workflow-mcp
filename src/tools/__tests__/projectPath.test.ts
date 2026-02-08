@@ -3,6 +3,8 @@ import { specStatusHandler } from '../spec-status.js';
 import { logImplementationHandler } from '../log-implementation.js';
 import { approvalsHandler } from '../approvals.js';
 import { ToolContext } from '../../types.js';
+import { dirname, join } from 'path';
+import { mkdtemp, mkdir, rm, writeFile } from 'fs/promises';
 
 describe('Tool projectPath fallback behavior', () => {
   const mockContext: ToolContext = {
@@ -90,6 +92,12 @@ describe('Tool projectPath fallback behavior', () => {
   });
 
   describe('approvals tool', () => {
+    async function createTempProject(prefix: string): Promise<string> {
+      const tempRoot = join(process.cwd(), '.tmp-test-approvals');
+      await mkdir(tempRoot, { recursive: true });
+      return mkdtemp(join(tempRoot, prefix));
+    }
+
     it('should use context.projectPath for request action when args.projectPath is not provided', async () => {
       const result = await approvalsHandler(
         {
@@ -188,6 +196,64 @@ describe('Tool projectPath fallback behavior', () => {
       expect(result.success).toBe(false);
       expect(result.message).not.toContain('PathUtils.translatePath is not a function');
       expect(result.message).not.toContain('PathUtils.translatePath is not available');
+    });
+
+    it('should block approval request for markdown with MDX-incompatible content', async () => {
+      const tempProject = await createTempProject('specwf-mdx-');
+      const relativePath = '.spec-workflow/specs/test-spec/requirements.md';
+      const absolutePath = join(tempProject, relativePath);
+
+      try {
+        await mkdir(dirname(absolutePath), { recursive: true });
+        await writeFile(absolutePath, '# Test\\n\\n- Threshold: <5%\\n', 'utf-8');
+
+        const result = await approvalsHandler(
+          {
+            action: 'request',
+            title: 'Review requirements',
+            filePath: relativePath,
+            type: 'document',
+            category: 'spec',
+            categoryName: 'test-spec'
+          },
+          { projectPath: tempProject }
+        );
+
+        expect(result.success).toBe(false);
+        expect(result.message).toContain('MDX compatibility errors');
+        expect(result.nextSteps?.some(step => step.includes('mdx-compile-error'))).toBe(true);
+      } finally {
+        await rm(tempProject, { recursive: true, force: true });
+      }
+    });
+
+    it('should block approval request for tasks markdown with MDX-incompatible content', async () => {
+      const tempProject = await createTempProject('specwf-mdx-tasks-');
+      const relativePath = '.spec-workflow/specs/test-spec/tasks.md';
+      const absolutePath = join(tempProject, relativePath);
+
+      try {
+        await mkdir(dirname(absolutePath), { recursive: true });
+        await writeFile(absolutePath, '# Tasks\\n\\n- [ ] 1. Check threshold <5%\\n', 'utf-8');
+
+        const result = await approvalsHandler(
+          {
+            action: 'request',
+            title: 'Review tasks',
+            filePath: relativePath,
+            type: 'document',
+            category: 'spec',
+            categoryName: 'test-spec'
+          },
+          { projectPath: tempProject }
+        );
+
+        expect(result.success).toBe(false);
+        expect(result.message).toContain('MDX compatibility errors');
+        expect(result.nextSteps?.some(step => step.includes('mdx-compile-error'))).toBe(true);
+      } finally {
+        await rm(tempProject, { recursive: true, force: true });
+      }
     });
   });
 });

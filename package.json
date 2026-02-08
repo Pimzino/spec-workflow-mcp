@@ -31,7 +31,8 @@
     "test:e2e:worktree": "playwright test -c playwright.worktree.config.ts",
     "test:e2e:ui": "playwright test --ui",
     "test:generate-approvals": "node scripts/generate-test-approvals.cjs",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "validate:mdx": "tsx scripts/validate-mdx.ts"
   },
   "keywords": [
     "mcp",
@@ -53,13 +54,13 @@
     "@fastify/static": "^7.0.4",
     "@fastify/websocket": "^8.2.1",
     "@heroicons/react": "^2.2.0",
+    "@mdx-js/mdx": "^3.1.1",
     "@mdxeditor/editor": "^3.50.0",
     "@modelcontextprotocol/sdk": "^1.24.3",
+    "@tailwindcss/vite": "^4.1.13",
+    "@toon-format/toon": "^0.8.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "@tailwindcss/vite": "^4.1.13",
-    "zod": "^3.25.0",
-    "@toon-format/toon": "^0.8.0",
     "chokidar": "^3.5.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -81,7 +82,8 @@
     "simple-git": "^3.28.0",
     "tailwind-merge": "^3.3.1",
     "toml": "^3.0.0",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
