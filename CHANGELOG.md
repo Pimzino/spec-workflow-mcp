@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.3] - 2026-02-08
+
+### Added
+- **MDX Pre-Render Validation for Approvals** (PR #197) - All markdown files are now validated for MDX compatibility before approval requests are accepted:
+  - Approval requests for any `.md` file are blocked if MDX compilation fails, preventing dashboard rendering issues
+  - Actionable error messages with line/column references and fix suggestions (e.g., escape `<` as `&lt;` or use inline code)
+  - Existing `tasks.md` structural validation still runs after MDX validation
+- **`validate:mdx` CLI Script** - New `npm run validate:mdx` command for batch-scanning markdown files:
+  - Scans all `.md` files in `.spec-workflow/specs/` and `.spec-workflow/steering/` directories
+  - Supports `--spec <name>` to validate a single spec, `--file <path>` for a single file
+  - `--json` output mode for CI/automation integration
+- **MDX Validator Module** - New `src/core/mdx-validator.ts` using `@mdx-js/mdx` compile for syntax validation with structured error reporting
+
+### Dependencies
+- Added `@mdx-js/mdx` (^3.1.1) for MDX compilation-based validation
+
 ## [2.2.2] - 2026-02-04
 
 ### Fixed
