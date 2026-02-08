@@ -5,6 +5,7 @@ import { join } from 'path';
 import { validateProjectPath, PathUtils } from '../core/path-utils.js';
 import { readFile } from 'fs/promises';
 import { validateTasksMarkdown, formatValidationErrors } from '../core/task-validator.js';
+import { validateMarkdownForMdx, formatMdxValidationIssues } from '../core/mdx-validator.js';
 
 /**
  * Safely translate a path, with defensive checks to provide better error messages
@@ -216,49 +217,80 @@ async function handleRequestApproval(
     });
     await approvalStorage.start();
 
-    // Validate tasks.md format before allowing approval request
-    if (args.filePath.endsWith('tasks.md')) {
+    const isMarkdownFile = args.filePath.toLowerCase().endsWith('.md');
+    let markdownContent: string | undefined;
+
+    if (isMarkdownFile) {
       try {
         const fullPath = join(validatedProjectPath, args.filePath);
-        const content = await readFile(fullPath, 'utf-8');
-        const validationResult = validateTasksMarkdown(content);
-
-        if (!validationResult.valid) {
-          await approvalStorage.stop();
-
-          const errorMessages = formatValidationErrors(validationResult);
-
-          return {
-            success: false,
-            message: 'Tasks document has format errors that must be fixed before approval',
-            data: {
-              errorCount: validationResult.errors.length,
-              warningCount: validationResult.warnings.length,
-              summary: validationResult.summary
-            },
-            nextSteps: [
-              'Fix the format errors listed below',
-              'Ensure each task has: checkbox (- [ ]), numeric ID (1.1), description',
-              'Ensure metadata uses underscores: _Requirements: ..._',
-              'Ensure _Prompt ends with underscore',
-              'Re-request approval after fixing',
-              ...errorMessages
-            ]
-          };
-        }
-
-        // If there are warnings, include them but allow approval to proceed
-        if (validationResult.warnings.length > 0) {
-          // Warnings don't block approval, but will be included in the response
-          // This allows the user to see potential issues while still proceeding
-        }
+        markdownContent = await readFile(fullPath, 'utf-8');
       } catch (fileError) {
         await approvalStorage.stop();
         const errorMessage = fileError instanceof Error ? fileError.message : String(fileError);
         return {
           success: false,
-          message: `Failed to read tasks file for validation: ${errorMessage}`
+          message: `Failed to read markdown file for validation: ${errorMessage}`
         };
+      }
+
+      const mdxValidation = await validateMarkdownForMdx(markdownContent);
+      if (!mdxValidation.valid) {
+        await approvalStorage.stop();
+        const formattedIssues = formatMdxValidationIssues(mdxValidation.issues);
+
+        return {
+          success: false,
+          message: 'Markdown file has MDX compatibility errors that must be fixed before approval',
+          data: {
+            errorCount: mdxValidation.issues.length,
+            summary: {
+              totalIssues: mdxValidation.issues.length,
+              rules: [...new Set(mdxValidation.issues.map(issue => issue.ruleId))]
+            }
+          },
+          nextSteps: [
+            'Fix MDX compatibility issues listed below',
+            'For literal comparisons (for example "<5%"), use "&lt;5%" or inline code (`<5%`)',
+            'Re-request approval after fixing',
+            ...formattedIssues
+          ]
+        };
+      }
+    }
+
+    // Validate tasks.md format before allowing approval request
+    if (args.filePath.endsWith('tasks.md')) {
+      const content = markdownContent ?? await readFile(join(validatedProjectPath, args.filePath), 'utf-8');
+      const validationResult = validateTasksMarkdown(content);
+
+      if (!validationResult.valid) {
+        await approvalStorage.stop();
+
+        const errorMessages = formatValidationErrors(validationResult);
+
+        return {
+          success: false,
+          message: 'Tasks document has format errors that must be fixed before approval',
+          data: {
+            errorCount: validationResult.errors.length,
+            warningCount: validationResult.warnings.length,
+            summary: validationResult.summary
+          },
+          nextSteps: [
+            'Fix the format errors listed below',
+            'Ensure each task has: checkbox (- [ ]), numeric ID (1.1), description',
+            'Ensure metadata uses underscores: _Requirements: ..._',
+            'Ensure _Prompt ends with underscore',
+            'Re-request approval after fixing',
+            ...errorMessages
+          ]
+        };
+      }
+
+      // If there are warnings, include them but allow approval to proceed
+      if (validationResult.warnings.length > 0) {
+        // Warnings don't block approval, but will be included in the response
+        // This allows the user to see potential issues while still proceeding
       }
     }
 
