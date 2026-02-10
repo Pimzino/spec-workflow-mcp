@@ -57,6 +57,13 @@
       "leverage": "Nutzen",
       "blockedReason": "Blockiert"
     },
+    "blockedReason": {
+      "title": "Blockierungsgrund",
+      "description": "Optional einen Grund angeben, warum diese Aufgabe blockiert ist.",
+      "placeholder": "z.B. Warten auf API-Team...",
+      "submit": "Als blockiert setzen",
+      "skip": "Überspringen"
+    },
     "loading": "Aufgaben werden geladen...",
     "noSpecs": "Keine Spezifikationen gefunden",
     "selectSpec": "Wählen Sie oben eine Spezifikation aus um Aufgaben anzuzeigen"
@@ -108,7 +115,6 @@
     }
   },
   "common": {
-    "dismiss": "Schließen",
     "scrollToTop": "Nach oben scrollen"
   },
   "specs": {
@@ -182,9 +188,6 @@
       "dataFlow": "Datenfluss:",
       "exported": "(exportiert)"
     }
-  },
-  "common": {
-    "scrollToTop": "Nach oben scrollen"
   },
   "commentModal": {
     "title": {

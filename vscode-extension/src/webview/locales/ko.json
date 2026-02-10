@@ -57,6 +57,13 @@
       "leverage": "활용",
       "blockedReason": "차단됨"
     },
+    "blockedReason": {
+      "title": "차단 사유",
+      "description": "이 작업이 차단된 이유를 선택적으로 제공하세요.",
+      "placeholder": "예: API 팀 대기 중...",
+      "submit": "차단 설정",
+      "skip": "건너뛰기"
+    },
     "loading": "태스크 로딩 중...",
     "noSpecs": "명세서를 찾을 수 없음",
     "selectSpec": "태스크를 보려면 위에서 명세서를 선택하세요"
@@ -108,8 +115,7 @@
     }
   },
   "common": {
-    "dismiss": "닫기",
-    "scrollToTop": "맨 위로"
+    "scrollToTop": "맨 위로 스크롤"
   },
   "specs": {
     "active": "활성",
@@ -182,9 +188,6 @@
       "dataFlow": "데이터 흐름:",
       "exported": "(내보내짐)"
     }
-  },
-  "common": {
-    "scrollToTop": "맨 위로 스크롤"
   },
   "commentModal": {
     "title": {

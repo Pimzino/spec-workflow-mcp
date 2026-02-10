@@ -79,6 +79,9 @@ function App() {
   const [lastBatchOperation, setLastBatchOperation] = useState<{ ids: string[]; action: string } | null>(null);
   const [showUndoToast, setShowUndoToast] = useState<boolean>(false);
   const undoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [blockedReasonModalOpen, setBlockedReasonModalOpen] = useState<boolean>(false);
+  const [blockedReasonTaskId, setBlockedReasonTaskId] = useState<string | null>(null);
+  const [blockedReasonText, setBlockedReasonText] = useState<string>('');
   const [copiedSteering, setCopiedSteering] = useState<boolean>(false);
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set());
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -692,9 +695,31 @@ Review the existing steering documents (if any) and help me improve or complete 
 
 
   const handleTaskStatusUpdate = (taskId: string, status: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
-    if (selectedSpec) {
-      vscodeApi.updateTaskStatus(selectedSpec, taskId, status);
+    if (!selectedSpec) return;
+
+    if (status === 'blocked') {
+      setBlockedReasonTaskId(taskId);
+      setBlockedReasonText('');
+      setBlockedReasonModalOpen(true);
+      return;
     }
+
+    vscodeApi.updateTaskStatus(selectedSpec, taskId, status);
+  };
+
+  const submitBlockedReason = () => {
+    if (selectedSpec && blockedReasonTaskId) {
+      vscodeApi.updateTaskStatus(selectedSpec, blockedReasonTaskId, 'blocked', blockedReasonText || undefined);
+    }
+    setBlockedReasonModalOpen(false);
+    setBlockedReasonTaskId(null);
+    setBlockedReasonText('');
+  };
+
+  const cancelBlockedReason = () => {
+    setBlockedReasonModalOpen(false);
+    setBlockedReasonTaskId(null);
+    setBlockedReasonText('');
   };
 
   // Calculate overall project statistics
@@ -1113,8 +1138,8 @@ Review the existing steering documents (if any) and help me improve or complete 
                                   <SelectContent>
                                     <SelectItem value="pending">{t('tasks.status.pending')}</SelectItem>
                                     <SelectItem value="in-progress">{t('tasks.status.inProgress')}</SelectItem>
-                                    <SelectItem value="blocked">{t('tasks.status.blocked')}</SelectItem>
                                     <SelectItem value="completed">{t('tasks.status.completed')}</SelectItem>
+                                    <SelectItem value="blocked">{t('tasks.status.blocked')}</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </>
@@ -1135,6 +1160,16 @@ Review the existing steering documents (if any) and help me improve or complete 
                               ? "text-slate-600 dark:text-slate-300" 
                               : "text-muted-foreground"
                           )}>{task.description}</p>
+
+                          {/* Blocked Reason */}
+                          {task.status === 'blocked' && task.blockedReason && (
+                            <div className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                              <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                              </svg>
+                              <span>{task.blockedReason}</span>
+                            </div>
+                          )}
 
                           {/* Task Metadata */}
                           <div className="space-y-2 border-t border-gray-100 dark:border-gray-700 pt-2">
@@ -1898,6 +1933,54 @@ Review the existing steering documents (if any) and help me improve or complete 
                 >
                   <Trash2 className="w-3.5 h-3.5 mr-1" />
                   {t('approvals.batch.confirmReject')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Blocked Reason Modal */}
+        {blockedReasonModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={cancelBlockedReason}
+            />
+            <div className="relative bg-background border rounded-lg shadow-lg p-4 w-[90%] max-w-md mx-4">
+              <h3 className="text-sm font-semibold mb-3">
+                {t('tasks.blockedReason.title', 'Blocked Reason')}
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                {t('tasks.blockedReason.description', 'Optionally provide a reason why this task is blocked.')}
+              </p>
+              <input
+                type="text"
+                className="w-full p-2 text-sm border rounded bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder={t('tasks.blockedReason.placeholder', 'e.g. Waiting on API team...')}
+                value={blockedReasonText}
+                onChange={(e) => setBlockedReasonText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') submitBlockedReason();
+                  if (e.key === 'Escape') cancelBlockedReason();
+                }}
+                autoFocus
+              />
+              <div className="flex justify-end gap-2 mt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setBlockedReasonText('');
+                    submitBlockedReason();
+                  }}
+                >
+                  {t('tasks.blockedReason.skip', 'Skip')}
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={submitBlockedReason}
+                >
+                  {t('tasks.blockedReason.submit', 'Set Blocked')}
                 </Button>
               </div>
             </div>

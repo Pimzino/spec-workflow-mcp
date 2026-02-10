@@ -45,7 +45,8 @@
     "status": {
       "pending": "Ausstehend",
       "inProgress": "In Arbeit",
-      "completed": "Abgeschlossen"
+      "completed": "Abgeschlossen",
+      "blocked": "Blockiert"
     },
     "taskGroup": "Aufgabengruppe",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "Implementierung",
       "purposes": "Zwecke",
       "requirements": "Anforderungen",
-      "leverage": "Nutzen"
+      "leverage": "Nutzen",
+      "blockedReason": "Blockiert"
+    },
+    "blockedReason": {
+      "title": "Blockierungsgrund",
+      "description": "Optional einen Grund angeben, warum diese Aufgabe blockiert ist.",
+      "placeholder": "z.B. Warten auf API-Team...",
+      "submit": "Als blockiert setzen",
+      "skip": "Überspringen"
     },
     "loading": "Aufgaben werden geladen...",
     "noSpecs": "Keine Spezifikationen gefunden",
@@ -106,7 +115,6 @@
     }
   },
   "common": {
-    "dismiss": "Schließen",
     "scrollToTop": "Nach oben scrollen"
   },
   "specs": {
@@ -180,9 +188,6 @@
       "dataFlow": "Datenfluss:",
       "exported": "(exportiert)"
     }
-  },
-  "common": {
-    "scrollToTop": "Nach oben scrollen"
   },
   "commentModal": {
     "title": {

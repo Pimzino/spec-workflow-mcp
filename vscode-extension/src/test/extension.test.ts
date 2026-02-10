@@ -217,6 +217,175 @@ suite('Extension Test Suite', () => {
 		});
 	});
 
+	suite('Blocked Task Status Tests', () => {
+		// Import the parser functions inline to avoid module issues in VS Code test runner
+		function parseTasksFromMarkdown(content: string): any {
+			const lines = content.split('\n');
+			const tasks: any[] = [];
+
+			const checkboxIndices: number[] = [];
+			for (let i = 0; i < lines.length; i++) {
+				if (lines[i].match(/^\s*[-*]\s+\[([ x\-~])\]/)) {
+					checkboxIndices.push(i);
+				}
+			}
+
+			for (let idx = 0; idx < checkboxIndices.length; idx++) {
+				const lineNumber = checkboxIndices[idx];
+				const endLine = idx < checkboxIndices.length - 1 ? checkboxIndices[idx + 1] : lines.length;
+				const line = lines[lineNumber];
+				const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
+				if (!checkboxMatch) continue;
+
+				const statusChar = checkboxMatch[3];
+				const taskText = checkboxMatch[4];
+
+				let status: string;
+				if (statusChar === 'x') status = 'completed';
+				else if (statusChar === '-') status = 'in-progress';
+				else if (statusChar === '~') status = 'blocked';
+				else status = 'pending';
+
+				const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
+				if (!taskMatch) continue;
+
+				let blockedReason: string | undefined;
+				for (let lineIdx = lineNumber + 1; lineIdx < endLine; lineIdx++) {
+					const contentLine = lines[lineIdx].trim();
+					if (contentLine.includes('_Blocked:')) {
+						const blockedMatch = contentLine.match(/_Blocked:\s*([^_]+?)_/);
+						if (blockedMatch) blockedReason = blockedMatch[1].trim();
+					}
+				}
+
+				tasks.push({
+					id: taskMatch[1],
+					description: taskMatch[2],
+					status,
+					blocked: status === 'blocked',
+					completed: status === 'completed',
+					inProgress: status === 'in-progress',
+					blockedReason
+				});
+			}
+
+			return {
+				tasks,
+				summary: {
+					blocked: tasks.filter((t: any) => t.status === 'blocked').length,
+					pending: tasks.filter((t: any) => t.status === 'pending').length,
+					completed: tasks.filter((t: any) => t.status === 'completed').length,
+					inProgress: tasks.filter((t: any) => t.status === 'in-progress').length,
+					total: tasks.length
+				}
+			};
+		}
+
+		function updateTaskStatus(content: string, taskId: string, newStatus: string, reason?: string): string {
+			const lines = content.split('\n');
+			const statusMarker = newStatus === 'completed' ? 'x' :
+				newStatus === 'in-progress' ? '-' :
+				newStatus === 'blocked' ? '~' : ' ';
+
+			for (let i = 0; i < lines.length; i++) {
+				const checkboxMatch = lines[i].match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
+				if (!checkboxMatch) continue;
+
+				const prefix = checkboxMatch[1];
+				const listMarker = checkboxMatch[2];
+				const taskText = checkboxMatch[4];
+				const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
+
+				if (taskMatch && taskMatch[1] === taskId) {
+					lines[i] = `${prefix}${listMarker} [${statusMarker}] ${taskText}`;
+
+					// Remove existing blocked line
+					let blockedLineIndex = -1;
+					for (let j = i + 1; j < lines.length; j++) {
+						if (lines[j].trim().match(/^[-*]\s+\[([ x\-~])\]/)) break;
+						if (lines[j].trim().match(/_Blocked:\s*[^_]+?_/)) {
+							blockedLineIndex = j;
+							break;
+						}
+					}
+					if (blockedLineIndex !== -1) lines.splice(blockedLineIndex, 1);
+
+					if (newStatus === 'blocked' && reason) {
+						lines.splice(i + 1, 0, `${prefix}  - _Blocked: ${reason}_`);
+					}
+					return lines.join('\n');
+				}
+			}
+			return content;
+		}
+
+		test('should parse [~] as blocked status', () => {
+			const result = parseTasksFromMarkdown('- [~] 1. Blocked task');
+			assert.strictEqual(result.tasks[0].status, 'blocked');
+			assert.strictEqual(result.tasks[0].blocked, true);
+			assert.strictEqual(result.tasks[0].completed, false);
+		});
+
+		test('should parse all four statuses', () => {
+			const content = '- [ ] 1. P\n- [-] 2. IP\n- [x] 3. C\n- [~] 4. B';
+			const result = parseTasksFromMarkdown(content);
+			assert.strictEqual(result.tasks[0].status, 'pending');
+			assert.strictEqual(result.tasks[1].status, 'in-progress');
+			assert.strictEqual(result.tasks[2].status, 'completed');
+			assert.strictEqual(result.tasks[3].status, 'blocked');
+		});
+
+		test('should count blocked in summary', () => {
+			const content = '- [~] 1. B1\n- [~] 2. B2\n- [ ] 3. P';
+			const result = parseTasksFromMarkdown(content);
+			assert.strictEqual(result.summary.blocked, 2);
+			assert.strictEqual(result.summary.pending, 1);
+		});
+
+		test('should parse _Blocked: reason_ metadata', () => {
+			const content = '- [~] 1. Task\n  - _Blocked: Waiting on API team_';
+			const result = parseTasksFromMarkdown(content);
+			assert.strictEqual(result.tasks[0].blockedReason, 'Waiting on API team');
+		});
+
+		test('should leave blockedReason undefined when absent', () => {
+			const result = parseTasksFromMarkdown('- [~] 1. Blocked no reason');
+			assert.strictEqual(result.tasks[0].blockedReason, undefined);
+		});
+
+		test('should update to blocked with [~]', () => {
+			const result = updateTaskStatus('- [ ] 1. Task', '1', 'blocked');
+			assert.ok(result.includes('[~]'), 'Should contain [~] marker');
+		});
+
+		test('should add _Blocked:_ line with reason', () => {
+			const result = updateTaskStatus('- [ ] 1. Task', '1', 'blocked', 'API down');
+			assert.ok(result.includes('_Blocked: API down_'));
+		});
+
+		test('should remove _Blocked:_ when unblocking', () => {
+			const content = '- [~] 1. Task\n  - _Blocked: Old reason_';
+			const result = updateTaskStatus(content, '1', 'pending');
+			assert.ok(result.includes('[ ]'), 'Should contain [ ] marker');
+			assert.ok(!result.includes('_Blocked:'), 'Should not contain _Blocked:');
+		});
+
+		test('should roundtrip blocked status correctly', () => {
+			const original = '- [ ] 1. Task to block';
+			const blocked = updateTaskStatus(original, '1', 'blocked', 'Reason');
+			assert.ok(blocked.includes('[~]'));
+			assert.ok(blocked.includes('_Blocked: Reason_'));
+
+			const parsed = parseTasksFromMarkdown(blocked);
+			assert.strictEqual(parsed.tasks[0].status, 'blocked');
+			assert.strictEqual(parsed.tasks[0].blockedReason, 'Reason');
+
+			const unblocked = updateTaskStatus(blocked, '1', 'pending');
+			assert.ok(unblocked.includes('[ ]'));
+			assert.ok(!unblocked.includes('_Blocked:'));
+		});
+	});
+
 	suite('Batch Operation Undo Logic Tests', () => {
 		// Helper function that simulates the undo tracking logic from App.tsx
 		interface BatchOperationState {

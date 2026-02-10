@@ -57,6 +57,13 @@
       "leverage": "Leverage",
       "blockedReason": "Blocked"
     },
+    "blockedReason": {
+      "title": "Blocked Reason",
+      "description": "Optionally provide a reason why this task is blocked.",
+      "placeholder": "e.g. Waiting on API team...",
+      "submit": "Set Blocked",
+      "skip": "Skip"
+    },
     "loading": "Loading tasks...",
     "noSpecs": "No specifications found",
     "selectSpec": "Select a specification above to view tasks"

@@ -45,7 +45,8 @@
     "status": {
       "pending": "In Attesa",
       "inProgress": "In Corso",
-      "completed": "Completato"
+      "completed": "Completato",
+      "blocked": "Bloccato"
     },
     "taskGroup": "Gruppo Task",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "Implementazione",
       "purposes": "Scopi",
       "requirements": "Requisiti",
-      "leverage": "Sfrutta"
+      "leverage": "Sfrutta",
+      "blockedReason": "Bloccato"
+    },
+    "blockedReason": {
+      "title": "Motivo del blocco",
+      "description": "Facoltativamente fornisci un motivo per cui questa attività è bloccata.",
+      "placeholder": "es. In attesa del team API...",
+      "submit": "Imposta come bloccato",
+      "skip": "Salta"
     },
     "loading": "Caricamento task...",
     "noSpecs": "Nessuna specifica trovata",
@@ -106,8 +115,7 @@
     }
   },
   "common": {
-    "dismiss": "Chiudi",
-    "scrollToTop": "Torna su"
+    "scrollToTop": "Scorri in alto"
   },
   "specs": {
     "active": "Attive",
@@ -180,9 +188,6 @@
       "dataFlow": "Flusso Dati:",
       "exported": "(esportato)"
     }
-  },
-  "common": {
-    "scrollToTop": "Scorri in alto"
   },
   "commentModal": {
     "title": {

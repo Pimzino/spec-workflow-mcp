@@ -42,7 +42,7 @@ export type WebviewMessage =
   | { type: 'get-steering-documents' }
   | { type: 'open-document'; specName: string; docType: string }
   | { type: 'open-steering-document'; docType: string }
-  | { type: 'update-task-status'; specName: string; taskId: string; status: TaskStatus }
+  | { type: 'update-task-status'; specName: string; taskId: string; status: TaskStatus; blockedReason?: string }
   | { type: 'save-document'; specName: string; docType: string; content: string }
   | { type: 'approve-request'; id: string; response: string }
   | { type: 'reject-request'; id: string; response: string }
@@ -127,6 +127,7 @@ export interface TaskInfo {
   prompt?: string;
   promptStructured?: PromptSection[];
   inProgress?: boolean; // For backward compatibility
+  blockedReason?: string;
 }
 export interface ApprovalComment {
   id: string;
@@ -323,8 +324,8 @@ class VsCodeApiService {
     this.postMessage({ type: 'get-tasks', specName });
   }
 
-  updateTaskStatus(specName: string, taskId: string, status: TaskStatus) {
-    this.postMessage({ type: 'update-task-status', specName, taskId, status });
+  updateTaskStatus(specName: string, taskId: string, status: TaskStatus, blockedReason?: string) {
+    this.postMessage({ type: 'update-task-status', specName, taskId, status, blockedReason });
   }
 
   saveDocument(specName: string, docType: string, content: string) {

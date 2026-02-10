@@ -57,6 +57,13 @@
       "leverage": "الاستفادة",
       "blockedReason": "محظور"
     },
+    "blockedReason": {
+      "title": "سبب الحظر",
+      "description": "اختياريًا قدم سببًا لحظر هذه المهمة.",
+      "placeholder": "مثال: في انتظار فريق API...",
+      "submit": "تعيين كمحظور",
+      "skip": "تخطي"
+    },
     "loading": "جاري تحميل المهام...",
     "noSpecs": "لم توجد مواصفات",
     "selectSpec": "اختر مواصفة أعلاه لعرض المهام"
@@ -108,8 +115,7 @@
     }
   },
   "common": {
-    "dismiss": "إغلاق",
-    "scrollToTop": "التمرير إلى الأعلى"
+    "scrollToTop": "التمرير للأعلى"
   },
   "specs": {
     "active": "نشط",
@@ -182,9 +188,6 @@
       "dataFlow": "تدفق البيانات:",
       "exported": "(مُصدّر)"
     }
-  },
-  "common": {
-    "scrollToTop": "التمرير للأعلى"
   },
   "commentModal": {
     "title": {

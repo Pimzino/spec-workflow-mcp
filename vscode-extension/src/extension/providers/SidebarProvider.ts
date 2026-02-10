@@ -101,7 +101,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           await this.sendSteering();
           break;
         case 'update-task-status':
-          await this.updateTaskStatus(message.specName, message.taskId, message.status);
+          await this.updateTaskStatus(message.specName, message.taskId, message.status, message.blockedReason);
           break;
         case 'save-document':
           await this.saveDocument(message.specName, message.docType, message.content);
@@ -444,10 +444,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async updateTaskStatus(specName: string, taskId: string, status: string) {
+  private async updateTaskStatus(specName: string, taskId: string, status: string, blockedReason?: string) {
     try {
       console.log(`updateTaskStatus: Updating task ${taskId} to ${status} in spec ${specName}`);
-      await this._specWorkflowService.updateTaskStatus(specName, taskId, status);
+      await this._specWorkflowService.updateTaskStatus(specName, taskId, status, blockedReason);
       console.log(`updateTaskStatus: Successfully updated task ${taskId}. File watcher will trigger automatic refresh.`);
       // File watcher will automatically trigger sendTasksForSpec() - no need to manually refresh
       this.sendNotification('Task status updated', 'success');

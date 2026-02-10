@@ -226,7 +226,9 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "check-types": "tsc -b",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "test:unit": "vitest run --config vitest.extension.config.ts",
+    "test:unit:watch": "vitest --config vitest.extension.config.ts"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
@@ -247,6 +249,7 @@
     "tw-animate-css": "^1.3.7",
     "typescript": "^5.7.3",
     "vite": "^6.0.3",
+    "vitest": "^4.0.18",
     "vscode-nls-dev": "^4.0.4"
   },
   "dependencies": {

@@ -67,6 +67,25 @@
 			"problemMatcher": ["$tsc", "$eslint-stylish"],
 			"label": "npm: compile",
 			"detail": "Compile extension (one-time build)"
+		},
+		{
+			"type": "npm",
+			"script": "build:webview",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build:webview",
+			"detail": "Build webview with Vite"
+		},
+		{
+			"label": "build:all",
+			"dependsOn": [
+				"npm: build:webview",
+				"npm: compile"
+			],
+			"dependsOrder": "sequence",
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "Build webview and compile extension"
 		}
 	]
 }

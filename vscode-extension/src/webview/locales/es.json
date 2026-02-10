@@ -57,6 +57,13 @@
       "leverage": "Aprovechar",
       "blockedReason": "Bloqueado"
     },
+    "blockedReason": {
+      "title": "Razón de bloqueo",
+      "description": "Opcionalmente proporcione una razón por la que esta tarea está bloqueada.",
+      "placeholder": "ej. Esperando al equipo de API...",
+      "submit": "Establecer bloqueado",
+      "skip": "Omitir"
+    },
     "loading": "Cargando tareas...",
     "noSpecs": "No se encontraron especificaciones",
     "selectSpec": "Selecciona una especificación arriba para ver las tareas"
@@ -108,8 +115,7 @@
     }
   },
   "common": {
-    "dismiss": "Cerrar",
-    "scrollToTop": "Ir arriba"
+    "scrollToTop": "Volver arriba"
   },
   "specs": {
     "active": "Activas",
@@ -182,9 +188,6 @@
       "dataFlow": "Flujo de Datos:",
       "exported": "(exportado)"
     }
-  },
-  "common": {
-    "scrollToTop": "Volver arriba"
   },
   "commentModal": {
     "title": {

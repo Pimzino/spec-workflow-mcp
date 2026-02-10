@@ -45,7 +45,8 @@
     "status": {
       "pending": "保留中",
       "inProgress": "進行中",
-      "completed": "完了"
+      "completed": "完了",
+      "blocked": "ブロック中"
     },
     "taskGroup": "タスクグループ",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "実装",
       "purposes": "目的",
       "requirements": "要件",
-      "leverage": "活用"
+      "leverage": "活用",
+      "blockedReason": "ブロック理由"
+    },
+    "blockedReason": {
+      "title": "ブロック理由",
+      "description": "このタスクがブロックされている理由を任意で入力してください。",
+      "placeholder": "例: APIチームの対応待ち...",
+      "submit": "ブロックに設定",
+      "skip": "スキップ"
     },
     "loading": "タスクを読み込み中...",
     "noSpecs": "仕様書が見つかりません",
@@ -106,8 +115,7 @@
     }
   },
   "common": {
-    "dismiss": "閉じる",
-    "scrollToTop": "トップへ戻る"
+    "scrollToTop": "一番上までスクロール"
   },
   "specs": {
     "active": "アクティブ",
@@ -180,9 +188,6 @@
       "dataFlow": "データフロー:",
       "exported": "(エクスポート済み)"
     }
-  },
-  "common": {
-    "scrollToTop": "一番上までスクロール"
   },
   "commentModal": {
     "title": {
