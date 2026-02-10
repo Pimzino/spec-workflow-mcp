@@ -294,7 +294,7 @@ export function updateTaskStatus(
         let blockedLineIndex = -1;
         for (let j = i + 1; j < lines.length; j++) {
           const nextLine = lines[j].trim();
-          if (nextLine.match(/^[-*]\s+\[([ x\-~])\]/)) break;
+          if (nextLine.match(/^[-*]\s+\[([ x\-~])\]/)) { break; }
           if (nextLine.match(/_Blocked:\s*[^_]+?_/)) {
             blockedLineIndex = j;
             break;
