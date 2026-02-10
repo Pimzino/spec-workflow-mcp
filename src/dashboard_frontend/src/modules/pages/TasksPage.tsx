@@ -4,6 +4,7 @@ import { useWs } from '../ws/WebSocketProvider';
 import { useSearchParams } from 'react-router-dom';
 import { useNotifications } from '../notifications/NotificationProvider';
 import { AlertModal } from '../modals/AlertModal';
+import { TextInputModal } from '../modals/TextInputModal';
 import { useTranslation } from 'react-i18next';
 import { KanbanBoard } from '../components/KanbanBoard';
 import { formatDate } from '../../lib/dateUtils';
@@ -200,12 +201,14 @@ function StatusPill({
   currentStatus: 'pending' | 'in-progress' | 'completed' | 'blocked';
   taskId: string;
   specName: string;
-  onStatusChange?: (newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked') => void;
+  onStatusChange?: (newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked', reason?: string) => void;
   disabled?: boolean;
 }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [blockedReasonOpen, setBlockedReasonOpen] = useState(false);
+  const blockedReasonSubmittedRef = useRef(false);
   const { updateTaskStatus } = useApiActions();
   const { showNotification } = useNotifications();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -266,16 +269,13 @@ function StatusPill({
     };
   }, [isOpen]);
 
-  const handleStatusUpdate = async (newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
-    if (newStatus === currentStatus || disabled || isUpdating) return;
-
+  const doStatusUpdate = async (newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked', reason?: string) => {
     setIsUpdating(true);
-    setIsOpen(false);
 
     try {
-      const result = await updateTaskStatus(specName, taskId, newStatus);
+      const result = await updateTaskStatus(specName, taskId, newStatus, reason);
       if (result.ok) {
-        onStatusChange?.(newStatus);
+        onStatusChange?.(newStatus, reason);
 
         // Show success notification
         const statusLabel = newStatus === 'completed'
@@ -285,9 +285,8 @@ function StatusPill({
             : newStatus === 'blocked'
               ? t('tasksPage.statusPill.blocked')
               : t('tasksPage.statusPill.pending');
-        showNotification(t('tasksPage.notifications.statusUpdated', { taskId, status: statusLabel }), 'success');
+        showNotification(t('tasksPage.notifications.statusUpdated', { taskId, status: statusLabel }), newStatus === 'blocked' ? 'warning' : 'success');
       } else {
-        // Handle error - show error notification
         showNotification(t('tasksPage.notifications.updateFailed', { taskId }), 'error');
         console.error('Failed to update task status');
       }
@@ -297,6 +296,19 @@ function StatusPill({
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  const handleStatusUpdate = async (newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
+    if (newStatus === currentStatus || disabled || isUpdating) return;
+
+    setIsOpen(false);
+
+    if (newStatus === 'blocked') {
+      setBlockedReasonOpen(true);
+      return;
+    }
+
+    await doStatusUpdate(newStatus);
   };
 
   const config = statusConfig[currentStatus];
@@ -376,6 +388,26 @@ function StatusPill({
           ))}
         </div>
       )}
+      <TextInputModal
+        isOpen={blockedReasonOpen}
+        onClose={() => {
+          if (!blockedReasonSubmittedRef.current) {
+            setBlockedReasonOpen(false);
+            doStatusUpdate('blocked');
+          }
+          blockedReasonSubmittedRef.current = false;
+        }}
+        onSubmit={(reason) => {
+          blockedReasonSubmittedRef.current = true;
+          setBlockedReasonOpen(false);
+          doStatusUpdate('blocked', reason || undefined);
+        }}
+        title={t('tasksPage.blockedReason.title')}
+        placeholder={t('tasksPage.blockedReason.placeholder')}
+        submitText={t('tasksPage.blockedReason.submit')}
+        cancelText={t('tasksPage.blockedReason.skip')}
+        required={false}
+      />
     </div>
   );
 }
@@ -468,6 +500,11 @@ function TaskList({ specName }: { specName: string }) {
 
   // View mode state
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+
+  // Blocked reason modal state (for kanban drag-to-blocked)
+  const [kanbanBlockedReasonOpen, setKanbanBlockedReasonOpen] = useState(false);
+  const [pendingBlockedTaskId, setPendingBlockedTaskId] = useState<string | null>(null);
+  const kanbanBlockedSubmittedRef = useRef(false);
 
   // Track pending status updates to prevent race conditions with websocket
   // Using ref instead of state to avoid re-renders and websocket re-subscriptions
@@ -717,6 +754,34 @@ function TaskList({ specName }: { specName: string }) {
     }
   };
 
+  // Complete a kanban blocked-status update with optional reason
+  const completeKanbanBlockedUpdate = (reason?: string) => {
+    if (!pendingBlockedTaskId) return;
+    const taskId = pendingBlockedTaskId;
+    setPendingBlockedTaskId(null);
+
+    pendingStatusUpdatesRef.current.add(taskId);
+    setData((prevData: any) => {
+      if (!prevData) return prevData;
+      const updatedTaskList = prevData.taskList.map((t: any) =>
+        t.id === taskId ? { ...t, status: 'blocked', completed: false, inProgress: false, blockedReason: reason || undefined } : t
+      );
+      return {
+        ...prevData,
+        taskList: updatedTaskList,
+        completed: updatedTaskList.filter((t: any) => t.status === 'completed').length,
+        progress: prevData.total > 0 ? (updatedTaskList.filter((t: any) => t.status === 'completed').length / prevData.total) * 100 : 0,
+        inProgress: prevData.inProgress === taskId ? null : prevData.inProgress
+      };
+    });
+    updateTaskStatus(specName, taskId, 'blocked', reason)
+      .then(() => { pendingStatusUpdatesRef.current.delete(taskId); })
+      .catch(() => {
+        pendingStatusUpdatesRef.current.delete(taskId);
+        getSpecTasksProgress(specName).then(setData);
+      });
+  };
+
   if (loading) {
     return (
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
@@ -957,40 +1022,43 @@ function TaskList({ specName }: { specName: string }) {
               specName={specName}
               statusFilter={statusFilter}
               onTaskStatusChange={(taskId, newStatus) => {
-                // Find the task and trigger the existing status change logic
                 const task = filteredAndSortedTasks.find(t => t.id === taskId);
-                if (task) {
-                  // Mark this task as having a pending update
-                  pendingStatusUpdatesRef.current.add(taskId);
+                if (!task) return;
 
-                  // Optimistically update the task in local data
-                  setData((prevData: any) => {
-                    if (!prevData) return prevData;
-                    const updatedTaskList = prevData.taskList.map((t: any) =>
-                      t.id === taskId ? { ...t, status: newStatus, completed: newStatus === 'completed', inProgress: newStatus === 'in-progress' } : t
-                    );
-                    return {
-                      ...prevData,
-                      taskList: updatedTaskList,
-                      completed: updatedTaskList.filter((t: any) => t.status === 'completed').length,
-                      progress: prevData.total > 0 ? (updatedTaskList.filter((t: any) => t.status === 'completed').length / prevData.total) * 100 : 0,
-                      inProgress: newStatus === 'in-progress' ? taskId : (prevData.inProgress === taskId ? null : prevData.inProgress)
-                    };
-                  });
-
-                  // Call the API to update the task status
-                  updateTaskStatus(specName, taskId, newStatus)
-                    .then(() => {
-                      // Remove from pending updates on success
-                      pendingStatusUpdatesRef.current.delete(taskId);
-                    })
-                    .catch(() => {
-                      // Remove from pending updates on error
-                      pendingStatusUpdatesRef.current.delete(taskId);
-                      // Revert on error - fetch fresh data
-                      getSpecTasksProgress(specName).then(setData);
-                    });
+                // Intercept blocked status to show reason modal
+                if (newStatus === 'blocked') {
+                  setPendingBlockedTaskId(taskId);
+                  setKanbanBlockedReasonOpen(true);
+                  return;
                 }
+
+                // Mark this task as having a pending update
+                pendingStatusUpdatesRef.current.add(taskId);
+
+                // Optimistically update the task in local data
+                setData((prevData: any) => {
+                  if (!prevData) return prevData;
+                  const updatedTaskList = prevData.taskList.map((t: any) =>
+                    t.id === taskId ? { ...t, status: newStatus, completed: newStatus === 'completed', inProgress: newStatus === 'in-progress', blockedReason: undefined } : t
+                  );
+                  return {
+                    ...prevData,
+                    taskList: updatedTaskList,
+                    completed: updatedTaskList.filter((t: any) => t.status === 'completed').length,
+                    progress: prevData.total > 0 ? (updatedTaskList.filter((t: any) => t.status === 'completed').length / prevData.total) * 100 : 0,
+                    inProgress: newStatus === 'in-progress' ? taskId : (prevData.inProgress === taskId ? null : prevData.inProgress)
+                  };
+                });
+
+                // Call the API to update the task status
+                updateTaskStatus(specName, taskId, newStatus)
+                  .then(() => {
+                    pendingStatusUpdatesRef.current.delete(taskId);
+                  })
+                  .catch(() => {
+                    pendingStatusUpdatesRef.current.delete(taskId);
+                    getSpecTasksProgress(specName).then(setData);
+                  });
               }}
               onCopyTaskPrompt={(task) => {
                 copyTaskPrompt(specName, task, () => {
@@ -1095,15 +1163,19 @@ function TaskList({ specName }: { specName: string }) {
                             currentStatus={task.status}
                             taskId={task.id}
                             specName={specName}
-                            onStatusChange={(newStatus) => {
-                              // Mark this task as having a pending update
-                              pendingStatusUpdatesRef.current.add(task.id);
-
+                            onStatusChange={(newStatus, reason) => {
                               // Optimistically update the task in local data
+                              // (StatusPill already called the API via doStatusUpdate)
                               setData((prevData: any) => {
                                 if (!prevData) return prevData;
                                 const updatedTaskList = prevData.taskList.map((t: any) =>
-                                  t.id === task.id ? { ...t, status: newStatus, completed: newStatus === 'completed', inProgress: newStatus === 'in-progress' } : t
+                                  t.id === task.id ? {
+                                    ...t,
+                                    status: newStatus,
+                                    completed: newStatus === 'completed',
+                                    inProgress: newStatus === 'in-progress',
+                                    blockedReason: newStatus === 'blocked' ? reason : undefined
+                                  } : t
                                 );
                                 return {
                                   ...prevData,
@@ -1113,19 +1185,6 @@ function TaskList({ specName }: { specName: string }) {
                                   inProgress: newStatus === 'in-progress' ? task.id : (prevData.inProgress === task.id ? null : prevData.inProgress)
                                 };
                               });
-
-                              // Call the API to update the task status
-                              updateTaskStatus(specName, task.id, newStatus)
-                                .then(() => {
-                                  // Remove from pending updates on success
-                                  pendingStatusUpdatesRef.current.delete(task.id);
-                                })
-                                .catch(() => {
-                                  // Remove from pending updates on error
-                                  pendingStatusUpdatesRef.current.delete(task.id);
-                                  // Revert on error - fetch fresh data
-                                  getSpecTasksProgress(specName).then(setData);
-                                });
                             }}
                           />
                         )}
@@ -1137,6 +1196,16 @@ function TaskList({ specName }: { specName: string }) {
                     }`}>
                       {task.description}
                     </p>
+
+                    {/* Blocked reason */}
+                    {task.blockedReason && (
+                      <div className="mt-2 text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
+                        <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                        <span>{task.blockedReason}</span>
+                      </div>
+                    )}
 
                     {/* File paths */}
                     {task.files && task.files.length > 0 && (
@@ -1233,6 +1302,28 @@ function TaskList({ specName }: { specName: string }) {
           </div>
         )}
       </div>
+
+      {/* Blocked Reason Modal (for kanban drag-to-blocked) */}
+      <TextInputModal
+        isOpen={kanbanBlockedReasonOpen}
+        onClose={() => {
+          if (!kanbanBlockedSubmittedRef.current) {
+            setKanbanBlockedReasonOpen(false);
+            completeKanbanBlockedUpdate();
+          }
+          kanbanBlockedSubmittedRef.current = false;
+        }}
+        onSubmit={(reason) => {
+          kanbanBlockedSubmittedRef.current = true;
+          setKanbanBlockedReasonOpen(false);
+          completeKanbanBlockedUpdate(reason || undefined);
+        }}
+        title={t('tasksPage.blockedReason.title')}
+        placeholder={t('tasksPage.blockedReason.placeholder')}
+        submitText={t('tasksPage.blockedReason.submit')}
+        cancelText={t('tasksPage.blockedReason.skip')}
+        required={false}
+      />
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-40">

@@ -202,6 +202,12 @@
       "progress": "Progrès",
       "progressDesc": "Terminé"
     },
+    "blockedReason": {
+      "title": "Pourquoi cette tâche est-elle bloquée ?",
+      "placeholder": "Ex., En attente de l'équipe API pour finaliser le schéma...",
+      "submit": "Ajouter une raison",
+      "skip": "Passer"
+    },
     "kanban": {
       "noBlockedTasks": "Aucune tâche bloquée"
     }

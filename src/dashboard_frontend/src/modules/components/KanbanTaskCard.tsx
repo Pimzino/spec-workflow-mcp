@@ -12,6 +12,7 @@ interface Task {
   requirements?: string[];
   leverage?: string;
   prompt?: string;
+  blockedReason?: string;
 }
 
 interface KanbanTaskCardProps {
@@ -169,6 +170,16 @@ export function KanbanTaskCard({
       <p className="text-xs sm:text-sm mb-2 line-clamp-3 leading-relaxed text-[var(--text-secondary)]">
         {task.description}
       </p>
+
+      {/* Blocked Reason */}
+      {task.blockedReason && (
+        <div className="flex items-center gap-1 text-xs text-red-500 dark:text-red-400 mb-2">
+          <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+          </svg>
+          <span className="truncate">{task.blockedReason}</span>
+        </div>
+      )}
 
       {/* Task Metadata */}
       <div className="space-y-1">

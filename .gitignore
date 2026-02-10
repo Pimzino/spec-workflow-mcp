@@ -128,6 +128,10 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# Playwright test output
+playwright-report/
+test-results/
+
 # yarn v2
 .yarn/cache
 .yarn/unplugged

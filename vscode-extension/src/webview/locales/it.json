@@ -54,7 +54,8 @@
       "implementation": "Implementazione",
       "purposes": "Scopi",
       "requirements": "Requisiti",
-      "leverage": "Sfrutta"
+      "leverage": "Sfrutta",
+      "blockedReason": "Bloccato"
     },
     "loading": "Caricamento task...",
     "noSpecs": "Nessuna specifica trovata",

@@ -54,7 +54,8 @@
       "implementation": "Реализация",
       "purposes": "Цели",
       "requirements": "Требования",
-      "leverage": "Использовать"
+      "leverage": "Использовать",
+      "blockedReason": "Заблокировано"
     },
     "loading": "Загрузка задач...",
     "noSpecs": "Спецификации не найдены",

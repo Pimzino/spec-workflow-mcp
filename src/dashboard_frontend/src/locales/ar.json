@@ -202,6 +202,12 @@
       "progress": "التقدم",
       "progressDesc": "مكتمل"
     },
+    "blockedReason": {
+      "title": "لماذا هذه المهمة محظورة؟",
+      "placeholder": "مثال: في انتظار فريق API لإنهاء المخطط...",
+      "submit": "إضافة سبب",
+      "skip": "تخطي"
+    },
     "kanban": {
       "noBlockedTasks": "لا توجد مهام محظورة"
     }

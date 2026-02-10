@@ -202,6 +202,12 @@
       "progress": "进度",
       "progressDesc": "完成度"
     },
+    "blockedReason": {
+      "title": "这个任务为什么被阻塞？",
+      "placeholder": "例如：等待API团队确定架构...",
+      "submit": "添加原因",
+      "skip": "跳过"
+    },
     "kanban": {
       "noBlockedTasks": "没有被阻塞的任务"
     }

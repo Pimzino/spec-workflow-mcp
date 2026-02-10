@@ -54,7 +54,8 @@
       "implementation": "التنفيذ",
       "purposes": "الأغراض",
       "requirements": "المتطلبات",
-      "leverage": "الاستفادة"
+      "leverage": "الاستفادة",
+      "blockedReason": "محظور"
     },
     "loading": "جاري تحميل المهام...",
     "noSpecs": "لم توجد مواصفات",

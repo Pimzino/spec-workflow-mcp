@@ -146,6 +146,32 @@ export function validateTasksMarkdown(content: string): ValidationResult {
         }
       }
 
+      // Check for _Blocked:_ format
+      if (trimmedLine.includes('Blocked:') && !trimmedLine.includes('_Prompt:')) {
+        // Accept _Blocked: text_ as valid metadata
+        if (trimmedLine.includes('_Blocked:')) {
+          if (!trimmedLine.match(/_Blocked:\s*[^_]+_/)) {
+            warnings.push({
+              line: lineIdx + 1,
+              taskId,
+              field: 'blocked',
+              message: 'Blocked field missing closing underscore delimiter',
+              suggestion: 'Use "_Blocked: reason_" format for proper parsing',
+              severity: 'warning'
+            });
+          }
+        } else if (trimmedLine.match(/Blocked:\s*\S/)) {
+          warnings.push({
+            line: lineIdx + 1,
+            taskId,
+            field: 'blocked',
+            message: 'Blocked field missing underscore delimiters',
+            suggestion: 'Use "_Blocked: reason_" format for proper parsing',
+            severity: 'warning'
+          });
+        }
+      }
+
       // Check for _Leverage:_ format
       if (trimmedLine.includes('Leverage:')) {
         hasLeverage = true;

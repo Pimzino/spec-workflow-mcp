@@ -49,7 +49,8 @@
       "implementation": "实施",
       "purposes": "目的",
       "requirements": "需求",
-      "leverage": "利用"
+      "leverage": "利用",
+      "blockedReason": "阻塞原因"
     },
     "loading": "正在加载任务...",
     "noSpecs": "未找到规范",

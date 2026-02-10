@@ -18,6 +18,7 @@ export interface ParsedTask {
   purposes?: string[];                 // Purpose statements
   implementationDetails?: string[];    // Implementation bullet points
   prompt?: string;                     // AI prompt for this task
+  blockedReason?: string;              // Reason the task is blocked (from _Blocked: reason_)
 
   // For backward compatibility
   completed: boolean;                  // true if status === 'completed'
@@ -107,7 +108,8 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     const purposes: string[] = [];
     const implementationDetails: string[] = [];
     let prompt: string | undefined;
-    
+    let blockedReason: string | undefined;
+
     for (let lineIdx = lineNumber + 1; lineIdx < endLine; lineIdx++) {
       const contentLine = lines[lineIdx].trim();
       
@@ -166,6 +168,11 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
           const levText = levMatch[1].trim();
           leverage.push(...levText.split(',').map(l => l.trim()).filter(l => l));
         }
+      } else if (contentLine.includes('_Blocked:') && !contentLine.includes('_Prompt:')) {
+        const blockedMatch = contentLine.match(/_Blocked:\s*([^_]+?)_/);
+        if (blockedMatch) {
+          blockedReason = blockedMatch[1].trim();
+        }
       } else if (contentLine.match(/Files?:/)) {
         const fileMatch = contentLine.match(/Files?:\s*(.+)$/);
         if (fileMatch) {
@@ -212,9 +219,10 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
       ...(files.length > 0 && { files }),
       ...(purposes.length > 0 && { purposes }),
       ...(implementationDetails.length > 0 && { implementationDetails }),
-      ...(prompt && { prompt })
+      ...(prompt && { prompt }),
+      ...(blockedReason && { blockedReason })
     };
-    
+
     tasks.push(task);
     
     // Track first in-progress task (for UI highlighting)
@@ -246,16 +254,17 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
  * Handles any indentation level and task numbering format
  */
 export function updateTaskStatus(
-  content: string, 
-  taskId: string, 
-  newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked'
+  content: string,
+  taskId: string,
+  newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked',
+  reason?: string
 ): string {
   const lines = content.split('\n');
   const statusMarker = newStatus === 'completed' ? 'x' :
                        newStatus === 'in-progress' ? '-' :
                        newStatus === 'blocked' ? '~' :
                        ' ';
-  
+
   // Find and update the task line
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -267,22 +276,46 @@ export function updateTaskStatus(
     if (checkboxMatch) {
       const prefix = checkboxMatch[1];
       const listMarker = checkboxMatch[2]; // Preserve original list marker
+      const oldStatusChar = checkboxMatch[3];
       const taskText = checkboxMatch[4];
 
       // Check if this line contains our target task ID
-      // Match patterns like "1. Description", "1.1 Description", "2.1. Description" etc
-      // Also handles escaped periods from MDXEditor: "1\. Description"
       const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
 
       if (taskMatch && taskMatch[1] === taskId) {
         // Reconstruct the line with new status, preserving the original list marker
         const statusPart = `${listMarker} [${statusMarker}] `;
         lines[i] = prefix + statusPart + taskText;
+
+        const wasBlocked = oldStatusChar === '~';
+        const isNowBlocked = newStatus === 'blocked';
+
+        // Find and remove any existing _Blocked:_ line after this task
+        let blockedLineIndex = -1;
+        for (let j = i + 1; j < lines.length; j++) {
+          const nextLine = lines[j].trim();
+          if (nextLine.match(/^[-*]\s+\[([ x\-~])\]/)) break;
+          if (nextLine.match(/_Blocked:\s*[^_]+?_/)) {
+            blockedLineIndex = j;
+            break;
+          }
+        }
+
+        if (blockedLineIndex !== -1) {
+          lines.splice(blockedLineIndex, 1);
+        }
+
+        if (isNowBlocked && reason) {
+          const indent = prefix + '  ';
+          const blockedLine = `${indent}- _Blocked: ${reason}_`;
+          lines.splice(i + 1, 0, blockedLine);
+        }
+
         return lines.join('\n');
       }
     }
   }
-  
+
   // Task not found
   return content;
 }

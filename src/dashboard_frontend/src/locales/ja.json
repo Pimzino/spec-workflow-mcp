@@ -202,6 +202,12 @@
       "progress": "進捗",
       "progressDesc": "完了率"
     },
+    "blockedReason": {
+      "title": "このタスクがブロックされている理由は？",
+      "placeholder": "例：APIチームがスキーマを確定するのを待っています...",
+      "submit": "理由を追加",
+      "skip": "スキップ"
+    },
     "kanban": {
       "noBlockedTasks": "ブロックされたタスクはありません"
     }

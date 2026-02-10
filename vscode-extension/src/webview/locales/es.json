@@ -54,7 +54,8 @@
       "implementation": "Implementación",
       "purposes": "Propósitos",
       "requirements": "Requisitos",
-      "leverage": "Aprovechar"
+      "leverage": "Aprovechar",
+      "blockedReason": "Bloqueado"
     },
     "loading": "Cargando tareas...",
     "noSpecs": "No se encontraron especificaciones",

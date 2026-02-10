@@ -54,7 +54,8 @@
       "implementation": "実装",
       "purposes": "目的",
       "requirements": "要件",
-      "leverage": "活用"
+      "leverage": "活用",
+      "blockedReason": "ブロック理由"
     },
     "loading": "タスクを読み込み中...",
     "noSpecs": "仕様書が見つかりません",

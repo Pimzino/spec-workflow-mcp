@@ -1054,7 +1054,7 @@ export class MultiProjectDashboardServer {
     // Update task status
     this.app.put('/api/projects/:projectId/specs/:name/tasks/:taskId/status', async (request, reply) => {
       const { projectId, name, taskId } = request.params as { projectId: string; name: string; taskId: string };
-      const { status } = request.body as { status: 'pending' | 'in-progress' | 'completed' | 'blocked' };
+      const { status, reason } = request.body as { status: 'pending' | 'in-progress' | 'completed' | 'blocked'; reason?: string };
       const project = this.projectManager.getProject(projectId);
 
       if (!project) {
@@ -1085,7 +1085,7 @@ export class MultiProjectDashboardServer {
           return reply.code(404).send({ error: `Task ${taskId} not found` });
         }
 
-        if (task.status === status) {
+        if (task.status === status && !(status === 'blocked' && reason && reason !== task.blockedReason)) {
           return {
             success: true,
             message: `Task ${taskId} already has status ${status}`,
@@ -1094,7 +1094,7 @@ export class MultiProjectDashboardServer {
         }
 
         const { updateTaskStatus } = await import('../core/task-parser.js');
-        const updatedContent = updateTaskStatus(tasksContent, taskId, status);
+        const updatedContent = updateTaskStatus(tasksContent, taskId, status, reason);
 
         if (updatedContent === tasksContent) {
           return reply.code(500).send({ error: `Failed to update task ${taskId} in markdown content` });

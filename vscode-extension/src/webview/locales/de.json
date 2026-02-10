@@ -54,7 +54,8 @@
       "implementation": "Implementierung",
       "purposes": "Zwecke",
       "requirements": "Anforderungen",
-      "leverage": "Nutzen"
+      "leverage": "Nutzen",
+      "blockedReason": "Blockiert"
     },
     "loading": "Aufgaben werden geladen...",
     "noSpecs": "Keine Spezifikationen gefunden",

@@ -29,6 +29,7 @@ interface Task {
   requirements?: string[];
   leverage?: string;
   prompt?: string;
+  blockedReason?: string;
 }
 
 interface KanbanBoardProps {

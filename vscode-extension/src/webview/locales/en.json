@@ -54,7 +54,8 @@
       "implementation": "Implementation",
       "purposes": "Purposes",
       "requirements": "Requirements",
-      "leverage": "Leverage"
+      "leverage": "Leverage",
+      "blockedReason": "Blocked"
     },
     "loading": "Loading tasks...",
     "noSpecs": "No specifications found",

@@ -54,7 +54,8 @@
       "implementation": "Implémentation",
       "purposes": "Objectifs",
       "requirements": "Exigences",
-      "leverage": "Utiliser"
+      "leverage": "Utiliser",
+      "blockedReason": "Bloqué"
     },
     "loading": "Chargement des tâches...",
     "noSpecs": "Aucune spécification trouvée",

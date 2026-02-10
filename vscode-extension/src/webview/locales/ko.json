@@ -54,7 +54,8 @@
       "implementation": "구현",
       "purposes": "목적",
       "requirements": "요구사항",
-      "leverage": "활용"
+      "leverage": "활용",
+      "blockedReason": "차단됨"
     },
     "loading": "태스크 로딩 중...",
     "noSpecs": "명세서를 찾을 수 없음",
