@@ -695,7 +695,7 @@ Review the existing steering documents (if any) and help me improve or complete 
 
 
   const handleTaskStatusUpdate = (taskId: string, status: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
-    if (!selectedSpec) return;
+    if (!selectedSpec) {return;}
 
     if (status === 'blocked') {
       setBlockedReasonTaskId(taskId);
@@ -1959,8 +1959,8 @@ Review the existing steering documents (if any) and help me improve or complete 
                 value={blockedReasonText}
                 onChange={(e) => setBlockedReasonText(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') submitBlockedReason();
-                  if (e.key === 'Escape') cancelBlockedReason();
+                  if (e.key === 'Enter') {submitBlockedReason();}
+                  if (e.key === 'Escape') {cancelBlockedReason();}
                 }}
                 autoFocus
               />

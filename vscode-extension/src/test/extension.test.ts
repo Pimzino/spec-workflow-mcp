@@ -235,26 +235,26 @@ suite('Extension Test Suite', () => {
 				const endLine = idx < checkboxIndices.length - 1 ? checkboxIndices[idx + 1] : lines.length;
 				const line = lines[lineNumber];
 				const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
-				if (!checkboxMatch) continue;
+				if (!checkboxMatch) {continue;}
 
 				const statusChar = checkboxMatch[3];
 				const taskText = checkboxMatch[4];
 
 				let status: string;
-				if (statusChar === 'x') status = 'completed';
-				else if (statusChar === '-') status = 'in-progress';
-				else if (statusChar === '~') status = 'blocked';
-				else status = 'pending';
+				if (statusChar === 'x') {status = 'completed';}
+				else if (statusChar === '-') {status = 'in-progress';}
+				else if (statusChar === '~') {status = 'blocked';}
+				else {status = 'pending';}
 
 				const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
-				if (!taskMatch) continue;
+				if (!taskMatch) {continue;}
 
 				let blockedReason: string | undefined;
 				for (let lineIdx = lineNumber + 1; lineIdx < endLine; lineIdx++) {
 					const contentLine = lines[lineIdx].trim();
 					if (contentLine.includes('_Blocked:')) {
 						const blockedMatch = contentLine.match(/_Blocked:\s*([^_]+?)_/);
-						if (blockedMatch) blockedReason = blockedMatch[1].trim();
+						if (blockedMatch) {blockedReason = blockedMatch[1].trim();}
 					}
 				}
 
@@ -289,7 +289,7 @@ suite('Extension Test Suite', () => {
 
 			for (let i = 0; i < lines.length; i++) {
 				const checkboxMatch = lines[i].match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
-				if (!checkboxMatch) continue;
+				if (!checkboxMatch) {continue;}
 
 				const prefix = checkboxMatch[1];
 				const listMarker = checkboxMatch[2];
@@ -302,13 +302,13 @@ suite('Extension Test Suite', () => {
 					// Remove existing blocked line
 					let blockedLineIndex = -1;
 					for (let j = i + 1; j < lines.length; j++) {
-						if (lines[j].trim().match(/^[-*]\s+\[([ x\-~])\]/)) break;
+						if (lines[j].trim().match(/^[-*]\s+\[([ x\-~])\]/)) {break;}
 						if (lines[j].trim().match(/_Blocked:\s*[^_]+?_/)) {
 							blockedLineIndex = j;
 							break;
 						}
 					}
-					if (blockedLineIndex !== -1) lines.splice(blockedLineIndex, 1);
+					if (blockedLineIndex !== -1) {lines.splice(blockedLineIndex, 1);}
 
 					if (newStatus === 'blocked' && reason) {
 						lines.splice(i + 1, 0, `${prefix}  - _Blocked: ${reason}_`);
