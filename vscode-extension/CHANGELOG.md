@@ -4,6 +4,17 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.7] - 2026-01-28
+
+### Added
+- **Configurable Workflow Root** (Issue #193) - Support for custom `.spec-workflow` folder location:
+  - New VSCode setting `specWorkflow.workflowRoot` for specifying custom path
+  - **Workflow Location** card in Overview tab with current path display
+  - **Browse** button to select folder via native file picker
+  - **Reset** button to restore default workspace root behavior
+  - Ideal for multi-root workspaces where `.spec-workflow` needs to be at a higher directory level
+  - Full i18n support for all 11 locales
+
 ## [1.1.6] - 2026-01-24
 
 ### Added

@@ -11,9 +11,15 @@ export interface ProjectInstance {
 
 export interface ProjectRegistryEntry {
   projectId: string;
-  projectPath: string;
+  projectPath: string;       // Workspace path (identity)
+  workflowRootPath: string;  // Path where .spec-workflow is stored (shared root)
   projectName: string;
   instances: ProjectInstance[];
+}
+
+export interface RegisterProjectOptions {
+  workflowRootPath?: string;
+  projectName?: string;
 }
 
 /**
@@ -24,6 +30,22 @@ export function generateProjectId(absolutePath: string): string {
   const hash = createHash('sha1').update(absolutePath).digest('base64url');
   // Take first 16 characters for readability
   return hash.substring(0, 16);
+}
+
+/**
+ * Build display name for a workspace.
+ * - Main repo: "repo"
+ * - Worktree: "repo · worktree"
+ */
+export function generateProjectDisplayName(workspacePath: string, workflowRootPath: string): string {
+  const workspaceName = basename(workspacePath);
+  const repoName = basename(workflowRootPath);
+
+  if (workspacePath === workflowRootPath) {
+    return repoName;
+  }
+
+  return `${repoName} · ${workspaceName}`;
 }
 
 export class ProjectRegistry {
@@ -64,26 +86,36 @@ export class ProjectRegistry {
   private async readRegistry(): Promise<Map<string, ProjectRegistryEntry>> {
     await this.ensureRegistryDir();
 
-    let fileWasEmpty = false;
     try {
       const content = await fs.readFile(this.registryPath, 'utf-8');
       // Handle empty or whitespace-only files
       const trimmedContent = content.trim();
       if (!trimmedContent) {
         console.error(`[ProjectRegistry] Warning: ${this.registryPath} is empty, initializing with empty registry`);
-        fileWasEmpty = true;
         // Mark that we need to write the file
         this.needsInitialization = true;
         return new Map();
       }
       const data = JSON.parse(trimmedContent) as Record<string, ProjectRegistryEntry>;
-      // Ensure backward compatibility: add default empty instances array if missing (older format)
-      for (const entry of Object.values(data)) {
-        if (!Array.isArray(entry.instances)) {
-          entry.instances = [];
-        }
+      const registry = new Map<string, ProjectRegistryEntry>();
+
+      // Ensure backward compatibility with older formats:
+      // - instances may be missing
+      // - workflowRootPath may be missing
+      for (const [projectId, entry] of Object.entries(data)) {
+        const normalizedProjectPath = resolve(entry.projectPath);
+        const normalizedWorkflowRootPath = resolve(entry.workflowRootPath || entry.projectPath);
+
+        registry.set(projectId, {
+          ...entry,
+          projectPath: normalizedProjectPath,
+          workflowRootPath: normalizedWorkflowRootPath,
+          projectName: entry.projectName || generateProjectDisplayName(normalizedProjectPath, normalizedWorkflowRootPath),
+          instances: Array.isArray(entry.instances) ? entry.instances : []
+        });
       }
-      return new Map(Object.entries(data));
+
+      return registry;
     } catch (error: any) {
       if (error.code === 'ENOENT') {
         // File doesn't exist yet, return empty map
@@ -152,12 +184,13 @@ export class ProjectRegistry {
    * Self-healing: If a project exists with dead PIDs, cleans them up and adds new PID
    * Multi-instance: Allows unlimited MCP server instances per project
    */
-  async registerProject(projectPath: string, pid: number): Promise<string> {
+  async registerProject(projectPath: string, pid: number, options: RegisterProjectOptions = {}): Promise<string> {
     const registry = await this.readRegistry();
 
-    const absolutePath = resolve(projectPath);
-    const projectId = generateProjectId(absolutePath);
-    const projectName = basename(absolutePath);
+    const workspacePath = resolve(projectPath);
+    const workflowRootPath = resolve(options.workflowRootPath || projectPath);
+    const projectId = generateProjectId(workspacePath);
+    const projectName = options.projectName || generateProjectDisplayName(workspacePath, workflowRootPath);
 
     const existing = registry.get(projectId);
 
@@ -171,13 +204,17 @@ export class ProjectRegistry {
       }
 
       // Update with live instances (no limit on number of instances)
+      existing.projectPath = workspacePath;
+      existing.workflowRootPath = workflowRootPath;
+      existing.projectName = projectName;
       existing.instances = liveInstances;
       registry.set(projectId, existing);
     } else {
       // New project
       const entry: ProjectRegistryEntry = {
         projectId,
-        projectPath: absolutePath,
+        projectPath: workspacePath,
+        workflowRootPath,
         projectName,
         instances: [{ pid, registeredAt: new Date().toISOString() }]
       };

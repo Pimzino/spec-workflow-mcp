@@ -102,14 +102,21 @@ export interface ApprovalRequest {
 }
 
 export class ApprovalStorage extends EventEmitter {
-  public projectPath: string; // Make public so dashboard server can access it (translated for local access)
-  public originalProjectPath: string; // Original host path for display/registry
+  public projectPath: string; // Workflow root path (.spec-workflow location)
+  public originalProjectPath: string; // Original workflow root path for display/registry
+  public fileResolutionPath: string; // Base path for resolving approval filePath artifacts
   private approvalsDir: string;
   private watcher?: chokidar.FSWatcher;
   private pendingEmit: NodeJS.Timeout | null = null;
   private readonly DEBOUNCE_MS = 500;
 
-  constructor(translatedPath: string, originalPath?: string) {
+  constructor(
+    translatedPath: string,
+    options: {
+      originalPath?: string;
+      fileResolutionPath?: string;
+    } = {}
+  ) {
     super();
 
     // Validate project path
@@ -127,7 +134,10 @@ export class ApprovalStorage extends EventEmitter {
 
     this.projectPath = resolvedPath;
     // Store original path for display/registry (fall back to translated if not provided)
-    this.originalProjectPath = resolve(originalPath ?? translatedPath);
+    this.originalProjectPath = resolve(options.originalPath ?? translatedPath);
+    // Relative approval file paths are resolved against workspace path by default.
+    // Falls back to workflow root path when files only exist in shared .spec-workflow root.
+    this.fileResolutionPath = resolve(options.fileResolutionPath ?? translatedPath);
     this.approvalsDir = PathUtils.getApprovalsPath(resolvedPath);
   }
 
@@ -184,6 +194,50 @@ export class ApprovalStorage extends EventEmitter {
 
     // Clean up EventEmitter listeners
     this.removeAllListeners();
+  }
+
+  /**
+   * Candidate resolution order for relative approval file paths:
+   * 1) Workspace/worktree base (fileResolutionPath)
+   * 2) Shared workflow root (projectPath)
+   */
+  private getFilePathCandidates(filePath: string): string[] {
+    if (isAbsolute(filePath)) {
+      return [filePath];
+    }
+
+    const candidates = [
+      join(this.fileResolutionPath, filePath),
+      join(this.projectPath, filePath)
+    ];
+
+    return Array.from(new Set(candidates));
+  }
+
+  private async resolveExistingFilePath(filePath: string): Promise<string | null> {
+    const candidates = this.getFilePathCandidates(filePath);
+    for (const candidate of candidates) {
+      try {
+        await fs.access(candidate);
+        return candidate;
+      } catch {
+        // Try next candidate
+      }
+    }
+    return null;
+  }
+
+  private async resolveFilePathForWrite(filePath: string): Promise<string> {
+    if (isAbsolute(filePath)) {
+      return filePath;
+    }
+
+    const existingPath = await this.resolveExistingFilePath(filePath);
+    if (existingPath) {
+      return existingPath;
+    }
+
+    return join(this.fileResolutionPath, filePath);
   }
 
   async createApproval(
@@ -343,10 +397,9 @@ export class ApprovalStorage extends EventEmitter {
       throw new Error(`Approval ${originalId} has no file path for revision`);
     }
 
-    // Read the current file content for revision history
-    const filePath = isAbsolute(originalApproval.filePath)
-      ? originalApproval.filePath
-      : join(this.projectPath, originalApproval.filePath);
+    // Resolve target file path (workspace first, workflow root fallback)
+    const existingFilePath = await this.resolveExistingFilePath(originalApproval.filePath);
+    const filePath = existingFilePath || await this.resolveFilePathForWrite(originalApproval.filePath);
 
     let currentContent = '';
     try {
@@ -484,10 +537,11 @@ export class ApprovalStorage extends EventEmitter {
       throw new Error(`Approval ${approvalId} not found or has no file path`);
     }
 
-    // Read current file content
-    const filePath = isAbsolute(approval.filePath)
-      ? approval.filePath
-      : join(this.projectPath, approval.filePath);
+    // Read current file content (workspace first, workflow root fallback)
+    const filePath = await this.resolveExistingFilePath(approval.filePath);
+    if (!filePath) {
+      throw new Error(`Failed to read file for snapshot: file does not exist for ${approval.filePath}`);
+    }
 
     let content: string;
     let stats: any;
@@ -605,9 +659,10 @@ export class ApprovalStorage extends EventEmitter {
     const approval = await this.getApproval(approvalId);
     if (!approval || !approval.filePath) return null;
 
-    const filePath = isAbsolute(approval.filePath)
-      ? approval.filePath
-      : join(this.projectPath, approval.filePath);
+    const filePath = await this.resolveExistingFilePath(approval.filePath);
+    if (!filePath) {
+      return null;
+    }
 
     try {
       return await fs.readFile(filePath, 'utf-8');

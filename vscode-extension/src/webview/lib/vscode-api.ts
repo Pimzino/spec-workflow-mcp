@@ -27,6 +27,7 @@ export type ExtensionMessage =
   | { type: 'archived-specs-updated'; data: SpecData[] }
   | { type: 'approval-categories-updated'; data: { value: string; label: string; count: number }[] }
   | { type: 'language-preference-updated'; data: string }
+  | { type: 'workflow-root-updated'; data: { path: string; isDefault: boolean } }
   | { type: 'logs-updated'; data: any }
   | { type: 'logs-search-results'; data: any }
   | { type: 'error'; message: string }
@@ -61,6 +62,10 @@ export type WebviewMessage =
   | { type: 'get-approval-categories' }
   | { type: 'get-language-preference' }
   | { type: 'set-language-preference'; language: string }
+  | { type: 'get-workflow-root' }
+  | { type: 'set-workflow-root'; path: string }
+  | { type: 'browse-workflow-root' }
+  | { type: 'reset-workflow-root' }
   | { type: 'open-external-url'; url: string }
   | { type: 'get-logs'; specName: string }
   | { type: 'search-logs'; specName: string; query: string };
@@ -422,6 +427,23 @@ class VsCodeApiService {
 
   setLanguagePreference(language: string) {
     this.postMessage({ type: 'set-language-preference', language });
+  }
+
+  // Workflow root methods
+  getWorkflowRoot() {
+    this.postMessage({ type: 'get-workflow-root' });
+  }
+
+  setWorkflowRoot(path: string) {
+    this.postMessage({ type: 'set-workflow-root', path });
+  }
+
+  browseWorkflowRoot() {
+    this.postMessage({ type: 'browse-workflow-root' });
+  }
+
+  resetWorkflowRoot() {
+    this.postMessage({ type: 'reset-workflow-root' });
   }
 
   // Log methods

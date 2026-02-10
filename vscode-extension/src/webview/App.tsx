@@ -28,7 +28,8 @@ import {
   Minus,
   RotateCcw,
   Trash2,
-  Undo2
+  Undo2,
+  FolderOpen
 } from 'lucide-react';
 import { vscodeApi, type SpecData, type TaskProgressData, type ApprovalData, type SteeringStatus, type DocumentInfo, type SoundNotificationConfig } from '@/lib/vscode-api';
 import { cn, formatDistanceToNow } from '@/lib/utils';
@@ -91,6 +92,7 @@ function App() {
   const [archiveView, setArchiveView] = useState<'active' | 'archived'>('active');
   const [selectedArchivedSpec, setSelectedArchivedSpec] = useState<string | null>(null);
   const [currentLanguage, setCurrentLanguage] = useState<string>('auto');
+  const [workflowRoot, setWorkflowRoot] = useState<{ path: string; isDefault: boolean }>({ path: '', isDefault: true });
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   
   // Sound notifications - use config from VS Code settings
@@ -541,9 +543,9 @@ Review the existing steering documents (if any) and help me improve or complete 
         console.log('Language preference:', message.data);
         const language = message.data || 'auto';
         setCurrentLanguage(language);
-        
+
         if (language === 'auto') {
-          // Reset to auto-detection - remove from localStorage  
+          // Reset to auto-detection - remove from localStorage
           localStorage.removeItem('spec-workflow-language');
           i18n.changeLanguage(undefined);
         } else {
@@ -551,6 +553,11 @@ Review the existing steering documents (if any) and help me improve or complete 
           localStorage.setItem('spec-workflow-language', language);
           i18n.changeLanguage(language);
         }
+      }),
+      vscodeApi.onMessage('workflow-root-updated', (message: any) => {
+        console.log('=== Received workflow-root-updated message ===');
+        console.log('Workflow root:', message.data);
+        setWorkflowRoot(message.data || { path: '', isDefault: true });
       }),
     ];
 
@@ -560,6 +567,8 @@ Review the existing steering documents (if any) and help me improve or complete 
     vscodeApi.getApprovals();
     // Get language preference
     vscodeApi.getLanguagePreference();
+    // Get workflow root
+    vscodeApi.getWorkflowRoot();
 
     return () => {
       unsubscribes.forEach(unsub => unsub());
@@ -971,6 +980,7 @@ Review the existing steering documents (if any) and help me improve or complete 
               </div>
             </CardContent>
           </Card>
+
         </TabsContent>
 
 
@@ -1741,6 +1751,46 @@ Review the existing steering documents (if any) and help me improve or complete 
           </Card>
         </TabsContent>
 
+        </div>
+
+        {/* Sticky Footer - Workflow Root */}
+        <div className="sidebar-sticky-footer">
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+            <div
+              className="flex items-center gap-1.5 min-w-0 flex-1 cursor-help"
+              title={t('workflowRoot.description')}
+            >
+              <FolderOpen className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate font-mono" title={workflowRoot.path || t('workflowRoot.notSet')}>
+                {workflowRoot.path || t('workflowRoot.notSet')}
+              </span>
+              {workflowRoot.isDefault && workflowRoot.path && (
+                <span className="text-[9px] text-muted-foreground/70">({t('workflowRoot.default')})</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-5 w-5 p-0"
+                onClick={() => vscodeApi.browseWorkflowRoot()}
+                title={t('workflowRoot.browse')}
+              >
+                <FolderOpen className="h-3 w-3" />
+              </Button>
+              {!workflowRoot.isDefault && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0"
+                  onClick={() => vscodeApi.resetWorkflowRoot()}
+                  title={t('workflowRoot.reset')}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Scroll to Top FAB */}

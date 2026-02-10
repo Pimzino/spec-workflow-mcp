@@ -5,6 +5,71 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.3] - 2026-02-08
+
+### Added
+- **MDX Pre-Render Validation for Approvals** (PR #197) - All markdown files are now validated for MDX compatibility before approval requests are accepted:
+  - Approval requests for any `.md` file are blocked if MDX compilation fails, preventing dashboard rendering issues
+  - Actionable error messages with line/column references and fix suggestions (e.g., escape `<` as `&lt;` or use inline code)
+  - Existing `tasks.md` structural validation still runs after MDX validation
+- **`validate:mdx` CLI Script** - New `npm run validate:mdx` command for batch-scanning markdown files:
+  - Scans all `.md` files in `.spec-workflow/specs/` and `.spec-workflow/steering/` directories
+  - Supports `--spec <name>` to validate a single spec, `--file <path>` for a single file
+  - `--json` output mode for CI/automation integration
+- **MDX Validator Module** - New `src/core/mdx-validator.ts` using `@mdx-js/mdx` compile for syntax validation with structured error reporting
+
+### Dependencies
+- Added `@mdx-js/mdx` (^3.1.1) for MDX compilation-based validation
+
+## [2.2.2] - 2026-02-04
+
+### Fixed
+- **NPX Entrypoint Execution** (PR #195) - Fixed CLI silently not executing when invoked via `npx`:
+  - Resolved symlinked paths using `realpathSync()` for proper entrypoint detection
+  - `process.argv[1]` returns symlink path while `import.meta.url` returns real path, causing comparison to fail
+  - Removed `process.stdin.resume()` in dashboard mode which could suspend the process in some shells
+
+### Added
+- **Markdown Thematic Breaks** - Added support for horizontal rules (`---`) in the dashboard editor:
+  - Enabled `thematicBreakPlugin` in MDX editor
+  - Added toolbar button for inserting thematic breaks
+
+## [2.2.1] - 2026-02-04
+
+### Fixed
+- **NPX Installation Error** (Issue #196) - Fixed "Cannot find package 'ajv'" error when installing via `npx`:
+  - Added `ajv`, `ajv-formats`, and `zod` as direct dependencies to ensure proper ESM module resolution
+  - These packages are required by `@modelcontextprotocol/sdk` but npm's dependency hoisting in npx environments could fail to resolve them correctly
+  - The fix ensures the MCP SDK's validation modules can always find their dependencies regardless of installation method
+
+## [2.2.0] - 2026-02-03
+
+### Added
+- **Git Worktree Support** (PR #194) - Separate worktree identity from shared `.spec-workflow` root:
+  - Each git worktree now registers as its own project identity in the dashboard
+  - Project labels reflect worktree context with `repo · worktree` naming format
+  - `.spec-workflow` remains shared by default across worktrees (existing behavior preserved)
+  - Artifact/approval content resolution now prioritizes workspace/worktree paths with workflow root fallback
+  - New `--no-shared-worktree-specs` CLI flag to opt-out of sharing and use workspace-local `.spec-workflow`
+  - Added `resolveGitWorkspaceRoot()` helper using `git rev-parse --show-toplevel`
+  - Backward compatible: legacy registry entries without `workflowRootPath` are normalized automatically
+
+### Added (Testing)
+- Comprehensive test coverage for worktree functionality:
+  - Unit tests for CLI argument parsing, git-utils, project-registry, and approval-storage path resolution
+  - Integration tests for multi-server approval content resolution
+  - E2E Playwright tests for no-shared worktree dashboard flow
+  - New `test:e2e:worktree` npm script with dedicated Playwright config
+
+## [2.1.12] - 2026-01-29
+
+### Added
+- **Approval Deeplinks** (Issue #192) - Approval requests now return direct URLs to specific approvals:
+  - Dashboard URL includes approval ID as query parameter: `/approvals?id={approvalId}`
+  - Clicking a deeplink auto-scrolls to the specific approval and highlights it with an amber ring
+  - Approval is automatically expanded when navigating via deeplink
+  - Improves workflow when running multiple AI agents in parallel
+
 ## [2.1.11] - 2026-01-27
 
 ### Fixed

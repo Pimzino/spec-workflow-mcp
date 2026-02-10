@@ -216,5 +216,14 @@
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "Posizione del Flusso di Lavoro",
+    "description": "Configura la posizione della cartella .spec-workflow per gli spazi di lavoro multi-radice.",
+    "current": "Attuale",
+    "notSet": "Non configurato",
+    "default": "predefinito",
+    "browse": "Sfoglia",
+    "reset": "Reimposta"
   }
 }

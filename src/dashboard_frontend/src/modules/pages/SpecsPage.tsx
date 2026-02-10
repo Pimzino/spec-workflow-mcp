@@ -416,6 +416,7 @@ function SpecTableRow({ spec, onOpenModal, isArchived }: { spec: any; onOpenModa
 
   return (
     <tr
+      data-testid={`spec-table-row-${spec.name}`}
       className="hover:bg-[var(--surface-hover)] cursor-pointer transition-colors"
       onClick={() => onOpenModal(spec)}
     >
@@ -743,5 +744,4 @@ function Content() {
 export function SpecsPage() {
   return <Content />;
 }
-
 

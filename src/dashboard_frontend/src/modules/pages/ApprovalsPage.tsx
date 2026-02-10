@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useApi, DocumentSnapshot, DiffResult, BatchApprovalResult } from '../api/api';
 import { ApprovalsAnnotator, ApprovalComment, ViewMode } from '../approvals/ApprovalsAnnotator';
 import { useNotifications } from '../notifications/NotificationProvider';
@@ -18,15 +19,17 @@ interface ApprovalItemProps {
   isSelected: boolean;
   selectedCount: number;
   onToggleSelection: (id: string) => void;
+  isHighlighted: boolean;
 }
 
-function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection }: ApprovalItemProps) {
+function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted }: ApprovalItemProps) {
   const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll } = useApi();
   const { showNotification } = useNotifications();
   const { t } = useTranslation();
+  const itemRef = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(isHighlighted); // Auto-open if highlighted
   const [viewMode, setViewMode] = useState<ViewMode | 'diff'>('annotate');
   const [diffViewMode, setDiffViewMode] = useState<'unified' | 'split' | 'inline'>('split');
   const [comments, setComments] = useState<ApprovalComment[]>([]);
@@ -56,6 +59,17 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
       annotationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  // Scroll to and highlight this item if it's the highlighted one from URL
+  useEffect(() => {
+    if (isHighlighted && itemRef.current) {
+      // Small delay to ensure DOM is ready
+      const timeoutId = setTimeout(() => {
+        itemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isHighlighted]);
 
   useEffect(() => {
     let active = true;
@@ -229,7 +243,12 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
   };
 
   return (
-    <div className={`bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg transition-colors overflow-hidden max-w-full ${isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+    <div
+      ref={itemRef}
+      id={`approval-${a.id}`}
+      data-testid={`approval-item-${a.id}`}
+      className={`bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg transition-all duration-500 overflow-hidden max-w-full ${isSelected ? 'ring-2 ring-blue-500' : ''} ${isHighlighted ? 'ring-2 ring-amber-500 shadow-lg shadow-amber-500/20' : ''}`}
+    >
       <div className="p-3 sm:p-4 md:p-6 lg:p-8 min-w-0 max-w-full overflow-x-hidden">
         <div className="flex items-start justify-between">
           {/* Selection Checkbox */}
@@ -628,6 +647,8 @@ function Content() {
   const { showNotification } = useNotifications();
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const highlightedId = searchParams.get('id');
 
   // Selection Mode state
   const [selectionMode, setSelectionMode] = useState<boolean>(false);
@@ -986,6 +1007,7 @@ function Content() {
               isSelected={selectedIds.has(a.id)}
               selectedCount={selectedIds.size}
               onToggleSelection={handleToggleSelection}
+              isHighlighted={highlightedId === a.id}
             />
           ))}
         </div>
@@ -1087,5 +1109,4 @@ function Content() {
 export function ApprovalsPage() {
   return <Content />;
 }
-
 

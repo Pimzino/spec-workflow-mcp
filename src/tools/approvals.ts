@@ -5,6 +5,7 @@ import { join } from 'path';
 import { validateProjectPath, PathUtils } from '../core/path-utils.js';
 import { readFile } from 'fs/promises';
 import { validateTasksMarkdown, formatValidationErrors } from '../core/task-validator.js';
+import { validateMarkdownForMdx, formatMdxValidationIssues } from '../core/mdx-validator.js';
 
 /**
  * Safely translate a path, with defensive checks to provide better error messages
@@ -210,52 +211,86 @@ async function handleRequestApproval(
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
     const translatedPath = safeTranslatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, {
+      originalPath: validatedProjectPath,
+      fileResolutionPath: translatedPath
+    });
     await approvalStorage.start();
 
-    // Validate tasks.md format before allowing approval request
-    if (args.filePath.endsWith('tasks.md')) {
+    const isMarkdownFile = args.filePath.toLowerCase().endsWith('.md');
+    let markdownContent: string | undefined;
+
+    if (isMarkdownFile) {
       try {
         const fullPath = join(validatedProjectPath, args.filePath);
-        const content = await readFile(fullPath, 'utf-8');
-        const validationResult = validateTasksMarkdown(content);
-
-        if (!validationResult.valid) {
-          await approvalStorage.stop();
-
-          const errorMessages = formatValidationErrors(validationResult);
-
-          return {
-            success: false,
-            message: 'Tasks document has format errors that must be fixed before approval',
-            data: {
-              errorCount: validationResult.errors.length,
-              warningCount: validationResult.warnings.length,
-              summary: validationResult.summary
-            },
-            nextSteps: [
-              'Fix the format errors listed below',
-              'Ensure each task has: checkbox (- [ ]), numeric ID (1.1), description',
-              'Ensure metadata uses underscores: _Requirements: ..._',
-              'Ensure _Prompt ends with underscore',
-              'Re-request approval after fixing',
-              ...errorMessages
-            ]
-          };
-        }
-
-        // If there are warnings, include them but allow approval to proceed
-        if (validationResult.warnings.length > 0) {
-          // Warnings don't block approval, but will be included in the response
-          // This allows the user to see potential issues while still proceeding
-        }
+        markdownContent = await readFile(fullPath, 'utf-8');
       } catch (fileError) {
         await approvalStorage.stop();
         const errorMessage = fileError instanceof Error ? fileError.message : String(fileError);
         return {
           success: false,
-          message: `Failed to read tasks file for validation: ${errorMessage}`
+          message: `Failed to read markdown file for validation: ${errorMessage}`
         };
+      }
+
+      const mdxValidation = await validateMarkdownForMdx(markdownContent);
+      if (!mdxValidation.valid) {
+        await approvalStorage.stop();
+        const formattedIssues = formatMdxValidationIssues(mdxValidation.issues);
+
+        return {
+          success: false,
+          message: 'Markdown file has MDX compatibility errors that must be fixed before approval',
+          data: {
+            errorCount: mdxValidation.issues.length,
+            summary: {
+              totalIssues: mdxValidation.issues.length,
+              rules: [...new Set(mdxValidation.issues.map(issue => issue.ruleId))]
+            }
+          },
+          nextSteps: [
+            'Fix MDX compatibility issues listed below',
+            'For literal comparisons (for example "<5%"), use "&lt;5%" or inline code (`<5%`)',
+            'Re-request approval after fixing',
+            ...formattedIssues
+          ]
+        };
+      }
+    }
+
+    // Validate tasks.md format before allowing approval request
+    if (args.filePath.endsWith('tasks.md')) {
+      const content = markdownContent ?? await readFile(join(validatedProjectPath, args.filePath), 'utf-8');
+      const validationResult = validateTasksMarkdown(content);
+
+      if (!validationResult.valid) {
+        await approvalStorage.stop();
+
+        const errorMessages = formatValidationErrors(validationResult);
+
+        return {
+          success: false,
+          message: 'Tasks document has format errors that must be fixed before approval',
+          data: {
+            errorCount: validationResult.errors.length,
+            warningCount: validationResult.warnings.length,
+            summary: validationResult.summary
+          },
+          nextSteps: [
+            'Fix the format errors listed below',
+            'Ensure each task has: checkbox (- [ ]), numeric ID (1.1), description',
+            'Ensure metadata uses underscores: _Requirements: ..._',
+            'Ensure _Prompt ends with underscore',
+            'Re-request approval after fixing',
+            ...errorMessages
+          ]
+        };
+      }
+
+      // If there are warnings, include them but allow approval to proceed
+      if (validationResult.warnings.length > 0) {
+        // Warnings don't block approval, but will be included in the response
+        // This allows the user to see potential issues while still proceeding
       }
     }
 
@@ -269,28 +304,33 @@ async function handleRequestApproval(
 
     await approvalStorage.stop();
 
+    // Build deeplink URL that navigates directly to this specific approval
+    const deeplink = context.dashboardUrl
+      ? `${context.dashboardUrl}/approvals?id=${encodeURIComponent(approvalId)}`
+      : undefined;
+
     return {
       success: true,
-      message: `Approval request created successfully. Please review in dashboard: ${context.dashboardUrl || 'Start with: spec-workflow-mcp --dashboard'}`,
+      message: `Approval request created successfully. Please review in dashboard: ${deeplink || 'Start with: spec-workflow-mcp --dashboard'}`,
       data: {
         approvalId,
         title: args.title,
         filePath: args.filePath,
         type: args.type,
         status: 'pending',
-        dashboardUrl: context.dashboardUrl
+        dashboardUrl: deeplink
       },
       nextSteps: [
         'BLOCKING - Dashboard approval required',
         'VERBAL APPROVAL NOT ACCEPTED',
         'Do not proceed on verbal confirmation',
-        context.dashboardUrl ? `Use dashboard: ${context.dashboardUrl}` : 'Start the dashboard with: spec-workflow-mcp --dashboard',
+        deeplink ? `Use dashboard: ${deeplink}` : 'Start the dashboard with: spec-workflow-mcp --dashboard',
         `Poll status with: approvals action:"status" approvalId:"${approvalId}"`
       ],
       projectContext: {
         projectPath: validatedProjectPath,
         workflowRoot: join(validatedProjectPath, '.spec-workflow'),
-        dashboardUrl: context.dashboardUrl
+        dashboardUrl: deeplink
       }
     };
 
@@ -324,7 +364,10 @@ async function handleGetApprovalStatus(
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
     const translatedPath = safeTranslatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, {
+      originalPath: validatedProjectPath,
+      fileResolutionPath: translatedPath
+    });
     await approvalStorage.start();
 
     const approval = await approvalStorage.getApproval(args.approvalId);
@@ -447,7 +490,10 @@ async function handleDeleteApproval(
     // Translate path at tool entry point (ApprovalStorage expects pre-translated paths)
     const translatedPath = safeTranslatePath(validatedProjectPath);
 
-    const approvalStorage = new ApprovalStorage(translatedPath, validatedProjectPath);
+    const approvalStorage = new ApprovalStorage(translatedPath, {
+      originalPath: validatedProjectPath,
+      fileResolutionPath: translatedPath
+    });
     await approvalStorage.start();
 
     // Check if approval exists and its status

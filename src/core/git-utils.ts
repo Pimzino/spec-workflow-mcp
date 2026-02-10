@@ -1,7 +1,32 @@
-import { execSync } from 'child_process';
+import { execSync, ExecSyncOptionsWithStringEncoding } from 'child_process';
 import { resolve } from 'path';
 
 export const SPEC_WORKFLOW_SHARED_ROOT_ENV = 'SPEC_WORKFLOW_SHARED_ROOT';
+const GIT_EXEC_OPTIONS: ExecSyncOptionsWithStringEncoding = {
+  encoding: 'utf-8',
+  stdio: ['pipe', 'pipe', 'pipe'],
+  timeout: 5000
+};
+
+/**
+ * Resolves the git workspace root directory.
+ * For repositories and worktrees, this returns the top-level checked-out directory.
+ *
+ * @param projectPath - Any path inside the workspace
+ * @returns Workspace root path, or original path when git is unavailable
+ */
+export function resolveGitWorkspaceRoot(projectPath: string): string {
+  try {
+    const workspaceRoot = execSync('git rev-parse --show-toplevel', {
+      cwd: projectPath,
+      ...GIT_EXEC_OPTIONS
+    }).trim();
+
+    return workspaceRoot || projectPath;
+  } catch {
+    return projectPath;
+  }
+}
 
 /**
  * Resolves the git root directory for storing shared specs.
@@ -21,9 +46,7 @@ export function resolveGitRoot(projectPath: string): string {
     // Get the git common directory (main repo's .git folder)
     const gitCommonDir = execSync('git rev-parse --git-common-dir', {
       cwd: projectPath,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-      timeout: 5000
+      ...GIT_EXEC_OPTIONS
     }).trim();
 
     // In main repo, returns ".git" - no change needed
@@ -60,9 +83,7 @@ export function isGitWorktree(projectPath: string): boolean {
   try {
     const gitCommonDir = execSync('git rev-parse --git-common-dir', {
       cwd: projectPath,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-      timeout: 5000
+      ...GIT_EXEC_OPTIONS
     }).trim();
     return gitCommonDir !== '.git';
   } catch {

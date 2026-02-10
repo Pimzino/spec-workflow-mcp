@@ -216,5 +216,14 @@
     "italian": "Italiano",
     "korean": "한국어",
     "arabic": "العربية"
+  },
+  "workflowRoot": {
+    "title": "موقع سير العمل",
+    "description": "قم بتكوين موقع مجلد .spec-workflow لمساحات العمل متعددة الجذور.",
+    "current": "الحالي",
+    "notSet": "غير مكوّن",
+    "default": "افتراضي",
+    "browse": "تصفح",
+    "reset": "إعادة تعيين"
   }
 }
