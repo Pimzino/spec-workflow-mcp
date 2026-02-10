@@ -165,6 +165,38 @@ function StatusIndicator({ saving, saved, error, hasUnsavedChanges }: {
   return null;
 }
 
+/**
+ * Preprocess markdown to make it safe for the MDX parser.
+ * Handles two issues:
+ * 1. Non-standard checkbox markers: `[-]` (in-progress) and `[~]` (blocked)
+ *    are not valid GFM — convert to unchecked checkboxes with text indicators.
+ * 2. Bare angle brackets: `<` followed by non-tag characters (digits, spaces, etc.)
+ *    are interpreted as invalid JSX by MDX — escape them as `&lt;`.
+ */
+function preprocessMarkdownForMDX(markdown: string): string {
+  let result = markdown;
+
+  // Convert non-standard checkbox markers to valid GFM
+  result = result.replace(
+    /^(\s*[-*]\s+)\[([~\-])\](\s+)/gm,
+    (_match, prefix, marker, space) => {
+      const label = marker === '~' ? '**\\[BLOCKED\\]** ' : '**\\[IN PROGRESS\\]** ';
+      return `${prefix}[ ]${space}${label}`;
+    }
+  );
+
+  // Escape `<` that MDX would interpret as JSX.
+  // Only preserve `<` before lowercase letters (HTML tags like <div>, <br>),
+  // `/` (closing tags), `!` (comments), or `>` (fragments).
+  // Escape everything else: <Uppercase (JSX components/generics like <T>),
+  // <digit (<5), <space, <symbol — all cause MDX parse errors.
+  // Replace with Unicode fullwidth less-than sign (U+FF1C) which looks
+  // visually identical but won't trigger MDX's JSX parser.
+  result = result.replace(/<(?![a-z\/!>])/g, '\uFF1C');
+
+  return result;
+}
+
 export function MDXEditorWrapper({
   content,
   mode,
@@ -194,7 +226,7 @@ export function MDXEditorWrapper({
       setLastSavedContent(content);
       // Programmatically update MDX Editor content when prop changes
       if (editorRef.current) {
-        editorRef.current.setMarkdown(content);
+        editorRef.current.setMarkdown(preprocessMarkdownForMDX(content));
       }
     }
     // Reset the flag after processing
@@ -326,7 +358,7 @@ export function MDXEditorWrapper({
       <div className={`mdx-editor-wrapper view-mode ${isDarkMode ? 'dark-theme' : ''} ${className}`} style={heightStyle}>
         <MDXEditor
           ref={editorRef}
-          markdown={content}
+          markdown={preprocessMarkdownForMDX(content)}
           plugins={plugins}
           readOnly={true}
           contentEditableClassName="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-img:max-w-full prose-img:h-auto prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-pre:bg-gray-50 dark:prose-pre:bg-gray-900 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300"
@@ -368,7 +400,7 @@ export function MDXEditorWrapper({
       <div className="flex-1 overflow-hidden">
         <MDXEditor
           ref={editorRef}
-          markdown={localContent}
+          markdown={preprocessMarkdownForMDX(localContent)}
           onChange={handleChange}
           plugins={plugins}
           placeholder={placeholder || t('editor.markdown.placeholder')}
