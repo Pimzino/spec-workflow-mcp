@@ -73,14 +73,33 @@ const plainTextCodeBlockDescriptor: CodeBlockEditorDescriptor = {
 };
 
 // Custom source toggle that only shows Rich text and Source (no Diff)
-function SourceToggle() {
+// Custom source toggle that preprocesses markdown before switching to rich text.
+// This ensures non-standard syntax ([-], [~], bare <) is converted before
+// MDXEditor's internal parser sees it.
+function SourceToggle({ editorRef }: { editorRef: React.RefObject<MDXEditorMethods | null> }) {
   const viewMode = useCellValue(viewMode$);
   const changeViewMode = usePublisher(viewMode$);
+
+  const handleSwitchToRichText = useCallback(() => {
+    changeViewMode('rich-text');
+    // After the view mode switch, MDXEditor's parser may have rendered
+    // non-standard markers as text. Re-set the markdown with preprocessing
+    // to convert them to proper visual indicators.
+    setTimeout(() => {
+      if (editorRef.current) {
+        const md = editorRef.current.getMarkdown();
+        const processed = preprocessMarkdownForMDX(md);
+        if (processed !== md) {
+          editorRef.current.setMarkdown(processed);
+        }
+      }
+    }, 100);
+  }, [editorRef, changeViewMode]);
 
   return (
     <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded p-0.5">
       <button
-        onClick={() => changeViewMode('rich-text')}
+        onClick={handleSwitchToRichText}
         className={`px-2 py-1 text-xs rounded transition-colors ${
           viewMode === 'rich-text'
             ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
@@ -176,12 +195,26 @@ function StatusIndicator({ saving, saved, error, hasUnsavedChanges }: {
 function preprocessMarkdownForMDX(markdown: string): string {
   let result = markdown;
 
-  // Convert non-standard checkbox markers to valid GFM
+  // Convert non-standard checkbox markers to valid GFM.
+  // Handles both raw markers and MDXEditor-escaped versions (\[\~], \[\-]).
+  //
+  const statusLabel = (marker: string) =>
+    marker === '~' ? '**\\[BLOCKED\\]** ' : '**\\[IN PROGRESS\\]** ';
+
+  // Pattern 1: [~] or [-] in the checkbox position: `- [~] Task`
   result = result.replace(
-    /^(\s*[-*]\s+)\[([~\-])\](\s+)/gm,
+    /^(\s*[-*]\s+)\\?\[\\?([~\-])\\?\](\s+)/gm,
     (_match, prefix, marker, space) => {
-      const label = marker === '~' ? '**\\[BLOCKED\\]** ' : '**\\[IN PROGRESS\\]** ';
-      return `${prefix}[ ]${space}${label}`;
+      return `${prefix}[ ]${space}${statusLabel(marker)}`;
+    }
+  );
+
+  // Pattern 2: [~] or [-] as text after a standard checkbox (from source mode edits
+  // where MDXEditor parsed `- [~]` as `- [ ] \[\~]`): `* [ ] \[\~] Task`
+  result = result.replace(
+    /^(\s*[-*]\s+\[[ x]\]\s+)\\?\[\\?([~\-])\\?\](\s+)/gm,
+    (_match, prefix, marker, space) => {
+      return `${prefix}${statusLabel(marker)}`;
     }
   );
 
@@ -322,7 +355,7 @@ export function MDXEditorWrapper({
               <InsertTable />
               <InsertThematicBreak />
               <Separator />
-              <SourceToggle />
+              <SourceToggle editorRef={editorRef} />
             </>
           ),
         })
