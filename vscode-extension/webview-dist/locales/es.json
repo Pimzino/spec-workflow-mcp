@@ -115,6 +115,7 @@
     }
   },
   "common": {
+    "dismiss": "Cerrar",
     "scrollToTop": "Volver arriba"
   },
   "specs": {

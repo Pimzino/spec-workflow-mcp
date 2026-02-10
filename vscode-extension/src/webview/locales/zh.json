@@ -110,6 +110,7 @@
     }
   },
   "common": {
+    "dismiss": "关闭",
     "scrollToTop": "滚动到顶部"
   },
   "specs": {

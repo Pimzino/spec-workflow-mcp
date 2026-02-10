@@ -190,9 +190,6 @@
       "exported": "(exported)"
     }
   },
-  "common": {
-    "scrollToTop": "Scroll to top"
-  },
   "commentModal": {
     "title": {
       "edit": "Edit Comment",

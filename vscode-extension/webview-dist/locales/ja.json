@@ -115,6 +115,7 @@
     }
   },
   "common": {
+    "dismiss": "閉じる",
     "scrollToTop": "一番上までスクロール"
   },
   "specs": {

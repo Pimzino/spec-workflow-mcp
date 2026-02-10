@@ -115,6 +115,7 @@
     }
   },
   "common": {
+    "dismiss": "닫기",
     "scrollToTop": "맨 위로 스크롤"
   },
   "specs": {

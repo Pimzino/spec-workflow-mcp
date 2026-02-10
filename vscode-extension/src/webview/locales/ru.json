@@ -115,6 +115,7 @@
     }
   },
   "common": {
+    "dismiss": "Закрыть",
     "scrollToTop": "Прокрутить вверх"
   },
   "specs": {

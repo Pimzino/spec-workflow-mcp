@@ -287,7 +287,6 @@ export function updateTaskStatus(
         const statusPart = `${listMarker} [${statusMarker}] `;
         lines[i] = prefix + statusPart + taskText;
 
-        const wasBlocked = oldStatusChar === '~';
         const isNowBlocked = newStatus === 'blocked';
 
         // Find and remove any existing _Blocked:_ line after this task

@@ -115,6 +115,7 @@
     }
   },
   "common": {
+    "dismiss": "Schließen",
     "scrollToTop": "Nach oben scrollen"
   },
   "specs": {
