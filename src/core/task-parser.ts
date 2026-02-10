@@ -376,7 +376,6 @@ export function updateTaskStatus(
     if (checkboxMatch) {
       const prefix = checkboxMatch[1];
       const listMarker = checkboxMatch[2]; // Preserve original list marker
-      const oldStatusChar = checkboxMatch[3];
       const taskText = checkboxMatch[4];
 
       // Check if this line contains our target task ID
