@@ -90,7 +90,13 @@ export function StatusFilterPills({ currentFilter, onFilterChange, taskCounts }:
             }`}
             title={t('tasksPage.filters.filterByTooltip', { status: option.label.toLowerCase() })}
           >
-            <span className={`w-2 h-2 rounded-full ${option.dotColor}`} />
+            {option.id === 'blocked' ? (
+              <svg className="w-2 h-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            ) : (
+              <span className={`w-2 h-2 rounded-full ${option.dotColor}`} />
+            )}
             <span className="font-medium">{option.label}</span>
             {option.count > 0 && (
               <span className={`px-1.5 py-0.5 text-xs rounded-md min-w-[20px] text-center font-mono tabular-nums ${

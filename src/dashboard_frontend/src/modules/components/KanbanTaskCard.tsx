@@ -113,7 +113,13 @@ export function KanbanTaskCard({
       {/* Task Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${config.dotColor}`} />
+          {task.status === 'blocked' ? (
+            <svg className="w-2 h-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+          ) : (
+            <div className={`w-2 h-2 rounded-full ${config.dotColor}`} />
+          )}
           <span className={`text-xs sm:text-sm font-medium font-mono tabular-nums ${config.textColor}`}>
             {t('tasksPage.item.task')} {task.id}
           </span>
