@@ -55,13 +55,13 @@ export function validateTasksMarkdown(content: string): ValidationResult {
     let taskId: string | undefined;
 
     // 1. Validate checkbox format: must be "- [ ]", "- [-]", or "- [x]"
-    const checkboxMatch = line.match(/^\s*-\s+\[([ x\-])\]\s+(.+)/);
+    const checkboxMatch = line.match(/^\s*-\s+\[([ x\-~])\]\s+(.+)/);
 
     if (!checkboxMatch) {
       // Check for common malformed patterns
       const malformedPatterns = [
         { pattern: /^\s*-\s*\[\]\s/, message: 'Empty checkbox brackets', suggestion: 'Use "- [ ]" with a space inside brackets' },
-        { pattern: /^\s*-\s*\[([^x \-])\]/, message: 'Invalid checkbox character', suggestion: 'Use space for pending, x for completed, - for in-progress' },
+        { pattern: /^\s*-\s*\[([^x \-~])\]/, message: 'Invalid checkbox character', suggestion: 'Use space for pending, x for completed, - for in-progress, ~ for blocked' },
         { pattern: /^\s*-\[\s*[x \-]?\s*\]/, message: 'Missing space after hyphen', suggestion: 'Use "- [ ]" with space between - and [' },
         { pattern: /^\s*\*\s+\[/, message: 'Wrong bullet character', suggestion: 'Use hyphen (-) instead of asterisk (*)' },
       ];

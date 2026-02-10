@@ -691,7 +691,7 @@ Review the existing steering documents (if any) and help me improve or complete 
 
 
 
-  const handleTaskStatusUpdate = (taskId: string, status: 'pending' | 'in-progress' | 'completed') => {
+  const handleTaskStatusUpdate = (taskId: string, status: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
     if (selectedSpec) {
       vscodeApi.updateTaskStatus(selectedSpec, taskId, status);
     }
@@ -1060,6 +1060,7 @@ Review the existing steering documents (if any) and help me improve or complete 
                       "transition-colors",
                       task.isHeader && "border-purple-200 dark:border-slate-600 bg-purple-50 dark:bg-slate-800/60",
                       task.status === 'in-progress' && "border-orange-500",
+                      task.status === 'blocked' && "border-red-500",
                       task.completed && "border-green-500"
                     )}>
                       <CardContent className="p-3">
@@ -1093,23 +1094,26 @@ Review the existing steering documents (if any) and help me improve or complete 
                                 </Button>
                                 <Select 
                                   value={task.completed ? 'completed' : (task.status || 'pending')} 
-                                  onValueChange={(status: 'pending' | 'in-progress' | 'completed') => 
+                                  onValueChange={(status: 'pending' | 'in-progress' | 'completed' | 'blocked') =>
                                     handleTaskStatusUpdate(task.id, status)
                                   }
                                 >
                                   <SelectTrigger className={cn(
                                     "w-auto h-6 px-2 text-xs border-0 focus:ring-0 focus:ring-offset-0",
-                                    task.completed 
-                                      ? "bg-green-500 text-white [&_svg]:!text-white [&_svg]:opacity-100" 
+                                    task.completed
+                                      ? "bg-green-500 text-white [&_svg]:!text-white [&_svg]:opacity-100"
                                       : task.status === 'in-progress'
-                                        ? "bg-orange-500 text-white [&_svg]:!text-white [&_svg]:opacity-100" 
-                                        : "bg-transparent border border-border text-foreground [&_svg]:text-foreground"
+                                        ? "bg-orange-500 text-white [&_svg]:!text-white [&_svg]:opacity-100"
+                                        : task.status === 'blocked'
+                                          ? "bg-red-500 text-white [&_svg]:!text-white [&_svg]:opacity-100"
+                                          : "bg-transparent border border-border text-foreground [&_svg]:text-foreground"
                                   )}>
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="pending">{t('tasks.status.pending')}</SelectItem>
                                     <SelectItem value="in-progress">{t('tasks.status.inProgress')}</SelectItem>
+                                    <SelectItem value="blocked">{t('tasks.status.blocked')}</SelectItem>
                                     <SelectItem value="completed">{t('tasks.status.completed')}</SelectItem>
                                   </SelectContent>
                                 </Select>

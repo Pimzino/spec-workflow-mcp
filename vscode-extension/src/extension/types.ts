@@ -61,7 +61,7 @@ export interface TaskInfo {
   inProgress?: boolean;                // true if status === 'in-progress'
 }
 
-export type TaskStatus = 'pending' | 'in-progress' | 'completed';
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'blocked';
 
 export interface HighlightColor {
   bg: string;

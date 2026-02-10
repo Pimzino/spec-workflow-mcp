@@ -45,7 +45,8 @@
     "status": {
       "pending": "Pendiente",
       "inProgress": "En Progreso",
-      "completed": "Completada"
+      "completed": "Completada",
+      "blocked": "Bloqueado"
     },
     "taskGroup": "Grupo de Tareas",
     "meta": {

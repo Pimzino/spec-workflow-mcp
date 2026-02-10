@@ -197,10 +197,10 @@ function StatusPill({
   onStatusChange,
   disabled = false
 }: {
-  currentStatus: 'pending' | 'in-progress' | 'completed';
+  currentStatus: 'pending' | 'in-progress' | 'completed' | 'blocked';
   taskId: string;
   specName: string;
-  onStatusChange?: (newStatus: 'pending' | 'in-progress' | 'completed') => void;
+  onStatusChange?: (newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked') => void;
   disabled?: boolean;
 }) {
   const { t } = useTranslation();
@@ -231,6 +231,13 @@ function StatusPill({
       textColor: 'text-[var(--text-secondary)]',
       hoverBg: 'hover:bg-[var(--surface-raised)]',
       dotColor: 'bg-green-500',
+    },
+    'blocked': {
+      label: t('tasksPage.statusPill.blocked'),
+      bgColor: 'bg-[var(--surface-panel)]',
+      textColor: 'text-[var(--text-secondary)]',
+      hoverBg: 'hover:bg-[var(--surface-raised)]',
+      dotColor: 'bg-red-500',
     }
   };
 
@@ -259,7 +266,7 @@ function StatusPill({
     };
   }, [isOpen]);
 
-  const handleStatusUpdate = async (newStatus: 'pending' | 'in-progress' | 'completed') => {
+  const handleStatusUpdate = async (newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
     if (newStatus === currentStatus || disabled || isUpdating) return;
 
     setIsUpdating(true);
@@ -275,7 +282,9 @@ function StatusPill({
           ? t('tasksPage.statusPill.completed')
           : newStatus === 'in-progress'
             ? t('tasksPage.statusPill.inProgress')
-            : t('tasksPage.statusPill.pending');
+            : newStatus === 'blocked'
+              ? t('tasksPage.statusPill.blocked')
+              : t('tasksPage.statusPill.pending');
         showNotification(t('tasksPage.notifications.statusUpdated', { taskId, status: statusLabel }), 'success');
       } else {
         // Handle error - show error notification
@@ -332,7 +341,7 @@ function StatusPill({
           {Object.entries(statusConfig).map(([status, statusConf]) => (
             <button
               key={status}
-              onClick={() => handleStatusUpdate(status as 'pending' | 'in-progress' | 'completed')}
+              onClick={() => handleStatusUpdate(status as 'pending' | 'in-progress' | 'completed' | 'blocked')}
               className={`w-full px-3 py-2 text-xs text-left transition-colors flex items-center gap-2 ${
                 status === currentStatus
                   ? `${statusConf.bgColor} ${statusConf.textColor}`
@@ -437,7 +446,7 @@ function TaskList({ specName }: { specName: string }) {
   const [expandedPrompts, setExpandedPrompts] = useState<Set<string>>(new Set());
 
   // Filter and sort state
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'in-progress' | 'completed' | 'blocked'>('all');
   const [sortBy, setSortBy] = useState<'default' | 'status' | 'id' | 'description'>('default');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
@@ -574,6 +583,8 @@ function TaskList({ specName }: { specName: string }) {
           return task.status === 'in-progress';
         case 'completed':
           return task.status === 'completed';
+        case 'blocked':
+          return task.status === 'blocked';
         default:
           return true;
       }
@@ -595,7 +606,7 @@ function TaskList({ specName }: { specName: string }) {
       switch (sortBy) {
         case 'status':
           // Sort by status priority: pending -> in-progress -> completed
-          const statusOrder = { 'pending': 0, 'in-progress': 1, 'completed': 2 };
+          const statusOrder = { 'pending': 0, 'in-progress': 1, 'blocked': 2, 'completed': 3 };
           aValue = statusOrder[a.status as keyof typeof statusOrder] || 0;
           bValue = statusOrder[b.status as keyof typeof statusOrder] || 0;
           break;
@@ -624,7 +635,8 @@ function TaskList({ specName }: { specName: string }) {
       all: 0,
       pending: 0,
       'in-progress': 0,
-      completed: 0
+      completed: 0,
+      blocked: 0
     };
 
     tasks?.forEach((task: any) => {
@@ -832,13 +844,14 @@ function TaskList({ specName }: { specName: string }) {
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('tasksPage.status')}:</label>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'in-progress' | 'completed')}
+                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'in-progress' | 'completed' | 'blocked')}
                 className="px-3 py-1.5 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">{t('tasksPage.filters.all')} ({taskCounts.all})</option>
                 <option value="pending">{t('tasksPage.filters.pending')} ({taskCounts.pending})</option>
                 <option value="in-progress">{t('tasksPage.filters.inProgress')} ({taskCounts['in-progress']})</option>
                 <option value="completed">{t('tasksPage.filters.completed')} ({taskCounts.completed})</option>
+                <option value="blocked">{t('tasksPage.filters.blocked')} ({taskCounts.blocked})</option>
               </select>
             </div>
 
@@ -1006,6 +1019,8 @@ function TaskList({ specName }: { specName: string }) {
                       <div className="w-3 h-3 rounded-full bg-purple-500" />
                     ) : task.completed ? (
                       <div className="w-3 h-3 rounded-full bg-green-500" />
+                    ) : task.status === 'blocked' ? (
+                      <div className="w-3 h-3 rounded-full bg-red-500" />
                     ) : data.inProgress === task.id ? (
                       <div className="w-3 h-3 rounded-full bg-orange-500 animate-pulse" />
                     ) : (

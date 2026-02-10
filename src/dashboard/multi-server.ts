@@ -1054,15 +1054,15 @@ export class MultiProjectDashboardServer {
     // Update task status
     this.app.put('/api/projects/:projectId/specs/:name/tasks/:taskId/status', async (request, reply) => {
       const { projectId, name, taskId } = request.params as { projectId: string; name: string; taskId: string };
-      const { status } = request.body as { status: 'pending' | 'in-progress' | 'completed' };
+      const { status } = request.body as { status: 'pending' | 'in-progress' | 'completed' | 'blocked' };
       const project = this.projectManager.getProject(projectId);
 
       if (!project) {
         return reply.code(404).send({ error: 'Project not found' });
       }
 
-      if (!status || !['pending', 'in-progress', 'completed'].includes(status)) {
-        return reply.code(400).send({ error: 'Invalid status. Must be pending, in-progress, or completed' });
+      if (!status || !['pending', 'in-progress', 'completed', 'blocked'].includes(status)) {
+        return reply.code(400).send({ error: 'Invalid status. Must be pending, in-progress, completed, or blocked' });
       }
 
       try {

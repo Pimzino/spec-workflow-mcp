@@ -45,7 +45,8 @@
     "status": {
       "pending": "معلق",
       "inProgress": "قيد التنفيذ",
-      "completed": "مكتمل"
+      "completed": "مكتمل",
+      "blocked": "محظور"
     },
     "taskGroup": "مجموعة المهام",
     "meta": {

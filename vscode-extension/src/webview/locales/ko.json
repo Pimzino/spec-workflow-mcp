@@ -45,7 +45,8 @@
     "status": {
       "pending": "대기 중",
       "inProgress": "진행 중",
-      "completed": "완료됨"
+      "completed": "완료됨",
+      "blocked": "차단됨"
     },
     "taskGroup": "태스크 그룹",
     "meta": {

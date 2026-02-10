@@ -8,12 +8,13 @@ interface StatusFilterPillsProps {
     pending: number;
     inProgress: number;
     completed: number;
+    blocked: number;
   };
 }
 
 export function StatusFilterPills({ currentFilter, onFilterChange, taskCounts }: StatusFilterPillsProps) {
   const { t } = useTranslation();
-  const totalTasks = taskCounts.pending + taskCounts.inProgress + taskCounts.completed;
+  const totalTasks = taskCounts.pending + taskCounts.inProgress + taskCounts.completed + taskCounts.blocked;
 
   const filterOptions = [
     {
@@ -48,6 +49,17 @@ export function StatusFilterPills({ currentFilter, onFilterChange, taskCounts }:
       activeText: 'text-[var(--text-primary)]',
       hoverBg: 'hover:bg-[var(--surface-raised)]',
       dotColor: 'bg-orange-500',
+    },
+    {
+      id: 'blocked',
+      label: t('tasksPage.filters.blocked'),
+      count: taskCounts.blocked,
+      bgColor: 'bg-[var(--surface-panel)]',
+      textColor: 'text-[var(--text-secondary)]',
+      activeBg: 'bg-[var(--surface-raised)]',
+      activeText: 'text-[var(--text-primary)]',
+      hoverBg: 'hover:bg-[var(--surface-raised)]',
+      dotColor: 'bg-red-500',
     },
     {
       id: 'completed',

@@ -742,7 +742,7 @@ export class SpecWorkflowService {
       const content = await fs.readFile(tasksPath, 'utf-8');
 
       // Use unified parser's update function
-      const updatedContent = updateTaskStatus(content, taskId, status as 'pending' | 'in-progress' | 'completed');
+      const updatedContent = updateTaskStatus(content, taskId, status as 'pending' | 'in-progress' | 'completed' | 'blocked');
 
       // Check if content actually changed
       if (updatedContent === content) {

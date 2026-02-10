@@ -6,11 +6,11 @@
 export interface ParsedTask {
   id: string;                          // Task ID (e.g., "1", "1.1", "2.3")
   description: string;                 // Task description
-  status: 'pending' | 'in-progress' | 'completed';
+  status: 'pending' | 'in-progress' | 'completed' | 'blocked';
   lineNumber: number;                  // Line number in the file (0-based)
   indentLevel: number;                 // Indentation level (for hierarchy)
   isHeader: boolean;                   // Whether this is a header task (no implementation details)
-  
+
   // Optional metadata
   requirements?: string[];              // Referenced requirements
   leverage?: string;                   // Code to leverage
@@ -18,10 +18,11 @@ export interface ParsedTask {
   purposes?: string[];                 // Purpose statements
   implementationDetails?: string[];    // Implementation bullet points
   prompt?: string;                     // AI prompt for this task
-  
+
   // For backward compatibility
   completed: boolean;                  // true if status === 'completed'
   inProgress: boolean;                 // true if status === 'in-progress'
+  blocked: boolean;                    // true if status === 'blocked'
 }
 
 export interface TaskParserResult {
@@ -32,6 +33,7 @@ export interface TaskParserResult {
     completed: number;
     inProgress: number;
     pending: number;
+    blocked: number;
     headers: number;
   };
 }
@@ -44,11 +46,11 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
   const lines = content.split('\n');
   const tasks: ParsedTask[] = [];
   let inProgressTask: string | null = null;
-  
+
   // Find all lines with checkboxes (supports both - and * list markers)
   const checkboxIndices: number[] = [];
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].match(/^\s*[-*]\s+\[([ x\-])\]/)) {
+    if (lines[i].match(/^\s*[-*]\s+\[([ x\-~])\]/)) {
       checkboxIndices.push(i);
     }
   }
@@ -59,7 +61,7 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     const endLine = idx < checkboxIndices.length - 1 ? checkboxIndices[idx + 1] : lines.length;
     
     const line = lines[lineNumber];
-    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-])\]\s+(.+)/);
+    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
 
     if (!checkboxMatch) {
       continue;
@@ -69,13 +71,15 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     const listMarker = checkboxMatch[2]; // '-' or '*'
     const statusChar = checkboxMatch[3];
     const taskText = checkboxMatch[4];
-    
+
     // Determine status
-    let status: 'pending' | 'in-progress' | 'completed';
+    let status: 'pending' | 'in-progress' | 'completed' | 'blocked';
     if (statusChar === 'x') {
       status = 'completed';
     } else if (statusChar === '-') {
       status = 'in-progress';
+    } else if (statusChar === '~') {
+      status = 'blocked';
     } else {
       status = 'pending';
     }
@@ -200,7 +204,8 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
       isHeader: !hasDetails,
       completed: status === 'completed',
       inProgress: status === 'in-progress',
-      
+      blocked: status === 'blocked',
+
       // Add metadata if present
       ...(requirements.length > 0 && { requirements }),
       ...(leverage.length > 0 && { leverage: leverage.join(', ') }),
@@ -225,6 +230,7 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     completed: nonHeaderTasks.filter(t => t.status === 'completed').length,
     inProgress: nonHeaderTasks.filter(t => t.status === 'in-progress').length,
     pending: nonHeaderTasks.filter(t => t.status === 'pending').length,
+    blocked: nonHeaderTasks.filter(t => t.status === 'blocked').length,
     headers: tasks.filter(t => t.isHeader).length
   };
   
@@ -242,11 +248,12 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
 export function updateTaskStatus(
   content: string, 
   taskId: string, 
-  newStatus: 'pending' | 'in-progress' | 'completed'
+  newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked'
 ): string {
   const lines = content.split('\n');
-  const statusMarker = newStatus === 'completed' ? 'x' : 
-                       newStatus === 'in-progress' ? '-' : 
+  const statusMarker = newStatus === 'completed' ? 'x' :
+                       newStatus === 'in-progress' ? '-' :
+                       newStatus === 'blocked' ? '~' :
                        ' ';
   
   // Find and update the task line
@@ -255,7 +262,7 @@ export function updateTaskStatus(
 
     // Match checkbox line with task ID in the description (supports both - and * list markers)
     // Pattern: - [x] 1.1 Task description  or  * [x] 1.1 Task description
-    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-])\]\s+(.+)/);
+    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
 
     if (checkboxMatch) {
       const prefix = checkboxMatch[1];

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 interface Task {
   id: string;
   description: string;
-  status: 'pending' | 'in-progress' | 'completed';
+  status: 'pending' | 'in-progress' | 'completed' | 'blocked';
   files?: string[];
   implementationDetails?: string[];
   requirements?: string[];
@@ -65,6 +65,13 @@ export function KanbanTaskCard({
           borderColor: 'border-[var(--border-default)]',
           textColor: 'text-[var(--text-primary)]',
           dotColor: 'bg-orange-500',
+        };
+      case 'blocked':
+        return {
+          bgColor: 'bg-[var(--surface-panel)]',
+          borderColor: 'border-[var(--border-default)]',
+          textColor: 'text-[var(--text-primary)]',
+          dotColor: 'bg-red-500',
         };
       case 'completed':
         return {

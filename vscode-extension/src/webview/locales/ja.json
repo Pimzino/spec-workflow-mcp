@@ -45,7 +45,8 @@
     "status": {
       "pending": "保留中",
       "inProgress": "進行中",
-      "completed": "完了"
+      "completed": "完了",
+      "blocked": "ブロック中"
     },
     "taskGroup": "タスクグループ",
     "meta": {

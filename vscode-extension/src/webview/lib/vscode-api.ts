@@ -70,7 +70,7 @@ export type WebviewMessage =
   | { type: 'get-logs'; specName: string }
   | { type: 'search-logs'; specName: string; query: string };
 
-export type TaskStatus = 'pending' | 'in-progress' | 'completed';
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'blocked';
 
 export interface SpecData {
   name: string;

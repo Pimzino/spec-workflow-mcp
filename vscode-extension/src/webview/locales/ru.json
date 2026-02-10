@@ -45,7 +45,8 @@
     "status": {
       "pending": "Ожидает",
       "inProgress": "В процессе",
-      "completed": "Завершено"
+      "completed": "Завершено",
+      "blocked": "Заблокировано"
     },
     "taskGroup": "Группа задач",
     "meta": {

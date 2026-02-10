@@ -141,6 +141,7 @@
       "pending": "保留中",
       "inProgress": "進行中",
       "completed": "完了",
+      "blocked": "ブロック中",
       "filterByTooltip": "{{status}}のタスクでフィルター"
     },
     "sort": {
@@ -167,6 +168,7 @@
       "pending": "保留中",
       "inProgress": "進行中",
       "completed": "完了",
+      "blocked": "ブロック中",
       "clickToChange": "クリックしてステータスを変更"
     },
     "noSpecsFound": {
@@ -199,6 +201,9 @@
       "leftDesc": "未完了",
       "progress": "進捗",
       "progressDesc": "完了率"
+    },
+    "kanban": {
+      "noBlockedTasks": "ブロックされたタスクはありません"
     }
   },
   "specsPage": {

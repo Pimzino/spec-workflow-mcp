@@ -121,6 +121,7 @@
       "pending": "대기 중",
       "inProgress": "진행 중",
       "completed": "완료됨",
+      "blocked": "차단됨",
       "filterByTooltip": "{{status}} 태스크로 필터"
     },
     "sort": {
@@ -147,6 +148,7 @@
       "pending": "대기 중",
       "inProgress": "진행 중",
       "completed": "완료됨",
+      "blocked": "차단됨",
       "clickToChange": "상태 변경하려면 클릭"
     },
     "dropdown": {
@@ -199,6 +201,9 @@
       "leftDesc": "남은 것",
       "progress": "진행률",
       "progressDesc": "완료"
+    },
+    "kanban": {
+      "noBlockedTasks": "차단된 작업 없음"
     }
   },
   "specsPage": {

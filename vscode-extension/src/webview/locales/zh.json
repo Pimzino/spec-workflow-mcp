@@ -40,7 +40,8 @@
     "status": {
       "pending": "待处理",
       "inProgress": "进行中",
-      "completed": "已完成"
+      "completed": "已完成",
+      "blocked": "已阻塞"
     },
     "taskGroup": "任务组",
     "meta": {

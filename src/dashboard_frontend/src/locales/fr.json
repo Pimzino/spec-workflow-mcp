@@ -121,6 +121,7 @@
       "pending": "En attente",
       "inProgress": "En cours",
       "completed": "Terminées",
+      "blocked": "Bloqué",
       "filterByTooltip": "Filtrer par tâches {{status}}"
     },
     "sort": {
@@ -147,6 +148,7 @@
       "pending": "En attente",
       "inProgress": "En cours",
       "completed": "Terminé",
+      "blocked": "Bloqué",
       "clickToChange": "Cliquer pour changer le statut"
     },
     "dropdown": {
@@ -199,6 +201,9 @@
       "leftDesc": "Restantes",
       "progress": "Progrès",
       "progressDesc": "Terminé"
+    },
+    "kanban": {
+      "noBlockedTasks": "Aucune tâche bloquée"
     }
   },
   "specsPage": {
