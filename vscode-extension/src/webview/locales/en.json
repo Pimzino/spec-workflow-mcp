@@ -45,7 +45,8 @@
     "status": {
       "pending": "Pending",
       "inProgress": "In Progress",
-      "completed": "Completed"
+      "completed": "Completed",
+      "blocked": "Blocked"
     },
     "taskGroup": "Task Group",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "Implementation",
       "purposes": "Purposes",
       "requirements": "Requirements",
-      "leverage": "Leverage"
+      "leverage": "Leverage",
+      "blockedReason": "Blocked"
+    },
+    "blockedReason": {
+      "title": "Blocked Reason",
+      "description": "Optionally provide a reason why this task is blocked.",
+      "placeholder": "e.g. Waiting on API team...",
+      "submit": "Set Blocked",
+      "skip": "Skip"
     },
     "loading": "Loading tasks...",
     "noSpecs": "No specifications found",
@@ -180,9 +189,6 @@
       "dataFlow": "Data Flow:",
       "exported": "(exported)"
     }
-  },
-  "common": {
-    "scrollToTop": "Scroll to top"
   },
   "commentModal": {
     "title": {

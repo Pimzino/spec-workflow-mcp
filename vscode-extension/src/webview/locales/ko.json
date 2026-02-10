@@ -45,7 +45,8 @@
     "status": {
       "pending": "대기 중",
       "inProgress": "진행 중",
-      "completed": "완료됨"
+      "completed": "완료됨",
+      "blocked": "차단됨"
     },
     "taskGroup": "태스크 그룹",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "구현",
       "purposes": "목적",
       "requirements": "요구사항",
-      "leverage": "활용"
+      "leverage": "활용",
+      "blockedReason": "차단됨"
+    },
+    "blockedReason": {
+      "title": "차단 사유",
+      "description": "이 작업이 차단된 이유를 선택적으로 제공하세요.",
+      "placeholder": "예: API 팀 대기 중...",
+      "submit": "차단 설정",
+      "skip": "건너뛰기"
     },
     "loading": "태스크 로딩 중...",
     "noSpecs": "명세서를 찾을 수 없음",
@@ -107,7 +116,7 @@
   },
   "common": {
     "dismiss": "닫기",
-    "scrollToTop": "맨 위로"
+    "scrollToTop": "맨 위로 스크롤"
   },
   "specs": {
     "active": "활성",
@@ -180,9 +189,6 @@
       "dataFlow": "데이터 흐름:",
       "exported": "(내보내짐)"
     }
-  },
-  "common": {
-    "scrollToTop": "맨 위로 스크롤"
   },
   "commentModal": {
     "title": {

@@ -55,13 +55,13 @@ export function validateTasksMarkdown(content: string): ValidationResult {
     let taskId: string | undefined;
 
     // 1. Validate checkbox format: must be "- [ ]", "- [-]", or "- [x]"
-    const checkboxMatch = line.match(/^\s*-\s+\[([ x\-])\]\s+(.+)/);
+    const checkboxMatch = line.match(/^\s*-\s+\[([ x\-~])\]\s+(.+)/);
 
     if (!checkboxMatch) {
       // Check for common malformed patterns
       const malformedPatterns = [
         { pattern: /^\s*-\s*\[\]\s/, message: 'Empty checkbox brackets', suggestion: 'Use "- [ ]" with a space inside brackets' },
-        { pattern: /^\s*-\s*\[([^x \-])\]/, message: 'Invalid checkbox character', suggestion: 'Use space for pending, x for completed, - for in-progress' },
+        { pattern: /^\s*-\s*\[([^x \-~])\]/, message: 'Invalid checkbox character', suggestion: 'Use space for pending, x for completed, - for in-progress, ~ for blocked' },
         { pattern: /^\s*-\[\s*[x \-]?\s*\]/, message: 'Missing space after hyphen', suggestion: 'Use "- [ ]" with space between - and [' },
         { pattern: /^\s*\*\s+\[/, message: 'Wrong bullet character', suggestion: 'Use hyphen (-) instead of asterisk (*)' },
       ];
@@ -143,6 +143,32 @@ export function validateTasksMarkdown(content: string): ValidationResult {
               severity: 'warning'
             });
           }
+        }
+      }
+
+      // Check for _Blocked:_ format
+      if (trimmedLine.includes('Blocked:') && !trimmedLine.includes('_Prompt:')) {
+        // Accept _Blocked: text_ as valid metadata
+        if (trimmedLine.includes('_Blocked:')) {
+          if (!trimmedLine.match(/_Blocked:\s*[^_]+_/)) {
+            warnings.push({
+              line: lineIdx + 1,
+              taskId,
+              field: 'blocked',
+              message: 'Blocked field missing closing underscore delimiter',
+              suggestion: 'Use "_Blocked: reason_" format for proper parsing',
+              severity: 'warning'
+            });
+          }
+        } else if (trimmedLine.match(/Blocked:\s*\S/)) {
+          warnings.push({
+            line: lineIdx + 1,
+            taskId,
+            field: 'blocked',
+            message: 'Blocked field missing underscore delimiters',
+            suggestion: 'Use "_Blocked: reason_" format for proper parsing',
+            severity: 'warning'
+          });
         }
       }
 

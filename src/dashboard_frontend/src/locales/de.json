@@ -121,6 +121,7 @@
       "pending": "Ausstehend",
       "inProgress": "In Arbeit",
       "completed": "Abgeschlossen",
+      "blocked": "Blockiert",
       "filterByTooltip": "Nach {{status}} Aufgaben filtern"
     },
     "sort": {
@@ -147,6 +148,7 @@
       "pending": "Ausstehend",
       "inProgress": "In Arbeit",
       "completed": "Abgeschlossen",
+      "blocked": "Blockiert",
       "clickToChange": "Klicken zum Ändern des Status"
     },
     "dropdown": {
@@ -199,6 +201,15 @@
       "leftDesc": "Verbleibend",
       "progress": "Fortschritt",
       "progressDesc": "Vollständig"
+    },
+    "blockedReason": {
+      "title": "Warum ist diese Aufgabe blockiert?",
+      "placeholder": "z.B., Warten auf API-Team zur Finalisierung des Schemas...",
+      "submit": "Grund hinzufügen",
+      "skip": "Überspringen"
+    },
+    "kanban": {
+      "noBlockedTasks": "Keine blockierten Aufgaben"
     }
   },
   "specsPage": {

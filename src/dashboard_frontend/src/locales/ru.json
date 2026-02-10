@@ -123,6 +123,7 @@
       "pending": "Ожидающие",
       "inProgress": "В процессе",
       "completed": "Завершенные",
+      "blocked": "Заблокировано",
       "filterByTooltip": "Фильтровать по задачам \"{{status}}\""
     },
     "sort": {
@@ -149,6 +150,7 @@
       "pending": "Ожидает",
       "inProgress": "В процессе",
       "completed": "Завершено",
+      "blocked": "Заблокировано",
       "clickToChange": "Нажмите для изменения статуса"
     },
     "dropdown": {
@@ -201,9 +203,17 @@
       "leftDesc": "Оставшиеся",
       "progress": "Прогресс",
       "progressDesc": "Завершено"
+    },
+    "blockedReason": {
+      "title": "Почему эта задача заблокирована?",
+      "placeholder": "Например, Ожидание команды API для финализации схемы...",
+      "submit": "Добавить причину",
+      "skip": "Пропустить"
+    },
+    "kanban": {
+      "noBlockedTasks": "Нет заблокированных задач"
     }
-  }
-  ,
+  },
   "specsPage": {
     "header": {
       "title": "Спецификации",

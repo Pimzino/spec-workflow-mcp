@@ -56,12 +56,13 @@ export interface TaskInfo {
   leverage?: string;                   // Code to leverage
   purposes?: string[];                 // Purpose statements
   prompt?: string;                     // AI prompt for this task
-  promptStructured?: PromptSection[];  // Structured prompt sections  
+  promptStructured?: PromptSection[];  // Structured prompt sections
+  blockedReason?: string;              // Reason the task is blocked (from _Blocked: reason_)
   // For backward compatibility
   inProgress?: boolean;                // true if status === 'in-progress'
 }
 
-export type TaskStatus = 'pending' | 'in-progress' | 'completed';
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'blocked';
 
 export interface HighlightColor {
   bg: string;

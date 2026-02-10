@@ -45,7 +45,8 @@
     "status": {
       "pending": "Pendente",
       "inProgress": "Em Progresso",
-      "completed": "Concluída"
+      "completed": "Concluída",
+      "blocked": "Bloqueado"
     },
     "taskGroup": "Grupo de Tarefas",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "Implementação",
       "purposes": "Propósitos",
       "requirements": "Requisitos",
-      "leverage": "Aproveitar"
+      "leverage": "Aproveitar",
+      "blockedReason": "Bloqueado"
+    },
+    "blockedReason": {
+      "title": "Motivo do bloqueio",
+      "description": "Opcionalmente forneça um motivo pelo qual esta tarefa está bloqueada.",
+      "placeholder": "ex. Aguardando equipe de API...",
+      "submit": "Definir como bloqueado",
+      "skip": "Pular"
     },
     "loading": "Carregando tarefas...",
     "noSpecs": "Nenhuma especificação encontrada",
@@ -180,9 +189,6 @@
       "dataFlow": "Fluxo de Dados:",
       "exported": "(exportado)"
     }
-  },
-  "common": {
-    "scrollToTop": "Voltar ao topo"
   },
   "commentModal": {
     "title": {

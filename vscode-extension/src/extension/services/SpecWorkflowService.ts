@@ -702,7 +702,8 @@ export class SpecWorkflowService {
       purposes: task.purposes,
       // Preserve parsed AI prompt for UI and copy functionality
       prompt: task.prompt,
-      inProgress: task.inProgress    }));
+      inProgress: task.inProgress,
+      blockedReason: task.blockedReason    }));
     
     this.logger.log('Tasks with prompts:', tasks.filter(t => t.prompt).map(t => ({
       id: t.id,
@@ -731,7 +732,7 @@ export class SpecWorkflowService {
     };
   }
 
-  async updateTaskStatus(specName: string, taskId: string, status: string): Promise<void> {
+  async updateTaskStatus(specName: string, taskId: string, status: string, blockedReason?: string): Promise<void> {
     if (!await this.ensureSpecWorkflowExists()) {
       throw new Error('Spec workflow directory not found');
     }
@@ -742,7 +743,7 @@ export class SpecWorkflowService {
       const content = await fs.readFile(tasksPath, 'utf-8');
 
       // Use unified parser's update function
-      const updatedContent = updateTaskStatus(content, taskId, status as 'pending' | 'in-progress' | 'completed');
+      const updatedContent = updateTaskStatus(content, taskId, status as 'pending' | 'in-progress' | 'completed' | 'blocked', blockedReason);
 
       // Check if content actually changed
       if (updatedContent === content) {

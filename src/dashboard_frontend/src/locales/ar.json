@@ -121,6 +121,7 @@
       "pending": "معلق",
       "inProgress": "قيد التنفيذ",
       "completed": "مكتمل",
+      "blocked": "محظور",
       "filterByTooltip": "تصفية بمهام {{status}}"
     },
     "sort": {
@@ -147,6 +148,7 @@
       "pending": "معلق",
       "inProgress": "قيد التنفيذ",
       "completed": "مكتمل",
+      "blocked": "محظور",
       "clickToChange": "انقر لتغيير الحالة"
     },
     "dropdown": {
@@ -199,6 +201,15 @@
       "leftDesc": "متبقية",
       "progress": "التقدم",
       "progressDesc": "مكتمل"
+    },
+    "blockedReason": {
+      "title": "لماذا هذه المهمة محظورة؟",
+      "placeholder": "مثال: في انتظار فريق API لإنهاء المخطط...",
+      "submit": "إضافة سبب",
+      "skip": "تخطي"
+    },
+    "kanban": {
+      "noBlockedTasks": "لا توجد مهام محظورة"
     }
   },
   "specsPage": {

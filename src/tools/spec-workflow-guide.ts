@@ -206,6 +206,8 @@ flowchart TD
   - \`- [ ]\` = Pending task
   - \`- [-]\` = In-progress task
   - \`- [x]\` = Completed task
+  - \`- [~]\` = Blocked task
+- Optional blocked reason metadata: \`- _Blocked: reason why task is blocked_\` (add as sub-bullet under the blocked task)
 
 **Tools**:
 - spec-status: Check overall progress

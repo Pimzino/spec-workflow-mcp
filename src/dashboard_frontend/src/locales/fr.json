@@ -121,6 +121,7 @@
       "pending": "En attente",
       "inProgress": "En cours",
       "completed": "Terminées",
+      "blocked": "Bloqué",
       "filterByTooltip": "Filtrer par tâches {{status}}"
     },
     "sort": {
@@ -147,6 +148,7 @@
       "pending": "En attente",
       "inProgress": "En cours",
       "completed": "Terminé",
+      "blocked": "Bloqué",
       "clickToChange": "Cliquer pour changer le statut"
     },
     "dropdown": {
@@ -199,6 +201,15 @@
       "leftDesc": "Restantes",
       "progress": "Progrès",
       "progressDesc": "Terminé"
+    },
+    "blockedReason": {
+      "title": "Pourquoi cette tâche est-elle bloquée ?",
+      "placeholder": "Ex., En attente de l'équipe API pour finaliser le schéma...",
+      "submit": "Ajouter une raison",
+      "skip": "Passer"
+    },
+    "kanban": {
+      "noBlockedTasks": "Aucune tâche bloquée"
     }
   },
   "specsPage": {

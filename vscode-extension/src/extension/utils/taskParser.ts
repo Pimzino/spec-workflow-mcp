@@ -6,11 +6,11 @@
 export interface ParsedTask {
   id: string;                          // Task ID (e.g., "1", "1.1", "2.3")
   description: string;                 // Task description
-  status: 'pending' | 'in-progress' | 'completed';
+  status: 'pending' | 'in-progress' | 'completed' | 'blocked';
   lineNumber: number;                  // Line number in the file (0-based)
   indentLevel: number;                 // Indentation level (for hierarchy)
   isHeader: boolean;                   // Whether this is a header task (no implementation details)
-  
+
   // Optional metadata
   requirements?: string[];              // Referenced requirements
   leverage?: string;                   // Code to leverage
@@ -18,10 +18,12 @@ export interface ParsedTask {
   purposes?: string[];                 // Purpose statements
   implementationDetails?: string[];    // Implementation bullet points
   prompt?: string;                     // AI prompt for this task
-  
+  blockedReason?: string;              // Reason the task is blocked (from _Blocked: reason_)
+
   // For backward compatibility
   completed: boolean;                  // true if status === 'completed'
   inProgress: boolean;                 // true if status === 'in-progress'
+  blocked: boolean;                    // true if status === 'blocked'
 }
 
 export interface TaskParserResult {
@@ -32,6 +34,7 @@ export interface TaskParserResult {
     completed: number;
     inProgress: number;
     pending: number;
+    blocked: number;
     headers: number;
   };
 }
@@ -44,11 +47,11 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
   const lines = content.split('\n');
   const tasks: ParsedTask[] = [];
   let inProgressTask: string | null = null;
-  
+
   // Find all lines with checkboxes (supports both - and * list markers)
   const checkboxIndices: number[] = [];
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].match(/^\s*[-*]\s+\[([ x\-])\]/)) {
+    if (lines[i].match(/^\s*[-*]\s+\[([ x\-~])\]/)) {
       checkboxIndices.push(i);
     }
   }
@@ -59,7 +62,7 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     const endLine = idx < checkboxIndices.length - 1 ? checkboxIndices[idx + 1] : lines.length;
     
     const line = lines[lineNumber];
-    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-])\]\s+(.+)/);
+    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
 
     if (!checkboxMatch) {
       continue;
@@ -69,13 +72,15 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     const listMarker = checkboxMatch[2]; // '-' or '*'
     const statusChar = checkboxMatch[3];
     const taskText = checkboxMatch[4];
-    
+
     // Determine status
-    let status: 'pending' | 'in-progress' | 'completed';
+    let status: 'pending' | 'in-progress' | 'completed' | 'blocked';
     if (statusChar === 'x') {
       status = 'completed';
     } else if (statusChar === '-') {
       status = 'in-progress';
+    } else if (statusChar === '~') {
+      status = 'blocked';
     } else {
       status = 'pending';
     }
@@ -103,7 +108,8 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     const purposes: string[] = [];
     const implementationDetails: string[] = [];
     let prompt: string | undefined;
-    
+    let blockedReason: string | undefined;
+
     for (let lineIdx = lineNumber + 1; lineIdx < endLine; lineIdx++) {
       const contentLine = lines[lineIdx].trim();
       
@@ -162,6 +168,11 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
           const levText = levMatch[1].trim();
           leverage.push(...levText.split(',').map(l => l.trim()).filter(l => l));
         }
+      } else if (contentLine.includes('_Blocked:') && !contentLine.includes('_Prompt:')) {
+        const blockedMatch = contentLine.match(/_Blocked:\s*([^_]+?)_/);
+        if (blockedMatch) {
+          blockedReason = blockedMatch[1].trim();
+        }
       } else if (contentLine.match(/Files?:/)) {
         const fileMatch = contentLine.match(/Files?:\s*(.+)$/);
         if (fileMatch) {
@@ -200,16 +211,18 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
       isHeader: !hasDetails,
       completed: status === 'completed',
       inProgress: status === 'in-progress',
-      
+      blocked: status === 'blocked',
+
       // Add metadata if present
       ...(requirements.length > 0 && { requirements }),
       ...(leverage.length > 0 && { leverage: leverage.join(', ') }),
       ...(files.length > 0 && { files }),
       ...(purposes.length > 0 && { purposes }),
       ...(implementationDetails.length > 0 && { implementationDetails }),
-      ...(prompt && { prompt })
+      ...(prompt && { prompt }),
+      ...(blockedReason && { blockedReason })
     };
-    
+
     tasks.push(task);
     
     // Track first in-progress task (for UI highlighting)
@@ -225,6 +238,7 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     completed: nonHeaderTasks.filter(t => t.status === 'completed').length,
     inProgress: nonHeaderTasks.filter(t => t.status === 'in-progress').length,
     pending: nonHeaderTasks.filter(t => t.status === 'pending').length,
+    blocked: nonHeaderTasks.filter(t => t.status === 'blocked').length,
     headers: tasks.filter(t => t.isHeader).length
   };
   
@@ -240,22 +254,24 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
  * Handles any indentation level and task numbering format
  */
 export function updateTaskStatus(
-  content: string, 
-  taskId: string, 
-  newStatus: 'pending' | 'in-progress' | 'completed'
+  content: string,
+  taskId: string,
+  newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked',
+  reason?: string
 ): string {
   const lines = content.split('\n');
-  const statusMarker = newStatus === 'completed' ? 'x' : 
-                       newStatus === 'in-progress' ? '-' : 
+  const statusMarker = newStatus === 'completed' ? 'x' :
+                       newStatus === 'in-progress' ? '-' :
+                       newStatus === 'blocked' ? '~' :
                        ' ';
-  
+
   // Find and update the task line
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
     // Match checkbox line with task ID in the description (supports both - and * list markers)
     // Pattern: - [x] 1.1 Task description  or  * [x] 1.1 Task description
-    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-])\]\s+(.+)/);
+    const checkboxMatch = line.match(/^(\s*)([-*])\s+\[([ x\-~])\]\s+(.+)/);
 
     if (checkboxMatch) {
       const prefix = checkboxMatch[1];
@@ -263,19 +279,41 @@ export function updateTaskStatus(
       const taskText = checkboxMatch[4];
 
       // Check if this line contains our target task ID
-      // Match patterns like "1. Description", "1.1 Description", "2.1. Description" etc
-      // Also handles escaped periods from MDXEditor: "1\. Description"
       const taskMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\\?\.?\s+(.+)/);
 
       if (taskMatch && taskMatch[1] === taskId) {
         // Reconstruct the line with new status, preserving the original list marker
         const statusPart = `${listMarker} [${statusMarker}] `;
         lines[i] = prefix + statusPart + taskText;
+
+        const isNowBlocked = newStatus === 'blocked';
+
+        // Find and remove any existing _Blocked:_ line after this task
+        let blockedLineIndex = -1;
+        for (let j = i + 1; j < lines.length; j++) {
+          const nextLine = lines[j].trim();
+          if (nextLine.match(/^[-*]\s+\[([ x\-~])\]/)) { break; }
+          if (nextLine.match(/_Blocked:\s*[^_]+?_/)) {
+            blockedLineIndex = j;
+            break;
+          }
+        }
+
+        if (blockedLineIndex !== -1) {
+          lines.splice(blockedLineIndex, 1);
+        }
+
+        if (isNowBlocked && reason) {
+          const indent = prefix + '  ';
+          const blockedLine = `${indent}- _Blocked: ${reason}_`;
+          lines.splice(i + 1, 0, blockedLine);
+        }
+
         return lines.join('\n');
       }
     }
   }
-  
+
   // Task not found
   return content;
 }
