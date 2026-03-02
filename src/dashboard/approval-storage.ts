@@ -202,14 +202,26 @@ export class ApprovalStorage extends EventEmitter {
    * 2) Shared workflow root (projectPath)
    */
   private getFilePathCandidates(filePath: string): string[] {
+    // Security: reject absolute paths and path traversal
     if (isAbsolute(filePath)) {
-      return [filePath];
+      throw new Error('Security error: absolute paths are not allowed for filePath');
+    }
+    if (filePath.includes('..')) {
+      throw new Error('Security error: path traversal (..) is not allowed in filePath');
     }
 
     const candidates = [
-      join(this.fileResolutionPath, filePath),
-      join(this.projectPath, filePath)
+      PathUtils.safeJoin(this.fileResolutionPath, filePath),
+      PathUtils.safeJoin(this.projectPath, filePath)
     ];
+
+    // Verify resolved paths stay within allowed directories
+    for (const candidate of candidates) {
+      PathUtils.validatePathWithinBases(resolve(candidate), [
+        resolve(this.fileResolutionPath),
+        resolve(this.projectPath)
+      ]);
+    }
 
     return Array.from(new Set(candidates));
   }
@@ -228,8 +240,12 @@ export class ApprovalStorage extends EventEmitter {
   }
 
   private async resolveFilePathForWrite(filePath: string): Promise<string> {
+    // Security: reject absolute paths and path traversal
     if (isAbsolute(filePath)) {
-      return filePath;
+      throw new Error('Security error: absolute paths are not allowed for filePath');
+    }
+    if (filePath.includes('..')) {
+      throw new Error('Security error: path traversal (..) is not allowed in filePath');
     }
 
     const existingPath = await this.resolveExistingFilePath(filePath);
@@ -237,7 +253,7 @@ export class ApprovalStorage extends EventEmitter {
       return existingPath;
     }
 
-    return join(this.fileResolutionPath, filePath);
+    return PathUtils.safeJoin(this.fileResolutionPath, filePath);
   }
 
   async createApproval(
@@ -248,6 +264,14 @@ export class ApprovalStorage extends EventEmitter {
     type: 'document' | 'action' = 'document',
     metadata?: Record<string, any>
   ): Promise<string> {
+    // Security: validate filePath before storing
+    if (isAbsolute(filePath)) {
+      throw new Error('Security error: absolute paths are not allowed for filePath');
+    }
+    if (filePath.includes('..')) {
+      throw new Error('Security error: path traversal (..) is not allowed in filePath');
+    }
+
     const id = this.generateId();
     const approval: ApprovalRequest = {
       id,

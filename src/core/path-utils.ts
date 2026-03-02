@@ -163,9 +163,24 @@ export class PathUtils {
   }
 
   /**
+   * Validate that a resolved absolute path is within at least one of the given base directories.
+   * Throws if the path escapes all bases.
+   */
+  static validatePathWithinBases(resolvedPath: string, basePaths: string[]): void {
+    const normalizedResolved = resolve(resolvedPath);
+    for (const base of basePaths) {
+      const normalizedBase = resolve(base);
+      if (normalizedResolved === normalizedBase || normalizedResolved.startsWith(normalizedBase + sep)) {
+        return;
+      }
+    }
+    throw new Error(`Path traversal detected: path escapes allowed directories`);
+  }
+
+  /**
    * Safely join paths ensuring no directory traversal
    */
-  private static safeJoin(basePath: string, ...paths: string[]): string {
+  static safeJoin(basePath: string, ...paths: string[]): string {
     // Validate base path
     if (!basePath || typeof basePath !== 'string') {
       throw new Error('Invalid base path');

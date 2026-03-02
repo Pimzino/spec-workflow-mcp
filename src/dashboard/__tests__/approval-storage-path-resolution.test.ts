@@ -73,6 +73,24 @@ describe('ApprovalStorage path resolution', () => {
     expect(content).toBe('# Requirements from shared root');
   });
 
+  it('rejects absolute file paths in createApproval', async () => {
+    await expect(
+      storage.createApproval('Review', '/etc/passwd', 'spec', 'test-spec')
+    ).rejects.toThrow('absolute paths are not allowed');
+  });
+
+  it('rejects path traversal in createApproval', async () => {
+    await expect(
+      storage.createApproval('Review', '../../../etc/passwd', 'spec', 'test-spec')
+    ).rejects.toThrow('path traversal (..) is not allowed');
+  });
+
+  it('rejects embedded path traversal in createApproval', async () => {
+    await expect(
+      storage.createApproval('Review', 'src/../../etc/passwd', 'spec', 'test-spec')
+    ).rejects.toThrow('path traversal (..) is not allowed');
+  });
+
   it('writes revisions to workspace file when it exists there', async () => {
     const relativePath = 'src/revision-target.ts';
     const workspaceFile = join(workspacePath, relativePath);

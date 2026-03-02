@@ -117,7 +117,7 @@ describe('MultiProjectDashboardServer approvals content resolution', () => {
     expect(body.filePath).toContain(join('repo-main', '.spec-workflow', 'specs', 'test-spec', 'requirements.md'));
   });
 
-  it('uses absolute approval filePath as-is', async () => {
+  it('rejects absolute approval filePath', async () => {
     const absolutePath = join(tempDir, 'absolute-target.md');
     await fs.writeFile(absolutePath, 'absolute-file-content', 'utf-8');
 
@@ -125,17 +125,20 @@ describe('MultiProjectDashboardServer approvals content resolution', () => {
       originalPath: workflowRootPath,
       fileResolutionPath: workspacePath
     });
-    const approvalId = await approvalStorage.createApproval('Review absolute path', absolutePath, 'spec', 'test-spec');
 
-    const port = await getFreePort();
-    server = new MultiProjectDashboardServer({ autoOpen: false, port });
-    await server.start();
+    await expect(
+      approvalStorage.createApproval('Review absolute path', absolutePath, 'spec', 'test-spec')
+    ).rejects.toThrow('absolute paths are not allowed');
+  });
 
-    const response = await realFetch(`http://127.0.0.1:${port}/api/projects/${projectId}/approvals/${approvalId}/content`);
-    const body = await response.json() as { content: string; filePath: string };
+  it('rejects path traversal in approval filePath', async () => {
+    const approvalStorage = new ApprovalStorage(workflowRootPath, {
+      originalPath: workflowRootPath,
+      fileResolutionPath: workspacePath
+    });
 
-    expect(response.status).toBe(200);
-    expect(body.content).toBe('absolute-file-content');
-    expect(body.filePath).toBe(absolutePath);
+    await expect(
+      approvalStorage.createApproval('Review traversal', '../../../etc/passwd', 'spec', 'test-spec')
+    ).rejects.toThrow('path traversal (..) is not allowed');
   });
 });

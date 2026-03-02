@@ -1,7 +1,7 @@
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { ToolContext, ToolResponse } from '../types.js';
 import { ApprovalStorage } from '../dashboard/approval-storage.js';
-import { join } from 'path';
+import { join, isAbsolute } from 'path';
 import { validateProjectPath, PathUtils } from '../core/path-utils.js';
 import { readFile } from 'fs/promises';
 import { validateTasksMarkdown, formatValidationErrors } from '../core/task-validator.js';
@@ -217,12 +217,28 @@ async function handleRequestApproval(
     });
     await approvalStorage.start();
 
+    // Security: Validate filePath to prevent arbitrary file reads
+    if (isAbsolute(args.filePath)) {
+      await approvalStorage.stop();
+      return {
+        success: false,
+        message: 'Security error: absolute paths are not allowed for filePath. Use a path relative to the project root.'
+      };
+    }
+    if (args.filePath.includes('..')) {
+      await approvalStorage.stop();
+      return {
+        success: false,
+        message: 'Security error: path traversal (..) is not allowed in filePath. Use a path relative to the project root.'
+      };
+    }
+
     const isMarkdownFile = args.filePath.toLowerCase().endsWith('.md');
     let markdownContent: string | undefined;
 
     if (isMarkdownFile) {
       try {
-        const fullPath = join(validatedProjectPath, args.filePath);
+        const fullPath = PathUtils.safeJoin(validatedProjectPath, args.filePath);
         markdownContent = await readFile(fullPath, 'utf-8');
       } catch (fileError) {
         await approvalStorage.stop();
@@ -260,7 +276,7 @@ async function handleRequestApproval(
 
     // Validate tasks.md format before allowing approval request
     if (args.filePath.endsWith('tasks.md')) {
-      const content = markdownContent ?? await readFile(join(validatedProjectPath, args.filePath), 'utf-8');
+      const content = markdownContent ?? await readFile(PathUtils.safeJoin(validatedProjectPath, args.filePath), 'utf-8');
       const validationResult = validateTasksMarkdown(content);
 
       if (!validationResult.valid) {
