@@ -173,15 +173,14 @@ export class MultiProjectDashboardServer {
     // WebSocket endpoint for real-time updates
     const self = this;
     await this.app.register(async function (fastify) {
-      fastify.get('/ws', { websocket: true }, (connection: WebSocketConnection, req) => {
-        const socket = connection.socket;
+      fastify.get('/ws', { websocket: true }, (socket, req) => {
+        const connection: WebSocketConnection = { socket, isAlive: true };
 
         // Get projectId from query parameter
         const url = new URL(req.url || '', `http://${req.headers.host}`);
         const projectId = url.searchParams.get('projectId') || undefined;
 
         connection.projectId = projectId;
-        connection.isAlive = true;
         self.clients.add(connection);
 
         // Handle pong for heartbeat

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.5] - 2026-03-02
+
+### Security
+- **Upgrade Fastify and Plugins** - Resolved all remaining npm audit vulnerabilities by upgrading from Fastify v4 to v5:
+  - `fastify` 4.29.1 -> 5.7.4 (fixes DoS via unbounded memory in sendWebStream, Content-Type header bypass)
+  - `@fastify/cors` 9.0.1 -> 11.2.0
+  - `@fastify/static` 7.0.4 -> 9.0.0
+  - `@fastify/websocket` 8.3.1 -> 11.2.0
+  - Updated WebSocket handler to use v11 API (socket-first signature instead of connection wrapper)
+  - Also resolved: `@isaacs/brace-expansion`, `@modelcontextprotocol/sdk`, `ajv`, `hono`, `markdown-it`, `minimatch`, `qs`, `rollup` vulnerabilities via `npm audit fix`
+
 ## [2.2.4] - 2026-03-02
 
 ### Security
