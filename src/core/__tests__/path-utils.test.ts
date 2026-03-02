@@ -272,24 +272,22 @@ describe('PathUtils case sensitivity', () => {
 
   // Note: These tests verify case-insensitive behavior on macOS/Windows
   // On Linux (case-sensitive), these would behave differently
-  if (process.platform === 'darwin' || process.platform === 'win32') {
-    it('should match paths with different case on case-insensitive filesystems', () => {
-      process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX = '/Users/Dev';
-      process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX = '/projects';
+  it.skipIf(process.platform === 'linux')('should match paths with different case on case-insensitive filesystems', () => {
+    process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX = '/Users/Dev';
+    process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX = '/projects';
 
-      // Lowercase 'dev' should match uppercase 'Dev' prefix
-      expect(PathUtils.translatePath('/Users/dev/myproject'))
-        .toBe('/projects/myproject');
-    });
+    // Lowercase 'dev' should match uppercase 'Dev' prefix
+    expect(PathUtils.translatePath('/Users/dev/myproject'))
+      .toBe('/projects/myproject');
+  });
 
-    it('should match mixed case paths', () => {
-      process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX = '/users/DEV';
-      process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX = '/PROJECTS';
+  it.skipIf(process.platform === 'linux')('should match mixed case paths', () => {
+    process.env.SPEC_WORKFLOW_HOST_PATH_PREFIX = '/users/DEV';
+    process.env.SPEC_WORKFLOW_CONTAINER_PATH_PREFIX = '/PROJECTS';
 
-      expect(PathUtils.translatePath('/Users/Dev/App'))
-        .toBe('/PROJECTS/App');
-    });
-  }
+    expect(PathUtils.translatePath('/Users/Dev/App'))
+      .toBe('/PROJECTS/App');
+  });
 });
 
 describe('PathUtils Windows backslash handling', () => {
