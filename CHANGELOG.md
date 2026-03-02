@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.4] - 2026-03-02
+
+### Security
+- **Fix Arbitrary File Read Vulnerability** (Issue #201) - Prevented reading files outside the project directory via crafted `filePath` values in approval requests:
+  - Reject absolute paths and path traversal (`..`) sequences at three defense layers: MCP tool input, approval creation, and file path resolution
+  - Replace unsafe `join()` calls with `PathUtils.safeJoin()` which validates resolved paths stay within project bounds
+  - Add `PathUtils.validatePathWithinBases()` for verifying resolved paths against allowed directories
+  - Previously, an attacker with dashboard access could read arbitrary system files (e.g., `/etc/passwd`) by creating approval requests with absolute or traversal paths
+
+### Fixed
+- **Empty Test Suite on Linux** - Case-sensitivity tests in `path-utils.test.ts` used a conditional `if` block that produced an empty `describe` on Linux, causing vitest to error. Replaced with `it.skipIf()` for proper test skipping
+- **Missing `@mdx-js/mdx` Dependency** - Restored missing package to fix 4 cascading test suite failures
+
 ## [2.2.3] - 2026-02-08
 
 ### Added
