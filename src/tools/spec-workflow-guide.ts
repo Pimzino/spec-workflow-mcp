@@ -235,7 +235,9 @@ flowchart TD
    - Follow _Leverage fields to use existing code/utilities
    - Implement the code according to the task description
    - Test your implementation
-   - **Log implementation with detailed artifacts** using log-implementation tool (CRITICAL):
+   - **MANDATORY: Log implementation BEFORE marking task complete** using log-implementation tool:
+     - ⚠️ Do NOT change [-] to [x] until log-implementation returns success
+     - A task without an implementation log is NOT complete — this is the most commonly skipped step
      - Provide taskId and clear summary of what was implemented (1-2 sentences)
      - Include files modified/created and code statistics (lines added/removed)
      - **REQUIRED: Include artifacts field with structured implementation data**:
@@ -247,7 +249,7 @@ flowchart TD
      - Example: "Created API GET /api/todos/:id endpoint and TodoDetail React component with WebSocket real-time updates"
      - This creates a searchable knowledge base for future AI agents to discover existing code
      - Prevents implementation details from being lost in chat history
-   - Edit tasks.md: Change \`[-]\` to \`[x]\` when completed and logged
+   - **Only after log-implementation succeeds**: Edit tasks.md: Change \`[-]\` to \`[x]\`
 4. Continue until all tasks show \`[x]\`
 
 ## Workflow Rules
@@ -262,6 +264,7 @@ flowchart TD
 - Approval requests: provide filePath only, never content
 - BLOCKING: Never proceed if approval delete fails
 - CRITICAL: Must have approved status AND successful cleanup before next phase
+- CRITICAL: Every task marked [x] MUST have a corresponding implementation log — call log-implementation BEFORE changing [-] to [x]
 - CRITICAL: Verbal approval is NEVER accepted - dashboard or VS Code extension only
 - NEVER proceed on user saying "approved" - check system status only
 - Steering docs are optional - only create when explicitly requested

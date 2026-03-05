@@ -104,23 +104,10 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
    - Follow existing patterns in the codebase
    - Test your implementation thoroughly
 
-6. **Complete the Task:**
-   - Verify all success criteria from the _Prompt are met
-   - Run any relevant tests to ensure nothing is broken
-   - Edit .spec-workflow/specs/${specName}/tasks.md directly
-   - Change the task marker from [-] to [x] for the completed task
-   - Only mark complete when fully implemented and tested
-
-7. **Log Implementation (CRITICAL - ARTIFACTS REQUIRED):**
-   - After completing a task, use the log-implementation tool to record comprehensive implementation details
-   - This creates a searchable knowledge base for future AI agents to discover and reuse existing code
-   - You MUST include artifacts (required field) to enable other agents to find your work:
-     - **apiEndpoints**: List all API endpoints created/modified with method, path, purpose, request/response formats, and location
-     - **components**: List all UI components created with name, type, purpose, props, and location
-     - **functions**: List all utility functions with signature and location
-     - **classes**: List all classes with methods and location
-     - **integrations**: Document how frontend connects to backend with data flow description
-   - Call log-implementation with:
+6. **Log Implementation (MANDATORY - must complete BEFORE marking task done):**
+   - ⚠️ **STOP: Do NOT mark the task [x] until this step succeeds.**
+   - A task without an implementation log is NOT complete. Skipping this step is the #1 workflow violation.
+   - Call log-implementation with ALL of the following:
      - specName: "${specName}"
      - taskId: ${taskId ? `"${taskId}"` : 'the task ID you just completed'}
      - summary: Clear description of what was implemented (1-2 sentences)
@@ -128,6 +115,12 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
      - filesCreated: List of files you created
      - statistics: {linesAdded: number, linesRemoved: number}
      - artifacts: {apiEndpoints: [...], components: [...], functions: [...], classes: [...], integrations: [...]}
+   - You MUST include artifacts (required field) to enable other agents to find your work:
+     - **apiEndpoints**: List all API endpoints created/modified with method, path, purpose, request/response formats, and location
+     - **components**: List all UI components created with name, type, purpose, props, and location
+     - **functions**: List all utility functions with signature and location
+     - **classes**: List all classes with methods and location
+     - **integrations**: Document how frontend connects to backend with data flow description
    - Example artifacts for an API endpoint:
      \`\`\`json
      "apiEndpoints": [{
@@ -140,12 +133,22 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
      }]
      \`\`\`
    - Why: Future AI agents will query logs before implementing, preventing duplicate code and ensuring architecture consistency
+   - This creates a searchable knowledge base — without it, implementation knowledge is lost when the conversation ends
+
+7. **Complete the Task (only after step 6 succeeds):**
+   - Confirm that log-implementation returned success in step 6
+   - Verify all success criteria from the _Prompt are met
+   - Run any relevant tests to ensure nothing is broken
+   - Edit .spec-workflow/specs/${specName}/tasks.md directly
+   - Change the task marker from [-] to [x] for the completed task
+   - ⚠️ If you skipped step 6, go back now — a task marked [x] without a log is incomplete
 
 **Important Guidelines:**
 - Always mark a task as in-progress before starting work
 - Follow the _Prompt field guidance for role, approach, and success criteria
 - Use existing patterns and utilities mentioned in _Leverage fields
 - Test your implementation before marking the task complete
+- **ALWAYS call log-implementation BEFORE marking a task [x]** — this is the most-skipped step and it is mandatory
 - If a task has subtasks (e.g., 4.1, 4.2), complete them in order
 - If you encounter blockers, document them and move to another task
 
@@ -153,7 +156,7 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
 - spec-status: Check overall progress
 - Bash (grep/ripgrep): CRITICAL - Search existing implementations before coding (step 4)
 - Read: Examine markdown implementation log files directly (step 4)
-- log-implementation: Record implementation details with artifacts after task completion (step 7)
+- log-implementation: MANDATORY - Record implementation details with artifacts BEFORE marking task complete (step 6)
 - Edit: Directly update task markers in tasks.md file
 - Read/Write/Edit: Implement the actual code changes
 - Bash: Run tests and verify implementation
