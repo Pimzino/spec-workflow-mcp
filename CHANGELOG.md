@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.6] - 2026-03-07
+
+### Changed
+- **Task Logging Workflow Guidance** (PR #200) - Strengthened implementation instructions so AI agents are explicitly directed to record implementation details before marking tasks complete:
+  - Updated the `implement-task` prompt to make `log-implementation` a mandatory step before changing tasks from `[-]` to `[x]`
+  - Updated the `spec-workflow-guide` implementation phase to reinforce the same ordering and emphasize implementation logs as required workflow context for future agents
+
 ## [2.2.5] - 2026-03-02
 
 ### Security
