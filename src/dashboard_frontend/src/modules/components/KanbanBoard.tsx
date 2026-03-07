@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 interface Task {
   id: string;
   description: string;
-  status: 'pending' | 'in-progress' | 'completed';
+  status: 'pending' | 'in-progress' | 'completed' | 'blocked';
   isHeader?: boolean;
   completed?: boolean;
   files?: string[];
@@ -29,16 +29,17 @@ interface Task {
   requirements?: string[];
   leverage?: string;
   prompt?: string;
+  blockedReason?: string;
 }
 
 interface KanbanBoardProps {
   tasks: Task[];
   specName: string;
-  onTaskStatusChange: (taskId: string, newStatus: 'pending' | 'in-progress' | 'completed') => void;
+  onTaskStatusChange: (taskId: string, newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked') => void;
   onCopyTaskPrompt: (task: Task) => void;
   copiedTaskId: string | null;
   data: any;
-  statusFilter?: 'all' | 'pending' | 'in-progress' | 'completed';
+  statusFilter?: 'all' | 'pending' | 'in-progress' | 'completed' | 'blocked';
 }
 
 export function KanbanBoard({
@@ -94,6 +95,7 @@ export function KanbanBoard({
     return {
       pending: filtered.filter(task => task.status === 'pending'),
       'in-progress': filtered.filter(task => task.status === 'in-progress'),
+      blocked: filtered.filter(task => task.status === 'blocked'),
       completed: filtered.filter(task => task.status === 'completed'),
     };
   }, [tasks]);
@@ -126,11 +128,11 @@ export function KanbanBoard({
     }
 
     const taskId = active.id as string;
-    let newStatus: 'pending' | 'in-progress' | 'completed' | null = null;
+    let newStatus: 'pending' | 'in-progress' | 'completed' | 'blocked' | null = null;
 
     // Check if we dropped directly on a status column
-    if (['pending', 'in-progress', 'completed'].includes(over.id as string)) {
-      newStatus = over.id as 'pending' | 'in-progress' | 'completed';
+    if (['pending', 'in-progress', 'completed', 'blocked'].includes(over.id as string)) {
+      newStatus = over.id as 'pending' | 'in-progress' | 'completed' | 'blocked';
       console.log('[KanbanBoard] Dropped on column:', newStatus);
     } else {
       // We dropped on a task - figure out which column that task is in
@@ -163,7 +165,7 @@ export function KanbanBoard({
     onTaskStatusChange(taskId, newStatus);
   };
 
-  const getColumnConfig = (status: 'pending' | 'in-progress' | 'completed') => {
+  const getColumnConfig = (status: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
     const configs = {
       pending: {
         title: t('tasksPage.statusPill.pending', 'Pending'),
@@ -191,6 +193,19 @@ export function KanbanBoard({
           </svg>
         ),
       },
+      blocked: {
+        title: t('tasksPage.statusPill.blocked', 'Blocked'),
+        bgColor: 'bg-[var(--surface-base)]',
+        borderColor: 'border-[var(--border-default)]',
+        headerBg: 'bg-[var(--surface-panel)]',
+        textColor: 'text-[var(--text-secondary)]',
+        dotColor: 'bg-red-500',
+        icon: (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+          </svg>
+        ),
+      },
       completed: {
         title: t('tasksPage.statusPill.completed', 'Completed'),
         bgColor: 'bg-[var(--surface-base)]',
@@ -209,7 +224,7 @@ export function KanbanBoard({
   };
 
   // Droppable Column Component
-  const DroppableColumn = ({ status }: { status: 'pending' | 'in-progress' | 'completed' }) => {
+  const DroppableColumn = ({ status }: { status: 'pending' | 'in-progress' | 'completed' | 'blocked' }) => {
     const config = getColumnConfig(status);
     const columnTasks = tasksByStatus[status];
 
@@ -240,7 +255,13 @@ export function KanbanBoard({
         <div className={`px-4 py-3 rounded-t-md ${config.headerBg} border-b ${config.borderColor}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${config.dotColor}`} />
+              {status === 'blocked' ? (
+                <svg className="w-2 h-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+              ) : (
+                <div className={`w-2 h-2 rounded-full ${config.dotColor}`} />
+              )}
               <h3 className={`text-sm font-medium ${config.textColor}`}>
                 {config.title}
               </h3>
@@ -276,6 +297,7 @@ export function KanbanBoard({
                 <div className="text-xs">
                   {status === 'pending' && t('tasksPage.kanban.noPendingTasks', 'No pending tasks')}
                   {status === 'in-progress' && t('tasksPage.kanban.noInProgressTasks', 'No tasks in progress')}
+                  {status === 'blocked' && t('tasksPage.kanban.noBlockedTasks', 'No blocked tasks')}
                   {status === 'completed' && t('tasksPage.kanban.noCompletedTasks', 'No completed tasks')}
                 </div>
               </div>
@@ -297,14 +319,14 @@ export function KanbanBoard({
     );
   };
 
-  const renderColumn = (status: 'pending' | 'in-progress' | 'completed') => {
+  const renderColumn = (status: 'pending' | 'in-progress' | 'completed' | 'blocked') => {
     return <DroppableColumn key={status} status={status} />;
   };
 
   // Determine which columns to show based on status filter
   const columnsToShow = useMemo(() => {
     if (statusFilter === 'all') {
-      return ['pending', 'in-progress', 'completed'] as const;
+      return ['pending', 'in-progress', 'blocked', 'completed'] as const;
     } else {
       return [statusFilter] as const;
     }

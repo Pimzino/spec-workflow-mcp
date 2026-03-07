@@ -113,7 +113,7 @@ type ApiActionsContextType = {
   getAllSpecDocuments: (name: string) => Promise<Record<string, { content: string; lastModified: string } | null>>;
   getAllArchivedSpecDocuments: (name: string) => Promise<Record<string, { content: string; lastModified: string } | null>>;
   getSpecTasksProgress: (name: string) => Promise<any>;
-  updateTaskStatus: (specName: string, taskId: string, status: 'pending' | 'in-progress' | 'completed') => Promise<{ ok: boolean; status: number; data?: any }>;
+  updateTaskStatus: (specName: string, taskId: string, status: 'pending' | 'in-progress' | 'completed' | 'blocked', reason?: string) => Promise<{ ok: boolean; status: number; data?: any }>;
   approvalsAction: (id: string, action: 'approve' | 'reject' | 'needs-revision', payload: any) => Promise<{ ok: boolean; status: number }>;
   approvalsActionBatch: (ids: string[], action: 'approve' | 'reject', response?: string) => Promise<{ ok: boolean; status: number; data?: BatchApprovalResult }>;
   approvalsUndoBatch: (ids: string[]) => Promise<{ ok: boolean; status: number; data?: BatchApprovalResult }>;
@@ -312,8 +312,8 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
       getAllSpecDocuments: (name: string) => getJson(`${prefix}/specs/${encodeURIComponent(name)}/all`),
       getAllArchivedSpecDocuments: (name: string) => getJson(`${prefix}/specs/${encodeURIComponent(name)}/all/archived`),
       getSpecTasksProgress: (name: string) => getJson(`${prefix}/specs/${encodeURIComponent(name)}/tasks/progress`),
-      updateTaskStatus: (specName: string, taskId: string, status: 'pending' | 'in-progress' | 'completed') =>
-        putJson(`${prefix}/specs/${encodeURIComponent(specName)}/tasks/${encodeURIComponent(taskId)}/status`, { status }),
+      updateTaskStatus: (specName: string, taskId: string, status: 'pending' | 'in-progress' | 'completed' | 'blocked', reason?: string) =>
+        putJson(`${prefix}/specs/${encodeURIComponent(specName)}/tasks/${encodeURIComponent(taskId)}/status`, { status, ...(reason && { reason }) }),
       approvalsAction: (id, action, body) => postJson(`${prefix}/approvals/${encodeURIComponent(id)}/${action}`, body),
       approvalsActionBatch: (ids, action, response) => postJsonWithData<BatchApprovalResult>(`${prefix}/approvals/batch/${action}`, { ids, response }),
       approvalsUndoBatch: (ids) => postJsonWithData<BatchApprovalResult>(`${prefix}/approvals/batch/undo`, { ids }),

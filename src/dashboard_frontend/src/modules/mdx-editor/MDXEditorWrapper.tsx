@@ -73,14 +73,33 @@ const plainTextCodeBlockDescriptor: CodeBlockEditorDescriptor = {
 };
 
 // Custom source toggle that only shows Rich text and Source (no Diff)
-function SourceToggle() {
+// Custom source toggle that preprocesses markdown before switching to rich text.
+// This ensures non-standard syntax ([-], [~], bare <) is converted before
+// MDXEditor's internal parser sees it.
+function SourceToggle({ editorRef }: { editorRef: React.RefObject<MDXEditorMethods | null> }) {
   const viewMode = useCellValue(viewMode$);
   const changeViewMode = usePublisher(viewMode$);
+
+  const handleSwitchToRichText = useCallback(() => {
+    changeViewMode('rich-text');
+    // After the view mode switch, MDXEditor's parser may have rendered
+    // non-standard markers as text. Re-set the markdown with preprocessing
+    // to convert them to proper visual indicators.
+    setTimeout(() => {
+      if (editorRef.current) {
+        const md = editorRef.current.getMarkdown();
+        const processed = preprocessMarkdownForMDX(md);
+        if (processed !== md) {
+          editorRef.current.setMarkdown(processed);
+        }
+      }
+    }, 100);
+  }, [editorRef, changeViewMode]);
 
   return (
     <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded p-0.5">
       <button
-        onClick={() => changeViewMode('rich-text')}
+        onClick={handleSwitchToRichText}
         className={`px-2 py-1 text-xs rounded transition-colors ${
           viewMode === 'rich-text'
             ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
@@ -165,6 +184,52 @@ function StatusIndicator({ saving, saved, error, hasUnsavedChanges }: {
   return null;
 }
 
+/**
+ * Preprocess markdown to make it safe for the MDX parser.
+ * Handles two issues:
+ * 1. Non-standard checkbox markers: `[-]` (in-progress) and `[~]` (blocked)
+ *    are not valid GFM — convert to unchecked checkboxes with text indicators.
+ * 2. Bare angle brackets: `<` followed by non-tag characters (digits, spaces, etc.)
+ *    are interpreted as invalid JSX by MDX — escape them as `&lt;`.
+ */
+function preprocessMarkdownForMDX(markdown: string): string {
+  let result = markdown;
+
+  // Convert non-standard checkbox markers to valid GFM.
+  // Handles both raw markers and MDXEditor-escaped versions (\[\~], \[\-]).
+  //
+  const statusLabel = (marker: string) =>
+    marker === '~' ? '**\\[BLOCKED\\]** ' : '**\\[IN PROGRESS\\]** ';
+
+  // Pattern 1: [~] or [-] in the checkbox position: `- [~] Task`
+  result = result.replace(
+    /^(\s*[-*]\s+)\\?\[\\?([~\-])\\?\](\s+)/gm,
+    (_match, prefix, marker, space) => {
+      return `${prefix}[ ]${space}${statusLabel(marker)}`;
+    }
+  );
+
+  // Pattern 2: [~] or [-] as text after a standard checkbox (from source mode edits
+  // where MDXEditor parsed `- [~]` as `- [ ] \[\~]`): `* [ ] \[\~] Task`
+  result = result.replace(
+    /^(\s*[-*]\s+\[[ x]\]\s+)\\?\[\\?([~\-])\\?\](\s+)/gm,
+    (_match, prefix, marker, space) => {
+      return `${prefix}${statusLabel(marker)}`;
+    }
+  );
+
+  // Escape `<` that MDX would interpret as JSX.
+  // Only preserve `<` before lowercase letters (HTML tags like <div>, <br>),
+  // `/` (closing tags), `!` (comments), or `>` (fragments).
+  // Escape everything else: <Uppercase (JSX components/generics like <T>),
+  // <digit (<5), <space, <symbol — all cause MDX parse errors.
+  // Replace with Unicode fullwidth less-than sign (U+FF1C) which looks
+  // visually identical but won't trigger MDX's JSX parser.
+  result = result.replace(/<(?![a-z\/!>])/g, '\uFF1C');
+
+  return result;
+}
+
 export function MDXEditorWrapper({
   content,
   mode,
@@ -194,7 +259,7 @@ export function MDXEditorWrapper({
       setLastSavedContent(content);
       // Programmatically update MDX Editor content when prop changes
       if (editorRef.current) {
-        editorRef.current.setMarkdown(content);
+        editorRef.current.setMarkdown(preprocessMarkdownForMDX(content));
       }
     }
     // Reset the flag after processing
@@ -290,7 +355,7 @@ export function MDXEditorWrapper({
               <InsertTable />
               <InsertThematicBreak />
               <Separator />
-              <SourceToggle />
+              <SourceToggle editorRef={editorRef} />
             </>
           ),
         })
@@ -326,7 +391,7 @@ export function MDXEditorWrapper({
       <div className={`mdx-editor-wrapper view-mode ${isDarkMode ? 'dark-theme' : ''} ${className}`} style={heightStyle}>
         <MDXEditor
           ref={editorRef}
-          markdown={content}
+          markdown={preprocessMarkdownForMDX(content)}
           plugins={plugins}
           readOnly={true}
           contentEditableClassName="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-img:max-w-full prose-img:h-auto prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-pre:bg-gray-50 dark:prose-pre:bg-gray-900 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300"
@@ -368,7 +433,7 @@ export function MDXEditorWrapper({
       <div className="flex-1 overflow-hidden">
         <MDXEditor
           ref={editorRef}
-          markdown={localContent}
+          markdown={preprocessMarkdownForMDX(localContent)}
           onChange={handleChange}
           plugins={plugins}
           placeholder={placeholder || t('editor.markdown.placeholder')}

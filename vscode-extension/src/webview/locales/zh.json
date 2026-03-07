@@ -40,7 +40,8 @@
     "status": {
       "pending": "待处理",
       "inProgress": "进行中",
-      "completed": "已完成"
+      "completed": "已完成",
+      "blocked": "已阻塞"
     },
     "taskGroup": "任务组",
     "meta": {
@@ -48,7 +49,15 @@
       "implementation": "实施",
       "purposes": "目的",
       "requirements": "需求",
-      "leverage": "利用"
+      "leverage": "利用",
+      "blockedReason": "阻塞原因"
+    },
+    "blockedReason": {
+      "title": "阻塞原因",
+      "description": "可选择提供此任务被阻塞的原因。",
+      "placeholder": "例如：等待API团队...",
+      "submit": "设为阻塞",
+      "skip": "跳过"
     },
     "loading": "正在加载任务...",
     "noSpecs": "未找到规范",
@@ -102,7 +111,7 @@
   },
   "common": {
     "dismiss": "关闭",
-    "scrollToTop": "回到顶部"
+    "scrollToTop": "滚动到顶部"
   },
   "specs": {
     "active": "活跃",
@@ -175,9 +184,6 @@
       "dataFlow": "数据流：",
       "exported": "（已导出）"
     }
-  },
-  "common": {
-    "scrollToTop": "滚动到顶部"
   },
   "commentModal": {
     "title": {
