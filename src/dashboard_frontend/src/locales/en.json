@@ -442,6 +442,19 @@
       "rejectFailed": "Failed to reject \"{{title}}\"",
       "revisionRequested": "Revisions requested for \"{{title}}\"",
       "revisionFailed": "Failed to request revisions for \"{{title}}\""
+    },
+    "adversarialReview": {
+      "button": "Adversarial Review",
+      "confirmTitle": "Start Adversarial Review",
+      "confirmMessage": "This will mark the approval as needing revisions and prepare an adversarial review. You'll receive a prompt to paste into a fresh agent session. Continue?",
+      "confirmYes": "Yes, start review",
+      "modalTitle": "Adversarial Review Prepared",
+      "version": "Version {{version}}",
+      "analysisOutput": "Analysis output:",
+      "promptLabel": "Paste this into a fresh Claude Code session:",
+      "copyPrompt": "Copy Prompt",
+      "copied": "Copied!",
+      "error": "Failed to prepare adversarial review"
     }
   },
   "logsPage": {

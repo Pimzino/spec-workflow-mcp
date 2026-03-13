@@ -3,6 +3,7 @@ import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyCors from '@fastify/cors';
 import { join, dirname, basename, resolve } from 'path';
+import { adversarialReviewHandler } from '../tools/adversarial-review.js';
 import { readFile } from 'fs/promises';
 import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
@@ -704,6 +705,69 @@ export class MultiProjectDashboardServer {
 
         await project.approvalStorage.updateApproval(id, status, response, annotations, comments);
         return { success: true };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
+    // Adversarial review preparation for spec approvals
+    this.app.post('/api/projects/:projectId/approvals/:id/adversarial-review', async (request, reply) => {
+      const { projectId, id } = request.params as { projectId: string; id: string };
+
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const approval = await project.approvalStorage.getApproval(id);
+        if (!approval) {
+          return reply.code(404).send({ error: 'Approval not found' });
+        }
+
+        if (approval.category !== 'spec') {
+          return reply.code(400).send({ error: 'Adversarial review is only available for spec approvals' });
+        }
+
+        const phase = basename(approval.filePath, '.md');
+        if (!['requirements', 'design', 'tasks'].includes(phase)) {
+          return reply.code(400).send({ error: `Invalid phase: ${phase}. Must be requirements, design, or tasks` });
+        }
+
+        const result = await adversarialReviewHandler(
+          { specName: approval.categoryName, phase },
+          { projectPath: project.originalProjectPath }
+        );
+
+        const prompt = [
+          `Use the spec-workflow MCP tools to perform an adversarial review of the "${phase}" phase for spec "${approval.categoryName}".`,
+          `Call the adversarial-review tool with specName: "${approval.categoryName}" and phase: "${phase}".`,
+          `Then follow the methodology it returns to generate a tailored adversarial prompt and launch a fresh-context subagent to execute it.`,
+        ].join(' ');
+
+        // Set approval to needs-revision with a general comment directing Agent A to the adversarial response flow
+        const response = `Adversarial review requested via dashboard. An adversarial analysis is being generated for this document.`;
+        const commentText = [
+          `An adversarial review has been requested for this document.`,
+          `Use the adversarial-response tool with specName "${approval.categoryName}" and phase "${phase}" to read the analysis, evaluate each finding, and present your assessment to the user before making changes.`,
+        ].join(' ');
+        const annotations = JSON.stringify({
+          decision: 'needs-revision',
+          trigger: 'adversarial-review',
+          specName: approval.categoryName,
+          phase,
+          analysisOutputPath: result.data?.analysisOutputPath,
+          timestamp: new Date().toISOString()
+        }, null, 2);
+        const comments = [{
+          type: 'general' as const,
+          comment: commentText,
+          timestamp: new Date().toISOString(),
+        }];
+
+        await project.approvalStorage.updateApproval(id, 'needs-revision', response, annotations, comments);
+
+        return { ...result, prompt };
       } catch (error: any) {
         return reply.code(500).send({ error: error.message || 'Internal server error' });
       }

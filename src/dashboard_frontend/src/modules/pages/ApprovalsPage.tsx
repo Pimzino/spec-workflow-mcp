@@ -23,7 +23,7 @@ interface ApprovalItemProps {
 }
 
 function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted }: ApprovalItemProps) {
-  const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll } = useApi();
+  const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll, requestAdversarialReview } = useApi();
   const { showNotification } = useNotifications();
   const { t } = useTranslation();
   const itemRef = useRef<HTMLDivElement>(null);
@@ -37,6 +37,12 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
   const [rejectModalOpen, setRejectModalOpen] = useState<boolean>(false);
   const [approvalWarningModalOpen, setApprovalWarningModalOpen] = useState<boolean>(false);
   const [revisionWarningModalOpen, setRevisionWarningModalOpen] = useState<boolean>(false);
+
+  // Adversarial review state
+  const [adversarialConfirmOpen, setAdversarialConfirmOpen] = useState(false);
+  const [adversarialLoading, setAdversarialLoading] = useState(false);
+  const [adversarialResult, setAdversarialResult] = useState<any>(null);
+  const [adversarialCopied, setAdversarialCopied] = useState(false);
 
   // Snapshot-related state
   const [snapshots, setSnapshots] = useState<DocumentSnapshot[]>([]);
@@ -242,6 +248,46 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
     }
   };
 
+  // Adversarial review eligibility: spec category, valid phase, pending status
+  const phase = a.filePath ? a.filePath.split('/').pop()?.replace('.md', '') || '' : '';
+  const isAdversarialEligible = a.category === 'spec' && ['requirements', 'design', 'tasks'].includes(phase) && a.status === 'pending';
+
+  const handleAdversarialReview = async () => {
+    setAdversarialLoading(true);
+    try {
+      const res = await requestAdversarialReview(a.id);
+      if (res.ok && res.data) {
+        setAdversarialResult(res.data);
+        await reloadAll();
+      } else {
+        showNotification(t('approvalsPage.adversarialReview.error'), 'error');
+      }
+    } catch {
+      showNotification(t('approvalsPage.adversarialReview.error'), 'error');
+    } finally {
+      setAdversarialLoading(false);
+    }
+  };
+
+  const handleCopyPrompt = async () => {
+    if (!adversarialResult?.prompt) return;
+    try {
+      await navigator.clipboard.writeText(adversarialResult.prompt);
+      setAdversarialCopied(true);
+      setTimeout(() => setAdversarialCopied(false), 2000);
+    } catch {
+      // Fallback for non-secure contexts
+      const textarea = document.createElement('textarea');
+      textarea.value = adversarialResult.prompt;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setAdversarialCopied(true);
+      setTimeout(() => setAdversarialCopied(false), 2000);
+    }
+  };
+
   return (
     <div
       ref={itemRef}
@@ -370,6 +416,26 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
                 <span className="hidden sm:inline">{t('approvalsPage.actions.quickReject')}</span>
                 <span className="sm:hidden">{t('approvalsPage.actions.reject')}</span>
               </button>
+
+              {isAdversarialEligible && (
+                <button
+                  onClick={() => setAdversarialConfirmOpen(true)}
+                  disabled={adversarialLoading}
+                  className="btn bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 min-w-0 touch-manipulation"
+                >
+                  {adversarialLoading ? (
+                    <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  )}
+                  <span className="hidden sm:inline">{t('approvalsPage.adversarialReview.button')}</span>
+                </button>
+              )}
 
               {open && (
                 <button
@@ -638,6 +704,59 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
         message={t('approvalsPage.revision.noCommentsMessage')}
         variant="warning"
       />
+
+      {/* Adversarial Review Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={adversarialConfirmOpen}
+        onClose={() => setAdversarialConfirmOpen(false)}
+        onConfirm={async () => {
+          setAdversarialConfirmOpen(false);
+          await handleAdversarialReview();
+        }}
+        title={t('approvalsPage.adversarialReview.confirmTitle')}
+        message={t('approvalsPage.adversarialReview.confirmMessage')}
+        confirmText={t('approvalsPage.adversarialReview.confirmYes')}
+      />
+
+      {/* Adversarial Review Result Modal */}
+      {adversarialResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setAdversarialResult(null)}>
+          <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg shadow-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold mb-4">{t('approvalsPage.adversarialReview.modalTitle')}</h3>
+
+            <div className="space-y-3 text-sm">
+              <p className="font-medium">{t('approvalsPage.adversarialReview.version', { version: adversarialResult.data?.version || 1 })}</p>
+
+              {adversarialResult.data?.analysisOutputPath && (
+                <div>
+                  <span className="text-[var(--text-faint)]">{t('approvalsPage.adversarialReview.analysisOutput')}</span>
+                  <code className="block mt-1 p-2 bg-[var(--surface-sunken)] rounded text-xs break-all">{adversarialResult.data.analysisOutputPath}</code>
+                </div>
+              )}
+
+              <div>
+                <span className="text-[var(--text-faint)]">{t('approvalsPage.adversarialReview.promptLabel')}</span>
+                <pre className="mt-1 p-3 bg-[var(--surface-sunken)] rounded text-xs whitespace-pre-wrap break-all border border-[var(--border-default)]">{adversarialResult.prompt}</pre>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={handleCopyPrompt}
+                className="btn bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 text-sm flex items-center gap-1"
+              >
+                {adversarialCopied ? t('approvalsPage.adversarialReview.copied') : t('approvalsPage.adversarialReview.copyPrompt')}
+              </button>
+              <button
+                onClick={() => setAdversarialResult(null)}
+                className="btn text-sm"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
