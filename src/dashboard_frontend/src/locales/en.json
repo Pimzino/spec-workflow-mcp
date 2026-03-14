@@ -397,6 +397,7 @@
     },
     "revisions": {
       "header": "Pending Revisions",
+      "description": "These items are awaiting revision by the agent. No actions are available until revisions are complete.",
       "count_one": "{{count}} awaiting revision",
       "count_other": "{{count}} awaiting revision"
     },
