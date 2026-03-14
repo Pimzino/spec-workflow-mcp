@@ -80,6 +80,9 @@ export async function adversarialReviewHandler(args: any, context: ToolContext):
   const steeringDocs = await findExistingFiles(steeringDir, ['product.md', 'tech.md', 'structure.md']);
   const priorPhaseDocs = await findPriorPhaseDocs(specDir, phase);
 
+  // Check for methodology override in settings
+  const methodology = await getMethodologyOverride(workflowRoot, 'reviewMethodology') || getAdversarialReviewMethodology();
+
   return {
     success: true,
     message: `Adversarial review prepared for ${specName}/${phase}.md (version ${version})`,
@@ -91,7 +94,7 @@ export async function adversarialReviewHandler(args: any, context: ToolContext):
       phase,
       steeringDocs,
       priorPhaseDocs,
-      methodology: getAdversarialReviewMethodology()
+      methodology
     },
     nextSteps: [
       'Read the target document and understand its content',
@@ -145,7 +148,18 @@ async function findPriorPhaseDocs(specDir: string, currentPhase: string): Promis
   return findExistingFiles(specDir, priorPhases.map(p => `${p}.md`));
 }
 
-function getAdversarialReviewMethodology(): string {
+async function getMethodologyOverride(workflowRoot: string, key: string): Promise<string | null> {
+  try {
+    const raw = await fs.readFile(join(workflowRoot, 'adversarial-settings.json'), 'utf-8');
+    const settings = JSON.parse(raw);
+    const value = settings[key];
+    return typeof value === 'string' && value.trim() ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+export function getAdversarialReviewMethodology(): string {
   return `# Adversarial Review Methodology
 
 ## Technique

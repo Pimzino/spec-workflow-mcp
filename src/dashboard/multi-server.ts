@@ -3,7 +3,8 @@ import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyCors from '@fastify/cors';
 import { join, dirname, basename, resolve } from 'path';
-import { adversarialReviewHandler } from '../tools/adversarial-review.js';
+import { adversarialReviewHandler, getAdversarialReviewMethodology } from '../tools/adversarial-review.js';
+import { getAdversarialResponseMethodology } from '../tools/adversarial-response.js';
 import { readFile } from 'fs/promises';
 import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
@@ -1274,6 +1275,169 @@ export class MultiProjectDashboardServer {
           return reply.code(404).send({ error: 'Changelog file not found' });
         }
         return reply.code(500).send({ error: `Failed to fetch changelog: ${error.message}` });
+      }
+    });
+
+    // ── Adversarial analysis endpoints ──
+
+    // List all adversarial reviews across specs
+    this.app.get('/api/projects/:projectId/adversarial/reviews', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const allSpecs = await project.parser.getAllSpecs();
+        const specsDir = join(project.projectPath, '.spec-workflow', 'specs');
+        const result: Array<{
+          specName: string;
+          displayName: string;
+          phases: Array<{
+            phase: string;
+            versions: Array<{ version: number; filename: string; lastModified: string }>;
+          }>;
+        }> = [];
+
+        for (const spec of allSpecs) {
+          const reviewsDir = join(specsDir, spec.name, 'reviews');
+          let files: string[];
+          try {
+            files = await fs.readdir(reviewsDir);
+          } catch {
+            continue; // No reviews dir for this spec
+          }
+
+          const phaseMap: Record<string, Array<{ version: number; filename: string; lastModified: string }>> = {};
+
+          for (const file of files) {
+            const match = file.match(/^adversarial-analysis-(requirements|design|tasks)(-r(\d+))?\.md$/);
+            if (!match) continue;
+            const phase = match[1];
+            const version = match[3] ? parseInt(match[3], 10) : 1;
+            const stat = await fs.stat(join(reviewsDir, file));
+            if (!phaseMap[phase]) phaseMap[phase] = [];
+            phaseMap[phase].push({ version, filename: file, lastModified: stat.mtime.toISOString() });
+          }
+
+          const phases = Object.entries(phaseMap).map(([phase, versions]) => ({
+            phase,
+            versions: versions.sort((a, b) => b.version - a.version),
+          }));
+
+          if (phases.length > 0) {
+            result.push({ specName: spec.name, displayName: spec.displayName || spec.name, phases });
+          }
+        }
+
+        return { specs: result };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
+    // Get specific adversarial review content
+    this.app.get('/api/projects/:projectId/adversarial/reviews/:specName/:phase/:version', async (request, reply) => {
+      const { projectId, specName, phase, version } = request.params as {
+        projectId: string; specName: string; phase: string; version: string;
+      };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      if (!['requirements', 'design', 'tasks'].includes(phase)) {
+        return reply.code(400).send({ error: 'Invalid phase' });
+      }
+
+      const versionNum = parseInt(version, 10);
+      if (isNaN(versionNum) || versionNum < 1) {
+        return reply.code(400).send({ error: 'Invalid version' });
+      }
+
+      const versionSuffix = versionNum === 1 ? '' : `-r${versionNum}`;
+      const filename = `adversarial-analysis-${phase}${versionSuffix}.md`;
+      const filePath = join(project.projectPath, '.spec-workflow', 'specs', specName, 'reviews', filename);
+
+      try {
+        const content = await readFile(filePath, 'utf-8');
+        const stat = await fs.stat(filePath);
+        return { content, lastModified: stat.mtime.toISOString() };
+      } catch (error: any) {
+        if (error.code === 'ENOENT') {
+          return reply.code(404).send({ error: 'Review not found' });
+        }
+        return reply.code(500).send({ error: error.message });
+      }
+    });
+
+    // Get adversarial settings
+    this.app.get('/api/projects/:projectId/adversarial/settings', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      const settingsPath = join(project.projectPath, '.spec-workflow', 'adversarial-settings.json');
+      const defaults = {
+        customPreamble: '',
+        requiredPhases: { requirements: false, design: false, tasks: false },
+        reviewMethodology: '',
+        responseMethodology: '',
+      };
+
+      let saved = {};
+      try {
+        const raw = await readFile(settingsPath, 'utf-8');
+        saved = JSON.parse(raw);
+      } catch {
+        // No settings file yet
+      }
+
+      return {
+        ...defaults,
+        ...saved,
+        defaultReviewMethodology: getAdversarialReviewMethodology(),
+        defaultResponseMethodology: getAdversarialResponseMethodology(),
+      };
+    });
+
+    // Save adversarial settings
+    this.app.put('/api/projects/:projectId/adversarial/settings', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      const body = request.body as any;
+      if (!body || typeof body !== 'object') {
+        return reply.code(400).send({ error: 'Request body must be an object' });
+      }
+
+      // Validate shape
+      const settings = {
+        customPreamble: typeof body.customPreamble === 'string' ? body.customPreamble : '',
+        requiredPhases: {
+          requirements: !!body.requiredPhases?.requirements,
+          design: !!body.requiredPhases?.design,
+          tasks: !!body.requiredPhases?.tasks,
+        },
+        reviewMethodology: typeof body.reviewMethodology === 'string' ? body.reviewMethodology : '',
+        responseMethodology: typeof body.responseMethodology === 'string' ? body.responseMethodology : '',
+      };
+
+      const settingsDir = join(project.projectPath, '.spec-workflow');
+      const settingsPath = join(settingsDir, 'adversarial-settings.json');
+
+      try {
+        await fs.mkdir(settingsDir, { recursive: true });
+        await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+        return { success: true };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message });
       }
     });
 

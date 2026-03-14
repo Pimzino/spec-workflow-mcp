@@ -86,6 +86,9 @@ export async function adversarialResponseHandler(args: any, context: ToolContext
     };
   }
 
+  // Check for methodology override in settings
+  const methodology = await getMethodologyOverride(workflowRoot, 'responseMethodology') || getAdversarialResponseMethodology();
+
   return {
     success: true,
     message: `Found adversarial analysis v${latestVersion} for ${specName}/${phase}`,
@@ -93,7 +96,7 @@ export async function adversarialResponseHandler(args: any, context: ToolContext
       analysisFile: latestAnalysis,
       targetFile,
       version: latestVersion,
-      methodology: getAdversarialResponseMethodology()
+      methodology
     },
     nextSteps: [
       `Read the adversarial analysis at: ${latestAnalysis}`,
@@ -104,7 +107,18 @@ export async function adversarialResponseHandler(args: any, context: ToolContext
   };
 }
 
-function getAdversarialResponseMethodology(): string {
+async function getMethodologyOverride(workflowRoot: string, key: string): Promise<string | null> {
+  try {
+    const raw = await fs.readFile(join(workflowRoot, 'adversarial-settings.json'), 'utf-8');
+    const settings = JSON.parse(raw);
+    const value = settings[key];
+    return typeof value === 'string' && value.trim() ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+export function getAdversarialResponseMethodology(): string {
   return `# Responding to an Adversarial Review
 
 ## Instructions
