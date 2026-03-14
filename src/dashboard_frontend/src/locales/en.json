@@ -395,6 +395,11 @@
       "title": "No Pending Approvals",
       "description": "All approvals have been processed. New approval requests will appear here."
     },
+    "revisions": {
+      "header": "Pending Revisions",
+      "count_one": "{{count}} awaiting revision",
+      "count_other": "{{count}} awaiting revision"
+    },
     "reject": {
       "title": "Reject Approval",
       "placeholder": "Please provide feedback explaining why this is being rejected...",
