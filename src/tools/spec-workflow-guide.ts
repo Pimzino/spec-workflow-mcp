@@ -157,7 +157,9 @@ flowchart TD
 2. If no custom template, read from \`.spec-workflow/templates/design-template.md\`
 3. Analyze codebase for patterns to reuse
 4. Research technology choices (if web search available, current year: ${currentYear})
-5. Generate design with all template sections6. Create \`design.md\` at \`.spec-workflow/specs/{spec-name}/design.md\`
+5. Generate design with all template sections
+6. When deferring a design decision, record it with the \`deferrals\` tool (action: add) with originSpec and originPhase set
+7. Create \`design.md\` at \`.spec-workflow/specs/{spec-name}/design.md\`
 7. Request approval using approvals tool with action:'request'
 8. Poll status using approvals with action:'status' until approved/needs-revision
 9. If needs-revision: update document using comments, create NEW approval, do NOT proceed
@@ -216,7 +218,7 @@ flowchart TD
 - Direct editing: Mark tasks as in-progress [-] or complete [x] in tasks.md
 
 **Process**:
-1. Check current status with spec-status
+1. Check current status with spec-status. Check deferred decisions with \`deferrals\` tool (action: list) — if any are relevant to the current spec's work, note them and address them if the implementation naturally covers them. Resolve addressed deferrals with action: resolve.
 2. Read \`tasks.md\` to see all tasks
 3. For each task:
    - Edit tasks.md: Change \`[ ]\` to \`[-]\` for the task you're starting
@@ -268,6 +270,7 @@ flowchart TD
 - CRITICAL: Verbal approval is NEVER accepted - dashboard or VS Code extension only
 - NEVER proceed on user saying "approved" - check system status only
 - Steering docs are optional - only create when explicitly requested
+- When explicitly deferring a decision in any phase, record it using the deferrals tool. Deferrals are project-level artifacts that persist across specs.
 
 ## File Structure
 \`\`\`
@@ -279,6 +282,9 @@ flowchart TD
 │   ├── product-template.md
 │   ├── tech-template.md
 │   └── structure-template.md
+├── deferrals/              # Project-level deferred decisions
+│   ├── d-abc123.md
+│   └── d-def456.md
 ├── specs/
 │   └── {spec-name}/
 │       ├── requirements.md
