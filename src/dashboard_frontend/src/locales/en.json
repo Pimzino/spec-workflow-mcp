@@ -8,6 +8,7 @@
     "specs": "Specs",
     "tasks": "Tasks",
     "approvals": "Approvals",
+    "adversarial": "Adversarial Analysis",
     "settings": "Settings",
     "logs": "Implementation Logs"
   },
@@ -442,6 +443,54 @@
       "rejectFailed": "Failed to reject \"{{title}}\"",
       "revisionRequested": "Revisions requested for \"{{title}}\"",
       "revisionFailed": "Failed to request revisions for \"{{title}}\""
+    },
+    "adversarialReview": {
+      "button": "Adversarial Review",
+      "confirmTitle": "Start Adversarial Review",
+      "confirmMessage": "This will mark the approval as needing revisions and prepare an adversarial review. You'll receive a prompt to paste into a fresh agent session. Continue?",
+      "confirmYes": "Yes, start review",
+      "modalTitle": "Adversarial Review Prepared",
+      "version": "Version {{version}}",
+      "analysisOutput": "Analysis output:",
+      "promptLabel": "Paste this into a fresh Claude Code session:",
+      "copyPrompt": "Copy Prompt",
+      "copied": "Copied!",
+      "error": "Failed to prepare adversarial review"
+    }
+  },
+  "adversarialPage": {
+    "header": {
+      "title": "Adversarial Analysis",
+      "subtitle": "Browse historical adversarial reviews and configure review settings"
+    },
+    "tabs": {
+      "reviews": "Reviews",
+      "settings": "Settings"
+    },
+    "reviews": {
+      "selectSpec": "Specification",
+      "selectReview": "Select a phase and version to view the review",
+      "emptyTitle": "No Adversarial Reviews",
+      "emptyDesc": "Adversarial reviews will appear here once triggered from the Approvals page or MCP tools.",
+      "loadError": "Failed to load review content"
+    },
+    "settings": {
+      "preambleLabel": "Custom Preamble",
+      "preambleHelp": "Additional instructions prepended to every adversarial review prompt. The defaults work well for most projects.",
+      "preamblePlaceholder": "e.g., Focus on security implications and data privacy concerns...",
+      "preambleOptional": "Optional",
+      "requiredPhasesLabel": "Required Phases",
+      "requiredPhasesHelp": "Phases that must have an adversarial review before approval.",
+      "save": "Save Settings",
+      "saved": "Settings saved",
+      "saveError": "Failed to save settings",
+      "reviewMethodologyLabel": "Review Methodology",
+      "reviewMethodologyHelp": "Instructions for how the adversarial review prompt is constructed. Leave empty to use the default.",
+      "responseMethodologyLabel": "Response Methodology",
+      "responseMethodologyHelp": "Instructions for how to evaluate and respond to adversarial findings. Leave empty to use the default.",
+      "resetToDefault": "Reset to default",
+      "usingDefault": "Default",
+      "usingCustom": "Custom"
     }
   },
   "logsPage": {

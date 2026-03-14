@@ -3,6 +3,8 @@ import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyCors from '@fastify/cors';
 import { join, dirname, basename, resolve } from 'path';
+import { adversarialReviewHandler, getAdversarialReviewMethodology } from '../tools/adversarial-review.js';
+import { getAdversarialResponseMethodology } from '../tools/adversarial-response.js';
 import { readFile } from 'fs/promises';
 import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
@@ -709,6 +711,69 @@ export class MultiProjectDashboardServer {
       }
     });
 
+    // Adversarial review preparation for spec approvals
+    this.app.post('/api/projects/:projectId/approvals/:id/adversarial-review', async (request, reply) => {
+      const { projectId, id } = request.params as { projectId: string; id: string };
+
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const approval = await project.approvalStorage.getApproval(id);
+        if (!approval) {
+          return reply.code(404).send({ error: 'Approval not found' });
+        }
+
+        if (approval.category !== 'spec') {
+          return reply.code(400).send({ error: 'Adversarial review is only available for spec approvals' });
+        }
+
+        const phase = basename(approval.filePath, '.md');
+        if (!['requirements', 'design', 'tasks'].includes(phase)) {
+          return reply.code(400).send({ error: `Invalid phase: ${phase}. Must be requirements, design, or tasks` });
+        }
+
+        const result = await adversarialReviewHandler(
+          { specName: approval.categoryName, phase },
+          { projectPath: project.originalProjectPath }
+        );
+
+        const prompt = [
+          `Use the spec-workflow MCP tools to perform an adversarial review of the "${phase}" phase for spec "${approval.categoryName}".`,
+          `Call the adversarial-review tool with specName: "${approval.categoryName}" and phase: "${phase}".`,
+          `Then follow the methodology it returns to generate a tailored adversarial prompt and launch a fresh-context subagent to execute it.`,
+        ].join(' ');
+
+        // Set approval to needs-revision with a general comment directing Agent A to the adversarial response flow
+        const response = `Adversarial review requested via dashboard. An adversarial analysis is being generated for this document.`;
+        const commentText = [
+          `An adversarial review has been requested for this document.`,
+          `Use the adversarial-response tool with specName "${approval.categoryName}" and phase "${phase}" to read the analysis, evaluate each finding, and present your assessment to the user before making changes.`,
+        ].join(' ');
+        const annotations = JSON.stringify({
+          decision: 'needs-revision',
+          trigger: 'adversarial-review',
+          specName: approval.categoryName,
+          phase,
+          analysisOutputPath: result.data?.analysisOutputPath,
+          timestamp: new Date().toISOString()
+        }, null, 2);
+        const comments = [{
+          type: 'general' as const,
+          comment: commentText,
+          timestamp: new Date().toISOString(),
+        }];
+
+        await project.approvalStorage.updateApproval(id, 'needs-revision', response, annotations, comments);
+
+        return { ...result, prompt };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
     // Undo batch operations - revert items back to pending
     // IMPORTANT: This route MUST be defined BEFORE the /batch/:action route
     // because Fastify matches routes in order of registration
@@ -1210,6 +1275,169 @@ export class MultiProjectDashboardServer {
           return reply.code(404).send({ error: 'Changelog file not found' });
         }
         return reply.code(500).send({ error: `Failed to fetch changelog: ${error.message}` });
+      }
+    });
+
+    // ── Adversarial analysis endpoints ──
+
+    // List all adversarial reviews across specs
+    this.app.get('/api/projects/:projectId/adversarial/reviews', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const allSpecs = await project.parser.getAllSpecs();
+        const specsDir = join(project.projectPath, '.spec-workflow', 'specs');
+        const result: Array<{
+          specName: string;
+          displayName: string;
+          phases: Array<{
+            phase: string;
+            versions: Array<{ version: number; filename: string; lastModified: string }>;
+          }>;
+        }> = [];
+
+        for (const spec of allSpecs) {
+          const reviewsDir = join(specsDir, spec.name, 'reviews');
+          let files: string[];
+          try {
+            files = await fs.readdir(reviewsDir);
+          } catch {
+            continue; // No reviews dir for this spec
+          }
+
+          const phaseMap: Record<string, Array<{ version: number; filename: string; lastModified: string }>> = {};
+
+          for (const file of files) {
+            const match = file.match(/^adversarial-analysis-(requirements|design|tasks)(-r(\d+))?\.md$/);
+            if (!match) continue;
+            const phase = match[1];
+            const version = match[3] ? parseInt(match[3], 10) : 1;
+            const stat = await fs.stat(join(reviewsDir, file));
+            if (!phaseMap[phase]) phaseMap[phase] = [];
+            phaseMap[phase].push({ version, filename: file, lastModified: stat.mtime.toISOString() });
+          }
+
+          const phases = Object.entries(phaseMap).map(([phase, versions]) => ({
+            phase,
+            versions: versions.sort((a, b) => b.version - a.version),
+          }));
+
+          if (phases.length > 0) {
+            result.push({ specName: spec.name, displayName: spec.displayName || spec.name, phases });
+          }
+        }
+
+        return { specs: result };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
+    // Get specific adversarial review content
+    this.app.get('/api/projects/:projectId/adversarial/reviews/:specName/:phase/:version', async (request, reply) => {
+      const { projectId, specName, phase, version } = request.params as {
+        projectId: string; specName: string; phase: string; version: string;
+      };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      if (!['requirements', 'design', 'tasks'].includes(phase)) {
+        return reply.code(400).send({ error: 'Invalid phase' });
+      }
+
+      const versionNum = parseInt(version, 10);
+      if (isNaN(versionNum) || versionNum < 1) {
+        return reply.code(400).send({ error: 'Invalid version' });
+      }
+
+      const versionSuffix = versionNum === 1 ? '' : `-r${versionNum}`;
+      const filename = `adversarial-analysis-${phase}${versionSuffix}.md`;
+      const filePath = join(project.projectPath, '.spec-workflow', 'specs', specName, 'reviews', filename);
+
+      try {
+        const content = await readFile(filePath, 'utf-8');
+        const stat = await fs.stat(filePath);
+        return { content, lastModified: stat.mtime.toISOString() };
+      } catch (error: any) {
+        if (error.code === 'ENOENT') {
+          return reply.code(404).send({ error: 'Review not found' });
+        }
+        return reply.code(500).send({ error: error.message });
+      }
+    });
+
+    // Get adversarial settings
+    this.app.get('/api/projects/:projectId/adversarial/settings', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      const settingsPath = join(project.projectPath, '.spec-workflow', 'adversarial-settings.json');
+      const defaults = {
+        customPreamble: '',
+        requiredPhases: { requirements: false, design: false, tasks: false },
+        reviewMethodology: '',
+        responseMethodology: '',
+      };
+
+      let saved = {};
+      try {
+        const raw = await readFile(settingsPath, 'utf-8');
+        saved = JSON.parse(raw);
+      } catch {
+        // No settings file yet
+      }
+
+      return {
+        ...defaults,
+        ...saved,
+        defaultReviewMethodology: getAdversarialReviewMethodology(),
+        defaultResponseMethodology: getAdversarialResponseMethodology(),
+      };
+    });
+
+    // Save adversarial settings
+    this.app.put('/api/projects/:projectId/adversarial/settings', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      const body = request.body as any;
+      if (!body || typeof body !== 'object') {
+        return reply.code(400).send({ error: 'Request body must be an object' });
+      }
+
+      // Validate shape
+      const settings = {
+        customPreamble: typeof body.customPreamble === 'string' ? body.customPreamble : '',
+        requiredPhases: {
+          requirements: !!body.requiredPhases?.requirements,
+          design: !!body.requiredPhases?.design,
+          tasks: !!body.requiredPhases?.tasks,
+        },
+        reviewMethodology: typeof body.reviewMethodology === 'string' ? body.reviewMethodology : '',
+        responseMethodology: typeof body.responseMethodology === 'string' ? body.responseMethodology : '',
+      };
+
+      const settingsDir = join(project.projectPath, '.spec-workflow');
+      const settingsPath = join(settingsDir, 'adversarial-settings.json');
+
+      try {
+        await fs.mkdir(settingsDir, { recursive: true });
+        await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+        return { success: true };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message });
       }
     });
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-[High-level description of the feature and its place in the overall system]
+[High-level description of the feature: what it does, where it fits in the system, and which requirements it addresses. 2-4 sentences.]
 
 ## Steering Document Alignment
 
@@ -10,28 +10,26 @@
 [How the design follows documented technical patterns and standards]
 
 ### Project Structure (structure.md)
-[How the implementation will follow project organization conventions]
+[How the implementation follows project organization conventions]
 
 ## Code Reuse Analysis
-[What existing code will be leveraged, extended, or integrated with this feature]
 
-### Existing Components to Leverage
-- **[Component/Utility Name]**: [How it will be used]
-- **[Service/Helper Name]**: [How it will be extended]
+<!-- List existing code that this feature will use, extend, or integrate with.
+     Include file paths. This prevents the implementation from rebuilding
+     what already exists. -->
 
-### Integration Points
-- **[Existing System/API]**: [How the new feature will integrate]
-- **[Database/Storage]**: [How data will connect to existing schemas]
+| Existing code | How it's used |
+|---|---|
+| [path/to/file] | [Reused as-is / Extended / Integrated via ...] |
+| [path/to/file] | [Reused as-is / Extended / Integrated via ...] |
 
 ## Architecture
 
-[Describe the overall architecture and design patterns used]
+<!-- Include a diagram ONLY if the feature involves non-obvious data flow,
+     multiple interacting components, or cross-feature coordination.
+     Omit for straightforward CRUD or single-component features. -->
 
-### Modular Design Principles
-- **Single File Responsibility**: Each file should handle one specific concern or domain
-- **Component Isolation**: Create small, focused components rather than large monolithic files
-- **Service Layer Separation**: Separate data access, business logic, and presentation layers
-- **Utility Modularity**: Break utilities into focused, single-purpose modules
+[Describe the overall architecture and design patterns used]
 
 ```mermaid
 graph TD
@@ -39,58 +37,63 @@ graph TD
     B --> C[Component C]
 ```
 
-## Components and Interfaces
+## Components
 
-### Component 1
-- **Purpose:** [What this component does]
-- **Interfaces:** [Public methods/APIs]
-- **Dependencies:** [What it depends on]
-- **Reuses:** [Existing components/utilities it builds upon]
+<!-- For each component, specify the file path and which requirements it addresses.
+     The implementing agent needs paths and requirement traceability, not just descriptions. -->
 
-### Component 2
+### [Component Name]
+- **File(s):** [path/to/file(s) to create or modify]
 - **Purpose:** [What this component does]
-- **Interfaces:** [Public methods/APIs]
+- **Interfaces:** [Public methods/APIs/props]
 - **Dependencies:** [What it depends on]
-- **Reuses:** [Existing components/utilities it builds upon]
+- **Reuses:** [Existing code it builds upon, from Code Reuse Analysis]
+- **Requirements:** [R1, R2.3, etc.]
+
+### [Component Name]
+- **File(s):** [path/to/file(s) to create or modify]
+- **Purpose:** [What this component does]
+- **Interfaces:** [Public methods/APIs/props]
+- **Dependencies:** [What it depends on]
+- **Reuses:** [Existing code it builds upon]
+- **Requirements:** [R1, R2.3, etc.]
+
+## API Endpoints
+
+<!-- Include this section if the feature adds or modifies API endpoints.
+     Omit entirely for features with no API surface. -->
+
+| Method | Path | Purpose | Request body | Response | Requirements |
+|---|---|---|---|---|---|
+| [GET/POST/...] | [/api/...] | [What it does] | [Schema or "none"] | [Shape] | [Rn] |
 
 ## Data Models
 
-### Model 1
-```
-[Define the structure of Model1 in your language]
-- id: [unique identifier type]
-- name: [string/text type]
-- [Additional properties as needed]
-```
+<!-- Include this section if the feature adds or modifies persistent data.
+     Omit for features with no data model changes. -->
 
-### Model 2
-```
-[Define the structure of Model2 in your language]
-- id: [unique identifier type]
-- [Additional properties as needed]
-```
+### [Model Name]
+- **Table/collection:** [name]
+- **Requirements:** [Rn]
+
+| Column/Field | Type | Constraints | Notes |
+|---|---|---|---|
+| [name] | [type] | [PK/FK/unique/nullable/default] | [purpose if not obvious] |
 
 ## Error Handling
 
-### Error Scenarios
-1. **Scenario 1:** [Description]
-   - **Handling:** [How to handle]
-   - **User Impact:** [What user sees]
+<!-- Only list error scenarios specific to this feature.
+     Reference the project's standard error handling pattern for common cases. -->
 
-2. **Scenario 2:** [Description]
-   - **Handling:** [How to handle]
-   - **User Impact:** [What user sees]
+| Scenario | Error type | Status | User impact |
+|---|---|---|---|
+| [What goes wrong] | [Error class/code] | [HTTP status or equivalent] | [What the user sees] |
 
 ## Testing Strategy
 
-### Unit Testing
-- [Unit testing approach]
-- [Key components to test]
+<!-- List what needs testing for this feature specifically.
+     Reference the project's testing patterns for how tests are structured. -->
 
-### Integration Testing
-- [Integration testing approach]
-- [Key flows to test]
-
-### End-to-End Testing
-- [E2E testing approach]
-- [User scenarios to test]
+- **Unit tests:** [What logic needs unit testing and why]
+- **Integration tests:** [What flows need integration testing]
+- **E2E tests:** [What user scenarios need E2E coverage, if any]
