@@ -453,15 +453,16 @@
     "adversarialReview": {
       "button": "Adversarial Review",
       "confirmTitle": "Start Adversarial Review",
-      "confirmMessage": "This will mark the approval as needing revisions and prepare an adversarial review. You'll receive a prompt to paste into a fresh agent session. Continue?",
+      "confirmMessage": "This will launch a background adversarial review using a Claude subagent. The review typically takes a few minutes. Continue?",
       "confirmYes": "Yes, start review",
-      "modalTitle": "Adversarial Review Prepared",
-      "version": "Version {{version}}",
-      "analysisOutput": "Analysis output:",
-      "promptLabel": "Paste this into a fresh Claude Code session:",
-      "copyPrompt": "Copy Prompt",
-      "copied": "Copied!",
-      "error": "Failed to prepare adversarial review"
+      "started": "Adversarial review started. You'll be notified when it's complete.",
+      "completed": "Adversarial review complete for {{spec}}/{{phase}}",
+      "failed": "Adversarial review failed for {{spec}}/{{phase}}: {{error}}",
+      "error": "Failed to start adversarial review",
+      "jobTitle": "Reviewing {{spec}}/{{phase}}",
+      "jobPending": "Preparing...",
+      "jobGeneratingPrompt": "Generating adversarial prompt...",
+      "jobRunningReview": "Running review..."
     }
   },
   "adversarialPage": {

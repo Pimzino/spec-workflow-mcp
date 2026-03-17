@@ -137,6 +137,9 @@ type ApiActionsContextType = {
   getAdversarialReviewContent: (specName: string, phase: string, version: number) => Promise<{ content: string; lastModified: string }>;
   getAdversarialSettings: () => Promise<any>;
   saveAdversarialSettings: (settings: any) => Promise<{ ok: boolean; status: number }>;
+  getAdversarialJobs: () => Promise<{ jobs: any[] }>;
+  getAdversarialJob: (jobId: string) => Promise<{ job: any }>;
+  cancelAdversarialJob: (jobId: string) => Promise<{ ok: boolean; status: number }>;
 };
 
 const ApiDataContext = createContext<ApiDataContextType | undefined>(undefined);
@@ -312,6 +315,9 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
         getAdversarialReviewContent: async () => ({ content: '', lastModified: '' }),
         getAdversarialSettings: async () => ({ customPreamble: '', requiredPhases: { requirements: false, design: false, tasks: false } }),
         saveAdversarialSettings: async () => ({ ok: false, status: 400 }),
+        getAdversarialJobs: async () => ({ jobs: [] }),
+        getAdversarialJob: async () => ({ job: null }),
+        cancelAdversarialJob: async () => ({ ok: false, status: 400 }),
       };
     }
 
@@ -360,6 +366,9 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
         getJson(`${prefix}/adversarial/reviews/${encodeURIComponent(specName)}/${encodeURIComponent(phase)}/${version}`),
       getAdversarialSettings: () => getJson(`${prefix}/adversarial/settings`),
       saveAdversarialSettings: (settings: any) => putJson(`${prefix}/adversarial/settings`, settings),
+      getAdversarialJobs: () => getJson(`${prefix}/adversarial/jobs`),
+      getAdversarialJob: (jobId: string) => getJson(`${prefix}/adversarial/jobs/${encodeURIComponent(jobId)}`),
+      cancelAdversarialJob: (jobId: string) => postJsonWithData(`${prefix}/adversarial/jobs/${encodeURIComponent(jobId)}/cancel`, {}),
     };
   }, [projectId, reloadAll]);
 

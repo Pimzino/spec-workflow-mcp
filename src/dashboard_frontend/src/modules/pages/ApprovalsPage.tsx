@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApi, DocumentSnapshot, DiffResult, BatchApprovalResult } from '../api/api';
+import { useWs } from '../ws/WebSocketProvider';
 import { ApprovalsAnnotator, ApprovalComment, ViewMode } from '../approvals/ApprovalsAnnotator';
 import { useNotifications } from '../notifications/NotificationProvider';
 import { TextInputModal } from '../modals/TextInputModal';
@@ -12,6 +13,99 @@ import { formatSnapshotTimestamp, createVersionLabel, hasDiffChanges, getSnapsho
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/dateUtils';
 
+function AdversarialJobsToast() {
+  const { getAdversarialJobs, cancelAdversarialJob, reloadAll } = useApi();
+  const { subscribe, unsubscribe } = useWs();
+  const { showNotification } = useNotifications();
+  const { t } = useTranslation();
+  const [jobs, setJobs] = useState<any[]>([]);
+
+  // Load active jobs on mount
+  useEffect(() => {
+    getAdversarialJobs().then(res => {
+      setJobs((res.jobs || []).filter((j: any) => j.status !== 'completed' && j.status !== 'failed'));
+    }).catch(() => {});
+  }, [getAdversarialJobs]);
+
+  // Subscribe to real-time job updates
+  useEffect(() => {
+    const handler = (data: any) => {
+      if (!data?.id) return;
+
+      if (data.status === 'completed') {
+        showNotification(
+          t('approvalsPage.adversarialReview.completed', { spec: data.specName, phase: data.phase }),
+          'success'
+        );
+        setJobs(prev => prev.filter(j => j.id !== data.id));
+        reloadAll();
+      } else if (data.status === 'failed') {
+        showNotification(
+          t('approvalsPage.adversarialReview.failed', { spec: data.specName, phase: data.phase, error: data.error || 'Unknown error' }),
+          'error'
+        );
+        setJobs(prev => prev.filter(j => j.id !== data.id));
+      } else {
+        setJobs(prev => {
+          const existing = prev.findIndex(j => j.id === data.id);
+          if (existing >= 0) {
+            const next = [...prev];
+            next[existing] = data;
+            return next;
+          }
+          return [...prev, data];
+        });
+      }
+    };
+
+    subscribe('adversarial-job-update', handler);
+    return () => unsubscribe('adversarial-job-update', handler);
+  }, [subscribe, unsubscribe, showNotification, reloadAll, t]);
+
+  if (jobs.length === 0) return null;
+
+  const statusLabel = (status: string) => {
+    switch (status) {
+      case 'pending': return t('approvalsPage.adversarialReview.jobPending');
+      case 'generating-prompt': return t('approvalsPage.adversarialReview.jobGeneratingPrompt');
+      case 'running-review': return t('approvalsPage.adversarialReview.jobRunningReview');
+      default: return status;
+    }
+  };
+
+  return (
+    <div className="fixed bottom-4 left-4 z-50 space-y-2 max-w-sm">
+      {jobs.map(job => (
+        <div key={job.id} className="p-3 rounded-lg shadow-lg bg-purple-50 dark:bg-purple-900/50 border border-purple-200 dark:border-purple-800">
+          <div className="flex items-start gap-3">
+            <svg className="animate-spin w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                {t('approvalsPage.adversarialReview.jobTitle', { spec: job.specName, phase: job.phase })}
+              </p>
+              <p className="text-xs text-purple-600 dark:text-purple-400 mt-0.5">
+                {statusLabel(job.status)}
+              </p>
+            </div>
+            <button
+              onClick={() => cancelAdversarialJob(job.id).then(() => setJobs(prev => prev.filter(j => j.id !== job.id)))}
+              className="text-purple-400 hover:text-purple-600 dark:hover:text-purple-200 flex-shrink-0"
+              title={t('common.cancel')}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
 interface ApprovalItemProps {
   a: any;
@@ -20,11 +114,10 @@ interface ApprovalItemProps {
   selectedCount: number;
   onToggleSelection: (id: string) => void;
   isHighlighted: boolean;
-  onAdversarialResult?: (result: any) => void;
   readOnly?: boolean;
 }
 
-function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted, onAdversarialResult, readOnly = false }: ApprovalItemProps) {
+function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted, readOnly = false }: ApprovalItemProps) {
   const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll, requestAdversarialReview } = useApi();
   const { showNotification } = useNotifications();
   const { t } = useTranslation();
@@ -257,7 +350,7 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
     try {
       const res = await requestAdversarialReview(a.id);
       if (res.ok && res.data) {
-        onAdversarialResult?.(res.data);
+        showNotification(t('approvalsPage.adversarialReview.started'), 'success');
         await reloadAll();
       } else {
         showNotification(t('approvalsPage.adversarialReview.error'), 'error');
@@ -725,10 +818,6 @@ function Content() {
   const [lastBatchOperation, setLastBatchOperation] = useState<{ ids: string[]; action: string } | null>(null);
   const [undoTimeoutId, setUndoTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
-  // Adversarial review result modal (lives here so it survives approval list re-renders)
-  const [adversarialResult, setAdversarialResult] = useState<any>(null);
-  const [adversarialCopied, setAdversarialCopied] = useState(false);
-
   // Get unique categories from approvals
   const categories = useMemo(() => {
     const cats = new Set<string>();
@@ -1086,7 +1175,6 @@ function Content() {
               selectedCount={selectedIds.size}
               onToggleSelection={handleToggleSelection}
               isHighlighted={highlightedId === a.id}
-              onAdversarialResult={setAdversarialResult}
             />
           ))}
         </div>
@@ -1156,60 +1244,8 @@ function Content() {
         multiline={true}
       />
 
-      {/* Adversarial Review Result Modal */}
-      {adversarialResult && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setAdversarialResult(null)}>
-          <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] rounded-lg shadow-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-4">{t('approvalsPage.adversarialReview.modalTitle')}</h3>
-
-            <div className="space-y-3 text-sm">
-              <p className="font-medium">{t('approvalsPage.adversarialReview.version', { version: adversarialResult.data?.version || 1 })}</p>
-
-              {adversarialResult.data?.analysisOutputPath && (
-                <div>
-                  <span className="text-[var(--text-faint)]">{t('approvalsPage.adversarialReview.analysisOutput')}</span>
-                  <code className="block mt-1 p-2 bg-[var(--surface-sunken)] rounded text-xs break-all">{adversarialResult.data.analysisOutputPath}</code>
-                </div>
-              )}
-
-              <div>
-                <span className="text-[var(--text-faint)]">{t('approvalsPage.adversarialReview.promptLabel')}</span>
-                <pre className="mt-1 p-3 bg-[var(--surface-sunken)] rounded text-xs whitespace-pre-wrap break-all border border-[var(--border-default)]">{adversarialResult.prompt}</pre>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={async () => {
-                  const text = adversarialResult?.prompt;
-                  if (!text) return;
-                  try {
-                    await navigator.clipboard.writeText(text);
-                  } catch {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = text;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                  }
-                  setAdversarialCopied(true);
-                  setTimeout(() => setAdversarialCopied(false), 2000);
-                }}
-                className="btn bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 text-sm flex items-center gap-1"
-              >
-                {adversarialCopied ? t('approvalsPage.adversarialReview.copied') : t('approvalsPage.adversarialReview.copyPrompt')}
-              </button>
-              <button
-                onClick={() => setAdversarialResult(null)}
-                className="btn text-sm"
-              >
-                {t('common.close')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Adversarial Review Running Jobs */}
+      <AdversarialJobsToast />
 
       {/* Batch Result Toast */}
       {showResultToast && batchResult && (

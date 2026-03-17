@@ -14,6 +14,7 @@ import { validateAndCheckPort, DASHBOARD_TEST_MESSAGE } from './utils.js';
 import { parseTasksFromMarkdown } from '../core/task-parser.js';
 import { ProjectManager } from './project-manager.js';
 import { JobScheduler } from './job-scheduler.js';
+import { AdversarialRunner, AdversarialJob } from './adversarial-runner.js';
 import { ImplementationLogManager } from './implementation-log-manager.js';
 import { DashboardSessionManager } from '../core/dashboard-session.js';
 import {
@@ -48,6 +49,7 @@ export class MultiProjectDashboardServer {
   private app: FastifyInstance;
   private projectManager: ProjectManager;
   private jobScheduler: JobScheduler;
+  private adversarialRunner: AdversarialRunner;
   private sessionManager: DashboardSessionManager;
   private options: MultiDashboardOptions;
   private bindAddress: string;
@@ -69,6 +71,7 @@ export class MultiProjectDashboardServer {
     this.options = options;
     this.projectManager = new ProjectManager();
     this.jobScheduler = new JobScheduler(this.projectManager);
+    this.adversarialRunner = new AdversarialRunner();
     this.sessionManager = new DashboardSessionManager();
 
     // Initialize network binding configuration
@@ -387,6 +390,15 @@ export class MultiProjectDashboardServer {
         console.error('Error broadcasting approval changes:', error);
         // Don't propagate error to prevent event system crash
       }
+    });
+
+    // Broadcast adversarial review job updates
+    this.adversarialRunner.on('job-update', (job: AdversarialJob) => {
+      this.broadcastToProject(job.projectId, {
+        type: 'adversarial-job-update',
+        projectId: job.projectId,
+        data: job
+      });
     });
   }
 
@@ -711,7 +723,7 @@ export class MultiProjectDashboardServer {
       }
     });
 
-    // Adversarial review preparation for spec approvals
+    // Adversarial review - spawns background Claude subagent to perform the review
     this.app.post('/api/projects/:projectId/approvals/:id/adversarial-review', async (request, reply) => {
       const { projectId, id } = request.params as { projectId: string; id: string };
 
@@ -740,14 +752,27 @@ export class MultiProjectDashboardServer {
           { projectPath: project.originalProjectPath }
         );
 
-        const prompt = [
-          `Use the spec-workflow MCP tools to perform an adversarial review of the "${phase}" phase for spec "${approval.categoryName}".`,
-          `Call the adversarial-review tool with specName: "${approval.categoryName}" and phase: "${phase}".`,
-          `Then follow the methodology it returns to generate a tailored adversarial prompt and launch a fresh-context subagent to execute it.`,
-        ].join(' ');
+        if (!result.success || !result.data) {
+          return reply.code(500).send({ error: result.message || 'Failed to prepare adversarial review' });
+        }
 
-        // Set approval to needs-revision with a general comment directing Agent A to the adversarial response flow
-        const response = `Adversarial review requested via dashboard. An adversarial analysis is being generated for this document.`;
+        // Spawn background Claude subagent to perform the review
+        const jobId = await this.adversarialRunner.run({
+          projectId,
+          specName: approval.categoryName,
+          phase,
+          projectPath: project.originalProjectPath,
+          targetFile: result.data.targetFile,
+          promptOutputPath: result.data.promptOutputPath,
+          analysisOutputPath: result.data.analysisOutputPath,
+          methodology: result.data.methodology,
+          steeringDocs: result.data.steeringDocs || [],
+          priorPhaseDocs: result.data.priorPhaseDocs || [],
+          version: result.data.version,
+        });
+
+        // Set approval to needs-revision
+        const response = `Adversarial review requested via dashboard. A background review is running (job: ${jobId}).`;
         const commentText = [
           `An adversarial review has been requested for this document.`,
           `Use the adversarial-response tool with specName "${approval.categoryName}" and phase "${phase}" to read the analysis, evaluate each finding, and present your assessment to the user before making changes.`,
@@ -757,7 +782,8 @@ export class MultiProjectDashboardServer {
           trigger: 'adversarial-review',
           specName: approval.categoryName,
           phase,
-          analysisOutputPath: result.data?.analysisOutputPath,
+          analysisOutputPath: result.data.analysisOutputPath,
+          jobId,
           timestamp: new Date().toISOString()
         }, null, 2);
         const comments = [{
@@ -768,10 +794,44 @@ export class MultiProjectDashboardServer {
 
         await project.approvalStorage.updateApproval(id, 'needs-revision', response, annotations, comments);
 
-        return { ...result, prompt };
+        return { ...result, jobId };
       } catch (error: any) {
         return reply.code(500).send({ error: error.message || 'Internal server error' });
       }
+    });
+
+    // Adversarial review job status
+    this.app.get('/api/projects/:projectId/adversarial/jobs', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      return { jobs: this.adversarialRunner.getJobsForProject(projectId) };
+    });
+
+    this.app.get('/api/projects/:projectId/adversarial/jobs/:jobId', async (request, reply) => {
+      const { jobId } = request.params as { jobId: string };
+
+      const job = this.adversarialRunner.getJob(jobId);
+      if (!job) {
+        return reply.code(404).send({ error: 'Job not found' });
+      }
+
+      return { job };
+    });
+
+    this.app.post('/api/projects/:projectId/adversarial/jobs/:jobId/cancel', async (request, reply) => {
+      const { jobId } = request.params as { jobId: string };
+
+      const cancelled = this.adversarialRunner.cancelJob(jobId);
+      if (!cancelled) {
+        return reply.code(400).send({ error: 'Job cannot be cancelled (already completed or not found)' });
+      }
+
+      return { success: true };
     });
 
     // Undo batch operations - revert items back to pending
@@ -1720,6 +1780,9 @@ export class MultiProjectDashboardServer {
       }
     });
     this.clients.clear();
+
+    // Stop adversarial runner
+    this.adversarialRunner.shutdown();
 
     // Stop job scheduler
     await this.jobScheduler.shutdown();
