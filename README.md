@@ -1,5 +1,7 @@
 # Spec Workflow MCP
 
+[![AgentRank Score](https://agentrank-ai.com/api/badge/tool/Pimzino--spec-workflow-mcp)](https://agentrank-ai.com/tool/Pimzino--spec-workflow-mcp)
+
 [![npm version](https://img.shields.io/npm/v/@pimzino/spec-workflow-mcp)](https://www.npmjs.com/package/@pimzino/spec-workflow-mcp)
 [![VSCode Extension](https://vsmarketplacebadges.dev/version-short/Pimzino.spec-workflow-mcp.svg)](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)
 
