@@ -21,9 +21,10 @@ interface ApprovalItemProps {
   onToggleSelection: (id: string) => void;
   isHighlighted: boolean;
   onAdversarialResult?: (result: any) => void;
+  readOnly?: boolean;
 }
 
-function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted, onAdversarialResult }: ApprovalItemProps) {
+function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted, onAdversarialResult, readOnly = false }: ApprovalItemProps) {
   const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll, requestAdversarialReview } = useApi();
   const { showNotification } = useNotifications();
   const { t } = useTranslation();
@@ -341,6 +342,7 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
             </div>
 
             {/* Action Buttons */}
+            {!readOnly && (
             <div className="flex flex-wrap items-center gap-3 min-w-0">
               <button
                 onClick={() => setOpen(!open)}
@@ -441,6 +443,7 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
                 </button>
               )}
             </div>
+            )}
           </div>
         </div>
       </div>
@@ -741,6 +744,17 @@ function Content() {
   // Filter approvals based on selected category and status (only show pending)
   const filteredApprovals = useMemo(() => {
     let filtered = approvals.filter(a => a.status === 'pending');
+
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(a => (a as any).categoryName === filterCategory);
+    }
+
+    return filtered;
+  }, [approvals, filterCategory]);
+
+  // Filter approvals with needs-revision status (with same category filter)
+  const revisionApprovals = useMemo(() => {
+    let filtered = approvals.filter(a => a.status === 'needs-revision');
 
     if (filterCategory !== 'all') {
       filtered = filtered.filter(a => (a as any).categoryName === filterCategory);
@@ -1075,6 +1089,41 @@ function Content() {
               onAdversarialResult={setAdversarialResult}
             />
           ))}
+        </div>
+      )}
+
+      {/* Pending Revisions Section */}
+      {revisionApprovals.length > 0 && (
+        <div className="grid gap-4 max-w-full overflow-x-hidden">
+          <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--text-primary)]">{t('approvalsPage.revisions.header')}</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">
+                  {t('approvalsPage.revisions.description')}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--status-warning-muted)] text-[var(--status-warning)]">
+                  {t('approvalsPage.revisions.count', { count: revisionApprovals.length })}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-3 sm:space-y-4 max-w-full overflow-x-hidden">
+            {revisionApprovals.map((a) => (
+              <ApprovalItem
+                key={a.id}
+                a={a}
+                selectionMode={false}
+                isSelected={false}
+                selectedCount={0}
+                onToggleSelection={handleToggleSelection}
+                isHighlighted={highlightedId === a.id}
+                readOnly
+              />
+            ))}
+          </div>
         </div>
       )}
 

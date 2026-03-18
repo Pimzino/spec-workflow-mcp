@@ -396,6 +396,12 @@
       "title": "No Pending Approvals",
       "description": "All approvals have been processed. New approval requests will appear here."
     },
+    "revisions": {
+      "header": "Pending Revisions",
+      "description": "These items are awaiting revision by the agent. No actions are available until revisions are complete.",
+      "count_one": "{{count}} awaiting revision",
+      "count_other": "{{count}} awaiting revision"
+    },
     "reject": {
       "title": "Reject Approval",
       "placeholder": "Please provide feedback explaining why this is being rejected...",
