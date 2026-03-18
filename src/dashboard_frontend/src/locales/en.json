@@ -455,14 +455,18 @@
       "confirmTitle": "Start Adversarial Review",
       "confirmMessage": "This will launch a background adversarial review using a Claude subagent. The review typically takes a few minutes. Continue?",
       "confirmYes": "Yes, start review",
-      "started": "Adversarial review started. You'll be notified when it's complete.",
-      "completed": "Adversarial review complete for {{spec}}/{{phase}}",
-      "failed": "Adversarial review failed for {{spec}}/{{phase}}: {{error}}",
+      "started": "Adversarial review started. Progress is shown on the approval card.",
       "error": "Failed to start adversarial review",
-      "jobTitle": "Reviewing {{spec}}/{{phase}}",
-      "jobPending": "Preparing...",
-      "jobGeneratingPrompt": "Generating adversarial prompt...",
-      "jobRunningReview": "Running review..."
+      "stepGeneratingPrompt": "Generating prompt",
+      "stepRunningReview": "Running review",
+      "reviewComplete": "Adversarial review complete",
+      "reviewFailed": "Adversarial review failed",
+      "nextStep": "Next: Tell a Claude agent to respond to the requested revision on this approval.",
+      "retry": "Retry",
+      "retryResume": "Resume review",
+      "dismiss": "Dismiss",
+      "reviewIncomplete": "Adversarial review incomplete",
+      "reviewIncompleteDescription": "A previous review was started but did not finish. This may have been caused by a server restart."
     }
   },
   "adversarialPage": {

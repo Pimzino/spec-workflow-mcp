@@ -30,6 +30,7 @@ interface RunOptions {
   steeringDocs: string[];
   priorPhaseDocs: string[];
   version: number;
+  skipPromptGeneration?: boolean; // Skip step 1 if prompt file already exists
 }
 
 const JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes per step
@@ -96,18 +97,30 @@ export class AdversarialRunner extends EventEmitter {
     if (!job) return;
 
     try {
-      // Step 1: Generate the tailored adversarial prompt
-      job.status = 'generating-prompt';
-      this.emit('job-update', { ...job });
+      // Step 1: Generate the tailored adversarial prompt (skip if prompt already exists)
+      let promptExists = false;
+      if (opts.skipPromptGeneration) {
+        try {
+          await fs.access(opts.promptOutputPath);
+          promptExists = true;
+        } catch {
+          // Prompt doesn't exist despite skipPromptGeneration — fall through to generate it
+        }
+      }
 
-      const promptGenerationInstructions = this.buildPromptGenerationInstructions(opts);
-      await this.runClaude(jobId, opts.projectPath, promptGenerationInstructions);
+      if (!promptExists) {
+        job.status = 'generating-prompt';
+        this.emit('job-update', { ...job });
 
-      // Verify the prompt file was written
-      try {
-        await fs.access(opts.promptOutputPath);
-      } catch {
-        throw new Error(`Prompt generation completed but prompt file was not created at ${opts.promptOutputPath}`);
+        const promptGenerationInstructions = this.buildPromptGenerationInstructions(opts);
+        await this.runClaude(jobId, opts.projectPath, promptGenerationInstructions);
+
+        // Verify the prompt file was written
+        try {
+          await fs.access(opts.promptOutputPath);
+        } catch {
+          throw new Error(`Prompt generation completed but prompt file was not created at ${opts.promptOutputPath}`);
+        }
       }
 
       // Step 2: Execute the adversarial review with fresh context

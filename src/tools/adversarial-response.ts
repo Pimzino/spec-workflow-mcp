@@ -24,6 +24,10 @@ structured instructions for evaluating findings.`,
         enum: ['requirements', 'design', 'tasks'],
         description: 'Which phase document was reviewed'
       },
+      version: {
+        type: 'number',
+        description: 'Specific analysis version to respond to (e.g. 1, 2, 3). If omitted, uses the latest available version.'
+      },
       projectPath: {
         type: 'string',
         description: 'Absolute path to the project root (optional - uses server context path if not provided)'
@@ -40,6 +44,7 @@ structured instructions for evaluating findings.`,
 
 export async function adversarialResponseHandler(args: any, context: ToolContext): Promise<ToolResponse> {
   const { specName, phase } = args;
+  const requestedVersion: number | undefined = args.version;
   const projectPath = args.projectPath || context.projectPath;
 
   if (!specName || typeof specName !== 'string') {
@@ -54,7 +59,39 @@ export async function adversarialResponseHandler(args: any, context: ToolContext
   const reviewsDir = join(specDir, 'reviews');
   const targetFile = join(specDir, `${phase}.md`);
 
-  // Find the latest adversarial analysis
+  // If a specific version was requested, look for that exact file
+  if (requestedVersion) {
+    const versionSuffix = requestedVersion === 1 ? '' : `-r${requestedVersion}`;
+    const expectedFile = join(reviewsDir, `adversarial-analysis-${phase}${versionSuffix}.md`);
+    try {
+      await fs.access(expectedFile);
+    } catch {
+      return {
+        success: false,
+        message: `Adversarial analysis v${requestedVersion} not found for ${specName}/${phase}. Expected file: ${expectedFile}. The background review may still be running, or it may have failed.`
+      };
+    }
+
+    const methodology = await getMethodologyOverride(workflowRoot, 'responseMethodology') || getAdversarialResponseMethodology();
+    return {
+      success: true,
+      message: `Found adversarial analysis v${requestedVersion} for ${specName}/${phase}`,
+      data: {
+        analysisFile: expectedFile,
+        targetFile,
+        version: requestedVersion,
+        methodology
+      },
+      nextSteps: [
+        `Read the adversarial analysis at: ${expectedFile}`,
+        'Evaluate each finding using the structured format',
+        'Present your assessment to the user for discussion',
+        'After alignment, update the document and resubmit for approval'
+      ]
+    };
+  }
+
+  // No version specified — find the latest adversarial analysis
   let latestAnalysis: string | null = null;
   let latestVersion = 0;
 

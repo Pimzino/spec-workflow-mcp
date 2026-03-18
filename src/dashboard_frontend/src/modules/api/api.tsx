@@ -133,6 +133,7 @@ type ApiActionsContextType = {
   getImplementationLogStats: (specName: string, taskId: string) => Promise<any>;
   getChangelog: (version: string) => Promise<{ content: string }>;
   requestAdversarialReview: (id: string) => Promise<{ ok: boolean; status: number; data?: any }>;
+  retryAdversarialReview: (id: string) => Promise<{ ok: boolean; status: number; data?: any }>;
   getAdversarialReviews: () => Promise<any>;
   getAdversarialReviewContent: (specName: string, phase: string, version: number) => Promise<{ content: string; lastModified: string }>;
   getAdversarialSettings: () => Promise<any>;
@@ -311,6 +312,7 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
         getImplementationLogStats: async () => ({}),
         getChangelog: async () => ({ content: '' }),
         requestAdversarialReview: async () => ({ ok: false, status: 400 }),
+        retryAdversarialReview: async () => ({ ok: false, status: 400 }),
         getAdversarialReviews: async () => ({ specs: [] }),
         getAdversarialReviewContent: async () => ({ content: '', lastModified: '' }),
         getAdversarialSettings: async () => ({ customPreamble: '', requiredPhases: { requirements: false, design: false, tasks: false } }),
@@ -361,6 +363,7 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
       getImplementationLogStats: (specName: string, taskId: string) => getJson(`${prefix}/specs/${encodeURIComponent(specName)}/implementation-log/task/${encodeURIComponent(taskId)}/stats`),
       getChangelog: (version: string) => getJson(`${prefix}/changelog/${encodeURIComponent(version)}`),
       requestAdversarialReview: (id: string) => postJsonWithData(`${prefix}/approvals/${encodeURIComponent(id)}/adversarial-review`, {}),
+      retryAdversarialReview: (id: string) => postJsonWithData(`${prefix}/approvals/${encodeURIComponent(id)}/adversarial-retry`, {}),
       getAdversarialReviews: () => getJson(`${prefix}/adversarial/reviews`),
       getAdversarialReviewContent: (specName: string, phase: string, version: number) =>
         getJson(`${prefix}/adversarial/reviews/${encodeURIComponent(specName)}/${encodeURIComponent(phase)}/${version}`),
