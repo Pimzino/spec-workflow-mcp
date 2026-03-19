@@ -76,7 +76,9 @@ function AdversarialProgress({ job, approval, onDismissJob, onRetry }: { job?: a
     phase = job.phase;
     // Job doesn't carry version directly, but annotationData might
     version = annotationData?.analysisVersion;
-  } else if (annotationData) {
+  } else if (annotationData && approval.status === 'needs-revision') {
+    // Only show annotation-based state when still in needs-revision.
+    // Once the document is revised and resubmitted (back to pending), the review cycle is over.
     specName = annotationData.specName || approval.categoryName || '';
     phase = annotationData.phase || '';
     version = annotationData.analysisVersion;
