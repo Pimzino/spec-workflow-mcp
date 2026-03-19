@@ -175,6 +175,43 @@ Poor feedback:
 "This doesn't look right. Fix it."
 ```
 
+### Adversarial Review (Optional)
+
+For high-stakes specifications, an adversarial review adds an independent quality gate between approval and implementation. It uses a fresh-context subagent to critique the document without the biases accumulated during authoring.
+
+#### When to Use
+
+- Complex or safety-critical features
+- Specifications that will be expensive to change post-implementation
+- Documents where the author and reviewer are the same person
+- Any phase where you want a second opinion before committing
+
+#### How It Works
+
+1. **Trigger** - Click "Adversarial Review" on a pending approval, or ask your AI assistant
+2. **Prompt generation** - A subagent reads the document, steering docs, and prior phases to generate a tailored adversarial prompt
+3. **Independent review** - A second subagent executes the prompt in a clean context, producing a structured critique
+4. **Status update** - The approval moves to "needs-revision" with the analysis attached
+5. **Response** - Your AI assistant reads the analysis, addresses valid findings, and resubmits the revised document
+
+#### Review Cycle
+
+The adversarial workflow integrates into the standard approval cycle:
+
+```
+Pending → Adversarial Review → Needs Revision → Revise & Resubmit → Pending → Approve
+```
+
+Each review is versioned (v1, v2, v3...) so you can run multiple rounds and compare how the document evolved.
+
+#### Configuration
+
+On the **Adversarial Analysis** page in the dashboard:
+
+- **Required Phases** - Enforce adversarial review before approval for specific phases
+- **Methodology** - Customize the review and response methodologies
+- **Model** - Choose which Claude model runs the review (e.g., Opus for depth, Sonnet for speed)
+
 ## Phase 4: Implementation
 
 ### Task Execution Strategy

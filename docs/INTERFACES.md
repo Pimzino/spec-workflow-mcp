@@ -96,6 +96,50 @@ The tasks view provides:
   - Section progress
   - Time estimates
 
+#### Approvals
+
+The approvals page manages pending approval requests:
+
+- **Approval Cards**
+  - Document title and file path
+  - Status badge (pending, approved, rejected, needs-revision)
+  - Submission timestamp
+  - Adversarial review progress (when running)
+
+- **Approval Actions**
+  - Review & Annotate — line-by-line review with comments
+  - Quick Approve / Quick Reject
+  - Adversarial Review — trigger independent critique
+
+- **Pending Revisions**
+  - Documents awaiting revision after feedback
+  - Read-only view of revision comments
+  - Direct link to the adversarial analysis (if applicable)
+
+- **Batch Operations**
+  - Select multiple approvals
+  - Batch approve or reject
+
+#### Adversarial Analysis
+
+![Adversarial Analysis page — Reviews tab](screenshots/08-adversarial-reviews-tab.png)
+
+Browse and configure adversarial reviews:
+
+- **Reviews Tab**
+  - Spec selector dropdown
+  - Phase list with version counts
+  - Rendered analysis with full markdown support
+  - Version history for each phase
+
+- **Settings Tab**
+  - Preamble text for review context
+  - Required phases toggle (enforce review before approval)
+  - Model selection (choose Claude model for reviews)
+  - Methodology editors for review and response prompts
+
+![Adversarial Analysis page — Settings tab](screenshots/09-adversarial-settings-tab.png)
+
 #### Steering Documents
 
 Access project guidance:
@@ -137,6 +181,8 @@ Direct links to specific views:
 - `/spec/{name}/design` - Design doc
 - `/spec/{name}/tasks` - Task list
 - `/steering/{type}` - Steering documents
+- `/approvals` - Approval queue
+- `/adversarial` - Adversarial analysis browser and settings
 
 ### Real-Time Updates
 
@@ -147,6 +193,7 @@ The dashboard uses WebSockets for live updates:
   - Task status updates
   - Progress changes
   - Approval notifications
+  - Adversarial review progress
 
 - **Connection Status**
   - Green: Connected

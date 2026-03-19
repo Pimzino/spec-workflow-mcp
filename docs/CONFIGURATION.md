@@ -485,6 +485,40 @@ The VSCode extension has its own settings:
 | Invalid TOML syntax | Validate with TOML linter |
 | Settings not applying | Check configuration precedence |
 
+## Adversarial Review Settings
+
+Adversarial review settings are stored per-project in `.spec-workflow/adversarial-settings.json`. These can be edited through the **Adversarial Analysis > Settings** tab in the dashboard or directly in the file.
+
+### Settings File
+
+```json
+{
+  "requiredPhases": {
+    "requirements": false,
+    "design": false,
+    "tasks": false
+  },
+  "preamble": "",
+  "reviewMethodology": "",
+  "responseMethodology": "",
+  "model": "sonnet"
+}
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `requiredPhases` | object | All false | Enforce adversarial review before approval per phase |
+| `preamble` | string | "" | Additional context prepended to review prompts |
+| `reviewMethodology` | string | Built-in | Custom methodology for generating adversarial critiques |
+| `responseMethodology` | string | Built-in | Custom methodology for responding to critiques |
+| `model` | string | "sonnet" | Claude model for reviews: "sonnet", "opus", "haiku", or a full model ID |
+
+### Required Phases
+
+When a phase is marked as required, the dashboard will prevent approval of that phase's document until an adversarial review has been completed. This is useful for enforcing quality gates on critical phases.
+
 ## Best Practices
 
 1. **Use version control** for configuration files
