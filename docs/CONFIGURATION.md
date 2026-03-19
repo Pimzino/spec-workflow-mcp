@@ -501,7 +501,9 @@ Adversarial review settings are stored per-project in `.spec-workflow/adversaria
   "preamble": "",
   "reviewMethodology": "",
   "responseMethodology": "",
-  "model": "sonnet"
+  "model": "sonnet",
+  "cli": "",
+  "cliArgs": []
 }
 ```
 
@@ -513,7 +515,23 @@ Adversarial review settings are stored per-project in `.spec-workflow/adversaria
 | `preamble` | string | "" | Additional context prepended to review prompts |
 | `reviewMethodology` | string | Built-in | Custom methodology for generating adversarial critiques |
 | `responseMethodology` | string | Built-in | Custom methodology for responding to critiques |
-| `model` | string | "sonnet" | Claude model for reviews: "sonnet", "opus", "haiku", or a full model ID |
+| `model` | string | "" | Model for reviews: "sonnet", "opus", "haiku", or a full model ID. Empty uses CLI default |
+| `cli` | string | "claude" | CLI executable for background reviews. Any LLM CLI that accepts a prompt as the final argument |
+| `cliArgs` | string[] | `["--print", "--dangerously-skip-permissions"]` | Base arguments passed to the CLI before the prompt |
+
+### Agent CLI
+
+The dashboard's one-click adversarial review spawns a background CLI process to run the review. By default it uses the Claude CLI (`claude --print --dangerously-skip-permissions`), but you can configure any LLM CLI that accepts a prompt as its final argument. The CLI must be able to read files from the project directory and write markdown output.
+
+Example for a different CLI:
+```json
+{
+  "cli": "my-llm-cli",
+  "cliArgs": ["--non-interactive", "--output-format", "markdown"]
+}
+```
+
+Note: The MCP tools (`adversarial-review`, `adversarial-response`) are LLM-agnostic and work with any agent. The CLI setting only affects background reviews triggered from the dashboard.
 
 ### Required Phases
 

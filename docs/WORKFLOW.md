@@ -209,8 +209,9 @@ Each review is versioned (v1, v2, v3...) so you can run multiple rounds and comp
 On the **Adversarial Analysis** page in the dashboard:
 
 - **Required Phases** - Enforce adversarial review before approval for specific phases
+- **Agent CLI** - Configure which LLM CLI runs background reviews (defaults to Claude CLI, but any compatible CLI works)
+- **Model** - Choose which model runs the review (e.g., Opus for depth, Sonnet for speed)
 - **Methodology** - Customize the review and response methodologies
-- **Model** - Choose which Claude model runs the review (e.g., Opus for depth, Sonnet for speed)
 
 ## Phase 4: Implementation
 

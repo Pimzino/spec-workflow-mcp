@@ -29,6 +29,8 @@ interface AdversarialSettings {
   reviewMethodology: string;
   responseMethodology: string;
   model: string;
+  cli: string;
+  cliArgs: string[];
 }
 
 const DEFAULT_SETTINGS: AdversarialSettings = {
@@ -37,6 +39,8 @@ const DEFAULT_SETTINGS: AdversarialSettings = {
   reviewMethodology: '',
   responseMethodology: '',
   model: '',
+  cli: '',
+  cliArgs: [],
 };
 
 function Content() {
@@ -351,10 +355,52 @@ function Content() {
                 </div>
               </div>
 
+              {/* Agent CLI Configuration */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                  {t('adversarialPage.settings.cliLabel', 'Agent CLI')}
+                  <span className="ml-2 text-xs font-normal text-[var(--text-muted)]">
+                    {t('adversarialPage.settings.cliOptional', 'Optional')}
+                  </span>
+                </label>
+                <p className="text-xs text-[var(--text-muted)] mb-2">
+                  {t('adversarialPage.settings.cliHelp', 'CLI executable for background reviews. Defaults to "claude". Any LLM CLI that accepts a prompt as the final argument will work.')}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 sm:flex-initial">
+                    <label className="block text-xs text-[var(--text-muted)] mb-1">
+                      {t('adversarialPage.settings.cliExecutableLabel', 'Executable')}
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.cli || ''}
+                      onChange={(e) => setSettings(s => ({ ...s, cli: e.target.value }))}
+                      placeholder="claude"
+                      className="w-full sm:w-48 px-3 py-2 rounded-md border border-[var(--border-default)] bg-[var(--surface-base)] text-[var(--text-primary)] text-sm font-mono placeholder:text-[var(--text-faint)]"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs text-[var(--text-muted)] mb-1">
+                      {t('adversarialPage.settings.cliArgsLabel', 'Base arguments')}
+                    </label>
+                    <input
+                      type="text"
+                      value={(settings.cliArgs || []).join(' ')}
+                      onChange={(e) => {
+                        const val = e.target.value.trim();
+                        setSettings(s => ({ ...s, cliArgs: val ? val.split(/\s+/) : [] }));
+                      }}
+                      placeholder="--print --dangerously-skip-permissions"
+                      className="w-full px-3 py-2 rounded-md border border-[var(--border-default)] bg-[var(--surface-base)] text-[var(--text-primary)] text-sm font-mono placeholder:text-[var(--text-faint)]"
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Model Selection */}
               <div>
                 <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                  {t('adversarialPage.settings.modelLabel', 'Claude Model')}
+                  {t('adversarialPage.settings.modelLabel', 'Model')}
                   <span className="ml-2 text-xs font-normal text-[var(--text-muted)]">
                     {t('adversarialPage.settings.modelOptional', 'Optional')}
                   </span>

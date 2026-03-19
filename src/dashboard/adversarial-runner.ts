@@ -31,7 +31,9 @@ interface RunOptions {
   priorPhaseDocs: string[];
   version: number;
   skipPromptGeneration?: boolean; // Skip step 1 if prompt file already exists
-  model?: string; // Claude model alias or full name (e.g. 'sonnet', 'opus', 'claude-sonnet-4-6')
+  model?: string; // Model alias or full name (e.g. 'sonnet', 'opus', 'claude-sonnet-4-6')
+  cli?: string; // CLI executable (default: 'claude')
+  cliArgs?: string[]; // Base CLI args (default: ['--print', '--dangerously-skip-permissions'])
 }
 
 const JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes per step
@@ -114,7 +116,7 @@ export class AdversarialRunner extends EventEmitter {
         this.emit('job-update', { ...job });
 
         const promptGenerationInstructions = this.buildPromptGenerationInstructions(opts);
-        await this.runClaude(jobId, opts.projectPath, promptGenerationInstructions, opts.model);
+        await this.runAgent(jobId, opts.projectPath, promptGenerationInstructions, opts);
 
         // Verify the prompt file was written
         try {
@@ -129,7 +131,7 @@ export class AdversarialRunner extends EventEmitter {
       this.emit('job-update', { ...job });
 
       const reviewInstructions = `Read and execute the instructions in ${opts.promptOutputPath}`;
-      await this.runClaude(jobId, opts.projectPath, reviewInstructions, opts.model);
+      await this.runAgent(jobId, opts.projectPath, reviewInstructions, opts);
 
       // Verify the analysis file was written
       try {
@@ -176,15 +178,18 @@ export class AdversarialRunner extends EventEmitter {
     ].join('\n');
   }
 
-  private runClaude(jobId: string, cwd: string, prompt: string, model?: string): Promise<void> {
+  private runAgent(jobId: string, cwd: string, prompt: string, opts: RunOptions): Promise<void> {
+    const cli = opts.cli || 'claude';
+    const baseArgs = opts.cliArgs || ['--print', '--dangerously-skip-permissions'];
+
     return new Promise((resolve, reject) => {
-      const args = ['--print', '--dangerously-skip-permissions'];
-      if (model) {
-        args.push('--model', model);
+      const args = [...baseArgs];
+      if (opts.model) {
+        args.push('--model', opts.model);
       }
       args.push(prompt);
 
-      const child = spawn('claude', args, {
+      const child = spawn(cli, args, {
         cwd,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: { ...process.env },
@@ -195,7 +200,7 @@ export class AdversarialRunner extends EventEmitter {
       // Set timeout
       const timeout = setTimeout(() => {
         child.kill('SIGTERM');
-        reject(new Error('Claude process timed out after 10 minutes'));
+        reject(new Error(`Agent process timed out after 10 minutes`));
       }, JOB_TIMEOUT_MS);
       this.timeouts.set(jobId, timeout);
 
@@ -212,7 +217,7 @@ export class AdversarialRunner extends EventEmitter {
         if (code === 0) {
           resolve();
         } else {
-          reject(new Error(`Claude process exited with code ${code}${stderr ? `: ${stderr.slice(0, 500)}` : ''}`));
+          reject(new Error(`Agent process exited with code ${code}${stderr ? `: ${stderr.slice(0, 500)}` : ''}`));
         }
       });
 
@@ -222,7 +227,7 @@ export class AdversarialRunner extends EventEmitter {
         this.processes.delete(jobId);
 
         if ((err as any).code === 'ENOENT') {
-          reject(new Error('Claude CLI not found. Ensure "claude" is installed and available in PATH.'));
+          reject(new Error(`CLI "${cli}" not found. Ensure it is installed and available in PATH.`));
         } else {
           reject(err);
         }

@@ -756,17 +756,25 @@ export class MultiProjectDashboardServer {
           return reply.code(500).send({ error: result.message || 'Failed to prepare adversarial review' });
         }
 
-        // Read model preference from adversarial settings
+        // Read preferences from adversarial settings
         let model: string | undefined;
+        let cli: string | undefined;
+        let cliArgs: string[] | undefined;
         try {
           const settingsRaw = await readFile(join(project.projectPath, '.spec-workflow', 'adversarial-settings.json'), 'utf-8');
           const settings = JSON.parse(settingsRaw);
           if (settings.model && typeof settings.model === 'string') {
             model = settings.model;
           }
+          if (settings.cli && typeof settings.cli === 'string') {
+            cli = settings.cli;
+          }
+          if (Array.isArray(settings.cliArgs) && settings.cliArgs.length > 0) {
+            cliArgs = settings.cliArgs;
+          }
         } catch { /* no settings or parse error — use default */ }
 
-        // Spawn background Claude subagent to perform the review
+        // Spawn background agent to perform the review
         const jobId = await this.adversarialRunner.run({
           projectId,
           specName: approval.categoryName,
@@ -780,6 +788,8 @@ export class MultiProjectDashboardServer {
           priorPhaseDocs: result.data.priorPhaseDocs || [],
           version: result.data.version,
           model,
+          cli,
+          cliArgs,
         });
 
         // Set approval to needs-revision
@@ -893,13 +903,21 @@ export class MultiProjectDashboardServer {
           promptExists = true;
         } catch { /* doesn't exist */ }
 
-        // Read model preference from adversarial settings
+        // Read preferences from adversarial settings
         let retryModel: string | undefined;
+        let retryCli: string | undefined;
+        let retryCliArgs: string[] | undefined;
         try {
           const settingsRaw = await readFile(join(project.projectPath, '.spec-workflow', 'adversarial-settings.json'), 'utf-8');
           const settings = JSON.parse(settingsRaw);
           if (settings.model && typeof settings.model === 'string') {
             retryModel = settings.model;
+          }
+          if (settings.cli && typeof settings.cli === 'string') {
+            retryCli = settings.cli;
+          }
+          if (Array.isArray(settings.cliArgs) && settings.cliArgs.length > 0) {
+            retryCliArgs = settings.cliArgs;
           }
         } catch { /* use default */ }
 
@@ -918,6 +936,8 @@ export class MultiProjectDashboardServer {
           version: result.data.version,
           skipPromptGeneration: promptExists,
           model: retryModel,
+          cli: retryCli,
+          cliArgs: retryCliArgs,
         });
 
         // Update annotations with the new job ID and paths
@@ -1556,6 +1576,8 @@ export class MultiProjectDashboardServer {
         reviewMethodology: '',
         responseMethodology: '',
         model: '',
+        cli: '',
+        cliArgs: [],
       };
 
       let saved = {};
@@ -1598,6 +1620,8 @@ export class MultiProjectDashboardServer {
         reviewMethodology: typeof body.reviewMethodology === 'string' ? body.reviewMethodology : '',
         responseMethodology: typeof body.responseMethodology === 'string' ? body.responseMethodology : '',
         model: typeof body.model === 'string' ? body.model : '',
+        cli: typeof body.cli === 'string' ? body.cli : '',
+        cliArgs: Array.isArray(body.cliArgs) ? body.cliArgs.filter((a: any) => typeof a === 'string') : [],
       };
 
       const settingsDir = join(project.projectPath, '.spec-workflow');

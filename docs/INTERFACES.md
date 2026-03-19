@@ -135,7 +135,8 @@ Browse and configure adversarial reviews:
 - **Settings Tab**
   - Preamble text for review context
   - Required phases toggle (enforce review before approval)
-  - Model selection (choose Claude model for reviews)
+  - Agent CLI configuration (executable and base arguments for background reviews)
+  - Model selection (choose model for reviews)
   - Methodology editors for review and response prompts
 
 ![Adversarial Analysis page — Settings tab](screenshots/09-adversarial-settings-tab.png)
