@@ -756,6 +756,16 @@ export class MultiProjectDashboardServer {
           return reply.code(500).send({ error: result.message || 'Failed to prepare adversarial review' });
         }
 
+        // Read model preference from adversarial settings
+        let model: string | undefined;
+        try {
+          const settingsRaw = await readFile(join(project.projectPath, '.spec-workflow', 'adversarial-settings.json'), 'utf-8');
+          const settings = JSON.parse(settingsRaw);
+          if (settings.model && typeof settings.model === 'string') {
+            model = settings.model;
+          }
+        } catch { /* no settings or parse error — use default */ }
+
         // Spawn background Claude subagent to perform the review
         const jobId = await this.adversarialRunner.run({
           projectId,
@@ -769,6 +779,7 @@ export class MultiProjectDashboardServer {
           steeringDocs: result.data.steeringDocs || [],
           priorPhaseDocs: result.data.priorPhaseDocs || [],
           version: result.data.version,
+          model,
         });
 
         // Set approval to needs-revision
@@ -882,6 +893,16 @@ export class MultiProjectDashboardServer {
           promptExists = true;
         } catch { /* doesn't exist */ }
 
+        // Read model preference from adversarial settings
+        let retryModel: string | undefined;
+        try {
+          const settingsRaw = await readFile(join(project.projectPath, '.spec-workflow', 'adversarial-settings.json'), 'utf-8');
+          const settings = JSON.parse(settingsRaw);
+          if (settings.model && typeof settings.model === 'string') {
+            retryModel = settings.model;
+          }
+        } catch { /* use default */ }
+
         // Spawn background review, skipping prompt generation if prompt already exists
         const jobId = await this.adversarialRunner.run({
           projectId,
@@ -896,6 +917,7 @@ export class MultiProjectDashboardServer {
           priorPhaseDocs: result.data.priorPhaseDocs || [],
           version: result.data.version,
           skipPromptGeneration: promptExists,
+          model: retryModel,
         });
 
         // Update annotations with the new job ID and paths
@@ -1533,6 +1555,7 @@ export class MultiProjectDashboardServer {
         requiredPhases: { requirements: false, design: false, tasks: false },
         reviewMethodology: '',
         responseMethodology: '',
+        model: '',
       };
 
       let saved = {};
@@ -1574,6 +1597,7 @@ export class MultiProjectDashboardServer {
         },
         reviewMethodology: typeof body.reviewMethodology === 'string' ? body.reviewMethodology : '',
         responseMethodology: typeof body.responseMethodology === 'string' ? body.responseMethodology : '',
+        model: typeof body.model === 'string' ? body.model : '',
       };
 
       const settingsDir = join(project.projectPath, '.spec-workflow');

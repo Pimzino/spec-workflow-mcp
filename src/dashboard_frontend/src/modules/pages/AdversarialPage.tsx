@@ -28,6 +28,7 @@ interface AdversarialSettings {
   requiredPhases: { requirements: boolean; design: boolean; tasks: boolean };
   reviewMethodology: string;
   responseMethodology: string;
+  model: string;
 }
 
 const DEFAULT_SETTINGS: AdversarialSettings = {
@@ -35,6 +36,7 @@ const DEFAULT_SETTINGS: AdversarialSettings = {
   requiredPhases: { requirements: false, design: false, tasks: false },
   reviewMethodology: '',
   responseMethodology: '',
+  model: '',
 };
 
 function Content() {
@@ -347,6 +349,29 @@ function Content() {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              {/* Model Selection */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                  {t('adversarialPage.settings.modelLabel', 'Claude Model')}
+                  <span className="ml-2 text-xs font-normal text-[var(--text-muted)]">
+                    {t('adversarialPage.settings.modelOptional', 'Optional')}
+                  </span>
+                </label>
+                <p className="text-xs text-[var(--text-muted)] mb-2">
+                  {t('adversarialPage.settings.modelHelp', 'Model used for background adversarial reviews. Leave empty to use your CLI default.')}
+                </p>
+                <select
+                  value={settings.model || ''}
+                  onChange={(e) => setSettings(s => ({ ...s, model: e.target.value }))}
+                  className="w-full sm:w-auto px-3 py-2 rounded-md border border-[var(--border-default)] bg-[var(--surface-base)] text-[var(--text-primary)] text-sm"
+                >
+                  <option value="">{t('adversarialPage.settings.modelDefault', 'Default (CLI setting)')}</option>
+                  <option value="opus">Opus</option>
+                  <option value="sonnet">Sonnet</option>
+                  <option value="haiku">Haiku</option>
+                </select>
               </div>
 
               {/* Review Methodology */}

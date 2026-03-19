@@ -31,6 +31,7 @@ interface RunOptions {
   priorPhaseDocs: string[];
   version: number;
   skipPromptGeneration?: boolean; // Skip step 1 if prompt file already exists
+  model?: string; // Claude model alias or full name (e.g. 'sonnet', 'opus', 'claude-sonnet-4-6')
 }
 
 const JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes per step
@@ -113,7 +114,7 @@ export class AdversarialRunner extends EventEmitter {
         this.emit('job-update', { ...job });
 
         const promptGenerationInstructions = this.buildPromptGenerationInstructions(opts);
-        await this.runClaude(jobId, opts.projectPath, promptGenerationInstructions);
+        await this.runClaude(jobId, opts.projectPath, promptGenerationInstructions, opts.model);
 
         // Verify the prompt file was written
         try {
@@ -128,7 +129,7 @@ export class AdversarialRunner extends EventEmitter {
       this.emit('job-update', { ...job });
 
       const reviewInstructions = `Read and execute the instructions in ${opts.promptOutputPath}`;
-      await this.runClaude(jobId, opts.projectPath, reviewInstructions);
+      await this.runClaude(jobId, opts.projectPath, reviewInstructions, opts.model);
 
       // Verify the analysis file was written
       try {
@@ -175,13 +176,15 @@ export class AdversarialRunner extends EventEmitter {
     ].join('\n');
   }
 
-  private runClaude(jobId: string, cwd: string, prompt: string): Promise<void> {
+  private runClaude(jobId: string, cwd: string, prompt: string, model?: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const child = spawn('claude', [
-        '--print',
-        '--dangerously-skip-permissions',
-        prompt,
-      ], {
+      const args = ['--print', '--dangerously-skip-permissions'];
+      if (model) {
+        args.push('--model', model);
+      }
+      args.push(prompt);
+
+      const child = spawn('claude', args, {
         cwd,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: { ...process.env },
