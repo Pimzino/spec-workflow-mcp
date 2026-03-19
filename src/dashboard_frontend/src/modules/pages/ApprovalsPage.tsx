@@ -70,12 +70,18 @@ function AdversarialProgress({ job, approval, onDismissJob, onRetry }: { job?: a
   let version: number | undefined;
 
   if (job) {
-    status = job.status;
-    error = job.error;
-    specName = job.specName;
-    phase = job.phase;
-    // Job doesn't carry version directly, but annotationData might
-    version = annotationData?.analysisVersion;
+    // If the job already completed/failed but the approval has moved back to pending
+    // (document was revised and resubmitted), the review cycle is over — don't show banner.
+    if ((job.status === 'completed' || job.status === 'failed') && approval.status === 'pending') {
+      // stale completed job — skip
+    } else {
+      status = job.status;
+      error = job.error;
+      specName = job.specName;
+      phase = job.phase;
+      // Job doesn't carry version directly, but annotationData might
+      version = annotationData?.analysisVersion;
+    }
   } else if (annotationData && approval.status === 'needs-revision') {
     // Only show annotation-based state when still in needs-revision.
     // Once the document is revised and resubmitted (back to pending), the review cycle is over.
