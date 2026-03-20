@@ -467,10 +467,10 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
     }
   };
 
-  // Adversarial review eligibility: spec category, valid phase, pending status
+  // Adversarial review eligibility: spec or steering category, pending status
   const phase = a.filePath ? a.filePath.split('/').pop()?.replace('.md', '') || '' : '';
-  const isAdversarialEligible = a.category === 'spec' && ['requirements', 'design', 'tasks'].includes(phase) && a.status === 'pending';
-  const canRetryAdversarial = a.category === 'spec' && ['requirements', 'design', 'tasks'].includes(phase);
+  const isAdversarialEligible = (a.category === 'spec' || a.category === 'steering') && a.status === 'pending';
+  const canRetryAdversarial = a.category === 'spec' || a.category === 'steering';
 
   const handleAdversarialReview = async () => {
     setAdversarialLoading(true);
@@ -1003,7 +1003,8 @@ function Content() {
   // Helper to find a job for an approval
   const getJobForApproval = useCallback((approval: any) => {
     const phase = approval.filePath ? approval.filePath.split('/').pop()?.replace('.md', '') || '' : '';
-    const key = `${approval.categoryName}:${phase}`;
+    const specName = approval.category === 'steering' ? 'steering' : approval.categoryName;
+    const key = `${specName}:${phase}`;
     return adversarialJobs.get(key);
   }, [adversarialJobs]);
 

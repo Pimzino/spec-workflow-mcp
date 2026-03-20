@@ -6,7 +6,7 @@ import { join } from 'path';
 
 export const adversarialResponseTool: Tool = {
   name: 'adversarial-response',
-  description: `Find the latest adversarial analysis for a spec phase and return response instructions.
+  description: `Find the latest adversarial analysis for a spec phase or steering document and return response instructions.
 
 # Instructions
 Use this tool when responding to an adversarial review — typically triggered by a revision
@@ -17,12 +17,11 @@ structured instructions for evaluating findings.`,
     properties: {
       specName: {
         type: 'string',
-        description: 'Name of the spec being reviewed (kebab-case)'
+        description: 'Name of the spec being reviewed (kebab-case), or "steering" for steering documents'
       },
       phase: {
         type: 'string',
-        enum: ['requirements', 'design', 'tasks'],
-        description: 'Which phase document was reviewed'
+        description: 'Which document was reviewed (e.g. requirements, design, tasks for specs; product, tech, structure for steering)'
       },
       version: {
         type: 'number',
@@ -50,14 +49,19 @@ export async function adversarialResponseHandler(args: any, context: ToolContext
   if (!specName || typeof specName !== 'string') {
     return { success: false, message: 'specName is required and must be a string' };
   }
-  if (!['requirements', 'design', 'tasks'].includes(phase)) {
-    return { success: false, message: 'phase must be one of: requirements, design, tasks' };
+  if (!phase || typeof phase !== 'string') {
+    return { success: false, message: 'phase is required and must be a string' };
   }
 
   const workflowRoot = PathUtils.getWorkflowRoot(projectPath);
-  const specDir = join(workflowRoot, 'specs', specName);
-  const reviewsDir = join(specDir, 'reviews');
-  const targetFile = join(specDir, `${phase}.md`);
+  const isSteering = specName === 'steering';
+  const docDir = isSteering
+    ? join(workflowRoot, 'steering')
+    : join(workflowRoot, 'specs', specName);
+  const reviewsDir = join(docDir, 'reviews');
+  const targetFile = isSteering && args.filePath
+    ? join(projectPath, args.filePath)
+    : join(docDir, `${phase}.md`);
 
   // If a specific version was requested, look for that exact file
   if (requestedVersion) {

@@ -35,13 +35,13 @@ describe('adversarial-response tool', () => {
     expect(result.message).toContain('specName is required');
   });
 
-  it('rejects invalid phase', async () => {
+  it('rejects missing phase', async () => {
     const result = await adversarialResponseHandler(
-      { specName: 'test', phase: 'invalid' },
+      { specName: 'test' },
       ctx('/tmp/fake')
     );
     expect(result.success).toBe(false);
-    expect(result.message).toContain('phase must be one of');
+    expect(result.message).toContain('phase is required');
   });
 
   it('fails when reviews directory does not exist', async () => {

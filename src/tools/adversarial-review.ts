@@ -6,24 +6,27 @@ import { join } from 'path';
 
 export const adversarialReviewTool: Tool = {
   name: 'adversarial-review',
-  description: `Prepare an adversarial review of a spec phase document.
+  description: `Prepare an adversarial review of a spec phase document or steering document.
 
 # Instructions
-Use this tool to set up an adversarial analysis of a requirements, design, or tasks document.
-Returns the methodology, output paths, and context needed to generate a tailored adversarial
-prompt and execute it via a fresh-context subagent. The agent writes the prompt, then launches
-a subagent to execute it — context separation ensures genuinely critical output.`,
+Use this tool to set up an adversarial analysis of a requirements, design, tasks, or steering
+document. Returns the methodology, output paths, and context needed to generate a tailored
+adversarial prompt and execute it via a fresh-context subagent. The agent writes the prompt,
+then launches a subagent to execute it — context separation ensures genuinely critical output.`,
   inputSchema: {
     type: 'object',
     properties: {
       specName: {
         type: 'string',
-        description: 'Name of the spec to review (kebab-case)'
+        description: 'Name of the spec to review (kebab-case), or "steering" for steering documents'
       },
       phase: {
         type: 'string',
-        enum: ['requirements', 'design', 'tasks'],
-        description: 'Which phase document to target'
+        description: 'Which document to target (e.g. requirements, design, tasks for specs; product, tech, structure for steering)'
+      },
+      filePath: {
+        type: 'string',
+        description: 'Relative path to the target file (optional — used for steering docs whose files live outside the steering directory)'
       },
       projectPath: {
         type: 'string',
@@ -46,14 +49,22 @@ export async function adversarialReviewHandler(args: any, context: ToolContext):
   if (!specName || typeof specName !== 'string') {
     return { success: false, message: 'specName is required and must be a string' };
   }
-  if (!['requirements', 'design', 'tasks'].includes(phase)) {
-    return { success: false, message: 'phase must be one of: requirements, design, tasks' };
+  if (!phase || typeof phase !== 'string') {
+    return { success: false, message: 'phase is required and must be a string' };
   }
 
   const workflowRoot = PathUtils.getWorkflowRoot(projectPath);
-  const specDir = join(workflowRoot, 'specs', specName);
-  const targetFile = join(specDir, `${phase}.md`);
-  const reviewsDir = join(specDir, 'reviews');
+
+  // Determine paths based on whether this is a steering doc or a spec phase
+  const isSteering = specName === 'steering';
+  const docDir = isSteering
+    ? join(workflowRoot, 'steering')
+    : join(workflowRoot, 'specs', specName);
+  // For steering docs, filePath may point outside the steering dir (e.g. research/sdd/foo.md)
+  const targetFile = isSteering && args.filePath
+    ? join(projectPath, args.filePath)
+    : join(docDir, `${phase}.md`);
+  const reviewsDir = join(docDir, 'reviews');
 
   // Validate target file exists
   try {
@@ -75,10 +86,14 @@ export async function adversarialReviewHandler(args: any, context: ToolContext):
   const promptOutputPath = join(reviewsDir, `adversarial-prompt-${phase}${versionSuffix}.md`);
   const analysisOutputPath = join(reviewsDir, `adversarial-analysis-${phase}${versionSuffix}.md`);
 
-  // Find existing steering docs and prior phase docs
+  // Find existing steering docs and prior phase docs as context
   const steeringDir = join(workflowRoot, 'steering');
-  const steeringDocs = await findExistingFiles(steeringDir, ['product.md', 'tech.md', 'structure.md']);
-  const priorPhaseDocs = await findPriorPhaseDocs(specDir, phase);
+  const steeringDocs = isSteering
+    ? [] // Don't include the target steering doc as its own context
+    : await findExistingFiles(steeringDir, ['product.md', 'tech.md', 'structure.md']);
+  const priorPhaseDocs = isSteering
+    ? [] // Steering docs don't have phase ordering
+    : await findPriorPhaseDocs(docDir, phase);
 
   // Check for methodology override in settings
   const methodology = await getMethodologyOverride(workflowRoot, 'reviewMethodology') || getAdversarialReviewMethodology();

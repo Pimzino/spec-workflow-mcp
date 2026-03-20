@@ -183,9 +183,9 @@ describe('Adversarial dashboard endpoints', () => {
       expect(res.status).toBe(404);
     });
 
-    it('returns 400 for invalid phase', async () => {
-      const res = await realFetch(url('reviews/my-feature/invalid/1'));
-      expect(res.status).toBe(400);
+    it('returns 404 for non-existent phase', async () => {
+      const res = await realFetch(url('reviews/my-feature/nonexistent/1'));
+      expect(res.status).toBe(404);
     });
   });
 
@@ -227,7 +227,10 @@ describe('Adversarial dashboard endpoints', () => {
       expect(res.status).toBe(404);
     });
 
-    it('returns 400 for non-spec category', async () => {
+    it('succeeds for steering category approval', async () => {
+      // Create steering doc at workspace root (filePath is project-relative)
+      await fs.writeFile(join(workspacePath, 'product.md'), '# Product\nSteering content.', 'utf-8');
+
       const approvalStorage = new ApprovalStorage(workflowRootPath, {
         originalPath: workflowRootPath,
         fileResolutionPath: workspacePath,
@@ -242,9 +245,9 @@ describe('Adversarial dashboard endpoints', () => {
       const res = await realFetch(approvalUrl(approvalId, 'adversarial-review'), {
         method: 'POST',
       });
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(200);
       const body = await res.json() as any;
-      expect(body.error).toContain('spec approvals');
+      expect(body.jobId).toBeTruthy();
     });
 
     it('succeeds and returns jobId for valid spec approval', async () => {
