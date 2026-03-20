@@ -149,6 +149,28 @@ When documents are ready for review:
 3. Review updated version
 4. Approve or request further changes
 
+### Adversarial Review
+
+Before approving a critical document, you can run an adversarial review — an automated, independent analysis that stress-tests the document for gaps, contradictions, and unstated assumptions.
+
+From the dashboard approvals page:
+
+1. Click **Adversarial Review** on any pending approval
+2. A background subagent generates a tailored critique
+3. Progress appears directly on the approval card
+4. On completion, the approval moves to **needs-revision** with a link to the analysis
+5. Tell your AI assistant to respond to the revision, and it will read the analysis, address valid findings, and resubmit
+
+![Adversarial review progress stepper on approval card](screenshots/07-adversarial-progress-stepper.png)
+
+You can also trigger reviews from the CLI:
+
+```
+"Run an adversarial review on the design phase of payment-gateway"
+```
+
+Browse past reviews and configure methodology on the **Adversarial Analysis** page in the dashboard sidebar.
+
 ## Bug Workflow
 
 ### Reporting Bugs

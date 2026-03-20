@@ -13,6 +13,7 @@ Spec Workflow MCP provides specialized tools for structured software development
 3. **Context Tools** - Retrieve project information
 4. **Steering Tools** - Project-level guidance
 5. **Approval Tools** - Document approval workflow
+6. **Adversarial Review Tools** - Independent document critique and response
 
 ## Workflow Guide Tools
 
@@ -458,6 +459,82 @@ Spec Workflow MCP provides specialized tools for structured software development
 "Clean up completed approvals for user-auth"
 ```
 
+### adversarial-review
+
+**Purpose**: Prepares an adversarial review of a spec phase document. Returns the methodology, output paths, and context needed for a subagent to generate and execute the review.
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| specName | string | Yes | Name of the spec (kebab-case) |
+| phase | string | Yes | Phase to review: "requirements", "design", or "tasks" |
+| projectPath | string | No | Absolute path to project root |
+
+**Usage Example**:
+```
+"Run an adversarial review on the design phase of payment-gateway"
+```
+
+**Returns**:
+```typescript
+{
+  success: true,
+  data: {
+    specName: "payment-gateway",
+    phase: "design",
+    version: 2,
+    targetFile: ".spec-workflow/specs/payment-gateway/design.md",
+    promptOutputPath: ".spec-workflow/specs/payment-gateway/reviews/adversarial-prompt-design-r2.md",
+    analysisOutputPath: ".spec-workflow/specs/payment-gateway/reviews/adversarial-analysis-design-r2.md",
+    methodology: "...",
+    steeringDocs: ["steering/product.md", "steering/tech.md"],
+    priorPhaseDocs: ["specs/payment-gateway/requirements.md"]
+  }
+}
+```
+
+**Notes**:
+- Automatically versions reviews (v1, v2, v3...) based on existing files
+- Includes steering documents and prior phase documents as context
+- The AI assistant uses the returned data to spawn a subagent for the actual review
+
+### adversarial-response
+
+**Purpose**: Retrieves the latest adversarial analysis for a spec phase and returns structured instructions for responding to its findings.
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| specName | string | Yes | Name of the spec (kebab-case) |
+| phase | string | Yes | Phase that was reviewed: "requirements", "design", or "tasks" |
+| version | number | No | Specific analysis version. Defaults to latest |
+| projectPath | string | No | Absolute path to project root |
+
+**Usage Example**:
+```
+"Respond to the adversarial review on user-auth requirements"
+```
+
+**Returns**:
+```typescript
+{
+  success: true,
+  data: {
+    analysisFile: ".spec-workflow/specs/user-auth/reviews/adversarial-analysis-requirements.md",
+    targetFile: ".spec-workflow/specs/user-auth/requirements.md",
+    version: 1,
+    responseMethodology: "..."
+  }
+}
+```
+
+**Notes**:
+- Typically triggered automatically when the AI assistant is told to respond to a revision
+- The response methodology instructs the agent to evaluate each finding, accept valid critiques, and justify any disagreements
+- The agent then revises the document and resubmits for approval
+
 ## Tool Integration Patterns
 
 ### Sequential Workflow
@@ -469,9 +546,11 @@ Tools are designed to work in sequence:
 3. `spec-workflow-guide` → Learn workflow
 4. `create-spec-doc` → Create requirements
 5. `request-approval` → Request review
-6. `get-approval-status` → Check status
-7. `create-spec-doc` → Create design (after approval)
-8. `manage-tasks` → Track implementation
+6. `adversarial-review` → Independent critique (optional)
+7. `adversarial-response` → Address findings and revise (if reviewed)
+8. `get-approval-status` → Check status
+9. `create-spec-doc` → Create design (after approval)
+10. `manage-tasks` → Track implementation
 
 ### Parallel Operations
 
