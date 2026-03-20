@@ -54,35 +54,43 @@ Spec documents benefit from critical review before approval, but self-review ten
 ### Approvals Page — Review Lifecycle
 
 **Pending approval with "Request Adversarial Review" button**
-PLACEHOLDER_1
+<img width="854" height="236" alt="Screenshot 2026-03-19 122059" src="https://github.com/user-attachments/assets/19f939ab-b7de-42d6-bb6b-94c2719e5bcf" />
+
+**Confirmation dialogue**
+<img width="612" height="384" alt="Screenshot 2026-03-19 122110" src="https://github.com/user-attachments/assets/129800d4-04aa-4281-bfd1-ca6822c85434" />
 
 **Step 1: Generating prompt (spinner active, step 2 grayed out)**
-PLACEHOLDER_2
+<img width="714" height="223" alt="Screenshot 2026-03-19 122143" src="https://github.com/user-attachments/assets/05861443-7288-4bd9-a54e-7af45309659a" />
 
 **Step 2: Running review (step 1 checkmark, step 2 spinner)**
-PLACEHOLDER_3
+<img width="642" height="217" alt="Screenshot 2026-03-19 122810" src="https://github.com/user-attachments/assets/1485793c-8fb8-43af-b4a0-772b95291721" />
+
 
 **Completed: green banner with next-step guidance**
-PLACEHOLDER_4
+<img width="666" height="254" alt="Screenshot 2026-03-19 130030" src="https://github.com/user-attachments/assets/cd4d568b-033b-4290-83db-a42ec02e6cb1" />
+
 
 **Failed: red banner with "Retry" and "Dismiss" options**
-PLACEHOLDER_5
+<img width="713" height="285" alt="Screenshot 2026-03-19 130446" src="https://github.com/user-attachments/assets/125b1952-f9d4-4cd1-81b9-f3de5515fa22" />
+
 
 **Incomplete after restart: amber warning with "Resume review" button**
-PLACEHOLDER_6
+<img width="621" height="292" alt="Screenshot 2026-03-19 131414" src="https://github.com/user-attachments/assets/50161117-756e-403e-ba96-c523fc05b0ff" />
+
 
 ### Adversarial Analysis Page
 
 **Reviews tab: spec dropdown, phase/version list, rendered analysis**
-PLACEHOLDER_7
+<img width="1582" height="1318" alt="Screenshot 2026-03-19 132303" src="https://github.com/user-attachments/assets/de1e29e5-edc4-4f66-904c-4ce0e2de6bee" />
+
 
 **Settings tab: preamble, required phases, model selector, methodology editors**
-PLACEHOLDER_8
+<img width="1909" height="1232" alt="Screenshot 2026-03-19 141546" src="https://github.com/user-attachments/assets/47278ddb-1875-4fb9-9b15-9f384416cedb" />
 
 ### Pending Revisions Section
 
 **Needs-revision approvals with adversarial progress/completion banners**
-PLACEHOLDER_9
+<img width="1571" height="802" alt="Screenshot 2026-03-19 131232" src="https://github.com/user-attachments/assets/894dd71e-e9aa-43e2-a48c-4f9c98f34ffe" />
 
 ## How to Review
 
@@ -93,13 +101,14 @@ Suggested reading order:
 3. **`src/dashboard/multi-server.ts`** — search for "adversarial" to find the endpoint changes. The retry endpoint is the most complex
 4. **`src/dashboard_frontend/.../ApprovalsPage.tsx`** — the `AdversarialProgress` component at the top of the file, then the `Content` component's job tracking state
 5. **`src/dashboard_frontend/.../AdversarialPage.tsx`** — standalone page, can be reviewed independently
-6. **Tests** (`__tests__/`) — 24 new tests covering tools and dashboard endpoints
+6. **`src/dashboard/adversarial-display-state.ts`** — pure function extracted from `ApprovalsPage.tsx` for testability (stale-job and annotation display logic)
+7. **Tests** (`__tests__/`) — 43 new tests covering tools, runner, endpoints, settings, and display state
 
 ## Testing
 
 - `npx tsc --noEmit` passes
 - `npm run build` succeeds
-- `npm test` — all tests pass (24 new covering adversarial tools + endpoints)
+- `npm test` — all tests pass (43 new covering adversarial tools, runner, endpoints, settings, and display state)
 - Manually tested: trigger review from dashboard, observe stepper progress, verify completion banner appears, navigate away and return (persists), kill server mid-review and restart (shows incomplete state with resume button), retry from incomplete state
 
 ## Diagram
