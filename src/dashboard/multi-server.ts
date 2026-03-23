@@ -28,6 +28,24 @@ import { SecurityConfig } from '../types.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+/**
+ * Validate a spec name parameter to prevent path traversal (CWE-22).
+ * Returns true if the name is safe to use in filesystem paths.
+ */
+function isValidSpecName(name: string): boolean {
+  if (!name || name.includes('..') || name.includes('/') || name.includes('\\') || name.includes('\0')) {
+    return false;
+  }
+  return basename(name) === name;
+}
+
+/**
+ * Escape special regex characters to prevent regex injection (CWE-1333).
+ */
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 interface WebSocketConnection {
   socket: WebSocket;
   projectId?: string;
@@ -465,6 +483,9 @@ export class MultiProjectDashboardServer {
     // Get spec details
     this.app.get('/api/projects/:projectId/specs/:name', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const project = this.projectManager.getProject(projectId);
       if (!project) {
         return reply.code(404).send({ error: 'Project not found' });
@@ -479,6 +500,9 @@ export class MultiProjectDashboardServer {
     // Get all spec documents
     this.app.get('/api/projects/:projectId/specs/:name/all', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const project = this.projectManager.getProject(projectId);
       if (!project) {
         return reply.code(404).send({ error: 'Project not found' });
@@ -508,6 +532,9 @@ export class MultiProjectDashboardServer {
     // Get all archived spec documents
     this.app.get('/api/projects/:projectId/specs/:name/all/archived', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const project = this.projectManager.getProject(projectId);
       if (!project) {
         return reply.code(404).send({ error: 'Project not found' });
@@ -538,6 +565,9 @@ export class MultiProjectDashboardServer {
     // Save spec document
     this.app.put('/api/projects/:projectId/specs/:name/:document', async (request, reply) => {
       const { projectId, name, document } = request.params as { projectId: string; name: string; document: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const { content } = request.body as { content: string };
       const project = this.projectManager.getProject(projectId);
 
@@ -569,6 +599,9 @@ export class MultiProjectDashboardServer {
     // Archive spec
     this.app.post('/api/projects/:projectId/specs/:name/archive', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const project = this.projectManager.getProject(projectId);
 
       if (!project) {
@@ -586,6 +619,9 @@ export class MultiProjectDashboardServer {
     // Unarchive spec
     this.app.post('/api/projects/:projectId/specs/:name/unarchive', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const project = this.projectManager.getProject(projectId);
 
       if (!project) {
@@ -1017,6 +1053,9 @@ export class MultiProjectDashboardServer {
     // Get task progress
     this.app.get('/api/projects/:projectId/specs/:name/tasks/progress', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const project = this.projectManager.getProject(projectId);
 
       if (!project) {
@@ -1053,6 +1092,9 @@ export class MultiProjectDashboardServer {
     // Update task status
     this.app.put('/api/projects/:projectId/specs/:name/tasks/:taskId/status', async (request, reply) => {
       const { projectId, name, taskId } = request.params as { projectId: string; name: string; taskId: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const { status } = request.body as { status: 'pending' | 'in-progress' | 'completed' };
       const project = this.projectManager.getProject(projectId);
 
@@ -1116,6 +1158,9 @@ export class MultiProjectDashboardServer {
     // Add implementation log entry
     this.app.post('/api/projects/:projectId/specs/:name/implementation-log', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const project = this.projectManager.getProject(projectId);
       if (!project) {
         return reply.code(404).send({ error: 'Project not found' });
@@ -1143,6 +1188,9 @@ export class MultiProjectDashboardServer {
     // Get implementation logs
     this.app.get('/api/projects/:projectId/specs/:name/implementation-log', async (request, reply) => {
       const { projectId, name } = request.params as { projectId: string; name: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
       const query = request.query as { taskId?: string; search?: string };
 
       const project = this.projectManager.getProject(projectId);
@@ -1171,6 +1219,9 @@ export class MultiProjectDashboardServer {
     // Get implementation log task stats
     this.app.get('/api/projects/:projectId/specs/:name/implementation-log/task/:taskId/stats', async (request, reply) => {
       const { projectId, name, taskId } = request.params as { projectId: string; name: string; taskId: string };
+      if (!isValidSpecName(name)) {
+        return reply.code(400).send({ error: 'Invalid spec name' });
+      }
 
       const project = this.projectManager.getProject(projectId);
       if (!project) {
@@ -1197,7 +1248,8 @@ export class MultiProjectDashboardServer {
         const content = await readFile(changelogPath, 'utf-8');
 
         // Extract the section for the requested version
-        const versionRegex = new RegExp(`## \\[${version}\\][^]*?(?=## \\[|$)`, 'i');
+        const escapedVersion = escapeRegExp(version);
+        const versionRegex = new RegExp(`## \\[${escapedVersion}\\][^]*?(?=## \\[|$)`, 'i');
         const match = content.match(versionRegex);
 
         if (!match) {
@@ -1222,7 +1274,8 @@ export class MultiProjectDashboardServer {
         const content = await readFile(changelogPath, 'utf-8');
 
         // Extract the section for the requested version
-        const versionRegex = new RegExp(`## \\[${version}\\][^]*?(?=## \\[|$)`, 'i');
+        const escapedVersion = escapeRegExp(version);
+        const versionRegex = new RegExp(`## \\[${escapedVersion}\\][^]*?(?=## \\[|$)`, 'i');
         const match = content.match(versionRegex);
 
         if (!match) {
