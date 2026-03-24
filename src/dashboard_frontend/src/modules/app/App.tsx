@@ -22,6 +22,8 @@ import { I18nErrorBoundary } from '../../components/I18nErrorBoundary';
 import { ProjectDropdown } from '../components/ProjectDropdown';
 import { PageNavigationSidebar } from '../components/PageNavigationSidebar';
 import { ChangelogModal } from '../modals/ChangelogModal';
+import { AuthProvider, useAuth } from '../auth/AuthContext';
+import { LoginPage } from '../auth/LoginPage';
 
 function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
   const { t } = useTranslation();
@@ -210,6 +212,7 @@ function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
 function AppInner() {
   const { initial } = useWs();
   const { currentProjectId } = useProjects();
+  const { token, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on desktop
 
   const SIDEBAR_COLLAPSE_KEY = 'spec-workflow-sidebar-collapsed';
@@ -238,6 +241,10 @@ function AppInner() {
   const toggleSidebarCollapse = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
+
+  if (!token) {
+    return <LoginPage />;
+  }
 
   return (
     <ApiProvider initial={initial} projectId={currentProjectId}>
@@ -303,9 +310,11 @@ export default function App() {
   return (
     <I18nErrorBoundary>
       <ThemeProvider>
-        <ProjectProvider>
-          <AppWithProviders />
-        </ProjectProvider>
+        <AuthProvider>
+          <ProjectProvider>
+            <AppWithProviders />
+          </ProjectProvider>
+        </AuthProvider>
       </ThemeProvider>
     </I18nErrorBoundary>
   );

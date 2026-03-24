@@ -1,6 +1,29 @@
 // Common types for the spec workflow MCP server
 import { encode } from '@toon-format/toon';
 
+// Authentication types
+export interface User {
+  id: string;
+  email: string;
+  passwordHash: string;
+  role: 'ADMIN' | 'DEVELOPER' | 'QA' | 'PM';
+  createdAt: string;
+}
+
+export interface Agent {
+  id: string;
+  name: string;
+  keyHash: string;
+  role: 'FACTORY_AGENT' | 'PRODUCT_AGENT';
+  createdAt: string;
+}
+
+export interface AuthTokenResponse {
+  token: string;
+  user?: Omit<User, 'passwordHash' | 'createdAt'>;
+  agent?: Omit<Agent, 'keyHash' | 'createdAt'>;
+}
+
 // Automation job types
 export interface AutomationJob {
   id: string;

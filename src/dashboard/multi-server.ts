@@ -25,6 +25,8 @@ import {
 } from '../core/security-utils.js';
 import { SecurityConfig } from '../types.js';
 import { N8NDispatcher } from '../core/n8n-dispatcher.js';
+import { AuthService } from '../core/auth-service.js';
+import { createAuthMiddleware } from './auth-middleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,6 +67,7 @@ export class MultiProjectDashboardServer {
   private readonly SPEC_BROADCAST_DEBOUNCE_MS = 300;
   // N8N event dispatcher (FS Factory integration)
   private n8nDispatcher: N8NDispatcher;
+  private authService: AuthService;
 
   constructor(options: MultiDashboardOptions = {}) {
     this.options = options;
@@ -72,6 +75,7 @@ export class MultiProjectDashboardServer {
     this.jobScheduler = new JobScheduler(this.projectManager);
     this.sessionManager = new DashboardSessionManager();
     this.n8nDispatcher = new N8NDispatcher();
+    this.authService = new AuthService(process.cwd());
 
     // Initialize network binding configuration
     this.bindAddress = options.bindAddress || '127.0.0.1';
@@ -148,6 +152,10 @@ export class MultiProjectDashboardServer {
     // Initialize job scheduler
     await this.jobScheduler.initialize();
 
+    // Initialize Auth Service
+    await this.authService.initialize();
+    await this.authService.ensureDefaultAdmin('admin@fsfactory.local', 'admin123').catch(console.error);
+
     // Register CORS plugin if enabled
     const corsConfig = getCorsConfig(this.securityConfig);
     if (corsConfig !== false) {
@@ -165,6 +173,9 @@ export class MultiProjectDashboardServer {
     if (this.auditLogger) {
       this.app.addHook('onRequest', this.auditLogger.middleware());
     }
+
+    // Auth Middleware
+    this.app.addHook('preHandler', createAuthMiddleware(this.authService));
 
     // Register plugins
     await this.app.register(fastifyStatic, {
@@ -421,6 +432,28 @@ export class MultiProjectDashboardServer {
     // Health check / test endpoint (used by utils.ts to detect running dashboard)
     this.app.get('/api/test', async () => {
       return { message: DASHBOARD_TEST_MESSAGE };
+    });
+
+    // Auth Login
+    this.app.post('/api/auth/login', async (request, reply) => {
+      const { email, password, tokenName, tokenKey } = request.body as any;
+      
+      if (email && password) {
+        const result = await this.authService.authenticateUser(email, password);
+        if (result) {
+          this.n8nDispatcher.dispatchSpecEvent('login.success', 'global', 'FS Factory', 'Auth', { user: result.user?.email }).catch(() => {});
+          return result;
+        }
+      } else if (tokenName && tokenKey) {
+        const result = await this.authService.authenticateAgent(tokenName, tokenKey);
+        if (result) {
+          this.n8nDispatcher.dispatchSpecEvent('login.success', 'global', 'FS Factory', 'Auth', { agent: result.agent?.name }).catch(() => {});
+          return result;
+        }
+      }
+      
+      this.n8nDispatcher.dispatchSpecEvent('login.failed', 'global', 'FS Factory', 'Auth', { attemptedEmail: email, attemptedToken: tokenName }).catch(() => {});
+      return reply.code(401).send({ error: 'Invalid credentials' });
     });
 
     // Projects list

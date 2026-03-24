@@ -74,25 +74,33 @@ export interface BatchApprovalResult {
   failed: Array<{ id: string; error: string }>;
 }
 
+function getAuthHeaders(headers: Record<string, string> = {}) {
+  const token = localStorage.getItem('fs-factory-token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: getAuthHeaders() });
   if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
   return res.json();
 }
 
 async function postJson(url: string, body: any) {
-  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const res = await fetch(url, { method: 'POST', headers: getAuthHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
   return { ok: res.ok, status: res.status };
 }
 
 async function postJsonWithData<T>(url: string, body: any): Promise<{ ok: boolean; status: number; data?: T }> {
-  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const res = await fetch(url, { method: 'POST', headers: getAuthHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
   const data = res.ok ? await res.json() : undefined;
   return { ok: res.ok, status: res.status, data };
 }
 
 async function putJson(url: string, body: any) {
-  const res = await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const res = await fetch(url, { method: 'PUT', headers: getAuthHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
   return { ok: res.ok, status: res.status, data: res.ok ? await res.json() : null };
 }
 

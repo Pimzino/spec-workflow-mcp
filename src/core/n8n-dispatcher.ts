@@ -19,7 +19,9 @@ export type SpecWorkflowEventType =
   | 'spec.approved'
   | 'task.started'
   | 'task.completed'
-  | 'spec.deployed';
+  | 'spec.deployed'
+  | 'login.success'
+  | 'login.failed';
 
 export interface SpecWorkflowEvent {
   /** Event type following the spec lifecycle */
