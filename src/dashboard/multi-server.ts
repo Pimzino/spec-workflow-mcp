@@ -24,6 +24,7 @@ import {
   DEFAULT_SECURITY_CONFIG
 } from '../core/security-utils.js';
 import { SecurityConfig } from '../types.js';
+import { N8NDispatcher } from '../core/n8n-dispatcher.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -62,12 +63,15 @@ export class MultiProjectDashboardServer {
   // Debounce spec broadcasts to coalesce rapid updates
   private pendingSpecBroadcasts: Map<string, NodeJS.Timeout> = new Map();
   private readonly SPEC_BROADCAST_DEBOUNCE_MS = 300;
+  // N8N event dispatcher (FS Factory integration)
+  private n8nDispatcher: N8NDispatcher;
 
   constructor(options: MultiDashboardOptions = {}) {
     this.options = options;
     this.projectManager = new ProjectManager();
     this.jobScheduler = new JobScheduler(this.projectManager);
     this.sessionManager = new DashboardSessionManager();
+    this.n8nDispatcher = new N8NDispatcher();
 
     // Initialize network binding configuration
     this.bindAddress = options.bindAddress || '127.0.0.1';
@@ -345,12 +349,37 @@ export class MultiProjectDashboardServer {
       }, this.SPEC_BROADCAST_DEBOUNCE_MS);
 
       this.pendingSpecBroadcasts.set(projectId, timeout);
+
+      // Dispatch N8N event (non-blocking, fail-safe)
+      const project = this.projectManager.getProject(projectId);
+      if (project) {
+        const eventType = event.action === 'created' ? 'spec.created' : 'spec.updated';
+        this.n8nDispatcher.dispatchSpecEvent(
+          eventType,
+          projectId,
+          project.projectName,
+          event.name,
+          { action: event.action, document: event.data?.documents }
+        ).catch(() => { /* already logged inside dispatcher */ });
+      }
     });
 
     // Broadcast task updates
     this.projectManager.on('task-update', (event) => {
       const { projectId, specName } = event;
       this.broadcastTaskUpdate(projectId, specName);
+
+      // Dispatch N8N event for task changes (non-blocking, fail-safe)
+      const project = this.projectManager.getProject(projectId);
+      if (project) {
+        this.n8nDispatcher.dispatchSpecEvent(
+          'task.started',
+          projectId,
+          project.projectName,
+          specName,
+          { taskAction: event.action }
+        ).catch(() => { /* already logged inside dispatcher */ });
+      }
     });
 
     // Broadcast steering changes
