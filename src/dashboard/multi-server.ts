@@ -14,6 +14,7 @@ import { ProjectManager } from './project-manager.js';
 import { JobScheduler } from './job-scheduler.js';
 import { ImplementationLogManager } from './implementation-log-manager.js';
 import { DashboardSessionManager } from '../core/dashboard-session.js';
+import { validateProjectPath } from '../core/path-utils.js';
 import {
   getSecurityConfig,
   RateLimiter,
@@ -406,10 +407,22 @@ export class MultiProjectDashboardServer {
         return reply.code(400).send({ error: 'projectPath is required' });
       }
       try {
-        const projectId = await this.projectManager.addProjectByPath(projectPath);
+        // Validate path: reject system directories, traversal, non-directories (CWE-22)
+        const validatedPath = await validateProjectPath(projectPath);
+
+        // Verify this is a spec-workflow project (has .spec-workflow directory)
+        try {
+          await fs.access(join(validatedPath, '.spec-workflow'));
+        } catch {
+          return reply.code(400).send({
+            error: 'Not a valid spec-workflow project: missing .spec-workflow directory'
+          });
+        }
+
+        const projectId = await this.projectManager.addProjectByPath(validatedPath);
         return { projectId, success: true };
       } catch (error: any) {
-        return reply.code(500).send({ error: error.message });
+        return reply.code(400).send({ error: error.message });
       }
     });
 
