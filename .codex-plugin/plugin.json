@@ -1,0 +1,24 @@
+{
+  "name": "spec-workflow-mcp",
+  "version": "0.1.0",
+  "description": "Spec-driven development workflow tools from Codex",
+  "author": {
+    "name": "Pimzino",
+    "url": "https://github.com/Pimzino/spec-workflow-mcp"
+  },
+  "homepage": "https://github.com/Pimzino/spec-workflow-mcp",
+  "repository": "https://github.com/Pimzino/spec-workflow-mcp",
+  "keywords": [
+    "mcp",
+    "codex"
+  ],
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Spec Workflow MCP",
+    "shortDescription": "Spec-driven development workflow tools from Codex",
+    "longDescription": "A MCP server providing structured spec-driven development workflow tools for AI-assisted software development.",
+    "category": "Development",
+    "websiteURL": "https://github.com/Pimzino/spec-workflow-mcp"
+  },
+  "skills": "./skills/"
+}
