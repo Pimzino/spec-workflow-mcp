@@ -1197,7 +1197,8 @@ export class MultiProjectDashboardServer {
         const content = await readFile(changelogPath, 'utf-8');
 
         // Extract the section for the requested version
-        const versionRegex = new RegExp(`## \\[${version}\\][^]*?(?=## \\[|$)`, 'i');
+        const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const versionRegex = new RegExp(`## \\[${escapedVersion}\\][^]*?(?=## \\[|$)`, 'i');
         const match = content.match(versionRegex);
 
         if (!match) {
@@ -1222,7 +1223,8 @@ export class MultiProjectDashboardServer {
         const content = await readFile(changelogPath, 'utf-8');
 
         // Extract the section for the requested version
-        const versionRegex = new RegExp(`## \\[${version}\\][^]*?(?=## \\[|$)`, 'i');
+        const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const versionRegex = new RegExp(`## \\[${escapedVersion}\\][^]*?(?=## \\[|$)`, 'i');
         const match = content.match(versionRegex);
 
         if (!match) {
