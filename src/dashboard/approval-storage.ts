@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import { join, isAbsolute, resolve } from 'path';
 import chokidar from 'chokidar';
-import { PathUtils } from '../core/path-utils.js';
+import { PathUtils, safeResolveUnder } from '../core/path-utils.js';
 
 export interface ApprovalComment {
   type: 'selection' | 'general';
@@ -198,11 +198,16 @@ export class ApprovalStorage extends EventEmitter {
       throw new Error(`Approval ${originalId} has no file path for revision`);
     }
 
-    // Read the current file content for revision history
-    const filePath = isAbsolute(originalApproval.filePath) 
-      ? originalApproval.filePath 
-      : join(this.projectPath, originalApproval.filePath);
-    
+    // Resolve the stored filePath, but only accept the result if it stays
+    // inside the project root. The approval JSON could have been corrupted
+    // or written by a non-trusted local process — defense in depth on read.
+    const filePath = safeResolveUnder(this.projectPath, originalApproval.filePath);
+    if (!filePath) {
+      throw new Error(
+        `Approval ${originalId} has a filePath outside the project root`
+      );
+    }
+
     let currentContent = '';
     try {
       currentContent = await fs.readFile(filePath, 'utf-8');

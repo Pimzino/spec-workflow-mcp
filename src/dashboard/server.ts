@@ -13,6 +13,15 @@ import { findAvailablePort, validateAndCheckPort } from "./utils.js";
 import { ApprovalStorage } from "./approval-storage.js";
 import { parseTasksFromMarkdown } from "../core/task-parser.js";
 import { SpecArchiveService } from "../core/archive-service.js";
+import {
+  InvalidSpecNameError,
+  isSafeSpecName,
+  safeResolveArchiveSpecPath,
+  safeResolveSpecPath,
+  safeResolveUnder,
+} from "../core/path-utils.js";
+
+const INVALID_SPEC_NAME_MESSAGE = "Invalid spec name";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -153,6 +162,10 @@ export class DashboardServer {
 
     this.app.post("/api/specs/:name/archive", async (request, reply) => {
       const { name } = request.params as { name: string };
+      if (!isSafeSpecName(name)) {
+        reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        return;
+      }
 
       try {
         await this.archiveService.archiveSpec(name);
@@ -171,6 +184,10 @@ export class DashboardServer {
 
     this.app.post("/api/specs/:name/unarchive", async (request, reply) => {
       const { name } = request.params as { name: string };
+      if (!isSafeSpecName(name)) {
+        reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        return;
+      }
 
       try {
         await this.archiveService.unarchiveSpec(name);
@@ -203,26 +220,36 @@ export class DashboardServer {
             .send({ error: "Approval not found or no file path" });
         }
 
-        // Try several resolution strategies for robustness across environments
-        const candidates: string[] = [];
+        // Resolve candidate paths and require each to stay inside the project
+        // root. Even though the dashboard write APIs cannot forge approval
+        // JSONs (path-traversal is blocked above), `approval.filePath` was
+        // produced by an MCP tool earlier in time and is treated as untrusted
+        // here on read. safeResolveUnder rejects anything that would escape.
+        const projectRoot = this.approvalStorage.projectPath;
         const p = approval.filePath;
-        // 1) As provided if absolute or relative to project root
-        candidates.push(join(this.approvalStorage.projectPath, p));
-        // 2) If path is already absolute, try it directly (join with absolute will normalize on some platforms)
+        const candidates: string[] = [];
+        const c1 = safeResolveUnder(projectRoot, p);
+        if (c1) candidates.push(c1);
         if (p.startsWith("/") || p.match(/^[A-Za-z]:[\\\/]/)) {
-          candidates.push(p);
+          const c2 = safeResolveUnder(projectRoot, p);
+          if (c2 && !candidates.includes(c2)) candidates.push(c2);
         }
-        // 3) If not already under .spec-workflow, try under that root
         if (!p.includes(".spec-workflow")) {
-          candidates.push(
-            join(this.approvalStorage.projectPath, ".spec-workflow", p)
-          );
+          const c3 = safeResolveUnder(projectRoot, join(".spec-workflow", p));
+          if (c3 && !candidates.includes(c3)) candidates.push(c3);
+        }
+
+        if (candidates.length === 0) {
+          return reply.code(400).send({
+            error: "Approval filePath is outside the project root",
+          });
         }
 
         let content: string | null = null;
         let resolvedPath: string | null = null;
         for (const candidate of candidates) {
           try {
+            // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
             const data = await fs.readFile(candidate, "utf-8");
             content = data;
             resolvedPath = candidate;
@@ -265,6 +292,10 @@ export class DashboardServer {
 
     this.app.get("/api/specs/:name", async (request, reply) => {
       const { name } = request.params as { name: string };
+      if (!isSafeSpecName(name)) {
+        reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        return;
+      }
       const spec = await this.parser.getSpec(name);
       if (!spec) {
         reply.code(404).send({ error: "Spec not found" });
@@ -285,13 +316,14 @@ export class DashboardServer {
         return;
       }
 
-      const docPath = join(
-        this.options.projectPath,
-        ".spec-workflow",
-        "specs",
-        name,
-        `${document}.md`
-      );
+      let specDir: string;
+      try {
+        specDir = safeResolveSpecPath(this.options.projectPath, name);
+      } catch {
+        reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        return;
+      }
+      const docPath = join(specDir, `${document}.md`);
 
       try {
         const content = await readFile(docPath, "utf-8");
@@ -320,22 +352,17 @@ export class DashboardServer {
         return;
       }
 
-      const docPath = join(
-        this.options.projectPath,
-        ".spec-workflow",
-        "specs",
-        name,
-        `${document}.md`
-      );
+      let specDir: string;
+      try {
+        specDir = safeResolveSpecPath(this.options.projectPath, name);
+      } catch {
+        reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        return;
+      }
+      const docPath = join(specDir, `${document}.md`);
 
       try {
         // Ensure the spec directory exists
-        const specDir = join(
-          this.options.projectPath,
-          ".spec-workflow",
-          "specs",
-          name
-        );
         await fs.mkdir(specDir, { recursive: true });
 
         // Write the content to file
@@ -370,24 +397,17 @@ export class DashboardServer {
           return;
         }
 
-        const docPath = join(
-          this.options.projectPath,
-          ".spec-workflow",
-          "archive",
-          "specs",
-          name,
-          `${document}.md`
-        );
+        let specDir: string;
+        try {
+          specDir = safeResolveArchiveSpecPath(this.options.projectPath, name);
+        } catch {
+          reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+          return;
+        }
+        const docPath = join(specDir, `${document}.md`);
 
         try {
           // Ensure the archived spec directory exists
-          const specDir = join(
-            this.options.projectPath,
-            ".spec-workflow",
-            "archive",
-            "specs",
-            name
-          );
           await fs.mkdir(specDir, { recursive: true });
 
           // Write the content to file
@@ -408,12 +428,13 @@ export class DashboardServer {
     // Get all spec documents for real-time viewing
     this.app.get("/api/specs/:name/all", async (request, reply) => {
       const { name } = request.params as { name: string };
-      const specDir = join(
-        this.options.projectPath,
-        ".spec-workflow",
-        "specs",
-        name
-      );
+      let specDir: string;
+      try {
+        specDir = safeResolveSpecPath(this.options.projectPath, name);
+      } catch {
+        reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        return;
+      }
       const documents = ["requirements", "design", "tasks"];
       const result: Record<
         string,
@@ -440,13 +461,13 @@ export class DashboardServer {
     // Get all archived spec documents for read-only viewing
     this.app.get("/api/specs/:name/all/archived", async (request, reply) => {
       const { name } = request.params as { name: string };
-      const specDir = join(
-        this.options.projectPath,
-        ".spec-workflow",
-        "archive",
-        "specs",
-        name
-      );
+      let specDir: string;
+      try {
+        specDir = safeResolveArchiveSpecPath(this.options.projectPath, name);
+      } catch {
+        reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        return;
+      }
       const documents = ["requirements", "design", "tasks"];
       const result: Record<
         string,
@@ -550,6 +571,12 @@ export class DashboardServer {
     // Get task progress for a specific spec
     this.app.get("/api/specs/:name/tasks/progress", async (request, reply) => {
       const { name } = request.params as { name: string };
+      let specDir: string;
+      try {
+        specDir = safeResolveSpecPath(this.options.projectPath, name);
+      } catch {
+        return reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+      }
 
       try {
         const spec = await this.parser.getSpec(name);
@@ -558,13 +585,7 @@ export class DashboardServer {
         }
 
         // Parse tasks.md file for detailed task information
-        const tasksPath = join(
-          this.options.projectPath,
-          ".spec-workflow",
-          "specs",
-          name,
-          "tasks.md"
-        );
+        const tasksPath = join(specDir, "tasks.md");
         const tasksContent = await readFile(tasksPath, "utf-8");
         const parseResult = parseTasksFromMarkdown(tasksContent);
 
@@ -610,14 +631,15 @@ export class DashboardServer {
           });
         }
 
+        let specDir: string;
         try {
-          const tasksPath = join(
-            this.options.projectPath,
-            ".spec-workflow",
-            "specs",
-            name,
-            "tasks.md"
-          );
+          specDir = safeResolveSpecPath(this.options.projectPath, name);
+        } catch {
+          return reply.code(400).send({ error: INVALID_SPEC_NAME_MESSAGE });
+        }
+
+        try {
+          const tasksPath = join(specDir, "tasks.md");
 
           // Check if tasks file exists
           let tasksContent: string;
@@ -813,8 +835,10 @@ export class DashboardServer {
       console.log(`Using ephemeral port: ${this.actualPort}`);
     }
 
-    // Start server
-    await this.app.listen({ port: this.actualPort, host: "0.0.0.0" });
+    // Start server.
+    // Bind to loopback only — the dashboard offers unauthenticated read/write
+    // of spec documents and is intended for the developer's own machine.
+    await this.app.listen({ port: this.actualPort, host: "127.0.0.1" });
 
     // Note: Browser opening is now handled externally via openBrowser() method
     // to allow lazy opening on first spec-workflow-guide tool call
@@ -886,14 +910,18 @@ export class DashboardServer {
 
   private async broadcastTaskUpdate(specName: string) {
     try {
-      // Get updated task progress for the specific spec
-      const tasksPath = join(
-        this.options.projectPath,
-        ".spec-workflow",
-        "specs",
-        specName,
-        "tasks.md"
-      );
+      // Get updated task progress for the specific spec.
+      // safeResolveSpecPath throws on traversal/invalid names — the watcher
+      // sources specName from on-disk dir entries, but defending here keeps
+      // the invariant local to every filesystem touch.
+      let specDir: string;
+      try {
+        specDir = safeResolveSpecPath(this.options.projectPath, specName);
+      } catch {
+        return;
+      }
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+      const tasksPath = join(specDir, "tasks.md");
       const tasksContent = await readFile(tasksPath, "utf-8");
       const parseResult = parseTasksFromMarkdown(tasksContent);
 

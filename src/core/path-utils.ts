@@ -1,7 +1,81 @@
-import { join, normalize, sep, resolve } from 'path';
+import { join, normalize, sep, resolve, isAbsolute } from 'path';
 import { access, stat, mkdir } from 'fs/promises';
 import { constants } from 'fs';
 import { gitignoreManager } from './gitignore-manager.js';
+
+export class InvalidSpecNameError extends Error {
+  constructor(message = 'Invalid spec name') {
+    super(message);
+    this.name = 'InvalidSpecNameError';
+  }
+}
+
+export function isSafeSpecName(name: unknown): name is string {
+  if (typeof name !== 'string' || name.length === 0 || name.length > 255) return false;
+  if (name.includes('/') || name.includes('\\') || name.includes('\0')) return false;
+  if (name === '.' || name === '..') return false;
+  if (name.startsWith('.')) return false;
+  return true;
+}
+
+export function assertSafeSpecName(name: unknown): asserts name is string {
+  if (!isSafeSpecName(name)) {
+    throw new InvalidSpecNameError();
+  }
+}
+
+function assertContained(baseDir: string, candidate: string): void {
+  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+  const resolvedBase = resolve(baseDir);
+  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+  const resolvedCandidate = resolve(candidate);
+  if (resolvedCandidate !== resolvedBase && !resolvedCandidate.startsWith(resolvedBase + sep)) {
+    throw new InvalidSpecNameError();
+  }
+}
+
+export function safeResolveSpecPath(projectPath: string, name: string): string {
+  assertSafeSpecName(name);
+  const baseDir = PathUtils.getSpecPath(projectPath, '');
+  const candidate = PathUtils.getSpecPath(projectPath, name);
+  assertContained(baseDir, candidate);
+  return candidate;
+}
+
+export function safeResolveArchiveSpecPath(projectPath: string, name: string): string {
+  assertSafeSpecName(name);
+  const baseDir = PathUtils.getArchiveSpecsPath(projectPath);
+  const candidate = PathUtils.getArchiveSpecPath(projectPath, name);
+  assertContained(baseDir, candidate);
+  return candidate;
+}
+
+/**
+ * Resolve `candidate` (absolute or relative-to-baseDir) and return the
+ * absolute path only if it stays inside baseDir. Returns null on traversal,
+ * non-string input, or any resolution error. Use this for filesystem paths
+ * derived from stored data (e.g. approval JSON `filePath`) where the field
+ * is expected to point inside the project but cannot be assumed safe.
+ */
+export function safeResolveUnder(baseDir: string, candidate: unknown): string | null {
+  if (typeof candidate !== 'string' || candidate.length === 0) return null;
+  if (candidate.includes('\0')) return null;
+  try {
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+    const resolvedBase = resolve(baseDir);
+    const resolvedCandidate = isAbsolute(candidate)
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+      ? resolve(candidate)
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+      : resolve(baseDir, candidate);
+    if (resolvedCandidate === resolvedBase || resolvedCandidate.startsWith(resolvedBase + sep)) {
+      return resolvedCandidate;
+    }
+  } catch {
+    // fall through
+  }
+  return null;
+}
 
 export class PathUtils {
   static getWorkflowRoot(projectPath: string): string {

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js/lib/common';
 import mermaid from 'mermaid';
+import DOMPurify from 'dompurify';
 
 type Props = {
   content: string;
@@ -14,8 +15,11 @@ function createMd(): MarkdownIt {
     typographer: true,
     highlight(str, lang) {
       if (lang === 'mermaid') {
-        // Render as mermaid container; actual rendering happens in useEffect
-        return `<div class="mermaid">${str}</div>`;
+        // Escape so attacker-supplied fence content cannot break out of the
+        // mermaid container and inject HTML. Mermaid reads node.textContent
+        // when it later runs, which decodes the entities back to the original
+        // diagram source — so escaping is XSS-safe and behavior-preserving.
+        return `<div class="mermaid">${md.utils.escapeHtml(str)}</div>`;
       }
       if (lang && hljs.getLanguage(lang)) {
         try {
@@ -35,7 +39,7 @@ function createMd(): MarkdownIt {
     const token = tokens[idx];
     const langInfo = token.info ? token.info.trim() : '';
     if (langInfo === 'mermaid') {
-      return `<div class="mermaid">${token.content}</div>`;
+      return `<div class="mermaid">${md.utils.escapeHtml(token.content)}</div>`;
     }
     return fence ? fence(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
   };
@@ -47,8 +51,17 @@ export function Markdown({ content }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [themeState, setThemeState] = useState(0); // Force re-render on theme change
   const md = useMemo(createMd, []);
-  const html = useMemo(() => md.render(typeof content === 'string' ? content : String(content ?? '')),
-    [md, content]);
+  const html = useMemo(() => {
+    const rendered = md.render(typeof content === 'string' ? content : String(content ?? ''));
+    // Sanitize as a defense-in-depth catch-all. The MarkdownIt config already
+    // escapes user content in every emitter (html:false plus md.utils.escapeHtml
+    // in highlight() and the mermaid fence rule), but DOMPurify guards against
+    // a future contributor adding an emitter that forgets to escape.
+    return DOMPurify.sanitize(rendered, {
+      ADD_ATTR: ['target'], // preserve target="_blank" on linkified URLs
+      USE_PROFILES: { html: true, svg: true, svgFilters: true, mathMl: true },
+    });
+  }, [md, content]);
 
   // Listen for theme changes
   useEffect(() => {
