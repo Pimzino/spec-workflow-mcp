@@ -3,6 +3,8 @@ import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyCors from '@fastify/cors';
 import { join, dirname, basename, resolve } from 'path';
+import { adversarialReviewHandler, getAdversarialReviewMethodology } from '../tools/adversarial-review.js';
+import { getAdversarialResponseMethodology } from '../tools/adversarial-response.js';
 import { readFile } from 'fs/promises';
 import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
@@ -12,6 +14,7 @@ import { validateAndCheckPort, DASHBOARD_TEST_MESSAGE } from './utils.js';
 import { parseTasksFromMarkdown } from '../core/task-parser.js';
 import { ProjectManager } from './project-manager.js';
 import { JobScheduler } from './job-scheduler.js';
+import { AdversarialRunner, AdversarialJob } from './adversarial-runner.js';
 import { ImplementationLogManager } from './implementation-log-manager.js';
 import { DashboardSessionManager } from '../core/dashboard-session.js';
 import {
@@ -46,6 +49,7 @@ export class MultiProjectDashboardServer {
   private app: FastifyInstance;
   private projectManager: ProjectManager;
   private jobScheduler: JobScheduler;
+  private adversarialRunner: AdversarialRunner;
   private sessionManager: DashboardSessionManager;
   private options: MultiDashboardOptions;
   private bindAddress: string;
@@ -67,6 +71,7 @@ export class MultiProjectDashboardServer {
     this.options = options;
     this.projectManager = new ProjectManager();
     this.jobScheduler = new JobScheduler(this.projectManager);
+    this.adversarialRunner = new AdversarialRunner();
     this.sessionManager = new DashboardSessionManager();
 
     // Initialize network binding configuration
@@ -386,6 +391,15 @@ export class MultiProjectDashboardServer {
         // Don't propagate error to prevent event system crash
       }
     });
+
+    // Broadcast adversarial review job updates
+    this.adversarialRunner.on('job-update', (job: AdversarialJob) => {
+      this.broadcastToProject(job.projectId, {
+        type: 'adversarial-job-update',
+        projectId: job.projectId,
+        data: job
+      });
+    });
   }
 
   private registerApiRoutes() {
@@ -704,6 +718,244 @@ export class MultiProjectDashboardServer {
 
         await project.approvalStorage.updateApproval(id, status, response, annotations, comments);
         return { success: true };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
+    // Adversarial review - spawns background Claude subagent to perform the review
+    this.app.post('/api/projects/:projectId/approvals/:id/adversarial-review', async (request, reply) => {
+      const { projectId, id } = request.params as { projectId: string; id: string };
+
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const approval = await project.approvalStorage.getApproval(id);
+        if (!approval) {
+          return reply.code(404).send({ error: 'Approval not found' });
+        }
+
+        if (approval.category !== 'spec' && approval.category !== 'steering') {
+          return reply.code(400).send({ error: 'Adversarial review is only available for spec and steering approvals' });
+        }
+
+        const phase = basename(approval.filePath, '.md');
+        const specName = approval.category === 'steering' ? 'steering' : approval.categoryName;
+
+        const result = await adversarialReviewHandler(
+          { specName, phase, filePath: approval.category === 'steering' ? approval.filePath : undefined },
+          { projectPath: project.originalProjectPath }
+        );
+
+        if (!result.success || !result.data) {
+          return reply.code(500).send({ error: result.message || 'Failed to prepare adversarial review' });
+        }
+
+        // Read preferences from adversarial settings
+        let model: string | undefined;
+        let cli: string | undefined;
+        let cliArgs: string[] | undefined;
+        try {
+          const settingsRaw = await readFile(join(project.projectPath, '.spec-workflow', 'adversarial-settings.json'), 'utf-8');
+          const settings = JSON.parse(settingsRaw);
+          if (settings.model && typeof settings.model === 'string') {
+            model = settings.model;
+          }
+          if (settings.cli && typeof settings.cli === 'string') {
+            cli = settings.cli;
+          }
+          if (Array.isArray(settings.cliArgs) && settings.cliArgs.length > 0) {
+            cliArgs = settings.cliArgs;
+          }
+        } catch { /* no settings or parse error — use default */ }
+
+        // Spawn background agent to perform the review
+        const jobId = await this.adversarialRunner.run({
+          projectId,
+          specName,
+          phase,
+          projectPath: project.originalProjectPath,
+          targetFile: result.data.targetFile,
+          promptOutputPath: result.data.promptOutputPath,
+          analysisOutputPath: result.data.analysisOutputPath,
+          methodology: result.data.methodology,
+          steeringDocs: result.data.steeringDocs || [],
+          priorPhaseDocs: result.data.priorPhaseDocs || [],
+          version: result.data.version,
+          model,
+          cli,
+          cliArgs,
+        });
+
+        // Set approval to needs-revision
+        const response = `Adversarial review requested via dashboard. A background review is running (job: ${jobId}).`;
+        const commentText = [
+          `An adversarial review (v${result.data.version}) has been requested for this document.`,
+          `Use the adversarial-response tool with specName "${specName}", phase "${phase}", and version ${result.data.version} to read the analysis, evaluate each finding, and present your assessment to the user before making changes.`,
+        ].join(' ');
+        const annotations = JSON.stringify({
+          decision: 'needs-revision',
+          trigger: 'adversarial-review',
+          specName,
+          phase,
+          promptOutputPath: result.data.promptOutputPath,
+          analysisOutputPath: result.data.analysisOutputPath,
+          analysisVersion: result.data.version,
+          jobId,
+          timestamp: new Date().toISOString()
+        }, null, 2);
+        const comments = [{
+          type: 'general' as const,
+          comment: commentText,
+          timestamp: new Date().toISOString(),
+        }];
+
+        await project.approvalStorage.updateApproval(id, 'needs-revision', response, annotations, comments);
+
+        return { ...result, jobId };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
+    // Adversarial review job status
+    this.app.get('/api/projects/:projectId/adversarial/jobs', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      return { jobs: this.adversarialRunner.getJobsForProject(projectId) };
+    });
+
+    this.app.get('/api/projects/:projectId/adversarial/jobs/:jobId', async (request, reply) => {
+      const { jobId } = request.params as { jobId: string };
+
+      const job = this.adversarialRunner.getJob(jobId);
+      if (!job) {
+        return reply.code(404).send({ error: 'Job not found' });
+      }
+
+      return { job };
+    });
+
+    this.app.post('/api/projects/:projectId/adversarial/jobs/:jobId/cancel', async (request, reply) => {
+      const { jobId } = request.params as { jobId: string };
+
+      const cancelled = this.adversarialRunner.cancelJob(jobId);
+      if (!cancelled) {
+        return reply.code(400).send({ error: 'Job cannot be cancelled (already completed or not found)' });
+      }
+
+      return { success: true };
+    });
+
+    // Resume/retry an adversarial review for an approval stuck in needs-revision
+    this.app.post('/api/projects/:projectId/approvals/:id/adversarial-retry', async (request, reply) => {
+      const { projectId, id } = request.params as { projectId: string; id: string };
+
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const approval = await project.approvalStorage.getApproval(id);
+        if (!approval) {
+          return reply.code(404).send({ error: 'Approval not found' });
+        }
+
+        // Parse annotations to get the original review parameters
+        let ann: any;
+        try {
+          ann = approval.annotations ? JSON.parse(approval.annotations) : null;
+        } catch { ann = null; }
+
+        if (!ann || ann.trigger !== 'adversarial-review') {
+          return reply.code(400).send({ error: 'This approval does not have an adversarial review to retry' });
+        }
+
+        const phase = ann.phase;
+        const specName = ann.specName;
+
+        // Re-run the adversarial review handler to get fresh paths/methodology
+        const result = await adversarialReviewHandler(
+          { specName, phase },
+          { projectPath: project.originalProjectPath }
+        );
+
+        if (!result.success || !result.data) {
+          return reply.code(500).send({ error: result.message || 'Failed to prepare adversarial review' });
+        }
+
+        // Check if the prompt file from the previous attempt exists
+        const promptPath = ann.promptOutputPath || result.data.promptOutputPath;
+        let promptExists = false;
+        try {
+          await fs.access(promptPath);
+          promptExists = true;
+        } catch { /* doesn't exist */ }
+
+        // Read preferences from adversarial settings
+        let retryModel: string | undefined;
+        let retryCli: string | undefined;
+        let retryCliArgs: string[] | undefined;
+        try {
+          const settingsRaw = await readFile(join(project.projectPath, '.spec-workflow', 'adversarial-settings.json'), 'utf-8');
+          const settings = JSON.parse(settingsRaw);
+          if (settings.model && typeof settings.model === 'string') {
+            retryModel = settings.model;
+          }
+          if (settings.cli && typeof settings.cli === 'string') {
+            retryCli = settings.cli;
+          }
+          if (Array.isArray(settings.cliArgs) && settings.cliArgs.length > 0) {
+            retryCliArgs = settings.cliArgs;
+          }
+        } catch { /* use default */ }
+
+        // Spawn background review, skipping prompt generation if prompt already exists
+        const jobId = await this.adversarialRunner.run({
+          projectId,
+          specName,
+          phase,
+          projectPath: project.originalProjectPath,
+          targetFile: result.data.targetFile,
+          promptOutputPath: promptPath,
+          analysisOutputPath: result.data.analysisOutputPath,
+          methodology: result.data.methodology,
+          steeringDocs: result.data.steeringDocs || [],
+          priorPhaseDocs: result.data.priorPhaseDocs || [],
+          version: result.data.version,
+          skipPromptGeneration: promptExists,
+          model: retryModel,
+          cli: retryCli,
+          cliArgs: retryCliArgs,
+        });
+
+        // Update annotations with the new job ID and paths
+        const newAnnotations = JSON.stringify({
+          ...ann,
+          promptOutputPath: promptPath,
+          analysisOutputPath: result.data.analysisOutputPath,
+          analysisVersion: result.data.version,
+          jobId,
+          timestamp: new Date().toISOString()
+        }, null, 2);
+        const comments = [{
+          type: 'general' as const,
+          comment: `Adversarial review retried${promptExists ? ' (resuming from existing prompt)' : ''}. Background job: ${jobId}`,
+          timestamp: new Date().toISOString(),
+        }];
+
+        await project.approvalStorage.updateApproval(id, 'needs-revision', approval.response || '', newAnnotations, comments);
+
+        return { jobId, skippedPromptGeneration: promptExists };
       } catch (error: any) {
         return reply.code(500).send({ error: error.message || 'Internal server error' });
       }
@@ -1213,6 +1465,194 @@ export class MultiProjectDashboardServer {
       }
     });
 
+    // ── Adversarial analysis endpoints ──
+
+    // List all adversarial reviews across specs
+    this.app.get('/api/projects/:projectId/adversarial/reviews', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const allSpecs = await project.parser.getAllSpecs();
+        const specsDir = join(project.projectPath, '.spec-workflow', 'specs');
+        const result: Array<{
+          specName: string;
+          displayName: string;
+          phases: Array<{
+            phase: string;
+            versions: Array<{ version: number; filename: string; lastModified: string }>;
+          }>;
+        }> = [];
+
+        // Helper to scan a reviews directory for adversarial analysis files
+        const scanReviewsDir = async (reviewsDir: string): Promise<Record<string, Array<{ version: number; filename: string; lastModified: string }>>> => {
+          const phaseMap: Record<string, Array<{ version: number; filename: string; lastModified: string }>> = {};
+          let files: string[];
+          try {
+            files = await fs.readdir(reviewsDir);
+          } catch {
+            return phaseMap;
+          }
+          for (const file of files) {
+            const match = file.match(/^adversarial-analysis-(\w+)(-r(\d+))?\.md$/);
+            if (!match) continue;
+            const phase = match[1];
+            const version = match[3] ? parseInt(match[3], 10) : 1;
+            const stat = await fs.stat(join(reviewsDir, file));
+            if (!phaseMap[phase]) phaseMap[phase] = [];
+            phaseMap[phase].push({ version, filename: file, lastModified: stat.mtime.toISOString() });
+          }
+          return phaseMap;
+        };
+
+        // Scan spec reviews
+        for (const spec of allSpecs) {
+          const reviewsDir = join(specsDir, spec.name, 'reviews');
+          const phaseMap = await scanReviewsDir(reviewsDir);
+
+          const phases = Object.entries(phaseMap).map(([phase, versions]) => ({
+            phase,
+            versions: versions.sort((a, b) => b.version - a.version),
+          }));
+
+          if (phases.length > 0) {
+            result.push({ specName: spec.name, displayName: spec.displayName || spec.name, phases });
+          }
+        }
+
+        // Scan steering reviews
+        const steeringReviewsDir = join(project.projectPath, '.spec-workflow', 'steering', 'reviews');
+        const steeringPhaseMap = await scanReviewsDir(steeringReviewsDir);
+        const steeringPhases = Object.entries(steeringPhaseMap).map(([phase, versions]) => ({
+          phase,
+          versions: versions.sort((a, b) => b.version - a.version),
+        }));
+        if (steeringPhases.length > 0) {
+          result.push({ specName: 'steering', displayName: 'Steering Documents', phases: steeringPhases });
+        }
+
+        return { specs: result };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message || 'Internal server error' });
+      }
+    });
+
+    // Get specific adversarial review content
+    this.app.get('/api/projects/:projectId/adversarial/reviews/:specName/:phase/:version', async (request, reply) => {
+      const { projectId, specName, phase, version } = request.params as {
+        projectId: string; specName: string; phase: string; version: string;
+      };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      if (!phase || typeof phase !== 'string' || !/^\w+$/.test(phase)) {
+        return reply.code(400).send({ error: 'Invalid phase' });
+      }
+
+      const versionNum = parseInt(version, 10);
+      if (isNaN(versionNum) || versionNum < 1) {
+        return reply.code(400).send({ error: 'Invalid version' });
+      }
+
+      const versionSuffix = versionNum === 1 ? '' : `-r${versionNum}`;
+      const filename = `adversarial-analysis-${phase}${versionSuffix}.md`;
+      const baseDir = specName === 'steering'
+        ? join(project.projectPath, '.spec-workflow', 'steering')
+        : join(project.projectPath, '.spec-workflow', 'specs', specName);
+      const filePath = join(baseDir, 'reviews', filename);
+
+      try {
+        const content = await readFile(filePath, 'utf-8');
+        const stat = await fs.stat(filePath);
+        return { content, lastModified: stat.mtime.toISOString() };
+      } catch (error: any) {
+        if (error.code === 'ENOENT') {
+          return reply.code(404).send({ error: 'Review not found' });
+        }
+        return reply.code(500).send({ error: error.message });
+      }
+    });
+
+    // Get adversarial settings
+    this.app.get('/api/projects/:projectId/adversarial/settings', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      const settingsPath = join(project.projectPath, '.spec-workflow', 'adversarial-settings.json');
+      const defaults = {
+        customPreamble: '',
+        requiredPhases: { requirements: false, design: false, tasks: false },
+        reviewMethodology: '',
+        responseMethodology: '',
+        model: '',
+        cli: '',
+        cliArgs: [],
+      };
+
+      let saved = {};
+      try {
+        const raw = await readFile(settingsPath, 'utf-8');
+        saved = JSON.parse(raw);
+      } catch {
+        // No settings file yet
+      }
+
+      return {
+        ...defaults,
+        ...saved,
+        defaultReviewMethodology: getAdversarialReviewMethodology(),
+        defaultResponseMethodology: getAdversarialResponseMethodology(),
+      };
+    });
+
+    // Save adversarial settings
+    this.app.put('/api/projects/:projectId/adversarial/settings', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      const body = request.body as any;
+      if (!body || typeof body !== 'object') {
+        return reply.code(400).send({ error: 'Request body must be an object' });
+      }
+
+      // Validate shape
+      const settings = {
+        customPreamble: typeof body.customPreamble === 'string' ? body.customPreamble : '',
+        requiredPhases: {
+          requirements: !!body.requiredPhases?.requirements,
+          design: !!body.requiredPhases?.design,
+          tasks: !!body.requiredPhases?.tasks,
+        },
+        reviewMethodology: typeof body.reviewMethodology === 'string' ? body.reviewMethodology : '',
+        responseMethodology: typeof body.responseMethodology === 'string' ? body.responseMethodology : '',
+        model: typeof body.model === 'string' ? body.model : '',
+        cli: typeof body.cli === 'string' ? body.cli : '',
+        cliArgs: Array.isArray(body.cliArgs) ? body.cliArgs.filter((a: any) => typeof a === 'string') : [],
+      };
+
+      const settingsDir = join(project.projectPath, '.spec-workflow');
+      const settingsPath = join(settingsDir, 'adversarial-settings.json');
+
+      try {
+        await fs.mkdir(settingsDir, { recursive: true });
+        await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+        return { success: true };
+      } catch (error: any) {
+        return reply.code(500).send({ error: error.message });
+      }
+    });
+
     // Global changelog endpoint
     this.app.get('/api/changelog/:version', async (request, reply) => {
       const { version } = request.params as { version: string };
@@ -1492,6 +1932,9 @@ export class MultiProjectDashboardServer {
       }
     });
     this.clients.clear();
+
+    // Stop adversarial runner
+    this.adversarialRunner.shutdown();
 
     // Stop job scheduler
     await this.jobScheduler.shutdown();

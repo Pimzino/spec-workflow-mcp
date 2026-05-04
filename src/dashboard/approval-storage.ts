@@ -477,7 +477,7 @@ export class ApprovalStorage extends EventEmitter {
   async getAllPendingApprovals(): Promise<ApprovalRequest[]> {
     const allApprovals = await this.getAllApprovals();
     return allApprovals.filter(approval =>
-      approval.status === 'pending'
+      approval.status === 'pending' || approval.status === 'needs-revision'
     );
   }
 

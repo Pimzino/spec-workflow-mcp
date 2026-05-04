@@ -8,6 +8,7 @@
     "specs": "Specs",
     "tasks": "Tasks",
     "approvals": "Approvals",
+    "adversarial": "Adversarial Analysis",
     "settings": "Settings",
     "logs": "Implementation Logs"
   },
@@ -406,6 +407,12 @@
       "title": "No Pending Approvals",
       "description": "All approvals have been processed. New approval requests will appear here."
     },
+    "revisions": {
+      "header": "Pending Revisions",
+      "description": "These items are awaiting revision by the agent. No actions are available until revisions are complete.",
+      "count_one": "{{count}} awaiting revision",
+      "count_other": "{{count}} awaiting revision"
+    },
     "reject": {
       "title": "Reject Approval",
       "placeholder": "Please provide feedback explaining why this is being rejected...",
@@ -453,6 +460,59 @@
       "rejectFailed": "Failed to reject \"{{title}}\"",
       "revisionRequested": "Revisions requested for \"{{title}}\"",
       "revisionFailed": "Failed to request revisions for \"{{title}}\""
+    },
+    "adversarialReview": {
+      "button": "Adversarial Review",
+      "confirmTitle": "Start Adversarial Review",
+      "confirmMessage": "This will launch a background adversarial review using a Claude subagent. The review typically takes a few minutes. Continue?",
+      "confirmYes": "Yes, start review",
+      "started": "Adversarial review started. Progress is shown on the approval card.",
+      "error": "Failed to start adversarial review",
+      "stepGeneratingPrompt": "Generating prompt",
+      "stepRunningReview": "Running review",
+      "reviewComplete": "Adversarial review complete",
+      "reviewFailed": "Adversarial review failed",
+      "nextStep": "Next: Tell a Claude agent to respond to the requested revision on this approval.",
+      "retry": "Retry",
+      "retryResume": "Resume review",
+      "dismiss": "Dismiss",
+      "reviewIncomplete": "Adversarial review incomplete",
+      "reviewIncompleteDescription": "A previous review was started but did not finish. This may have been caused by a server restart."
+    }
+  },
+  "adversarialPage": {
+    "header": {
+      "title": "Adversarial Analysis",
+      "subtitle": "Browse historical adversarial reviews and configure review settings"
+    },
+    "tabs": {
+      "reviews": "Reviews",
+      "settings": "Settings"
+    },
+    "reviews": {
+      "selectSpec": "Specification",
+      "selectReview": "Select a phase and version to view the review",
+      "emptyTitle": "No Adversarial Reviews",
+      "emptyDesc": "Adversarial reviews will appear here once triggered from the Approvals page or MCP tools.",
+      "loadError": "Failed to load review content"
+    },
+    "settings": {
+      "preambleLabel": "Custom Preamble",
+      "preambleHelp": "Additional instructions prepended to every adversarial review prompt. The defaults work well for most projects.",
+      "preamblePlaceholder": "e.g., Focus on security implications and data privacy concerns...",
+      "preambleOptional": "Optional",
+      "requiredPhasesLabel": "Required Phases",
+      "requiredPhasesHelp": "Phases that must have an adversarial review before approval.",
+      "save": "Save Settings",
+      "saved": "Settings saved",
+      "saveError": "Failed to save settings",
+      "reviewMethodologyLabel": "Review Methodology",
+      "reviewMethodologyHelp": "Instructions for how the adversarial review prompt is constructed. Leave empty to use the default.",
+      "responseMethodologyLabel": "Response Methodology",
+      "responseMethodologyHelp": "Instructions for how to evaluate and respond to adversarial findings. Leave empty to use the default.",
+      "resetToDefault": "Reset to default",
+      "usingDefault": "Default",
+      "usingCustom": "Custom"
     }
   },
   "logsPage": {

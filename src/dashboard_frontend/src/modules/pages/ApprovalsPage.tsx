@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApi, DocumentSnapshot, DiffResult, BatchApprovalResult } from '../api/api';
+import { useWs } from '../ws/WebSocketProvider';
 import { ApprovalsAnnotator, ApprovalComment, ViewMode } from '../approvals/ApprovalsAnnotator';
 import { useNotifications } from '../notifications/NotificationProvider';
 import { TextInputModal } from '../modals/TextInputModal';
@@ -12,6 +13,223 @@ import { formatSnapshotTimestamp, createVersionLabel, hasDiffChanges, getSnapsho
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../lib/dateUtils';
 
+function AdversarialProgress({ job, approval, onDismissJob, onRetry }: { job?: any; approval: any; onDismissJob?: (key: string) => void; onRetry?: () => void }) {
+  const { t } = useTranslation();
+  const { cancelAdversarialJob, getAdversarialReviews } = useApi();
+
+  // When falling back to annotations (no live job), verify the analysis file exists
+  const [analysisVerified, setAnalysisVerified] = useState<boolean | null>(null);
+
+  // Parse annotation data
+  const annotationData = useMemo(() => {
+    if (!approval.annotations) return null;
+    try {
+      const ann = typeof approval.annotations === 'string' ? JSON.parse(approval.annotations) : approval.annotations;
+      if (ann.trigger === 'adversarial-review') return ann;
+    } catch { /* ignore */ }
+    return null;
+  }, [approval.annotations]);
+
+  // Check if the specific analysis version exists on disk (only when falling back to annotations, no live job)
+  useEffect(() => {
+    if (job || !annotationData) {
+      setAnalysisVerified(null);
+      return;
+    }
+
+    const specName = annotationData.specName || approval.categoryName || '';
+    const phase = annotationData.phase || '';
+    const expectedVersion = annotationData.analysisVersion;
+    if (!specName || !phase) return;
+
+    getAdversarialReviews().then(res => {
+      const specEntry = (res.specs || []).find((s: any) => s.specName === specName);
+      if (specEntry) {
+        const phaseEntry = (specEntry.phases || []).find((p: any) => p.phase === phase);
+        if (phaseEntry && expectedVersion) {
+          // Check if the specific version requested by this annotation exists
+          const hasVersion = (phaseEntry.versions || []).some((v: any) => v.version === expectedVersion);
+          setAnalysisVerified(hasVersion);
+        } else if (phaseEntry) {
+          // No version in annotations (older data) — fall back to checking any version exists
+          setAnalysisVerified((phaseEntry.versions || []).length > 0);
+        } else {
+          setAnalysisVerified(false);
+        }
+      } else {
+        setAnalysisVerified(false);
+      }
+    }).catch(() => setAnalysisVerified(false));
+  }, [job, annotationData, approval.categoryName, getAdversarialReviews]);
+
+  // Determine state from live job or from persisted approval annotations
+  let status: string | null = null;
+  let error: string | undefined;
+  let specName = '';
+  let phase = '';
+  let version: number | undefined;
+
+  if (job) {
+    // If the job already completed/failed but the approval has moved back to pending
+    // (document was revised and resubmitted), the review cycle is over — don't show banner.
+    if ((job.status === 'completed' || job.status === 'failed') && approval.status === 'pending') {
+      // stale completed job — skip
+    } else {
+      status = job.status;
+      error = job.error;
+      specName = job.specName;
+      phase = job.phase;
+      // Job doesn't carry version directly, but annotationData might
+      version = annotationData?.analysisVersion;
+    }
+  } else if (annotationData && approval.status === 'needs-revision') {
+    // Only show annotation-based state when still in needs-revision.
+    // Once the document is revised and resubmitted (back to pending), the review cycle is over.
+    specName = annotationData.specName || approval.categoryName || '';
+    phase = annotationData.phase || '';
+    version = annotationData.analysisVersion;
+    if (analysisVerified === true) {
+      status = 'completed';
+    } else if (analysisVerified === false) {
+      status = 'incomplete';
+    }
+    // analysisVerified === null means still checking, don't show anything yet
+  }
+
+  if (!status) return null;
+
+  const isStep1Active = status === 'pending' || status === 'generating-prompt';
+  const isStep1Done = status === 'running-review' || status === 'completed';
+  const isStep2Active = status === 'running-review';
+  const isStep2Done = status === 'completed';
+  const isFailed = status === 'failed';
+  const isIncomplete = status === 'incomplete';
+  const isRunning = isStep1Active || isStep2Active;
+
+  const Spinner = () => (
+    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+  );
+
+  const Checkmark = () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+
+  if (isFailed) {
+    const jobKey = `${specName}:${phase}`;
+    return (
+      <div className="mt-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 max-w-md">
+        <div className="flex items-start gap-2">
+          <svg className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-red-700 dark:text-red-300">{t('approvalsPage.adversarialReview.reviewFailed')}</p>
+            {error && <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{error}</p>}
+            <div className="flex items-center gap-2 mt-2">
+              {onRetry && (
+                <button
+                  onClick={() => { onDismissJob?.(jobKey); onRetry(); }}
+                  className="text-xs font-medium text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100 underline"
+                >
+                  {t('approvalsPage.adversarialReview.retry')}
+                </button>
+              )}
+              {onDismissJob && (
+                <button
+                  onClick={() => onDismissJob(jobKey)}
+                  className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-200"
+                >
+                  {t('approvalsPage.adversarialReview.dismiss')}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isIncomplete) {
+    return (
+      <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 max-w-md">
+        <div className="flex items-start gap-2">
+          <svg className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-amber-700 dark:text-amber-300">{t('approvalsPage.adversarialReview.reviewIncomplete')}</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">{t('approvalsPage.adversarialReview.reviewIncompleteDescription')}</p>
+            {onRetry && (
+              <button
+                onClick={onRetry}
+                className="mt-2 text-xs font-medium text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 underline"
+              >
+                {t('approvalsPage.adversarialReview.retryResume')}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isStep2Done) {
+    return (
+      <div className="mt-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 max-w-md">
+        <div className="flex items-start gap-2">
+          <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-green-700 dark:text-green-300">{t('approvalsPage.adversarialReview.reviewComplete')}</p>
+            <p className="text-xs text-green-600 dark:text-green-400 mt-1">{t('approvalsPage.adversarialReview.nextStep')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Running state — two-step stepper
+  return (
+    <div className="mt-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 max-w-md">
+      <div className="flex items-center gap-3">
+        {/* Step 1 */}
+        <div className={`flex items-center gap-1.5 ${isStep1Done ? 'text-green-600 dark:text-green-400' : isStep1Active ? 'text-purple-700 dark:text-purple-300' : 'text-[var(--text-faint)]'}`}>
+          {isStep1Done ? <Checkmark /> : isStep1Active ? <Spinner /> : <span className="w-4 h-4 flex items-center justify-center text-xs font-bold">1</span>}
+          <span className="text-xs font-medium">{t('approvalsPage.adversarialReview.stepGeneratingPrompt')}</span>
+        </div>
+
+        {/* Connector */}
+        <div className={`w-8 h-px ${isStep1Done ? 'bg-green-300 dark:bg-green-700' : 'bg-purple-200 dark:bg-purple-700'}`} />
+
+        {/* Step 2 */}
+        <div className={`flex items-center gap-1.5 ${isStep2Active ? 'text-purple-700 dark:text-purple-300' : 'text-[var(--text-faint)] opacity-50'}`}>
+          {isStep2Active ? <Spinner /> : <span className="w-4 h-4 flex items-center justify-center text-xs font-bold">2</span>}
+          <span className="text-xs font-medium">{t('approvalsPage.adversarialReview.stepRunningReview')}</span>
+        </div>
+
+        {/* Cancel button */}
+        {isRunning && job && (
+          <button
+            onClick={() => cancelAdversarialJob(job.id)}
+            className="text-purple-400 hover:text-purple-600 dark:hover:text-purple-200 flex-shrink-0 ml-2"
+            title={t('common.cancel')}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 
 interface ApprovalItemProps {
   a: any;
@@ -20,10 +238,13 @@ interface ApprovalItemProps {
   selectedCount: number;
   onToggleSelection: (id: string) => void;
   isHighlighted: boolean;
+  readOnly?: boolean;
+  adversarialJob?: any;
+  onDismissJob?: (key: string) => void;
 }
 
-function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted }: ApprovalItemProps) {
-  const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll } = useApi();
+function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSelection, isHighlighted, readOnly = false, adversarialJob, onDismissJob }: ApprovalItemProps) {
+  const { approvalsAction, getApprovalContent, getApprovalSnapshots, getApprovalDiff, reloadAll, requestAdversarialReview, retryAdversarialReview } = useApi();
   const { showNotification } = useNotifications();
   const { t } = useTranslation();
   const itemRef = useRef<HTMLDivElement>(null);
@@ -37,6 +258,10 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
   const [rejectModalOpen, setRejectModalOpen] = useState<boolean>(false);
   const [approvalWarningModalOpen, setApprovalWarningModalOpen] = useState<boolean>(false);
   const [revisionWarningModalOpen, setRevisionWarningModalOpen] = useState<boolean>(false);
+
+  // Adversarial review state
+  const [adversarialConfirmOpen, setAdversarialConfirmOpen] = useState(false);
+  const [adversarialLoading, setAdversarialLoading] = useState(false);
 
   // Snapshot-related state
   const [snapshots, setSnapshots] = useState<DocumentSnapshot[]>([]);
@@ -242,6 +467,45 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
     }
   };
 
+  // Adversarial review eligibility: spec or steering category, pending status
+  const phase = a.filePath ? a.filePath.split('/').pop()?.replace('.md', '') || '' : '';
+  const isAdversarialEligible = (a.category === 'spec' || a.category === 'steering') && a.status === 'pending';
+  const canRetryAdversarial = a.category === 'spec' || a.category === 'steering';
+
+  const handleAdversarialReview = async () => {
+    setAdversarialLoading(true);
+    try {
+      const res = await requestAdversarialReview(a.id);
+      if (res.ok && res.data) {
+        showNotification(t('approvalsPage.adversarialReview.started'), 'success');
+        await reloadAll();
+      } else {
+        showNotification(t('approvalsPage.adversarialReview.error'), 'error');
+      }
+    } catch {
+      showNotification(t('approvalsPage.adversarialReview.error'), 'error');
+    } finally {
+      setAdversarialLoading(false);
+    }
+  };
+
+  const handleAdversarialRetry = async () => {
+    setAdversarialLoading(true);
+    try {
+      const res = await retryAdversarialReview(a.id);
+      if (res.ok && res.data) {
+        showNotification(t('approvalsPage.adversarialReview.started'), 'success');
+        await reloadAll();
+      } else {
+        showNotification(t('approvalsPage.adversarialReview.error'), 'error');
+      }
+    } catch {
+      showNotification(t('approvalsPage.adversarialReview.error'), 'error');
+    } finally {
+      setAdversarialLoading(false);
+    }
+  };
+
   return (
     <div
       ref={itemRef}
@@ -314,7 +578,11 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
               </span>
             </div>
 
+            {/* Adversarial Review Progress */}
+            <AdversarialProgress job={adversarialJob} approval={a} onDismissJob={onDismissJob} onRetry={canRetryAdversarial ? handleAdversarialRetry : undefined} />
+
             {/* Action Buttons */}
+            {!readOnly && (
             <div className="flex flex-wrap items-center gap-3 min-w-0">
               <button
                 onClick={() => setOpen(!open)}
@@ -371,6 +639,26 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
                 <span className="sm:hidden">{t('approvalsPage.actions.reject')}</span>
               </button>
 
+              {isAdversarialEligible && (
+                <button
+                  onClick={() => setAdversarialConfirmOpen(true)}
+                  disabled={adversarialLoading}
+                  className="btn bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 min-w-0 touch-manipulation"
+                >
+                  {adversarialLoading ? (
+                    <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  )}
+                  <span className="hidden sm:inline">{t('approvalsPage.adversarialReview.button')}</span>
+                </button>
+              )}
+
               {open && (
                 <button
                   onClick={handleRevision}
@@ -395,6 +683,7 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
                 </button>
               )}
             </div>
+            )}
           </div>
         </div>
       </div>
@@ -638,17 +927,95 @@ function ApprovalItem({ a, selectionMode, isSelected, selectedCount, onToggleSel
         message={t('approvalsPage.revision.noCommentsMessage')}
         variant="warning"
       />
+
+      {/* Adversarial Review Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={adversarialConfirmOpen}
+        onClose={() => setAdversarialConfirmOpen(false)}
+        onConfirm={async () => {
+          setAdversarialConfirmOpen(false);
+          await handleAdversarialReview();
+        }}
+        title={t('approvalsPage.adversarialReview.confirmTitle')}
+        message={t('approvalsPage.adversarialReview.confirmMessage')}
+        confirmText={t('approvalsPage.adversarialReview.confirmYes')}
+      />
+
     </div>
   );
 }
 
 function Content() {
-  const { approvals, approvalsActionBatch, approvalsUndoBatch, reloadAll } = useApi();
+  const { approvals, approvalsActionBatch, approvalsUndoBatch, reloadAll, getAdversarialJobs } = useApi();
+  const { subscribe, unsubscribe } = useWs();
   const { showNotification } = useNotifications();
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const highlightedId = searchParams.get('id');
+
+  // Adversarial job tracking
+  const [adversarialJobs, setAdversarialJobs] = useState<Map<string, any>>(new Map());
+
+  // Load active jobs on mount
+  useEffect(() => {
+    getAdversarialJobs().then(res => {
+      const jobMap = new Map<string, any>();
+      for (const job of (res.jobs || [])) {
+        jobMap.set(`${job.specName}:${job.phase}`, job);
+      }
+      setAdversarialJobs(jobMap);
+    }).catch(() => {});
+  }, [getAdversarialJobs]);
+
+  // Subscribe to real-time job updates
+  useEffect(() => {
+    const handler = (data: any) => {
+      if (!data?.id) return;
+      const key = `${data.specName}:${data.phase}`;
+
+      if (data.status === 'completed') {
+        setAdversarialJobs(prev => {
+          const next = new Map(prev);
+          next.delete(key);
+          return next;
+        });
+        reloadAll();
+      } else if (data.status === 'failed') {
+        setAdversarialJobs(prev => {
+          const next = new Map(prev);
+          next.set(key, data);
+          return next;
+        });
+      } else {
+        setAdversarialJobs(prev => {
+          const next = new Map(prev);
+          next.set(key, data);
+          return next;
+        });
+      }
+    };
+
+    subscribe('adversarial-job-update', handler);
+    return () => unsubscribe('adversarial-job-update', handler);
+  }, [subscribe, unsubscribe, reloadAll]);
+
+  // Helper to find a job for an approval
+  const getJobForApproval = useCallback((approval: any) => {
+    const phase = approval.filePath ? approval.filePath.split('/').pop()?.replace('.md', '') || '' : '';
+    const specName = approval.category === 'steering' ? 'steering' : approval.categoryName;
+    const key = `${specName}:${phase}`;
+    return adversarialJobs.get(key);
+  }, [adversarialJobs]);
+
+  // Dismiss a failed job from the local state
+  const dismissJob = useCallback((key: string) => {
+    setAdversarialJobs(prev => {
+      const next = new Map(prev);
+      next.delete(key);
+      return next;
+    });
+  }, []);
 
   // Selection Mode state
   const [selectionMode, setSelectionMode] = useState<boolean>(false);
@@ -677,6 +1044,17 @@ function Content() {
   // Filter approvals based on selected category and status (only show pending)
   const filteredApprovals = useMemo(() => {
     let filtered = approvals.filter(a => a.status === 'pending');
+
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(a => (a as any).categoryName === filterCategory);
+    }
+
+    return filtered;
+  }, [approvals, filterCategory]);
+
+  // Filter approvals with needs-revision status (with same category filter)
+  const revisionApprovals = useMemo(() => {
+    let filtered = approvals.filter(a => a.status === 'needs-revision');
 
     if (filterCategory !== 'all') {
       filtered = filtered.filter(a => (a as any).categoryName === filterCategory);
@@ -1008,8 +1386,47 @@ function Content() {
               selectedCount={selectedIds.size}
               onToggleSelection={handleToggleSelection}
               isHighlighted={highlightedId === a.id}
+              adversarialJob={getJobForApproval(a)}
+              onDismissJob={dismissJob}
             />
           ))}
+        </div>
+      )}
+
+      {/* Pending Revisions Section */}
+      {revisionApprovals.length > 0 && (
+        <div className="grid gap-4 max-w-full overflow-x-hidden">
+          <div className="bg-[var(--surface-panel)] border border-[var(--border-default)] shadow rounded-lg p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--text-primary)]">{t('approvalsPage.revisions.header')}</h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1">
+                  {t('approvalsPage.revisions.description')}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--status-warning-muted)] text-[var(--status-warning)]">
+                  {t('approvalsPage.revisions.count', { count: revisionApprovals.length })}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-3 sm:space-y-4 max-w-full overflow-x-hidden">
+            {revisionApprovals.map((a) => (
+              <ApprovalItem
+                key={a.id}
+                a={a}
+                selectionMode={false}
+                isSelected={false}
+                selectedCount={0}
+                onToggleSelection={handleToggleSelection}
+                isHighlighted={highlightedId === a.id}
+                readOnly
+                adversarialJob={getJobForApproval(a)}
+                onDismissJob={dismissJob}
+              />
+            ))}
+          </div>
         </div>
       )}
 
