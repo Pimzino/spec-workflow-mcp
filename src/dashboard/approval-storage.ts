@@ -272,10 +272,7 @@ export class ApprovalStorage extends EventEmitter {
       throw new Error('Security error: path traversal (..) is not allowed in filePath');
     }
 
-    // Security: validate categoryName is a single path segment
-    if (categoryName.includes('/') || categoryName.includes('\\')) {
-      throw new Error('Security error: categoryName must be a simple name without directory separators');
-    }
+    PathUtils.validateSimplePathSegment(categoryName, 'categoryName');
 
     const id = this.generateId();
     const approval: ApprovalRequest = {
@@ -329,6 +326,7 @@ export class ApprovalStorage extends EventEmitter {
         if (categoryName.isDirectory()) {
           let categoryPath: string;
           try {
+            PathUtils.validateSimplePathSegment(categoryName.name, 'categoryName');
             categoryPath = PathUtils.safeJoin(this.approvalsDir, categoryName.name);
           } catch {
             // Skip entries that fail path validation (e.g. malicious symlinks)
@@ -493,6 +491,7 @@ export class ApprovalStorage extends EventEmitter {
           if (categoryName.isDirectory()) {
             let categoryPath: string;
             try {
+              PathUtils.validateSimplePathSegment(categoryName.name, 'categoryName');
               categoryPath = PathUtils.safeJoin(this.approvalsDir, categoryName.name);
             } catch {
               // Skip entries that fail path validation (e.g. malicious symlinks)
@@ -596,7 +595,9 @@ export class ApprovalStorage extends EventEmitter {
     }
 
     // Create file-based snapshots directory
-    const categoryDir = PathUtils.safeJoin(this.approvalsDir, approval.categoryName || 'default');
+    const categoryName = approval.categoryName || 'default';
+    PathUtils.validateSimplePathSegment(categoryName, 'categoryName');
+    const categoryDir = PathUtils.safeJoin(this.approvalsDir, categoryName);
     const snapshotsDir = join(categoryDir, '.snapshots', basename(approval.filePath));
     await fs.mkdir(snapshotsDir, { recursive: true });
 
@@ -670,7 +671,9 @@ export class ApprovalStorage extends EventEmitter {
     if (!approval || !approval.filePath) return [];
 
     // Get snapshots based on file path, not approval ID
-    const categoryDir = PathUtils.safeJoin(this.approvalsDir, approval.categoryName || 'default');
+    const categoryName = approval.categoryName || 'default';
+    PathUtils.validateSimplePathSegment(categoryName, 'categoryName');
+    const categoryDir = PathUtils.safeJoin(this.approvalsDir, categoryName);
     const snapshotsDir = join(categoryDir, '.snapshots', basename(approval.filePath));
     const metadataPath = join(snapshotsDir, 'metadata.json');
 

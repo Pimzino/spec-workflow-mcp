@@ -413,6 +413,27 @@ describe('PathUtils path traversal security', () => {
   });
 });
 
+describe('PathUtils.validateSimplePathSegment', () => {
+  it('accepts a simple category name', () => {
+    expect(() => PathUtils.validateSimplePathSegment('test-spec', 'categoryName')).not.toThrow();
+  });
+
+  it('rejects forward slashes', () => {
+    expect(() => PathUtils.validateSimplePathSegment('foo/bar', 'categoryName'))
+      .toThrow('categoryName must be a simple name without path traversal or directory separators');
+  });
+
+  it('rejects backslashes', () => {
+    expect(() => PathUtils.validateSimplePathSegment('foo\\bar', 'categoryName'))
+      .toThrow('categoryName must be a simple name without path traversal or directory separators');
+  });
+
+  it('rejects dot-dot traversal patterns', () => {
+    expect(() => PathUtils.validateSimplePathSegment('..foo', 'categoryName'))
+      .toThrow('categoryName must be a simple name without path traversal or directory separators');
+  });
+});
+
 describe('PathUtils root prefix edge case', () => {
   const originalEnv = { ...process.env };
 

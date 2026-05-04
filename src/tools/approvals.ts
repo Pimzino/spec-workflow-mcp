@@ -233,12 +233,16 @@ async function handleRequestApproval(
       };
     }
 
-    // Security: Validate categoryName to prevent path traversal in approval directory names
-    if (args.categoryName.includes('..') || args.categoryName.includes('/') || args.categoryName.includes('\\')) {
+    // Security: validate categoryName at the tool boundary before storage access
+    try {
+      PathUtils.validateSimplePathSegment(args.categoryName, 'categoryName');
+    } catch (error) {
       await approvalStorage.stop();
       return {
         success: false,
-        message: 'Security error: categoryName must be a simple name without path traversal or directory separators.'
+        message: error instanceof Error
+          ? error.message
+          : 'Security error: categoryName must be a simple name without path traversal or directory separators.'
       };
     }
 

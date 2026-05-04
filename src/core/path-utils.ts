@@ -178,6 +178,27 @@ export class PathUtils {
   }
 
   /**
+   * Validate a single path segment that must not contain traversal or separators.
+   */
+  static validateSimplePathSegment(pathSegment: string, label: string = 'path segment'): void {
+    if (!pathSegment || typeof pathSegment !== 'string') {
+      throw new Error(`Invalid ${label}`);
+    }
+
+    if (
+      pathSegment === '.' ||
+      pathSegment.includes('..') ||
+      pathSegment.includes('/') ||
+      pathSegment.includes('\\') ||
+      pathSegment.includes('\0')
+    ) {
+      throw new Error(
+        `Security error: ${label} must be a simple name without path traversal or directory separators`
+      );
+    }
+  }
+
+  /**
    * Safely join paths ensuring no directory traversal
    */
   static safeJoin(basePath: string, ...paths: string[]): string {
