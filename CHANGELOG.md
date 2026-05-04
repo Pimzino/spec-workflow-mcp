@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.2.7] - 2026-05-04
 
+### Added
+- **Blocked Task Status** (PR #198) - Added a fourth task status for marking tasks as blocked:
+  - New `[~]` checkbox marker in `tasks.md` representing blocked tasks
+  - Optional `_Blocked: reason_` metadata for documenting why a task is blocked
+  - Blocked reason is automatically removed when task status changes
+  - Blocked column in Kanban board with red/ban-icon styling and drag-and-drop support
+  - Blocked filter pill in status filters and status dropdown
+  - Full support across web dashboard, VS Code extension, and MCP guide
+  - All 22 locale files updated (11 dashboard + 11 extension)
+
 ### Security
 - **Fix Approval Category Path Traversal** (Issue #220) - Prevented writing approval files outside the `.spec-workflow/approvals` directory via crafted `categoryName` values:
   - Added defense-in-depth validation at both the MCP tool handler (`src/tools/approvals.ts`) and the storage layer (`src/dashboard/approval-storage.ts`)

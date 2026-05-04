@@ -4,6 +4,16 @@ All notable changes to the "spec-workflow-mcp" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.8] - 2026-05-04
+
+### Added
+- **Blocked Task Status** (PR #198) - Support for marking tasks as blocked:
+  - Blocked option in task status dropdown with red styling
+  - Blocked reason modal (input field + Skip/Set Blocked buttons)
+  - Blocked reason displayed on task cards with ban icon
+  - Full message chain: Webview → vscode-api → SidebarProvider → SpecWorkflowService → core parser
+  - All 11 locale files updated with blocked status translations
+
 ## [1.1.7] - 2026-01-28
 
 ### Added

@@ -65,7 +65,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "diff": "^5.2.0",
-    "fastify": "^5.7.4",
+    "fastify": "^5.8.5",
     "highlight.js": "^11.9.0",
     "howler": "^2.2.4",
     "i18next": "^25.5.2",
@@ -79,7 +79,7 @@
     "react-i18next": "^15.7.3",
     "react-router-dom": "^6.26.2",
     "react-text-annotate-blend": "^1.2.0",
-    "simple-git": "^3.28.0",
+    "simple-git": "^3.36.0",
     "tailwind-merge": "^3.3.1",
     "toml": "^3.0.0",
     "ws": "^8.18.0",
@@ -99,7 +99,7 @@
     "tailwindcss": "^4.1.13",
     "tsx": "^4.7.0",
     "typescript": "^5.7.2",
-    "vite": "^7.2.7",
+    "vite": "^7.3.2",
     "vitest": "^4.0.15"
   }
 }
