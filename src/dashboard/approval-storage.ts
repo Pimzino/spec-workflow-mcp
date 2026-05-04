@@ -272,6 +272,11 @@ export class ApprovalStorage extends EventEmitter {
       throw new Error('Security error: path traversal (..) is not allowed in filePath');
     }
 
+    // Security: validate categoryName is a single path segment
+    if (categoryName.includes('/') || categoryName.includes('\\')) {
+      throw new Error('Security error: categoryName must be a simple name without directory separators');
+    }
+
     const id = this.generateId();
     const approval: ApprovalRequest = {
       id,
@@ -286,7 +291,7 @@ export class ApprovalStorage extends EventEmitter {
     };
 
     // Create category directory if it doesn't exist
-    const categoryDir = join(this.approvalsDir, categoryName);
+    const categoryDir = PathUtils.safeJoin(this.approvalsDir, categoryName);
     await fs.mkdir(categoryDir, { recursive: true });
 
     const approvalFilePath = join(categoryDir, `${id}.json`);
@@ -322,7 +327,14 @@ export class ApprovalStorage extends EventEmitter {
       const categoryNames = await fs.readdir(this.approvalsDir, { withFileTypes: true });
       for (const categoryName of categoryNames) {
         if (categoryName.isDirectory()) {
-          const approvalPath = join(this.approvalsDir, categoryName.name, `${id}.json`);
+          let categoryPath: string;
+          try {
+            categoryPath = PathUtils.safeJoin(this.approvalsDir, categoryName.name);
+          } catch {
+            // Skip entries that fail path validation (e.g. malicious symlinks)
+            continue;
+          }
+          const approvalPath = join(categoryPath, `${id}.json`);
           try {
             await fs.access(approvalPath);
             return approvalPath;
@@ -479,7 +491,13 @@ export class ApprovalStorage extends EventEmitter {
         const categoryNames = await fs.readdir(this.approvalsDir, { withFileTypes: true });
         for (const categoryName of categoryNames) {
           if (categoryName.isDirectory()) {
-            const categoryPath = join(this.approvalsDir, categoryName.name);
+            let categoryPath: string;
+            try {
+              categoryPath = PathUtils.safeJoin(this.approvalsDir, categoryName.name);
+            } catch {
+              // Skip entries that fail path validation (e.g. malicious symlinks)
+              continue;
+            }
             try {
               const approvalFiles = await fs.readdir(categoryPath);
               for (const file of approvalFiles) {
@@ -578,7 +596,7 @@ export class ApprovalStorage extends EventEmitter {
     }
 
     // Create file-based snapshots directory
-    const categoryDir = join(this.approvalsDir, approval.categoryName || 'default');
+    const categoryDir = PathUtils.safeJoin(this.approvalsDir, approval.categoryName || 'default');
     const snapshotsDir = join(categoryDir, '.snapshots', basename(approval.filePath));
     await fs.mkdir(snapshotsDir, { recursive: true });
 
@@ -652,7 +670,7 @@ export class ApprovalStorage extends EventEmitter {
     if (!approval || !approval.filePath) return [];
 
     // Get snapshots based on file path, not approval ID
-    const categoryDir = join(this.approvalsDir, approval.categoryName || 'default');
+    const categoryDir = PathUtils.safeJoin(this.approvalsDir, approval.categoryName || 'default');
     const snapshotsDir = join(categoryDir, '.snapshots', basename(approval.filePath));
     const metadataPath = join(snapshotsDir, 'metadata.json');
 

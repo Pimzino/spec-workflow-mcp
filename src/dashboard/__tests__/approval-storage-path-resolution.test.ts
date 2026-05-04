@@ -91,6 +91,30 @@ describe('ApprovalStorage path resolution', () => {
     ).rejects.toThrow('path traversal (..) is not allowed');
   });
 
+  it('rejects path traversal in categoryName', async () => {
+    await expect(
+      storage.createApproval('Review', 'test.md', 'spec', '../../../etc/passwd')
+    ).rejects.toThrow('categoryName must be a simple name without directory separators');
+  });
+
+  it('rejects backslash path traversal in categoryName', async () => {
+    await expect(
+      storage.createApproval('Review', 'test.md', 'spec', '..\\..\\..\\outside')
+    ).rejects.toThrow('categoryName must be a simple name without directory separators');
+  });
+
+  it('rejects absolute path in categoryName', async () => {
+    await expect(
+      storage.createApproval('Review', 'test.md', 'spec', '/etc/passwd')
+    ).rejects.toThrow('categoryName must be a simple name without directory separators');
+  });
+
+  it('rejects nested directory separator in categoryName', async () => {
+    await expect(
+      storage.createApproval('Review', 'test.md', 'spec', 'foo/bar')
+    ).rejects.toThrow('categoryName must be a simple name without directory separators');
+  });
+
   it('writes revisions to workspace file when it exists there', async () => {
     const relativePath = 'src/revision-target.ts';
     const workspaceFile = join(workspacePath, relativePath);

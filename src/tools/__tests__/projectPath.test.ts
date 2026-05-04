@@ -149,6 +149,30 @@ describe('Tool projectPath fallback behavior', () => {
       expect(result.message).toContain('Project path is required but not provided');
     });
 
+    it('should reject malicious categoryName in request action', async () => {
+      const tempProject = await createTempProject('specwf-cat-trav-');
+
+      try {
+        const result = await approvalsHandler(
+          {
+            action: 'request',
+            title: 'Test approval',
+            filePath: 'test.txt',
+            type: 'document',
+            category: 'spec',
+            categoryName: '..\\..\\..\\outside'
+          },
+          { projectPath: tempProject }
+        );
+
+        expect(result.success).toBe(false);
+        expect(result.message).toContain('Security error');
+        expect(result.message).toContain('categoryName');
+      } finally {
+        await rm(tempProject, { recursive: true, force: true });
+      }
+    });
+
     it('should not report PathUtils.translatePath error for request action', async () => {
       const result = await approvalsHandler(
         {
@@ -161,7 +185,7 @@ describe('Tool projectPath fallback behavior', () => {
         },
         mockContext
       );
-      
+
       // The actual error should be about path validation, not about PathUtils
       expect(result.success).toBe(false);
       expect(result.message).not.toContain('PathUtils.translatePath is not a function');

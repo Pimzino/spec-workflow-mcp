@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.7] - 2026-05-04
+
+### Security
+- **Fix Approval Category Path Traversal** (Issue #220) - Prevented writing approval files outside the `.spec-workflow/approvals` directory via crafted `categoryName` values:
+  - Added defense-in-depth validation at both the MCP tool handler (`src/tools/approvals.ts`) and the storage layer (`src/dashboard/approval-storage.ts`)
+  - Reject `categoryName` containing `..`, `/`, or `\` at the tool boundary with a clear security error
+  - Replaced all raw `join(this.approvalsDir, categoryName)` calls with `PathUtils.safeJoin()` which enforces path containment within the approvals directory
+  - Hardened `findApprovalPath()` and `getAllApprovals()` to skip directory entries that fail validation instead of crashing
+
 ## [2.2.6] - 2026-03-07
 
 ### Changed

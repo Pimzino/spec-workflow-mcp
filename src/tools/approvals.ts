@@ -233,6 +233,15 @@ async function handleRequestApproval(
       };
     }
 
+    // Security: Validate categoryName to prevent path traversal in approval directory names
+    if (args.categoryName.includes('..') || args.categoryName.includes('/') || args.categoryName.includes('\\')) {
+      await approvalStorage.stop();
+      return {
+        success: false,
+        message: 'Security error: categoryName must be a simple name without path traversal or directory separators.'
+      };
+    }
+
     const isMarkdownFile = args.filePath.toLowerCase().endsWith('.md');
     let markdownContent: string | undefined;
 
