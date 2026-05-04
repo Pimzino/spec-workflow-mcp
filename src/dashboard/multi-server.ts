@@ -1188,6 +1188,49 @@ export class MultiProjectDashboardServer {
       }
     });
 
+    // Deferrals endpoints (read-only)
+    this.app.get('/api/projects/:projectId/deferrals', async (request, reply) => {
+      const { projectId } = request.params as { projectId: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const { DeferralStorage } = await import('../core/deferral-storage.js');
+        const storage = new DeferralStorage(project.projectPath);
+        const query = request.query as { status?: string; originSpec?: string; tag?: string };
+        const deferrals = await storage.list({
+          status: query.status,
+          originSpec: query.originSpec,
+          tag: query.tag,
+        });
+        return deferrals;
+      } catch (error: any) {
+        return reply.code(500).send({ error: `Failed to list deferrals: ${error.message}` });
+      }
+    });
+
+    this.app.get('/api/projects/:projectId/deferrals/:id', async (request, reply) => {
+      const { projectId, id } = request.params as { projectId: string; id: string };
+      const project = this.projectManager.getProject(projectId);
+      if (!project) {
+        return reply.code(404).send({ error: 'Project not found' });
+      }
+
+      try {
+        const { DeferralStorage } = await import('../core/deferral-storage.js');
+        const storage = new DeferralStorage(project.projectPath);
+        const deferral = await storage.get(id);
+        if (!deferral) {
+          return reply.code(404).send({ error: `Deferral ${id} not found` });
+        }
+        return deferral;
+      } catch (error: any) {
+        return reply.code(500).send({ error: `Failed to get deferral: ${error.message}` });
+      }
+    });
+
     // Project-specific changelog endpoint
     this.app.get('/api/projects/:projectId/changelog/:version', async (request, reply) => {
       const { version } = request.params as { version: string };
