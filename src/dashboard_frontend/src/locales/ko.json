@@ -121,6 +121,7 @@
       "pending": "대기 중",
       "inProgress": "진행 중",
       "completed": "완료됨",
+      "blocked": "차단됨",
       "filterByTooltip": "{{status}} 태스크로 필터"
     },
     "sort": {
@@ -147,6 +148,7 @@
       "pending": "대기 중",
       "inProgress": "진행 중",
       "completed": "완료됨",
+      "blocked": "차단됨",
       "clickToChange": "상태 변경하려면 클릭"
     },
     "dropdown": {
@@ -199,6 +201,15 @@
       "leftDesc": "남은 것",
       "progress": "진행률",
       "progressDesc": "완료"
+    },
+    "blockedReason": {
+      "title": "이 작업이 차단된 이유는?",
+      "placeholder": "예: API 팀이 스키마를 확정할 때까지 대기 중...",
+      "submit": "이유 추가",
+      "skip": "건너뛰기"
+    },
+    "kanban": {
+      "noBlockedTasks": "차단된 작업 없음"
     }
   },
   "specsPage": {

@@ -45,7 +45,8 @@
     "status": {
       "pending": "Ожидает",
       "inProgress": "В процессе",
-      "completed": "Завершено"
+      "completed": "Завершено",
+      "blocked": "Заблокировано"
     },
     "taskGroup": "Группа задач",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "Реализация",
       "purposes": "Цели",
       "requirements": "Требования",
-      "leverage": "Использовать"
+      "leverage": "Использовать",
+      "blockedReason": "Заблокировано"
+    },
+    "blockedReason": {
+      "title": "Причина блокировки",
+      "description": "При необходимости укажите причину блокировки этой задачи.",
+      "placeholder": "напр. Ожидание команды API...",
+      "submit": "Установить как заблокировано",
+      "skip": "Пропустить"
     },
     "loading": "Загрузка задач...",
     "noSpecs": "Спецификации не найдены",
@@ -107,7 +116,7 @@
   },
   "common": {
     "dismiss": "Закрыть",
-    "scrollToTop": "Наверх"
+    "scrollToTop": "Прокрутить вверх"
   },
   "specs": {
     "active": "Активные",
@@ -180,9 +189,6 @@
       "dataFlow": "Поток Данных:",
       "exported": "(экспортировано)"
     }
-  },
-  "common": {
-    "scrollToTop": "Прокрутить вверх"
   },
   "commentModal": {
     "title": {

@@ -45,7 +45,8 @@
     "status": {
       "pending": "En attente",
       "inProgress": "En cours",
-      "completed": "Terminé"
+      "completed": "Terminé",
+      "blocked": "Bloqué"
     },
     "taskGroup": "Groupe de Tâches",
     "meta": {
@@ -53,7 +54,15 @@
       "implementation": "Implémentation",
       "purposes": "Objectifs",
       "requirements": "Exigences",
-      "leverage": "Utiliser"
+      "leverage": "Utiliser",
+      "blockedReason": "Bloqué"
+    },
+    "blockedReason": {
+      "title": "Raison du blocage",
+      "description": "Fournissez éventuellement une raison pour laquelle cette tâche est bloquée.",
+      "placeholder": "ex. En attente de l'équipe API...",
+      "submit": "Définir comme bloqué",
+      "skip": "Passer"
     },
     "loading": "Chargement des tâches...",
     "noSpecs": "Aucune spécification trouvée",
@@ -107,7 +116,7 @@
   },
   "common": {
     "dismiss": "Fermer",
-    "scrollToTop": "Retour en haut"
+    "scrollToTop": "Défiler vers le haut"
   },
   "specs": {
     "active": "Actif",
@@ -133,9 +142,6 @@
     "noDocs": "Aucun document de pilotage trouvé",
     "copyInstructions": "Copier les Instructions",
     "copied": "Copié !"
-  },
-  "common": {
-    "scrollToTop": "Défiler vers le haut"
   },
   "commentModal": {
     "title": {

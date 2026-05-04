@@ -40,6 +40,19 @@ describe('task-validator', () => {
         expect(result.summary.totalTasks).toBe(3);
       });
 
+      it('should accept blocked tasks with [~] checkbox', () => {
+        const content = `- [~] 1. Blocked task
+  - File: src/blocked.ts
+
+- [ ] 2. Pending task
+  - File: src/todo.ts
+`;
+        const result = validateTasksMarkdown(content);
+        expect(result.valid).toBe(true);
+        expect(result.errors).toHaveLength(0);
+        expect(result.summary.totalTasks).toBe(2);
+      });
+
       it('should accept nested task IDs', () => {
         const content = `- [ ] 1.1 First subtask
   - File: src/a.ts
