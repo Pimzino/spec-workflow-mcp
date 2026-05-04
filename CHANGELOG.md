@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reject `categoryName` containing `..`, `/`, or `\` at the tool boundary with a clear security error
   - Replaced all raw `join(this.approvalsDir, categoryName)` calls with `PathUtils.safeJoin()` which enforces path containment within the approvals directory
   - Hardened `findApprovalPath()` and `getAllApprovals()` to skip directory entries that fail validation instead of crashing
+- **Bump simple-git to 3.36.0** (CVE-2026-28292, CVSS 9.8) - Fixed critical RCE vulnerability via case-sensitivity bypass of protocol allowlist checks in `block-unsafe-operations-plugin.ts`. The `[a-z]` regex character class missed uppercase variants (e.g. `PROTOCOL.ALLOW=always`), allowing an attacker to bypass two prior CVE patches and execute arbitrary commands via git operations.
+- **Bump fastify to 5.8.5** (CVE-2026-33806) - Fixed body schema validation bypass via leading space character in `Content-Type` header. A regression from CVE-2025-32442 fix that allowed `\x20application/json` to skip `schema.body.content` validation entirely.
+- **Bump vite to 7.3.2** (CVE-2026-39365, CVE-2026-39363, CVE-2026-39364) - Fixed path traversal in `.map` file handling, arbitrary file read via WebSocket `fetchModule`, and `server.fs.deny` bypass via query parameters.
 
 ## [2.2.6] - 2026-03-07
 

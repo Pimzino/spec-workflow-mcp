@@ -14,6 +14,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Full message chain: Webview → vscode-api → SidebarProvider → SpecWorkflowService → core parser
   - All 11 locale files updated with blocked status translations
 
+### Security
+- **Bump vite to 6.4.2** (CVE-2026-39365, CVE-2026-39363) - Fixed path traversal in `.map` file handling and arbitrary file read via WebSocket `fetchModule` in the Vite dev server. Dev-only dependencies, exploitable only when dev server is exposed to the network with `--host`.
+
 ## [1.1.7] - 2026-01-28
 
 ### Added
