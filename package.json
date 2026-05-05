@@ -33,7 +33,8 @@
     "sync:plugin-version": "node scripts/sync-plugin-version.js",
     "check:plugin-version": "node scripts/sync-plugin-version.js --check",
     "copy-static": "node scripts/copy-static.cjs",
-    "package:extension": "npm run package -w packages/vscode-extension"
+    "package:extension": "npm run package -w packages/vscode-extension",
+    "publish:server": "npm run build:shared && npm run build:server && npm publish -w packages/server"
   },
   "keywords": [
     "mcp",

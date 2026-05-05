@@ -1,5 +1,5 @@
 {
-  "name": "@spec-workflow/server",
+  "name": "@pimzino/spec-workflow-mcp",
   "version": "2.2.7",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "type": "module",
@@ -7,15 +7,22 @@
   "bin": {
     "spec-workflow-mcp": "./dist/index.js"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --noEmit && node esbuild.config.cjs",
+    "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
-    "test": "vitest",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
@@ -43,6 +50,7 @@
     "@types/node": "^22.18.1",
     "@types/ws": "^8.5.13",
     "@vitest/coverage-v8": "^4.0.15",
+    "esbuild": "^0.25.0",
     "rimraf": "^6.0.1",
     "tsx": "^4.7.0",
     "typescript": "^5.7.2",
