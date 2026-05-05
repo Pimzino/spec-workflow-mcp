@@ -8,7 +8,7 @@
     "packages/shared",
     "packages/server",
     "packages/dashboard",
-    "vscode-extension"
+    "packages/vscode-extension"
   ],
   "scripts": {
     "build": "npm run build -w packages/shared && npm run build -w packages/server && npm run build -w packages/dashboard",

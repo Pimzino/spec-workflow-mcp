@@ -131,7 +131,7 @@ function validateI18nFiles() {
   }
   
   // Check VSCode extension locale files
-  const vscodeLocalesDir = path.resolve(__dirname, '../vscode-extension/src/webview/locales');
+  const vscodeLocalesDir = path.resolve(__dirname, '../packages/vscode-extension/src/webview/locales');
   const vscodeFiles = supportedLanguages.map(lang => `${lang}.json`);
   const vscodeTranslations = {};
   
