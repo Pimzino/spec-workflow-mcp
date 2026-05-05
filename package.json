@@ -15,13 +15,15 @@
     "build:shared": "npm run build -w packages/shared",
     "build:server": "npm run build -w packages/server",
     "build:dashboard": "npm run build -w packages/dashboard",
+    "build:extension": "npm run compile -w packages/vscode-extension",
     "dev": "npm run dev -w packages/server",
     "dev:dashboard": "npm run dev -w packages/dashboard",
     "start": "npm run start -w packages/server",
-    "clean": "npm run clean -w packages/shared && npm run clean -w packages/server && rimraf packages/dashboard/dist",
+    "clean": "npm run clean -w packages/shared && npm run clean -w packages/server && rimraf packages/dashboard/dist && rimraf packages/vscode-extension/dist",
     "test": "npm run test -w packages/server",
     "test:watch": "npm run test:watch -w packages/server",
     "test:coverage": "npm run test:coverage -w packages/server",
+    "test:extension": "npm run test:unit -w packages/vscode-extension",
     "test:e2e": "playwright test",
     "test:e2e:worktree": "playwright test -c playwright.worktree.config.ts",
     "test:e2e:ui": "playwright test --ui",
@@ -30,7 +32,8 @@
     "validate:mdx": "tsx scripts/validate-mdx.ts",
     "sync:plugin-version": "node scripts/sync-plugin-version.js",
     "check:plugin-version": "node scripts/sync-plugin-version.js --check",
-    "copy-static": "node scripts/copy-static.cjs"
+    "copy-static": "node scripts/copy-static.cjs",
+    "package:extension": "npm run package -w packages/vscode-extension"
   },
   "keywords": [
     "mcp",

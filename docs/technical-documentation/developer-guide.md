@@ -20,15 +20,10 @@ VS Code >= 1.74.0
 git clone <repository-url>
 cd spec-workflow-mcp
 
-# Install dependencies
+# Install all workspace dependencies
 npm install
 
-# Install VS Code extension dependencies (optional)
-cd vscode-extension
-npm install
-cd ..
-
-# Build everything
+# Build everything (shared → server → dashboard)
 npm run build
 ```
 
@@ -40,14 +35,21 @@ npm run dev
 # Start dashboard in development mode  
 npm run dev:dashboard
 
-# Build for production
+# Build all packages
 npm run build
+
+# Build individual packages
+npm run build:shared
+npm run build:server
+npm run build:dashboard
+npm run build:extension
 
 # Clean build artifacts
 npm run clean
 
-# Run tests (when available)
-npm test
+# Run tests
+npm run test              # Server unit tests
+npm run test:extension    # Extension unit tests
 ```
 
 ## 🛠️ Development Workflows
@@ -169,7 +171,7 @@ npm run dev:dashboard
 
 #### Adding a New Page
 ```typescript
-// src/dashboard_frontend/src/modules/pages/MyNewPage.tsx
+// packages/dashboard/src/modules/pages/MyNewPage.tsx
 import React from 'react';
 
 export default function MyNewPage() {
@@ -183,7 +185,7 @@ export default function MyNewPage() {
 ```
 
 ```typescript
-// src/dashboard_frontend/src/modules/app/App.tsx
+// packages/dashboard/src/modules/app/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MyNewPage from '../pages/MyNewPage';
 
@@ -201,7 +203,7 @@ function App() {
 
 #### Adding Backend API Endpoint
 ```typescript
-// src/dashboard/multi-server.ts
+// packages/server/src/dashboard/multi-server.ts
 export class MultiProjectDashboardServer {
   private async setupRoutes() {
     // Add new project-scoped endpoint
@@ -230,8 +232,11 @@ export class MultiProjectDashboardServer {
 
 #### Development Setup
 ```bash
-cd vscode-extension
-npm install
+# From repo root — no need to cd into the extension directory
+npm run build:extension
+
+# Or work directly in the extension package
+cd packages/vscode-extension
 
 # Open in VS Code
 code .
@@ -241,13 +246,13 @@ code .
 
 #### Extension Structure
 ```
-vscode-extension/
+packages/vscode-extension/
 ├── src/
 │   ├── extension.ts           # Main extension entry
 │   ├── extension/
 │   │   ├── providers/         # View providers
 │   │   ├── services/          # Business logic  
-│   │   └── utils/            # Helper functions
+│   │   └── utils/            # Helper functions (re-exports from shared)
 │   └── webview/              # Webview components
 ├── package.json              # Extension manifest
 └── README.md                # Extension documentation
@@ -319,7 +324,24 @@ npm run dev:dashboard
 
 ## 📁 Project Structure
 
-### Core MCP Server
+### Monorepo Overview
+
+This is an **npm workspaces monorepo** with four packages:
+
+```
+spec-workflow-mcp/
+├── package.json              # Workspaces root
+├── packages/
+│   ├── shared/               # @spec-workflow/shared — pure TypeScript
+│   ├── server/               # @spec-workflow/server — MCP + dashboard backend
+│   ├── dashboard/            # @spec-workflow/dashboard — React frontend
+│   └── vscode-extension/     # VS Code extension
+├── scripts/                  # Build and validation scripts
+├── docs/                     # Documentation
+└── e2e/                      # End-to-end tests
+```
+
+### Core MCP Server (`packages/server/`)
 ```
 src/
 ├── core/                     # Core business logic
@@ -345,12 +367,12 @@ src/
 │   └── templates/         # Document templates
 ├── server.ts             # Main MCP server
 ├── index.ts              # CLI entry point
-└── types.ts              # TypeScript definitions
+└── types.ts              # Server-specific types (re-exports from shared)
 ```
 
-### Dashboard Frontend
+### Dashboard Frontend (`packages/dashboard/`)
 ```
-src/dashboard_frontend/src/
+src/
 ├── modules/
 │   ├── api/              # API communication
 │   ├── app/              # Main app component
@@ -364,6 +386,22 @@ src/dashboard_frontend/src/
 │   └── ws/               # WebSocket integration
 ├── main.tsx              # React entry point
 └── App.tsx               # Root component
+```
+
+### Shared Package (`packages/shared/`)
+```
+src/
+├── types.ts           # Shared interfaces (SpecData, TaskInfo, etc.)
+├── task-parser.ts     # Task parsing from markdown
+├── task-validator.ts  # Task format validation
+├── date-utils.ts      # Date formatting utilities
+└── index.ts           # Barrel export
+```
+
+Import from shared in any package:
+```typescript
+import { parseTasksFromMarkdown, formatDate } from '@spec-workflow/shared';
+import type { SpecData, TaskInfo } from '@spec-workflow/shared';
 ```
 
 ## 🔧 Development Best Practices

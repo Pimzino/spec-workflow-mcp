@@ -362,7 +362,7 @@ project-root/
 
 ## 🌐 Dashboard Architecture
 
-### Backend (`src/dashboard/multi-server.ts`)
+### Backend (`packages/server/src/dashboard/multi-server.ts`)
 
 Fastify-based multi-project server with WebSocket support:
 
@@ -385,7 +385,7 @@ export class MultiProjectDashboardServer {
 - **Job Scheduling**: Automated task execution
 - **Session Management**: Single dashboard instance enforcement
 
-### Frontend (`src/dashboard_frontend/`)
+### Frontend (`packages/dashboard/`)
 
 React application with modern tooling:
 
@@ -406,6 +406,21 @@ src/
 - **Vite**: Build tool and dev server
 - **Tailwind CSS**: Utility-first styling
 - **WebSocket**: Real-time communication
+
+### Shared Package (`packages/shared/`)
+
+Pure TypeScript code shared across all packages:
+
+```
+src/
+├── types.ts           # Shared interfaces (SpecData, TaskInfo, etc.)
+├── task-parser.ts     # Task parsing from markdown
+├── task-validator.ts  # Task format validation
+├── date-utils.ts      # Date formatting utilities
+└── index.ts           # Barrel export
+```
+
+This package contains no Node.js or browser APIs, making it importable by both the server (Node.js) and dashboard/extension (browser).
 
 ## 🔄 State Management
 

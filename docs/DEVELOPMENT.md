@@ -32,12 +32,11 @@ cd spec-workflow-mcp
 npm install
 ```
 
-This installs:
-- MCP SDK
-- TypeScript and build tools
-- Express for dashboard server
-- WebSocket libraries
-- Testing frameworks
+This is an **npm workspaces monorepo**. Running `npm install` from the root installs dependencies for all packages:
+- `packages/shared` — Shared types and utilities
+- `packages/server` — MCP server + dashboard backend
+- `packages/dashboard` — React frontend
+- `packages/vscode-extension` — VS Code extension
 
 ### 3. Build the Project
 
@@ -45,7 +44,7 @@ This installs:
 npm run build
 ```
 
-This compiles TypeScript files to JavaScript in the `dist/` directory.
+This builds all packages in dependency order: shared → server → dashboard.
 
 ## Development Commands
 
@@ -53,13 +52,18 @@ This compiles TypeScript files to JavaScript in the `dist/` directory.
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start in development mode with auto-reload |
-| `npm run build` | Build production bundle |
+| `npm run dev` | Start MCP server in development mode |
+| `npm run build` | Build all packages (shared → server → dashboard) |
+| `npm run build:shared` | Build shared package only |
+| `npm run build:server` | Build server package only |
+| `npm run build:dashboard` | Build dashboard frontend only |
+| `npm run build:extension` | Build VS Code extension |
 | `npm start` | Run production server |
-| `npm test` | Run test suite |
-| `npm run clean` | Remove build artifacts |
-| `npm run lint` | Run code linter |
-| `npm run format` | Format code with Prettier |
+| `npm run test` | Run server unit tests |
+| `npm run test:extension` | Run extension unit tests |
+| `npm run clean` | Remove all build artifacts |
+| `npm run dev:dashboard` | Start dashboard dev server with hot reload |
+| `npm run package:extension` | Package VS Code extension for distribution |
 
 ### Development Mode
 
@@ -89,35 +93,45 @@ Optimizations:
 
 ```
 spec-workflow-mcp/
-├── src/                    # Source code
-│   ├── index.ts           # MCP server entry point
-│   ├── server.ts          # Dashboard server
-│   ├── tools/             # MCP tool implementations
-│   ├── prompts/           # Prompt templates
-│   ├── utils/             # Utility functions
-│   └── types/             # TypeScript type definitions
-├── dist/                   # Compiled JavaScript
-├── dashboard/             # Web dashboard files
-│   ├── index.html         # Dashboard UI
-│   ├── styles.css         # Dashboard styles
-│   └── script.js          # Dashboard JavaScript
-├── vscode-extension/      # VSCode extension
-│   ├── src/               # Extension source
-│   └── package.json       # Extension manifest
-├── tests/                 # Test files
-├── docs/                  # Documentation
-└── package.json           # Project configuration
+├── package.json              # npm workspaces root (no runtime deps)
+├── packages/
+│   ├── shared/               # @spec-workflow/shared
+│   │   └── src/
+│   │       ├── types.ts      # Shared TypeScript interfaces
+│   │       ├── task-parser.ts # Task parsing logic
+│   │       ├── task-validator.ts # Task validation
+│   │       ├── date-utils.ts  # Date formatting utilities
+│   │       └── index.ts       # Barrel export
+│   ├── server/               # @spec-workflow/server
+│   │   └── src/
+│   │       ├── index.ts      # MCP server entry point
+│   │       ├── server.ts     # MCP server implementation
+│   │       ├── config.ts     # Configuration loading
+│   │       ├── core/         # Core business logic
+│   │       ├── dashboard/    # Dashboard backend (Fastify)
+│   │       ├── tools/        # MCP tool implementations
+│   │       ├── prompts/      # Prompt templates
+│   │       └── markdown/     # Document templates
+│   ├── dashboard/            # @spec-workflow/dashboard
+│   │   └── src/              # React frontend (Vite + Tailwind)
+│   └── vscode-extension/     # VS Code extension
+│       └── src/
+│           ├── extension/    # Extension backend
+│           └── webview/      # Webview UI components
+├── scripts/                  # Build and validation scripts
+├── docs/                     # Documentation
+└── e2e/                      # End-to-end tests
 ```
 
-## Architecture Overview
-
-### MCP Server Architecture
+### Package Dependency Flow
 
 ```
-Client (AI) ↔ MCP Protocol ↔ Server ↔ File System
-                              ↓
-                          Dashboard
+@spec-workflow/shared  ←  @spec-workflow/server
+       ↑                        ↑
+@spec-workflow/dashboard    packages/vscode-extension
 ```
+
+The `shared` package contains pure TypeScript code (no Node.js or browser APIs) that all other packages can import. This eliminates duplicated types, task parsing logic, and date utilities across the codebase.
 
 ### Key Components
 
