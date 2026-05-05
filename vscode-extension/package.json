@@ -5,6 +5,7 @@
   "version": "1.1.7",
   "publisher": "Pimzino",
   "license": "GPL-3.0",
+  "type": "module",
   "icon": "icon.png",
   "repository": {
     "type": "git",
@@ -212,13 +213,13 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run build:webview && node esbuild.js --production",
-    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "vscode:prepublish": "npm run build:webview && node esbuild.cjs --production",
+    "compile": "npm run check-types && npm run lint && node esbuild.cjs",
     "watch": "npm-run-all -p watch:*",
-    "watch:esbuild": "node esbuild.js --watch",
+    "watch:esbuild": "node esbuild.cjs --watch",
     "watch:tsc": "tsc -b --watch",
     "watch:webview": "npm run build:webview -- --watch",
-    "package": "npm run check-types && npm run lint && npm run build:webview && node esbuild.js --production",
+    "package": "npm run check-types && npm run lint && npm run build:webview && node esbuild.cjs --production",
     "build:webview": "vite build --emptyOutDir",
     "dev:webview": "vite",
     "compile-tests": "tsc -p tsconfig.test.json",
@@ -261,6 +262,7 @@
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
+    "@spec-workflow/shared": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "i18next": "^25.5.2",

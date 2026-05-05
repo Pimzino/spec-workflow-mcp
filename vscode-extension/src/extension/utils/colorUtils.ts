@@ -1,4 +1,4 @@
-import { HighlightColor } from '../types';
+import { HighlightColor } from '../types.js';
 
 /**
  * Convert hex color to RGBA with alpha transparency for background

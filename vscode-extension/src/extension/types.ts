@@ -1,4 +1,13 @@
-// Shared types between extension and webview
+// Shared types between extension and webview.
+// Common types are imported from @spec-workflow/shared.
+
+import type { PhaseStatus, PromptSection } from '@spec-workflow/shared';
+
+// Re-export shared types used by the extension
+export type { PhaseStatus, PromptSection } from '@spec-workflow/shared';
+
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'blocked';
+
 export interface SpecData {
   name: string;
   displayName: string;
@@ -19,13 +28,6 @@ export interface SpecData {
   isArchived?: boolean;
 }
 
-export interface PhaseStatus {
-  exists: boolean;
-  approved?: boolean;
-  lastModified?: string;
-  content?: string;
-}
-
 export interface TaskProgressData {
   specName: string;
   total: number;
@@ -33,11 +35,6 @@ export interface TaskProgressData {
   progress: number;
   taskList: TaskInfo[];
   inProgress?: string;
-}
-
-export interface PromptSection {
-  key: string;
-  value: string;
 }
 
 export interface TaskInfo {
@@ -61,8 +58,6 @@ export interface TaskInfo {
   // For backward compatibility
   inProgress?: boolean;                // true if status === 'in-progress'
 }
-
-export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'blocked';
 
 export interface HighlightColor {
   bg: string;

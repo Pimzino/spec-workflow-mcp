@@ -1,0 +1,565 @@
+{
+  "documentTitle": "{{projectName}} Dashboard",
+  "projectNameDefault": "Spec Workflow",
+  "projectDescription": "Development workflow dashboard",
+  "nav": {
+    "statistics": "Statistics",
+    "steering": "Steering",
+    "specs": "Specs",
+    "tasks": "Tasks",
+    "approvals": "Approvals",
+    "settings": "Settings",
+    "logs": "Implementation Logs"
+  },
+  "connectionStatus": {
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "support": {
+    "me": "Support Me",
+    "project": "Support the project"
+  },
+  "mobile": {
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "notificationVolume": "Notification Volume",
+    "theme": "Theme"
+  },
+  "stats": {
+    "specifications": {
+      "title": "Specifications",
+      "label": "Active specs"
+    },
+    "taskProgress": {
+      "title": "Task Progress",
+      "summary_one": "{{count}} task across {{specs}} spec",
+      "summary_other": "{{count}} tasks across {{specs}} specs",
+      "noActiveSpecs": "No active specs"
+    },
+    "approvals": {
+      "title": "Approvals",
+      "awaiting": "Awaiting review",
+      "allClear": "All clear"
+    }
+  },
+  "comingSoon": {
+    "title": "More Features Coming Soon",
+    "description": "We're working on additional analytics and insights for your development workflow. Stay tuned for updates!"
+  },
+  "links": {
+    "npm": "npm package",
+    "github": "GitHub"
+  },
+  "editor": {
+    "markdown": {
+      "title": "Markdown Editor",
+      "saving": "Saving...",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "Error",
+      "unsavedChanges": "Unsaved changes",
+      "hints": "Ctrl+S to save • Tab to indent",
+      "placeholder": "Start typing your markdown content...",
+      "lines": "Lines",
+      "characters": "Characters"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "Spec Documents" },
+    "tooltips": { "viewRendered": "View rendered document", "viewSource": "View source markdown" },
+    "empty": { "docNotCreated": "This {{doc}} document hasn't been created yet." }
+  },
+  "language": {
+    "select": "Select language"
+  },
+  "common": {
+    "viewMode": {
+      "rendered": "Rendered",
+      "source": "Source",
+      "editor": "Editor"
+    },
+    "loadingContent": "Loading content...",
+    "noContentAvailable": "No content available",
+    "percentComplete": "{{percent}}% complete",
+    "lastModified": "Last modified {{date}}",
+    "never": "Never",
+    "unknown": "Unknown",
+    "close": "Close",
+    "keepEditing": "Keep Editing",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "processing": "Processing...",
+    "closeModalAria": "Close modal",
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "Unsaved Changes",
+      "message": "You have unsaved changes. Are you sure you want to close without saving?"
+    }
+  },
+  "tasksPage": {
+    "header": {
+      "title": "Task Management",
+      "subtitle": {
+        "selected": "Manage and track task completion",
+        "unselected": "Select a specification to view and manage its tasks"
+      }
+    },
+    "taskDetails": "Task Details",
+    "status": "Status",
+    "noTasksFound": "No tasks found",
+    "showAllTasks": "Show all tasks",
+    "noTasksWithStatus": "No tasks with status \"{{status}}\" found.",
+    "noTasksAvailable": "No tasks available for this specification",
+    "showingTasksWithStatus": "Showing {{count}} tasks with status \"{{status}}\"",
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "blocked": "Blocked",
+      "filterByTooltip": "Filter by {{status}} tasks"
+    },
+    "sort": {
+      "label": "Sort",
+      "defaultOrder": "Default Order",
+      "defaultOrderDesc": "Original task order",
+      "status": "Status",
+      "statusDesc": "Group by task status",
+      "taskId": "Task ID",
+      "taskIdDesc": "Sort by task identifier",
+      "description": "Description",
+      "descriptionDesc": "Sort alphabetically by description",
+      "byStatus": "By Status",
+      "byTaskId": "By Task ID",
+      "byDescription": "By Description",
+      "changeSortOrder": "Change sort order",
+      "sortOrder": "Sort Order",
+      "ascending": "Ascending",
+      "descending": "Descending",
+      "sortAscending": "Sort ascending",
+      "sortDescending": "Sort descending"
+    },
+    "statusPill": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "blocked": "Blocked",
+      "clickToChange": "Click to change status"
+    },
+    "dropdown": {
+      "selectPlaceholder": "Select a spec...",
+      "completedOutOfTotal": "{{completed}} / {{total}} tasks completed",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} tasks"
+    },
+    "search": {
+      "placeholder": "Search specs...",
+      "noSpecsFound": "No specs found",
+      "tryAdjusting": "Try adjusting your search"
+    },
+    "loading": "Loading task progress…",
+    "overallProgress": "Overall Progress",
+    "item": {
+      "section": "Section",
+      "task": "Task",
+      "groupBadge": "Task Group"
+    },
+    "files": { "label": "Files:" },
+    "implementation": { "label": "Implementation:" },
+    "labels": { "spec": "Spec:" },
+    "noSpecsFound": {
+      "title": "No specs found",
+      "noMatch": "No specs match \"{{query}}\"",
+      "noSpecsAvailable": "No specifications available to manage tasks for."
+    },
+    "copyFailed": {
+      "title": "Copy Failed",
+      "message": "Copy failed. Please copy this text manually:"
+    },
+    "copyPrompt": {
+      "tooltip": "Copy prompt for AI agent",
+      "copied": "Copied!",
+      "copyPrompt": "Copy Prompt",
+      "copy": "Copy"
+    },
+    "notifications": {
+      "statusUpdated": "Task {{taskId}} marked as {{status}}",
+      "updateFailed": "Failed to update task {{taskId}} status",
+      "updateError": "Error updating task {{taskId}} status"
+    },
+    "noTaskData": "No task data available",
+    "stats": {
+      "total": "Total",
+      "totalDesc": "All tasks",
+      "done": "Done",
+      "doneDesc": "Completed",
+      "left": "Left",
+      "leftDesc": "Remaining",
+      "progress": "Progress",
+      "progressDesc": "Complete"
+    },
+    "blockedReason": {
+      "title": "Why is this task blocked?",
+      "placeholder": "e.g., Waiting on API team to finalize schema...",
+      "submit": "Add Reason",
+      "skip": "Skip"
+    },
+    "kanban": {
+      "noBlockedTasks": "No blocked tasks"
+    }
+  },
+  "specsPage": {
+    "header": {
+      "title": "Specifications",
+      "subtitle": {
+        "active": "View and manage active requirements, design and task documents",
+        "archived": "View archived specifications"
+      }
+    },
+    "modal": {
+      "archivedBadge": "Archived",
+      "archivedNotice": "Archived specification (editing enabled)",
+      "closeAria": "Close spec viewer",
+      "docLabel": "Doc:",
+      "docSelectAria": "Select document type"
+    },
+    "documents": {
+      "requirements": "Requirements",
+      "design": "Design",
+      "tasks": "Tasks"
+    },
+    "table": {
+      "name": "Name",
+      "progress": "Progress",
+      "lastModified": "Last Modified",
+      "actions": "Actions"
+    },
+    "sort": {
+      "defaultOrder": "Default Order",
+      "defaultOrderDesc": "Original spec order",
+      "name": "Name",
+      "nameDesc": "Sort alphabetically by name",
+      "progress": "Progress",
+      "progressDesc": "Sort by task completion percentage",
+      "lastModified": "Last Modified",
+      "lastModifiedDesc": "Sort by modification date"
+    },
+    "noTasks": "No tasks",
+    "search": {
+      "placeholder": {
+        "active": "Search active specs...",
+        "archived": "Search archived specs..."
+      }
+    },
+    "empty": {
+      "title": "No Documents Available",
+      "description": "This spec doesn't have any documents created yet.",
+      "noResults": "No specs found",
+      "noResultsDescription": "Try adjusting your search or filters"
+    },
+    "tabs": {
+      "active": "Active",
+      "archived": "Archive"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "Steering Documents",
+      "subtitle": "View and manage project steering documents for product guidance, technical architecture, and structure"
+    },
+    "table": {
+      "document": "Document",
+      "status": "Status",
+      "lastModified": "Last Modified",
+      "actions": "Actions"
+    },
+    "badge": {
+      "available": "Available",
+      "notCreated": "Not Created"
+    },
+    "modal": {
+      "title": "{{name}} Steering Document",
+      "closeAria": "Close steering document"
+    },
+    "controls": {
+      "documentLabel": "Document:"
+    },
+    "empty": {
+      "title": "No Steering Documents",
+      "description": "Steering documents provide project context and guidance. Click on any document above to create or view it."
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "pending",
+      "needsRevision": "needs revision",
+      "approved": "approved",
+      "rejected": "rejected"
+    },
+    "annotator": {
+      "instructions": {
+        "title": "How to annotate:",
+        "mobile": "Select text → double tap selection → comment dialog appears. Tap highlighted text to edit comments.",
+        "step1": "• Select any text to add a comment - a dialog will appear automatically",
+        "step2": "• Click on existing highlights (colored text) to view or edit comments",
+        "step3": "• Use the \"Add General Comment\" button for document-wide feedback"
+      },
+      "editCommentTitle": "Edit Comment",
+      "addCommentTitle": "Add Comment",
+      "subtitle": "Comment on the highlighted text below",
+      "highlightedText": "Highlighted Text:",
+      "chooseHighlightColor": "Choose Highlight Color:",
+      "pickColorTooltip": "Pick highlight color",
+      "yourComment": "Your Comment:",
+      "commentPlaceholder": "Enter your comment here...",
+      "hints": {
+        "desktop": "Press Ctrl/Cmd + Enter to save, or Escape to cancel",
+        "mobile": "Tap Save to confirm"
+      },
+      "updateCommentButton": "Update Comment",
+      "addCommentButton": "Add Comment",
+      "updateShort": "Update",
+      "saveShort": "Save",
+      "tooltips": {
+        "viewEditComment": "Click to view/edit comment",
+        "editComment": "Edit comment",
+        "deleteComment": "Delete comment"
+      },
+      "badge": {
+        "textSelection": "Text Selection",
+        "generalComment": "General Comment"
+      },
+      "colorHighlight": "{{color}} highlight",
+      "addGeneralComment": {
+        "title": "Add General Comment",
+        "placeholder": "Enter a general comment...",
+        "submit": "Add Comment",
+        "button": "Add General Comment"
+      },
+      "addCommentShort": "Add Comment",
+      "empty": {
+        "title": "No comments yet",
+        "description": "Select text or add a general comment"
+      },
+      "switchHelp": "Switch to Annotate mode to add comments by selecting text or add general feedback.",
+      "viewMode": {
+        "preview": "Preview",
+        "annotate": "Annotate",
+        "sideBySide": "Side by Side"
+      },
+      "sideBySide": {
+        "title": "Side by Side View",
+        "buttonLabel": "Side by Side",
+        "tooltip": "View source and preview side by side",
+        "sourceLabel": "Source (Annotate)",
+        "previewLabel": "Preview",
+        "syncEnabled": "Scroll sync is enabled",
+        "syncDisabled": "Scroll sync is disabled",
+        "syncOn": "Sync On",
+        "syncOff": "Sync Off",
+        "instructions": "Select text in the source panel (left) to add comments. The preview panel (right) shows the rendered document."
+      },
+      "delete": {
+        "title": "Delete Comment",
+        "message": "Are you sure you want to remove this comment? This action cannot be undone."
+      }
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "Approvals",
+      "subtitle": "Review and manage pending approval requests"
+    },
+    "pendingCount_one": "{{count}} pending",
+    "pendingCount_other": "{{count}} pending",
+    "messages": {
+      "approvedViaDashboard": "Approved via dashboard"
+    },
+    "actions": {
+      "openReview": "Review & Annotate",
+      "closeReview": "Close Review",
+      "reviewShort": "Review",
+      "quickApprove": "Quick Approve",
+      "approve": "Approve",
+      "quickReject": "Quick Reject",
+      "reject": "Reject",
+      "requestRevisions": "Request Revisions",
+      "revisions": "Revisions",
+      "useBatchActions": "Use batch actions for multiple items"
+    },
+    "tooltips": {
+      "goToAnnotations": "Go to annotations",
+      "goToComments": "Go to comments"
+    },
+    "filter": {
+      "label": "Filter by:",
+      "options": {
+        "all": "All Documents",
+        "steering": "Steering Documents"
+      }
+    },
+    "empty": {
+      "title": "No Pending Approvals",
+      "description": "All approvals have been processed. New approval requests will appear here."
+    },
+    "reject": {
+      "title": "Reject Approval",
+      "placeholder": "Please provide feedback explaining why this is being rejected...",
+      "submit": "Reject"
+    },
+    "batchReject": {
+      "title": "Reject {{count}} Items",
+      "placeholder": "Enter a rejection reason that will apply to all selected items (e.g., 'Needs Principal Engineer review')...",
+      "submit": "Reject All"
+    },
+    "approvalWarning": {
+      "title": "Cannot Approve",
+      "message": "Cannot approve when comments exist. Use \"Request Revisions\" to send feedback."
+    },
+    "revision": {
+      "noCommentsTitle": "No Comments Added",
+      "noCommentsMessage": "Please add at least one comment before requesting revisions."
+    },
+    "selection": {
+      "enterMode": "Select Items",
+      "exitMode": "Cancel Selection",
+      "select": "Select",
+      "selectAll": "Select All",
+      "selectedCount_one": "{{count}} selected",
+      "selectedCount_other": "{{count}} selected",
+      "selectItem": "Select {{title}}",
+      "approveSelected": "Approve Selected",
+      "rejectSelected": "Reject Selected"
+    },
+    "batchConfirm": {
+      "title": "Confirm Batch Action",
+      "message": "You are about to {{action}} {{count}} items. This action cannot be undone. Are you sure you want to continue?",
+      "confirm": "Yes, proceed"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} of {{total}} items processed",
+      "failedCount_one": "{{count}} item failed",
+      "failedCount_other": "{{count}} items failed",
+      "undo": "Undo"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" has been approved",
+      "approveFailed": "Failed to approve \"{{title}}\"",
+      "rejected": "\"{{title}}\" has been rejected",
+      "rejectFailed": "Failed to reject \"{{title}}\"",
+      "revisionRequested": "Revisions requested for \"{{title}}\"",
+      "revisionFailed": "Failed to request revisions for \"{{title}}\""
+    }
+  },
+  "logsPage": {
+    "header": {
+      "title": "Implementation Logs"
+    },
+    "search": {
+      "placeholder": "Search logs..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "Select Specification",
+      "searchPlaceholder": "Search specs...",
+      "noSpecsFound": "No specs found"
+    },
+    "filter": {
+      "label": "Filter by Task",
+      "all": "All",
+      "taskPrefix": "Task"
+    },
+    "sort": {
+      "timestamp": "Date/Time",
+      "timestampDesc": "Sort by log timestamp",
+      "taskId": "Task ID",
+      "taskIdDesc": "Sort by task identifier",
+      "linesAdded": "Lines Added",
+      "linesAddedDesc": "Sort by lines of code added",
+      "filesChanged": "Files Changed",
+      "filesChangedDesc": "Sort by number of files modified"
+    },
+    "stats": {
+      "title": "Code Statistics",
+      "linesAdded": "Lines Added",
+      "linesRemoved": "Lines Removed",
+      "filesChanged": "Files Changed",
+      "netChange": "Net Change",
+      "totalEntries": "Total Entries"
+    },
+    "files": {
+      "modified": "Files Modified",
+      "created": "Files Created"
+    },
+    "artifacts": {
+      "title": "Artifacts",
+      "apiEndpoints": "API Endpoints",
+      "components": "Components",
+      "functions": "Functions",
+      "classes": "Classes",
+      "integrations": "Integrations",
+      "details": {
+        "request": "Request:",
+        "response": "Response:",
+        "props": "Props:",
+        "exports": "Exports:",
+        "exported": "Exported",
+        "private": "Private",
+        "methods": "Methods:",
+        "component": "Component:",
+        "endpoint": "Endpoint:",
+        "flow": "Flow:"
+      }
+    },
+    "empty": {
+      "selectSpec": "Select a specification to view implementation logs",
+      "noResults": "No logs match your search filters",
+      "noLogs": "No implementation logs yet for this specification"
+    },
+    "loading": "Loading logs...",
+    "taskBadge": "Task"
+  },
+  "volumeControl": {
+    "mute": "Mute notifications",
+    "enable": "Enable notification sounds",
+    "volumeLevel": "Volume: {{percentage}}%"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage automated cleanup jobs that run across all connected projects",
+    "addJob": "Add Job",
+    "loading": "Loading jobs...",
+    "noJobs": "No automation jobs",
+    "noJobsDesc": "Create your first automation job to get started",
+    "createFirst": "Create First Job",
+    "addNewJob": "Add New Job",
+    "editJob": "Edit Job",
+    "deleteJob": "Delete Job",
+    "deleteConfirm": "Are you sure you want to delete this automation job? This action cannot be undone.",
+    "lastRun": "Last Run",
+    "schedule": "Schedule",
+    "runNow": "Run Now",
+    "running": "Running...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "close": "Close",
+    "jobDescription": "Delete records older than {{days}} days on schedule: {{schedule}}",
+    "section": {
+      "automatedCleanup": "Automated Cleanup",
+      "automatedCleanupDesc": "Automatically delete old approval records, specifications, and archived specifications based on a schedule. Configure cleanup jobs to run on a recurring basis across all connected projects."
+    }
+  },
+  "changelog": {
+    "viewChangelog": "View changelog",
+    "modal": {
+      "title": "Changelog",
+      "version": "Version",
+      "loading": "Loading changelog...",
+      "notFound": "Changelog not found for this version"
+    }
+  }
+}

@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as nls from 'vscode-nls';
-import { ApprovalData, ApprovalComment, HighlightColor } from '../types';
+import { ApprovalData, ApprovalComment, HighlightColor } from '../types.js';
 
 const localize = nls.loadMessageBundle();
-import { SpecWorkflowService } from './SpecWorkflowService';
-import { hexToColorObject, generateRandomColor } from '../utils/colorUtils';
-import { CommentModalService } from './CommentModalService';
+import { SpecWorkflowService } from './SpecWorkflowService.js';
+import { hexToColorObject, generateRandomColor } from '../utils/colorUtils.js';
+import { CommentModalService } from './CommentModalService.js';
 
 const APPROVAL_STATUS_COLORS = {
   pending: { bg: 'rgba(255, 193, 7, 0.1)', border: 'rgba(255, 193, 7, 0.3)' },

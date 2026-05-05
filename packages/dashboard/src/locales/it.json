@@ -1,0 +1,565 @@
+{
+  "documentTitle": "Dashboard {{projectName}}",
+  "projectNameDefault": "Spec Workflow",
+  "projectDescription": "Dashboard flusso di lavoro sviluppo",
+  "nav": {
+    "statistics": "Statistiche",
+    "steering": "Direzione",
+    "specs": "Spec",
+    "tasks": "Task",
+    "approvals": "Approvazioni",
+    "settings": "Impostazioni",
+    "logs": "Log di Implementazione"
+  },
+  "connectionStatus": {
+    "connected": "Connesso",
+    "disconnected": "Disconnesso"
+  },
+  "theme": {
+    "toggle": "Cambia tema",
+    "dark": "Scuro",
+    "light": "Chiaro"
+  },
+  "support": {
+    "me": "Supportami",
+    "project": "Supporta il progetto"
+  },
+  "mobile": {
+    "menu": "Menu",
+    "closeMenu": "Chiudi menu",
+    "notificationVolume": "Volume Notifiche",
+    "theme": "Tema"
+  },
+  "stats": {
+    "specifications": {
+      "title": "Specifiche",
+      "label": "Spec attive"
+    },
+    "taskProgress": {
+      "title": "Progresso Task",
+      "summary_one": "{{count}} task in {{specs}} spec",
+      "summary_other": "{{count}} task in {{specs}} spec",
+      "noActiveSpecs": "Nessuna spec attiva"
+    },
+    "approvals": {
+      "title": "Approvazioni",
+      "awaiting": "In attesa di revisione",
+      "allClear": "Tutto a posto"
+    }
+  },
+  "comingSoon": {
+    "title": "Altre Funzionalità in Arrivo",
+    "description": "Stiamo lavorando su ulteriori analisi e approfondimenti per il tuo flusso di lavoro di sviluppo. Resta sintonizzato per aggiornamenti!"
+  },
+  "links": {
+    "npm": "pacchetto npm",
+    "github": "GitHub"
+  },
+  "editor": {
+    "markdown": {
+      "title": "Editor Markdown",
+      "saving": "Salvataggio...",
+      "save": "Salva",
+      "saved": "Salvato",
+      "error": "Errore",
+      "unsavedChanges": "Modifiche non salvate",
+      "hints": "Ctrl+S per salvare • Tab per indentare",
+      "placeholder": "Inizia a scrivere il tuo contenuto markdown...",
+      "lines": "Righe",
+      "characters": "Caratteri"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "Documenti Spec" },
+    "tooltips": { "viewRendered": "Visualizza documento renderizzato", "viewSource": "Visualizza markdown sorgente" },
+    "empty": { "docNotCreated": "Questo documento {{doc}} non è stato ancora creato." }
+  },
+  "language": {
+    "select": "Seleziona lingua"
+  },
+  "common": {
+    "viewMode": {
+      "rendered": "Renderizzato",
+      "source": "Sorgente",
+      "editor": "Editor"
+    },
+    "loadingContent": "Caricamento contenuto...",
+    "noContentAvailable": "Nessun contenuto disponibile",
+    "percentComplete": "{{percent}}% completato",
+    "lastModified": "Ultima modifica {{date}}",
+    "never": "Mai",
+    "unknown": "Sconosciuto",
+    "close": "Chiudi",
+    "keepEditing": "Continua Modifica",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "processing": "Elaborazione...",
+    "closeModalAria": "Chiudi modale",
+    "ok": "OK",
+    "unsavedChanges": {
+      "title": "Modifiche non salvate",
+      "message": "Hai modifiche non salvate. Sei sicuro di voler chiudere senza salvare?"
+    }
+  },
+  "tasksPage": {
+    "header": {
+      "title": "Gestione Task",
+      "subtitle": {
+        "selected": "Gestisci e traccia completamento task",
+        "unselected": "Seleziona una specifica per visualizzare e gestire i suoi task"
+      }
+    },
+    "taskDetails": "Dettagli Task",
+    "status": "Stato",
+    "noTasksFound": "Nessun task trovato",
+    "showAllTasks": "Mostra tutti i task",
+    "noTasksWithStatus": "Nessun task con stato \"{{status}}\" trovato.",
+    "noTasksAvailable": "Nessun task disponibile per questa specifica",
+    "showingTasksWithStatus": "Mostrando {{count}} task con stato \"{{status}}\"",
+    "filters": {
+      "all": "Tutti",
+      "pending": "In Attesa",
+      "inProgress": "In Corso",
+      "completed": "Completati",
+      "blocked": "Bloccato",
+      "filterByTooltip": "Filtra per task {{status}}"
+    },
+    "sort": {
+      "label": "Ordina",
+      "defaultOrder": "Ordine Predefinito",
+      "defaultOrderDesc": "Ordine task originale",
+      "status": "Stato",
+      "statusDesc": "Raggruppa per stato task",
+      "taskId": "ID Task",
+      "taskIdDesc": "Ordina per identificatore task",
+      "description": "Descrizione",
+      "descriptionDesc": "Ordina alfabeticamente per descrizione",
+      "byStatus": "Per Stato",
+      "byTaskId": "Per ID Task",
+      "byDescription": "Per Descrizione",
+      "changeSortOrder": "Cambia ordine ordinamento",
+      "sortOrder": "Ordine Ordinamento",
+      "ascending": "Crescente",
+      "descending": "Decrescente",
+      "sortAscending": "Ordina crescente",
+      "sortDescending": "Ordina decrescente"
+    },
+    "statusPill": {
+      "pending": "In Attesa",
+      "inProgress": "In Corso",
+      "completed": "Completato",
+      "blocked": "Bloccato",
+      "clickToChange": "Clicca per cambiare stato"
+    },
+    "dropdown": {
+      "selectPlaceholder": "Seleziona una spec...",
+      "completedOutOfTotal": "{{completed}} / {{total}} task completati",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} task"
+    },
+    "search": {
+      "placeholder": "Cerca spec...",
+      "noSpecsFound": "Nessuna spec trovata",
+      "tryAdjusting": "Prova ad aggiustare la tua ricerca"
+    },
+    "loading": "Caricamento progresso task...",
+    "overallProgress": "Progresso Complessivo",
+    "item": {
+      "section": "Sezione",
+      "task": "Task",
+      "groupBadge": "Gruppo Task"
+    },
+    "files": { "label": "File:" },
+    "implementation": { "label": "Implementazione:" },
+    "labels": { "spec": "Spec:" },
+    "noSpecsFound": {
+      "title": "Nessuna spec trovata",
+      "noMatch": "Nessuna spec corrisponde a \"{{query}}\"",
+      "noSpecsAvailable": "Nessuna specifica disponibile per gestire task."
+    },
+    "copyFailed": {
+      "title": "Copia Fallita",
+      "message": "Copia fallita. Copia questo testo manualmente:"
+    },
+    "copyPrompt": {
+      "tooltip": "Copia prompt per agente AI",
+      "copied": "Copiato!",
+      "copyPrompt": "Copia Prompt",
+      "copy": "Copia"
+    },
+    "notifications": {
+      "statusUpdated": "Task {{taskId}} contrassegnato come {{status}}",
+      "updateFailed": "Errore nell'aggiornamento stato task {{taskId}}",
+      "updateError": "Errore nell'aggiornamento stato task {{taskId}}"
+    },
+    "noTaskData": "Nessun dato task disponibile",
+    "stats": {
+      "total": "Totale",
+      "totalDesc": "Tutti i task",
+      "done": "Fatto",
+      "doneDesc": "Completati",
+      "left": "Rimanenti",
+      "leftDesc": "Rimanenti",
+      "progress": "Progresso",
+      "progressDesc": "Completi"
+    },
+    "blockedReason": {
+      "title": "Perché questa attività è bloccata?",
+      "placeholder": "Es., In attesa del team API per finalizzare lo schema...",
+      "submit": "Aggiungi motivo",
+      "skip": "Salta"
+    },
+    "kanban": {
+      "noBlockedTasks": "Nessuna attività bloccata"
+    }
+  },
+  "specsPage": {
+    "header": {
+      "title": "Specifiche",
+      "subtitle": {
+        "active": "Visualizza e gestisci documenti requisiti, design e task attivi",
+        "archived": "Visualizza specifiche archiviate"
+      }
+    },
+    "modal": {
+      "archivedBadge": "Archiviata",
+      "archivedNotice": "Specifica archiviata (modifica abilitata)",
+      "closeAria": "Chiudi visualizzatore spec",
+      "docLabel": "Doc:",
+      "docSelectAria": "Seleziona tipo documento"
+    },
+    "documents": {
+      "requirements": "Requisiti",
+      "design": "Design",
+      "tasks": "Task"
+    },
+    "table": {
+      "name": "Nome",
+      "progress": "Progresso",
+      "lastModified": "Ultima Modifica",
+      "actions": "Azioni"
+    },
+    "sort": {
+      "defaultOrder": "Ordine Predefinito",
+      "defaultOrderDesc": "Ordine originale delle specifiche",
+      "name": "Nome",
+      "nameDesc": "Ordina alfabeticamente per nome",
+      "progress": "Progresso",
+      "progressDesc": "Ordina per percentuale task completati",
+      "lastModified": "Ultima Modifica",
+      "lastModifiedDesc": "Ordina per data di modifica"
+    },
+    "noTasks": "Nessun task",
+    "search": {
+      "placeholder": {
+        "active": "Cerca spec attive...",
+        "archived": "Cerca spec archiviate..."
+      }
+    },
+    "empty": {
+      "title": "Nessun Documento Disponibile",
+      "description": "Questa spec non ha ancora documenti creati.",
+      "noResults": "Nessuna specifica trovata",
+      "noResultsDescription": "Prova ad aggiustare la ricerca o i filtri"
+    },
+    "tabs": {
+      "active": "Attive",
+      "archived": "Archivio"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "Documenti Direzione",
+      "subtitle": "Visualizza e gestisci documenti direzione progetto per guida prodotto, architettura tecnica e struttura"
+    },
+    "table": {
+      "document": "Documento",
+      "status": "Stato",
+      "lastModified": "Ultima Modifica",
+      "actions": "Azioni"
+    },
+    "badge": {
+      "available": "Disponibile",
+      "notCreated": "Non Creato"
+    },
+    "modal": {
+      "title": "Documento Direzione {{name}}",
+      "closeAria": "Chiudi documento direzione"
+    },
+    "controls": {
+      "documentLabel": "Documento:"
+    },
+    "empty": {
+      "title": "Nessun Documento Direzione",
+      "description": "I documenti direzione forniscono contesto e guida progetto. Clicca su qualsiasi documento sopra per crearlo o visualizzarlo."
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "in attesa",
+      "needsRevision": "necessita revisione",
+      "approved": "approvato",
+      "rejected": "rifiutato"
+    },
+    "annotator": {
+      "instructions": {
+        "title": "Come annotare:",
+        "mobile": "Seleziona testo → tocca due volte selezione → appare dialogo commento. Tocca testo evidenziato per modificare commenti.",
+        "step1": "• Seleziona qualsiasi testo per aggiungere un commento - un dialogo apparirà automaticamente",
+        "step2": "• Clicca su evidenziazioni esistenti (testo colorato) per visualizzare o modificare commenti",
+        "step3": "• Usa il pulsante \"Aggiungi Commento Generale\" per feedback su tutto il documento"
+      },
+      "editCommentTitle": "Modifica Commento",
+      "addCommentTitle": "Aggiungi Commento",
+      "subtitle": "Commenta il testo evidenziato sotto",
+      "highlightedText": "Testo Evidenziato:",
+      "chooseHighlightColor": "Scegli Colore Evidenziazione:",
+      "pickColorTooltip": "Scegli colore evidenziazione",
+      "yourComment": "Il Tuo Commento:",
+      "commentPlaceholder": "Inserisci il tuo commento qui...",
+      "hints": {
+        "desktop": "Premi Ctrl/Cmd + Invio per salvare, o Esc per annullare",
+        "mobile": "Tocca Salva per confermare"
+      },
+      "updateCommentButton": "Aggiorna Commento",
+      "addCommentButton": "Aggiungi Commento",
+      "updateShort": "Aggiorna",
+      "saveShort": "Salva",
+      "tooltips": {
+        "viewEditComment": "Clicca per visualizzare/modificare commento",
+        "deleteComment": "Elimina commento"
+      },
+      "badge": {
+        "textSelection": "Selezione Testo",
+        "generalComment": "Commento Generale"
+      },
+      "colorHighlight": "evidenziazione {{color}}",
+      "addGeneralComment": {
+        "title": "Aggiungi Commento Generale",
+        "placeholder": "Inserisci un commento generale...",
+        "submit": "Aggiungi Commento",
+        "button": "Aggiungi Commento Generale"
+      },
+      "addCommentShort": "Aggiungi Commento",
+      "empty": {
+        "title": "Nessun commento ancora",
+        "description": "Seleziona testo o aggiungi un commento generale"
+      },
+      "switchHelp": "Passa alla modalità Annota per aggiungere commenti selezionando testo o aggiungi feedback generale.",
+      "viewMode": {
+        "preview": "Anteprima",
+        "annotate": "Annota",
+        "sideBySide": "Affiancato"
+      },
+      "sideBySide": {
+        "title": "Vista Affiancata",
+        "buttonLabel": "Affiancato",
+        "tooltip": "Visualizza sorgente e anteprima affiancati",
+        "sourceLabel": "Sorgente (Annota)",
+        "previewLabel": "Anteprima",
+        "syncEnabled": "Sincronizzazione scorrimento attiva",
+        "syncDisabled": "Sincronizzazione scorrimento disattiva",
+        "syncOn": "Sinc. Attiva",
+        "syncOff": "Sinc. Disattiva",
+        "instructions": "Seleziona testo nel pannello sorgente (sinistra) per aggiungere commenti. Il pannello anteprima (destra) mostra il documento renderizzato."
+      },
+      "delete": {
+        "title": "Elimina Commento",
+        "message": "Sei sicuro di voler rimuovere questo commento? Questa azione non può essere annullata."
+      }
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "Approvazioni",
+      "subtitle": "Rivedi e gestisci richieste approvazione in attesa"
+    },
+    "pendingCount_one": "{{count}} in attesa",
+    "pendingCount_other": "{{count}} in attesa",
+    "messages": {
+      "approvedViaDashboard": "Approvato tramite dashboard"
+    },
+    "actions": {
+      "openReview": "Rivedi e Annota",
+      "closeReview": "Chiudi Revisione",
+      "reviewShort": "Rivedi",
+      "quickApprove": "Approva Veloce",
+      "approve": "Approva",
+      "quickReject": "Rifiuta Veloce",
+      "reject": "Rifiuta",
+      "requestRevisions": "Richiedi Revisioni",
+      "revisions": "Revisioni",
+      "useBatchActions": "Usa azioni batch per più elementi"
+    },
+    "tooltips": {
+      "goToAnnotations": "Vai alle annotazioni",
+      "goToComments": "Vai ai commenti"
+    },
+    "filter": {
+      "label": "Filtra per:",
+      "options": {
+        "all": "Tutti i Documenti",
+        "steering": "Documenti Direzione"
+      }
+    },
+    "empty": {
+      "title": "Nessuna Approvazione in Attesa",
+      "description": "Tutte le approvazioni sono state elaborate. Nuove richieste approvazione appariranno qui."
+    },
+    "reject": {
+      "title": "Rifiuta Approvazione",
+      "placeholder": "Fornisci feedback spiegando perché questo viene rifiutato...",
+      "submit": "Rifiuta"
+    },
+    "batchReject": {
+      "title": "Rifiuta {{count}} elementi",
+      "placeholder": "Inserisci un motivo di rifiuto che verrà applicato a tutti gli elementi selezionati (es. 'Richiede revisione dell'Ingegnere Principale')...",
+      "submit": "Rifiuta tutto"
+    },
+    "approvalWarning": {
+      "title": "Impossibile Approvare",
+      "message": "Impossibile approvare quando esistono commenti. Usa \"Richiedi Revisioni\" per inviare feedback."
+    },
+    "revision": {
+      "noCommentsTitle": "Nessun Commento Aggiunto",
+      "noCommentsMessage": "Aggiungi almeno un commento prima di richiedere revisioni."
+    },
+    "selection": {
+      "enterMode": "Seleziona Elementi",
+      "exitMode": "Annulla Selezione",
+      "select": "Seleziona",
+      "selectAll": "Seleziona Tutto",
+      "selectedCount_one": "{{count}} selezionato",
+      "selectedCount_other": "{{count}} selezionati",
+      "selectItem": "Seleziona {{title}}",
+      "approveSelected": "Approva Selezionati",
+      "rejectSelected": "Rifiuta Selezionati"
+    },
+    "batchConfirm": {
+      "title": "Conferma Azione di Massa",
+      "message": "Stai per {{action}} {{count}} elementi. Questa azione non può essere annullata. Sei sicuro di voler continuare?",
+      "confirm": "Sì, procedi"
+    },
+    "batchResult": {
+      "title": "{{succeeded}} di {{total}} elementi elaborati",
+      "failedCount_one": "{{count}} elemento fallito",
+      "failedCount_other": "{{count}} elementi falliti",
+      "undo": "Annulla"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" è stato approvato",
+      "approveFailed": "Impossibile approvare \"{{title}}\"",
+      "rejected": "\"{{title}}\" è stato rifiutato",
+      "rejectFailed": "Impossibile rifiutare \"{{title}}\"",
+      "revisionRequested": "Revisioni richieste per \"{{title}}\"",
+      "revisionFailed": "Impossibile richiedere revisioni per \"{{title}}\""
+    }
+  },
+  "logsPage": {
+    "header": {
+      "title": "Log di Implementazione"
+    },
+    "search": {
+      "placeholder": "Cerca log..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "Seleziona Specifica",
+      "searchPlaceholder": "Cerca specifiche...",
+      "noSpecsFound": "Nessuna specifica trovata"
+    },
+    "filter": {
+      "label": "Filtra per Attività",
+      "all": "Tutto",
+      "taskPrefix": "Attività"
+    },
+    "sort": {
+      "timestamp": "Data/Ora",
+      "timestampDesc": "Ordina per timestamp del log",
+      "taskId": "ID Attività",
+      "taskIdDesc": "Ordina per identificativo dell'attività",
+      "linesAdded": "Righe Aggiunte",
+      "linesAddedDesc": "Ordina per righe di codice aggiunte",
+      "filesChanged": "File Modificati",
+      "filesChangedDesc": "Ordina per numero di file modificati"
+    },
+    "stats": {
+      "title": "Statistiche Codice",
+      "linesAdded": "Righe Aggiunte",
+      "linesRemoved": "Righe Rimosse",
+      "filesChanged": "File Modificati",
+      "netChange": "Cambio Netto",
+      "totalEntries": "Totale Voci"
+    },
+    "files": {
+      "modified": "File Modificati",
+      "created": "File Creati"
+    },
+    "artifacts": {
+      "title": "Artefatti",
+      "apiEndpoints": "Endpoint API",
+      "components": "Componenti",
+      "functions": "Funzioni",
+      "classes": "Classi",
+      "integrations": "Integrazioni",
+      "details": {
+        "request": "Richiesta:",
+        "response": "Risposta:",
+        "props": "Props:",
+        "exports": "Esportazioni:",
+        "exported": "Esportato",
+        "private": "Privato",
+        "methods": "Metodi:",
+        "component": "Componente:",
+        "endpoint": "Endpoint:",
+        "flow": "Flusso:"
+      }
+    },
+    "empty": {
+      "selectSpec": "Seleziona una specifica per visualizzare i log di implementazione",
+      "noResults": "Nessun log corrisponde ai tuoi filtri di ricerca",
+      "noLogs": "Nessun log di implementazione ancora per questa specifica"
+    },
+    "loading": "Caricamento log...",
+    "taskBadge": "Attività"
+  },
+  "volumeControl": {
+    "mute": "Mute notifications",
+    "enable": "Enable notification sounds",
+    "volumeLevel": "Volume: {{percentage}}%"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "section": {
+      "automatedCleanup": "Pulizia Automatizzata",
+      "automatedCleanupDesc": "Elimina automaticamente i vecchi record di approvazione, le specifiche e le specifiche archiviate secondo una pianificazione. Configura i lavori di pulizia per essere eseguiti ricorrentemente su tutti i progetti connessi."
+    },
+    "description": "Gestire i lavori di pulizia automatizzati su tutti i progetti collegati",
+    "addJob": "Aggiungi lavoro",
+    "loading": "Caricamento dei lavori...",
+    "noJobs": "Nessun lavoro di automazione",
+    "noJobsDesc": "Crea il tuo primo lavoro di automazione per iniziare",
+    "createFirst": "Crea primo lavoro",
+    "addNewJob": "Aggiungi nuovo lavoro",
+    "editJob": "Modifica lavoro",
+    "deleteJob": "Elimina lavoro",
+    "deleteConfirm": "Sei sicuro di voler eliminare questo lavoro di automazione? Questa azione non può essere annullata.",
+    "lastRun": "Ultima esecuzione",
+    "schedule": "Pianificazione",
+    "runNow": "Esegui ora",
+    "running": "In esecuzione...",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "processing": "Elaborazione...",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "jobDescription": "Elimina i record più vecchi di {{days}} giorni secondo la pianificazione: {{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "Visualizza il registro delle modifiche",
+    "modal": {
+      "title": "Registro delle modifiche",
+      "version": "Versione",
+      "loading": "Caricamento del registro delle modifiche...",
+      "notFound": "Registro delle modifiche non trovato per questa versione"
+    }
+  }
+}

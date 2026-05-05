@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Logger } from '../utils/logger';
+import { Logger } from '../utils/logger.js';
 
 /**
  * Service for archiving and unarchiving specifications

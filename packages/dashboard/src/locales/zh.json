@@ -1,0 +1,565 @@
+{
+  "documentTitle": "{{projectName}} 仪表板",
+  "projectNameDefault": "规范工作流",
+  "projectDescription": "开发工作流仪表板",
+  "nav": {
+    "statistics": "统计",
+    "steering": "指导",
+    "specs": "规范",
+    "tasks": "任务",
+    "approvals": "审批",
+    "settings": "设置",
+    "logs": "实现日志"
+  },
+  "connectionStatus": {
+    "connected": "已连接",
+    "disconnected": "已断开连接"
+  },
+  "theme": {
+    "toggle": "切换主题",
+    "dark": "深色",
+    "light": "浅色"
+  },
+  "support": {
+    "me": "支持我",
+    "project": "支持项目"
+  },
+  "mobile": {
+    "menu": "菜单",
+    "closeMenu": "关闭菜单",
+    "notificationVolume": "通知音量",
+    "theme": "主题"
+  },
+  "stats": {
+    "specifications": {
+      "title": "规范",
+      "label": "活跃规范"
+    },
+    "taskProgress": {
+      "title": "任务进度",
+      "summary_one": "{{specs}} 个规范中的 {{count}} 个任务",
+      "summary_other": "{{specs}} 个规范中的 {{count}} 个任务",
+      "noActiveSpecs": "无活跃规范"
+    },
+    "approvals": {
+      "title": "审批",
+      "awaiting": "等待审核",
+      "allClear": "全部通过"
+    }
+  },
+  "comingSoon": {
+    "title": "更多功能即将推出",
+    "description": "我们正在为您的开发工作流添加更多分析和洞察功能。敬请期待更新！"
+  },
+  "links": {
+    "npm": "npm 包",
+    "github": "GitHub"
+  },
+  "editor": {
+    "markdown": {
+      "title": "Markdown 编辑器",
+      "saving": "正在保存...",
+      "save": "保存",
+      "saved": "已保存",
+      "error": "错误",
+      "unsavedChanges": "有未保存的更改",
+      "hints": "Ctrl+S 保存 • Tab 缩进",
+      "placeholder": "开始编写 Markdown 内容...",
+      "lines": "行数",
+      "characters": "字符数"
+    }
+  },
+  "specViewer": {
+    "header": { "title": "规范文档" },
+    "tooltips": { "viewRendered": "查看渲染文档", "viewSource": "查看源 Markdown" },
+    "empty": { "docNotCreated": "该 {{doc}} 文档尚未创建。" }
+  },
+  "language": {
+    "select": "选择语言"
+  },
+  "common": {
+    "viewMode": {
+      "rendered": "渲染",
+      "source": "源代码",
+      "editor": "编辑器"
+    },
+    "loadingContent": "正在加载内容...",
+    "noContentAvailable": "暂无内容",
+    "percentComplete": "已完成 {{percent}}%",
+    "lastModified": "最后修改 {{date}}",
+    "never": "无",
+    "unknown": "未知",
+    "close": "关闭",
+    "keepEditing": "继续编辑",
+    "cancel": "取消",
+    "delete": "删除",
+    "processing": "处理中...",
+    "closeModalAria": "关闭弹窗",
+    "ok": "确定",
+    "unsavedChanges": {
+      "title": "未保存的更改",
+      "message": "您有未保存的更改。确定要关闭而不保存吗？"
+    }
+  },
+  "tasksPage": {
+    "header": {
+      "title": "任务管理",
+      "subtitle": {
+        "selected": "管理并跟踪任务完成情况",
+        "unselected": "选择一个规范以查看并管理其任务"
+      }
+    },
+    "dropdown": {
+      "selectPlaceholder": "选择规范...",
+      "completedOutOfTotal": "已完成 {{completed}} / 共 {{total}} 个任务",
+      "completedOutOfTotalShort": "{{completed}} / {{total}} 任务"
+    },
+    "search": {
+      "placeholder": "搜索规范...",
+      "noSpecsFound": "未找到规范",
+      "tryAdjusting": "请尝试调整搜索条件"
+    },
+    "loading": "正在加载任务进度…",
+    "overallProgress": "总体进度",
+    "item": {
+      "section": "章节",
+      "task": "任务",
+      "groupBadge": "任务组"
+    },
+    "files": { "label": "文件:" },
+    "implementation": { "label": "实现:" },
+    "labels": { "spec": "规范:" },
+    "taskDetails": "任务详情",
+    "status": "状态",
+    "noTasksFound": "未找到任务",
+    "showAllTasks": "显示所有任务",
+    "noTasksWithStatus": "未找到状态为「{{status}}」的任务。",
+    "noTasksAvailable": "此规范没有可用的任务",
+    "showingTasksWithStatus": "显示 {{count}} 个状态为「{{status}}」的任务",
+    "filters": {
+      "all": "全部",
+      "pending": "待处理",
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "blocked": "已阻塞",
+      "filterByTooltip": "按{{status}}任务筛选"
+    },
+    "sort": {
+      "label": "排序",
+      "defaultOrder": "默认顺序",
+      "defaultOrderDesc": "原始任务顺序",
+      "status": "状态",
+      "statusDesc": "按任务状态分组",
+      "taskId": "任务ID",
+      "taskIdDesc": "按任务标识符排序",
+      "description": "描述",
+      "descriptionDesc": "按描述字母顺序排序",
+      "byStatus": "按状态",
+      "byTaskId": "按任务ID",
+      "byDescription": "按描述",
+      "changeSortOrder": "更改排序顺序",
+      "sortOrder": "排序顺序",
+      "ascending": "升序",
+      "descending": "降序",
+      "sortAscending": "升序排列",
+      "sortDescending": "降序排列"
+    },
+    "statusPill": {
+      "pending": "待处理",
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "blocked": "已阻塞",
+      "clickToChange": "点击更改状态"
+    },
+    "noSpecsFound": {
+      "title": "未找到规范",
+      "noMatch": "没有规范匹配 \"{{query}}\"",
+      "noSpecsAvailable": "没有可用于管理任务的规范。"
+    },
+    "copyFailed": {
+      "title": "复制失败",
+      "message": "复制失败。请手动复制以下文本："
+    },
+    "copyPrompt": {
+      "tooltip": "复制供 AI 代理使用的提示",
+      "copied": "已复制",
+      "copyPrompt": "复制提示",
+      "copy": "复制"
+    },
+    "notifications": {
+      "statusUpdated": "任务 {{taskId}} 已标记为 {{status}}",
+      "updateFailed": "更新任务 {{taskId}} 状态失败",
+      "updateError": "更新任务 {{taskId}} 状态时出错"
+    },
+    "noTaskData": "暂无任务数据",
+    "stats": {
+      "total": "总计",
+      "totalDesc": "所有任务",
+      "done": "已完成",
+      "doneDesc": "完成",
+      "left": "剩余",
+      "leftDesc": "未完成",
+      "progress": "进度",
+      "progressDesc": "完成度"
+    },
+    "blockedReason": {
+      "title": "这个任务为什么被阻塞？",
+      "placeholder": "例如：等待API团队确定架构...",
+      "submit": "添加原因",
+      "skip": "跳过"
+    },
+    "kanban": {
+      "noBlockedTasks": "没有被阻塞的任务"
+    }
+  },
+  "specsPage": {
+    "header": {
+      "title": "规范",
+      "subtitle": {
+        "active": "查看并管理活动的需求、设计和任务文档",
+        "archived": "查看已归档的规范"
+      }
+    },
+    "modal": {
+      "archivedBadge": "已归档",
+      "archivedNotice": "已归档的规范（可编辑）",
+      "closeAria": "关闭规范查看器",
+      "docLabel": "文档:",
+      "docSelectAria": "选择文档类型"
+    },
+    "documents": {
+      "requirements": "需求",
+      "design": "设计",
+      "tasks": "任务"
+    },
+    "table": {
+      "name": "名称",
+      "progress": "进度",
+      "lastModified": "最后修改",
+      "actions": "操作"
+    },
+    "sort": {
+      "defaultOrder": "默认顺序",
+      "defaultOrderDesc": "原始规范顺序",
+      "name": "名称",
+      "nameDesc": "按名称字母排序",
+      "progress": "进度",
+      "progressDesc": "按任务完成百分比排序",
+      "lastModified": "最后修改",
+      "lastModifiedDesc": "按修改日期排序"
+    },
+    "noTasks": "无任务",
+    "search": {
+      "placeholder": {
+        "active": "搜索活动规范...",
+        "archived": "搜索已归档规范..."
+      }
+    },
+    "empty": {
+      "title": "暂无文档",
+      "description": "此规范尚未创建任何文档。",
+      "noResults": "未找到规范",
+      "noResultsDescription": "请尝试调整搜索条件或筛选器"
+    },
+    "tabs": {
+      "active": "活动",
+      "archived": "归档"
+    }
+  },
+  "steeringPage": {
+    "header": {
+      "title": "指导文档",
+      "subtitle": "查看并管理项目的产品指导、技术架构和组织结构相关的指导文档"
+    },
+    "table": {
+      "document": "文档",
+      "status": "状态",
+      "lastModified": "最后修改",
+      "actions": "操作"
+    },
+    "badge": {
+      "available": "可用",
+      "notCreated": "未创建"
+    },
+    "modal": {
+      "title": "{{name}} 指导文档",
+      "closeAria": "关闭指导文档"
+    },
+    "controls": {
+      "documentLabel": "文档:"
+    },
+    "empty": {
+      "title": "暂无指导文档",
+      "description": "指导文档提供项目背景与指导。点击上方任意文档以创建或查看。"
+    }
+  },
+  "approvals": {
+    "status": {
+      "pending": "待处理",
+      "needsRevision": "需修订",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "annotator": {
+      "instructions": {
+        "title": "如何添加注释：",
+        "mobile": "选择文本 → 双击选择 → 弹出评论对话框。点击高亮文本可编辑评论",
+        "step1": "• 选择任意文本以添加评论（会自动弹出对话框）",
+        "step2": "• 点击已有高亮（彩色文本）以查看或编辑评论",
+        "step3": "• 使用“添加通用评论”按钮为整篇文档提供反馈"
+      },
+      "editCommentTitle": "编辑评论",
+      "addCommentTitle": "添加评论",
+      "subtitle": "对下方高亮的文本进行评论",
+      "highlightedText": "高亮文本:",
+      "chooseHighlightColor": "选择高亮颜色:",
+      "pickColorTooltip": "选择高亮颜色",
+      "yourComment": "你的评论:",
+      "commentPlaceholder": "在此输入评论...",
+      "hints": {
+        "desktop": "按 Ctrl/Cmd + Enter 保存，Esc 取消",
+        "mobile": "点击保存以确认"
+      },
+      "updateCommentButton": "更新评论",
+      "addCommentButton": "添加评论",
+      "updateShort": "更新",
+      "saveShort": "保存",
+      "tooltips": {
+        "viewEditComment": "点击查看/编辑评论",
+        "deleteComment": "删除评论"
+      },
+      "badge": {
+        "textSelection": "文本选中",
+        "generalComment": "通用评论"
+      },
+      "colorHighlight": "{{color}} 高亮",
+      "addGeneralComment": {
+        "title": "添加通用评论",
+        "placeholder": "输入通用评论...",
+        "submit": "添加评论",
+        "button": "添加通用评论"
+      },
+      "addCommentShort": "添加评论",
+      "empty": {
+        "title": "暂无评论",
+        "description": "选择文本以添加评论，或添加通用评论"
+      },
+      "switchHelp": "切换到注释模式以通过选择文本添加评论，或添加通用反馈。",
+      "viewMode": {
+        "preview": "预览",
+        "annotate": "注释",
+        "sideBySide": "并排视图"
+      },
+      "sideBySide": {
+        "title": "并排视图",
+        "buttonLabel": "并排",
+        "tooltip": "并排查看源码和预览",
+        "sourceLabel": "源码 (注释)",
+        "previewLabel": "预览",
+        "syncEnabled": "滚动同步已启用",
+        "syncDisabled": "滚动同步已禁用",
+        "syncOn": "同步开启",
+        "syncOff": "同步关闭",
+        "instructions": "在左侧源码面板中选择文本以添加评论。右侧预览面板显示渲染后的文档。"
+      },
+      "delete": {
+        "title": "删除评论",
+        "message": "确定要删除此评论吗？该操作不可撤销。"
+      }
+    }
+  },
+  "approvalsPage": {
+    "header": {
+      "title": "审批",
+      "subtitle": "审阅并管理待处理的审批请求"
+    },
+    "pendingCount_one": "{{count}} 个待处理",
+    "pendingCount_other": "{{count}} 个待处理",
+    "messages": {
+      "approvedViaDashboard": "通过仪表板批准"
+    },
+    "actions": {
+      "openReview": "审阅与注释",
+      "closeReview": "关闭审阅",
+      "reviewShort": "审阅",
+      "quickApprove": "快速批准",
+      "approve": "批准",
+      "quickReject": "快速拒绝",
+      "reject": "拒绝",
+      "requestRevisions": "请求修订",
+      "revisions": "修订",
+      "useBatchActions": "使用批量操作处理多个项目"
+    },
+    "tooltips": {
+      "goToAnnotations": "跳转到注释",
+      "goToComments": "跳转到评论"
+    },
+    "filter": {
+      "label": "筛选：",
+      "options": {
+        "all": "所有文档",
+        "steering": "指导文档"
+      }
+    },
+    "empty": {
+      "title": "暂无待处理审批",
+      "description": "所有审批均已处理。新的审批请求将显示在此处。"
+    },
+    "reject": {
+      "title": "拒绝审批",
+      "placeholder": "请输入拒绝原因或反馈...",
+      "submit": "拒绝"
+    },
+    "batchReject": {
+      "title": "拒绝 {{count}} 项",
+      "placeholder": "输入将应用于所有选定项的拒绝原因（例如：'需要首席工程师审核'）...",
+      "submit": "全部拒绝"
+    },
+    "approvalWarning": {
+      "title": "无法批准",
+      "message": "存在评论时无法批准。请使用“请求修订”发送反馈。"
+    },
+    "revision": {
+      "noCommentsTitle": "尚未添加评论",
+      "noCommentsMessage": "在请求修订之前，请至少添加一条评论。"
+    },
+    "selection": {
+      "enterMode": "选择项目",
+      "exitMode": "取消选择",
+      "select": "选择",
+      "selectAll": "全选",
+      "selectedCount_one": "已选择 {{count}} 项",
+      "selectedCount_other": "已选择 {{count}} 项",
+      "selectItem": "选择 {{title}}",
+      "approveSelected": "批准所选",
+      "rejectSelected": "拒绝所选"
+    },
+    "batchConfirm": {
+      "title": "确认批量操作",
+      "message": "您即将{{action}} {{count}} 个项目。此操作无法撤销。确定要继续吗？",
+      "confirm": "是的，继续"
+    },
+    "batchResult": {
+      "title": "已处理 {{succeeded}}/{{total}} 个项目",
+      "failedCount_one": "{{count}} 项失败",
+      "failedCount_other": "{{count}} 项失败",
+      "undo": "撤销"
+    },
+    "notifications": {
+      "approved": "\"{{title}}\" 已批准",
+      "approveFailed": "批准 \"{{title}}\" 失败",
+      "rejected": "\"{{title}}\" 已拒绝",
+      "rejectFailed": "拒绝 \"{{title}}\" 失败",
+      "revisionRequested": "已请求修订 \"{{title}}\"",
+      "revisionFailed": "请求修订 \"{{title}}\" 失败"
+    }
+  },
+  "logsPage": {
+    "header": {
+      "title": "实现日志"
+    },
+    "search": {
+      "placeholder": "搜索日志..."
+    },
+    "specDropdown": {
+      "selectPlaceholder": "选择规范",
+      "searchPlaceholder": "搜索规范...",
+      "noSpecsFound": "未找到规范"
+    },
+    "filter": {
+      "label": "按任务过滤",
+      "all": "全部",
+      "taskPrefix": "任务"
+    },
+    "sort": {
+      "timestamp": "日期/时间",
+      "timestampDesc": "按日志时间戳排序",
+      "taskId": "任务ID",
+      "taskIdDesc": "按任务标识符排序",
+      "linesAdded": "添加的行数",
+      "linesAddedDesc": "按添加的代码行数排序",
+      "filesChanged": "更改的文件数",
+      "filesChangedDesc": "按修改的文件数排序"
+    },
+    "stats": {
+      "title": "代码统计",
+      "linesAdded": "添加的行数",
+      "linesRemoved": "删除的行数",
+      "filesChanged": "更改的文件数",
+      "netChange": "净变化",
+      "totalEntries": "总条目数"
+    },
+    "files": {
+      "modified": "修改的文件",
+      "created": "创建的文件"
+    },
+    "artifacts": {
+      "title": "工件",
+      "apiEndpoints": "API端点",
+      "components": "组件",
+      "functions": "函数",
+      "classes": "类",
+      "integrations": "集成",
+      "details": {
+        "request": "请求:",
+        "response": "响应:",
+        "props": "属性:",
+        "exports": "导出:",
+        "exported": "已导出",
+        "private": "私有",
+        "methods": "方法:",
+        "component": "组件:",
+        "endpoint": "端点:",
+        "flow": "流程:"
+      }
+    },
+    "empty": {
+      "selectSpec": "选择一个规范来查看实现日志",
+      "noResults": "没有日志与您的搜索过滤器匹配",
+      "noLogs": "该规范尚无实现日志"
+    },
+    "loading": "加载日志中...",
+    "taskBadge": "任务"
+  },
+  "volumeControl": {
+    "mute": "静音通知",
+    "enable": "启用通知声音",
+    "volumeLevel": "音量: {{percentage}}%"
+  },
+  "settings": {
+    "title": "设置",
+    "description": "管理在所有连接项目上运行的自动清理作业",
+    "section": {
+      "automatedCleanup": "自动清理",
+      "automatedCleanupDesc": "根据计划自动删除旧的批准记录、规范和存档的规范。配置清理作业在所有连接的项目中循环运行。"
+    },
+    "addJob": "添加作业",
+    "loading": "正在加载作业...",
+    "noJobs": "没有自动化作业",
+    "noJobsDesc": "创建您的第一个自动化作业以开始",
+    "createFirst": "创建第一个作业",
+    "addNewJob": "添加新作业",
+    "editJob": "编辑作业",
+    "deleteJob": "删除作业",
+    "deleteConfirm": "您确定要删除此自动化作业吗? 此操作无法撤消。",
+    "lastRun": "最后运行",
+    "schedule": "计划",
+    "runNow": "立即运行",
+    "running": "正在运行...",
+    "edit": "编辑",
+    "delete": "删除",
+    "processing": "处理中...",
+    "cancel": "取消",
+    "close": "关闭",
+    "jobDescription": "删除超过{{days}}天的记录，按计划{{schedule}}"
+  },
+  "changelog": {
+    "viewChangelog": "查看更改日志",
+    "modal": {
+      "title": "更改日志",
+      "version": "版本",
+      "loading": "正在加载更改日志...",
+      "notFound": "找不到此版本的更改日志"
+    }
+  }
+}

@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { SpecData, TaskProgressData, TaskInfo, ApprovalData, SteeringStatus, PhaseStatus, LogsData, ImplementationLogEntry } from '../types';
-import { ApprovalEditorService } from './ApprovalEditorService';
-import { ArchiveService } from './ArchiveService';
-import { ImplementationLogService } from './ImplementationLogService';
-import { parseTasksFromMarkdown, updateTaskStatus } from '../utils/taskParser';
-import { Logger } from '../utils/logger';
+import { SpecData, TaskProgressData, TaskInfo, ApprovalData, SteeringStatus, PhaseStatus, LogsData, ImplementationLogEntry } from '../types.js';
+import { ApprovalEditorService } from './ApprovalEditorService.js';
+import { ArchiveService } from './ArchiveService.js';
+import { ImplementationLogService } from './ImplementationLogService.js';
+import { parseTasksFromMarkdown, updateTaskStatus } from '../utils/taskParser.js';
+import { Logger } from '../utils/logger.js';
 
 export class SpecWorkflowService {
   private workspaceRoot: string | null = null;

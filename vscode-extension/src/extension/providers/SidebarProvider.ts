@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { SpecWorkflowService } from '../services/SpecWorkflowService';
-import { Logger } from '../utils/logger';
+import { SpecWorkflowService } from '../services/SpecWorkflowService.js';
+import { Logger } from '../utils/logger.js';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'spec-workflow.sidebar';

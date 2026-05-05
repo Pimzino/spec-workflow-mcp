@@ -1,0 +1,51 @@
+{
+  "name": "@spec-workflow/server",
+  "version": "2.2.7",
+  "description": "MCP server for spec-driven development workflow with real-time web dashboard",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "spec-workflow-mcp": "./dist/index.js"
+  },
+  "files": ["dist/**/*"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/static": "^9.0.0",
+    "@fastify/websocket": "^11.2.0",
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "@spec-workflow/shared": "*",
+    "@toon-format/toon": "^0.8.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "chokidar": "^3.5.3",
+    "diff": "^5.2.0",
+    "fastify": "^5.8.5",
+    "howler": "^2.2.4",
+    "markdown-it": "^14.1.0",
+    "node-cron": "^4.2.1",
+    "open": "^8.4.2",
+    "simple-git": "^3.36.0",
+    "toml": "^3.0.0",
+    "ws": "^8.18.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.2.3",
+    "@types/node": "^22.18.1",
+    "@types/ws": "^8.5.13",
+    "@vitest/coverage-v8": "^4.0.15",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.15"
+  }
+}

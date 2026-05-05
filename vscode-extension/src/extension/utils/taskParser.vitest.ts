@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseTasksFromMarkdown, updateTaskStatus, findNextPendingTask, getTaskById, parseTaskProgress } from './taskParser';
+import { parseTasksFromMarkdown, updateTaskStatus, findNextPendingTask, getTaskById, parseTaskProgress } from './taskParser.js';
 
 describe('extension taskParser', () => {
   describe('parseTasksFromMarkdown', () => {

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { HighlightColor, ApprovalComment } from '../types';
-import { hexToColorObject } from '../utils/colorUtils';
+import { HighlightColor, ApprovalComment } from '../types.js';
+import { hexToColorObject } from '../utils/colorUtils.js';
 
 export interface CommentModalOptions {
   selectedText: string;

@@ -13,13 +13,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "sourceMap": true,
-    "baseUrl": "."
+    "sourceMap": true
   },
   "include": [
     "src/extension",
     "src/extension.ts",
-    "esbuild.js"
+    "esbuild.cjs"
   ],
   "exclude": [
     "node_modules"

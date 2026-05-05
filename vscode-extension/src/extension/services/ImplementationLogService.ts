@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Logger } from '../utils/logger';
+import { Logger } from '../utils/logger.js';
 
 // Type definitions
 export interface LogStatistics {

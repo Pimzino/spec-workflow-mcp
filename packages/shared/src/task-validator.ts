@@ -1,0 +1,175 @@
+/**
+ * Task Validator Module
+ * Validates tasks.md format compliance before approval.
+ * Pure TypeScript — no Node.js or browser APIs.
+ */
+
+export interface ValidationError {
+  line: number;
+  taskId?: string;
+  field: string;
+  message: string;
+  suggestion?: string;
+  severity: 'error' | 'warning';
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  errors: ValidationError[];
+  warnings: ValidationError[];
+  summary: {
+    totalTasks: number;
+    validTasks: number;
+    invalidTasks: number;
+  };
+}
+
+export function validateTasksMarkdown(content: string): ValidationResult {
+  const lines = content.split('\n');
+  const errors: ValidationError[] = [];
+  const warnings: ValidationError[] = [];
+  let taskCount = 0;
+  let validTaskCount = 0;
+
+  const checkboxIndices: number[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].match(/^\s*[-*]\s*\[/)) checkboxIndices.push(i);
+  }
+
+  for (let idx = 0; idx < checkboxIndices.length; idx++) {
+    const lineIndex = checkboxIndices[idx];
+    const endLine = idx < checkboxIndices.length - 1 ? checkboxIndices[idx + 1] : lines.length;
+    const line = lines[lineIndex];
+    const lineNum = lineIndex + 1;
+
+    taskCount++;
+    let taskValid = true;
+    let taskId: string | undefined;
+
+    const checkboxMatch = line.match(/^\s*-\s+\[([ x\-~])\]\s+(.+)/);
+    if (!checkboxMatch) {
+      const malformedPatterns = [
+        { pattern: /^\s*-\s*\[\]\s/, message: 'Empty checkbox brackets', suggestion: 'Use "- [ ]" with a space inside brackets' },
+        { pattern: /^\s*-\s*\[([^x \-~])\]/, message: 'Invalid checkbox character', suggestion: 'Use space for pending, x for completed, - for in-progress, ~ for blocked' },
+        { pattern: /^\s*-\[\s*[x \-]?\s*\]/, message: 'Missing space after hyphen', suggestion: 'Use "- [ ]" with space between - and [' },
+        { pattern: /^\s*\*\s+\[/, message: 'Wrong bullet character', suggestion: 'Use hyphen (-) instead of asterisk (*)' },
+      ];
+
+      let foundMalformed = false;
+      for (const { pattern, message, suggestion } of malformedPatterns) {
+        if (line.match(pattern)) {
+          errors.push({ line: lineNum, field: 'checkbox', message, suggestion, severity: 'error' });
+          foundMalformed = true;
+          taskValid = false;
+          break;
+        }
+      }
+      if (!foundMalformed) {
+        errors.push({ line: lineNum, field: 'checkbox', message: 'Invalid checkbox format', suggestion: 'Expected format: "- [ ] 1. Task description"', severity: 'error' });
+        taskValid = false;
+      }
+      continue;
+    }
+
+    const taskText = checkboxMatch[2];
+    const taskIdMatch = taskText.match(/^(\d+(?:\.\d+)*)\s*\.?\s+(.+)/);
+    if (!taskIdMatch) {
+      errors.push({ line: lineNum, field: 'taskId', message: 'Missing task ID number', suggestion: 'Add numeric ID like "1." or "1.1" after checkbox', severity: 'error' });
+      taskValid = false;
+    } else {
+      taskId = taskIdMatch[1];
+    }
+
+    let hasPrompt = false;
+    let promptHasClosingUnderscore = false;
+    let promptSections: string[] = [];
+
+    for (let lineIdx = lineIndex + 1; lineIdx < endLine; lineIdx++) {
+      const trimmedLine = lines[lineIdx].trim();
+      if (!trimmedLine) continue;
+
+      if (trimmedLine.includes('Requirements:') && !trimmedLine.match(/_Requirements:\s*[^_]+_/)) {
+        if (trimmedLine.match(/Requirements:\s*\S/) && !trimmedLine.includes('_Requirements:')) {
+          warnings.push({ line: lineIdx + 1, taskId, field: 'requirements', message: 'Requirements field missing underscore delimiters', suggestion: 'Use "_Requirements: ..._" format for proper parsing', severity: 'warning' });
+        }
+      }
+
+      if (trimmedLine.includes('Blocked:') && !trimmedLine.includes('_Prompt:')) {
+        if (trimmedLine.includes('_Blocked:') && !trimmedLine.match(/_Blocked:\s*[^_]+_/)) {
+          warnings.push({ line: lineIdx + 1, taskId, field: 'blocked', message: 'Blocked field missing closing underscore delimiter', suggestion: 'Use "_Blocked: reason_" format for proper parsing', severity: 'warning' });
+        } else if (trimmedLine.match(/Blocked:\s*\S/)) {
+          warnings.push({ line: lineIdx + 1, taskId, field: 'blocked', message: 'Blocked field missing underscore delimiters', suggestion: 'Use "_Blocked: reason_" format for proper parsing', severity: 'warning' });
+        }
+      }
+
+      if (trimmedLine.includes('Leverage:') && !trimmedLine.match(/_Leverage:\s*[^_]+_/)) {
+        if (trimmedLine.match(/Leverage:\s*\S/) && !trimmedLine.includes('_Leverage:')) {
+          warnings.push({ line: lineIdx + 1, taskId, field: 'leverage', message: 'Leverage field missing underscore delimiters', suggestion: 'Use "_Leverage: ..._" format for proper parsing', severity: 'warning' });
+        }
+      }
+
+      if (trimmedLine.includes('_Prompt:')) {
+        hasPrompt = true;
+        if (trimmedLine.match(/_Prompt:\s*.+_$/)) {
+          promptHasClosingUnderscore = true;
+        } else {
+          let foundClosing = false;
+          for (let j = lineIdx; j < endLine; j++) {
+            if (lines[j].trim().endsWith('_') && !lines[j].trim().match(/^_[A-Z]/)) { foundClosing = true; break; }
+          }
+          promptHasClosingUnderscore = foundClosing;
+        }
+
+        const promptContent = trimmedLine.replace(/_Prompt:\s*/, '').replace(/_$/, '');
+        const requiredSections = ['Role', 'Task', 'Restrictions', 'Success'];
+        for (const section of requiredSections) {
+          if (promptContent.toLowerCase().includes(section.toLowerCase() + ':')) promptSections.push(section);
+        }
+      }
+    }
+
+    if (hasPrompt) {
+      if (!promptHasClosingUnderscore) {
+        warnings.push({ line: lineNum, taskId, field: 'prompt', message: 'Prompt field may be missing closing underscore', suggestion: 'Ensure _Prompt: ..._ ends with underscore', severity: 'warning' });
+      }
+      const requiredSections = ['Role', 'Task', 'Restrictions', 'Success'];
+      const missingSections = requiredSections.filter(s => !promptSections.includes(s));
+      if (missingSections.length > 0) {
+        warnings.push({ line: lineNum, taskId, field: 'prompt_structure', message: `Prompt missing sections: ${missingSections.join(', ')}`, suggestion: 'Format: Role: ... | Task: ... | Restrictions: ... | Success: ...', severity: 'warning' });
+      }
+    }
+
+    if (taskValid) validTaskCount++;
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+    summary: { totalTasks: taskCount, validTasks: validTaskCount, invalidTasks: taskCount - validTaskCount },
+  };
+}
+
+export function formatValidationErrors(result: ValidationResult): string[] {
+  const messages: string[] = [];
+
+  if (result.errors.length > 0) {
+    messages.push(`Found ${result.errors.length} error(s):`);
+    for (const error of result.errors) {
+      const taskInfo = error.taskId ? ` (Task ${error.taskId})` : '';
+      messages.push(`  Line ${error.line}${taskInfo}: ${error.message}`);
+      if (error.suggestion) messages.push(`    Suggestion: ${error.suggestion}`);
+    }
+  }
+
+  if (result.warnings.length > 0) {
+    messages.push(`Found ${result.warnings.length} warning(s):`);
+    for (const warning of result.warnings) {
+      const taskInfo = warning.taskId ? ` (Task ${warning.taskId})` : '';
+      messages.push(`  Line ${warning.line}${taskInfo}: ${warning.message}`);
+      if (warning.suggestion) messages.push(`    Suggestion: ${warning.suggestion}`);
+    }
+  }
+
+  return messages;
+}

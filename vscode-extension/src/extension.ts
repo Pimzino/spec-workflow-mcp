@@ -3,11 +3,11 @@ import * as nls from 'vscode-nls';
 
 const localize = nls.loadMessageBundle();
 
-import { SidebarProvider } from './extension/providers/SidebarProvider';
-import { SpecWorkflowService } from './extension/services/SpecWorkflowService';
-import { FileWatcher } from './extension/services/FileWatcher';
-import { ApprovalEditorService } from './extension/services/ApprovalEditorService';
-import { ApprovalCommandService } from './extension/services/ApprovalCommandService';
+import { SidebarProvider } from './extension/providers/SidebarProvider.js';
+import { SpecWorkflowService } from './extension/services/SpecWorkflowService.js';
+import { FileWatcher } from './extension/services/FileWatcher.js';
+import { ApprovalEditorService } from './extension/services/ApprovalEditorService.js';
+import { ApprovalCommandService } from './extension/services/ApprovalCommandService.js';
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log(localize('extension.active', 'Spec Workflow MCP extension is now active!'));

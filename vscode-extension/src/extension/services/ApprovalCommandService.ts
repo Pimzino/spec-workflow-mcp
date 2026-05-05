@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
-import { ApprovalEditorService } from './ApprovalEditorService';
+import { ApprovalEditorService } from './ApprovalEditorService.js';
 
 const localize = nls.loadMessageBundle();
-import { SpecWorkflowService } from './SpecWorkflowService';
-import { CommentModalService } from './CommentModalService';
-import { HighlightColor } from '../types';
+import { SpecWorkflowService } from './SpecWorkflowService.js';
+import { CommentModalService } from './CommentModalService.js';
+import { HighlightColor } from '../types.js';
 
 export class ApprovalCommandService {
   private static instance: ApprovalCommandService;
