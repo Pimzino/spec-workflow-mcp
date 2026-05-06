@@ -132,6 +132,15 @@ type ApiActionsContextType = {
   getImplementationLogs: (specName: string, query?: { taskId?: string; search?: string }) => Promise<{ entries: ImplementationLogEntry[] }>;
   getImplementationLogStats: (specName: string, taskId: string) => Promise<any>;
   getChangelog: (version: string) => Promise<{ content: string }>;
+  requestAdversarialReview: (id: string) => Promise<{ ok: boolean; status: number; data?: any }>;
+  retryAdversarialReview: (id: string) => Promise<{ ok: boolean; status: number; data?: any }>;
+  getAdversarialReviews: () => Promise<any>;
+  getAdversarialReviewContent: (specName: string, phase: string, version: number) => Promise<{ content: string; lastModified: string }>;
+  getAdversarialSettings: () => Promise<any>;
+  saveAdversarialSettings: (settings: any) => Promise<{ ok: boolean; status: number }>;
+  getAdversarialJobs: () => Promise<{ jobs: any[] }>;
+  getAdversarialJob: (jobId: string) => Promise<{ job: any }>;
+  cancelAdversarialJob: (jobId: string) => Promise<{ ok: boolean; status: number }>;
 };
 
 const ApiDataContext = createContext<ApiDataContextType | undefined>(undefined);
@@ -302,6 +311,15 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
         getImplementationLogs: async () => ({ entries: [] }),
         getImplementationLogStats: async () => ({}),
         getChangelog: async () => ({ content: '' }),
+        requestAdversarialReview: async () => ({ ok: false, status: 400 }),
+        retryAdversarialReview: async () => ({ ok: false, status: 400 }),
+        getAdversarialReviews: async () => ({ specs: [] }),
+        getAdversarialReviewContent: async () => ({ content: '', lastModified: '' }),
+        getAdversarialSettings: async () => ({ customPreamble: '', requiredPhases: { requirements: false, design: false, tasks: false } }),
+        saveAdversarialSettings: async () => ({ ok: false, status: 400 }),
+        getAdversarialJobs: async () => ({ jobs: [] }),
+        getAdversarialJob: async () => ({ job: null }),
+        cancelAdversarialJob: async () => ({ ok: false, status: 400 }),
       };
     }
 
@@ -344,6 +362,16 @@ export function ApiProvider({ initial, projectId, children }: ApiProviderProps) 
       },
       getImplementationLogStats: (specName: string, taskId: string) => getJson(`${prefix}/specs/${encodeURIComponent(specName)}/implementation-log/task/${encodeURIComponent(taskId)}/stats`),
       getChangelog: (version: string) => getJson(`${prefix}/changelog/${encodeURIComponent(version)}`),
+      requestAdversarialReview: (id: string) => postJsonWithData(`${prefix}/approvals/${encodeURIComponent(id)}/adversarial-review`, {}),
+      retryAdversarialReview: (id: string) => postJsonWithData(`${prefix}/approvals/${encodeURIComponent(id)}/adversarial-retry`, {}),
+      getAdversarialReviews: () => getJson(`${prefix}/adversarial/reviews`),
+      getAdversarialReviewContent: (specName: string, phase: string, version: number) =>
+        getJson(`${prefix}/adversarial/reviews/${encodeURIComponent(specName)}/${encodeURIComponent(phase)}/${version}`),
+      getAdversarialSettings: () => getJson(`${prefix}/adversarial/settings`),
+      saveAdversarialSettings: (settings: any) => putJson(`${prefix}/adversarial/settings`, settings),
+      getAdversarialJobs: () => getJson(`${prefix}/adversarial/jobs`),
+      getAdversarialJob: (jobId: string) => getJson(`${prefix}/adversarial/jobs/${encodeURIComponent(jobId)}`),
+      cancelAdversarialJob: (jobId: string) => postJsonWithData(`${prefix}/adversarial/jobs/${encodeURIComponent(jobId)}/cancel`, {}),
     };
   }, [projectId, reloadAll]);
 

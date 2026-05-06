@@ -254,6 +254,27 @@ flowchart TD
    - **Only after log-implementation succeeds**: Edit tasks.md: Change \`[-]\` to \`[x]\`
 4. Continue until all tasks show \`[x]\`
 
+## Steering Document Loading
+
+When steering docs exist in \`.spec-workflow/steering/\`, load them selectively by phase to conserve context:
+
+| Phase | Load in full | Skim or skip |
+|---|---|---|
+| Requirements | product.md | tech.md (skim constraints only), structure.md (skip) |
+| Design | tech.md, structure.md | product.md (skip — internalized via requirements) |
+| Tasks | structure.md, the spec's design.md | tech.md (skip — internalized via design), product.md (skip) |
+
+Each phase's output internalizes the previous phase's primary inputs. The requirements encode the product vision, so the design agent doesn't need to re-read product.md. The design encodes the tech decisions, so the tasks agent doesn't need to re-read tech.md.
+
+## Adversarial Review (Optional)
+
+Two tools support adversarial analysis of spec documents:
+
+- **adversarial-review**: Prepares methodology and file paths for running an adversarial review against a spec phase document. The agent writes a tailored adversarial prompt and launches a fresh-context subagent to execute it.
+- **adversarial-response**: Finds the latest adversarial analysis and returns instructions for evaluating findings. Used when responding to a revision comment requesting adversarial review response.
+
+These are not part of the core approval flow — they are invoked when requested by the user or as a revision comment on an approval.
+
 ## Workflow Rules
 
 - Create documents directly at specified file paths
@@ -286,6 +307,9 @@ flowchart TD
 │       ├── requirements.md
 │       ├── design.md
 │       ├── tasks.md
+│       ├── reviews/                 # Adversarial review artifacts
+│       │   ├── adversarial-prompt-{phase}.md
+│       │   └── adversarial-analysis-{phase}.md
 │       └── Implementation Logs/     # Created automatically
 │           ├── task-1_timestamp_id.md
 │           ├── task-2_timestamp_id.md
