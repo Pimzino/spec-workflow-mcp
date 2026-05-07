@@ -402,11 +402,43 @@ export class MultiProjectDashboardServer {
     // Add project manually
     this.app.post('/api/projects/add', async (request, reply) => {
       const { projectPath } = request.body as { projectPath: string };
-      if (!projectPath) {
+      if (!projectPath || typeof projectPath !== 'string') {
         return reply.code(400).send({ error: 'projectPath is required' });
       }
+
+      // Reject obviously dangerous inputs (NUL bytes, traversal sequences) before
+      // any filesystem access to avoid registering arbitrary directories as
+      // projects (CWE-22). The path must be absolute and resolve to an existing
+      // directory that already contains a .spec-workflow folder, which proves the
+      // caller is registering a legitimate spec-workflow project rather than an
+      // arbitrary location they want to read/write through the dashboard APIs.
+      if (projectPath.indexOf('\0') !== -1 || projectPath.includes('..')) {
+        return reply.code(400).send({ error: 'Invalid projectPath' });
+      }
+
+      const resolvedPath = resolve(projectPath);
       try {
-        const projectId = await this.projectManager.addProjectByPath(projectPath);
+        const stats = await fs.stat(resolvedPath);
+        if (!stats.isDirectory()) {
+          return reply.code(400).send({ error: 'projectPath must be a directory' });
+        }
+      } catch {
+        return reply.code(400).send({ error: 'projectPath does not exist or is not accessible' });
+      }
+
+      try {
+        const specWorkflowStats = await fs.stat(join(resolvedPath, '.spec-workflow'));
+        if (!specWorkflowStats.isDirectory()) {
+          throw new Error('not a directory');
+        }
+      } catch {
+        return reply.code(400).send({
+          error: 'projectPath must contain a .spec-workflow directory. Initialize spec-workflow in the project before registering it.'
+        });
+      }
+
+      try {
+        const projectId = await this.projectManager.addProjectByPath(resolvedPath);
         return { projectId, success: true };
       } catch (error: any) {
         return reply.code(500).send({ error: error.message });
