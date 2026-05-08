@@ -193,6 +193,28 @@ export interface MCPToolResponse {
   _meta?: Record<string, any>;
 }
 
+export interface Deferral {
+  id: string;
+  status: 'deferred' | 'resolved' | 'superseded';
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt: string | null;
+  originSpec: string | null;
+  originPhase: 'requirements' | 'design' | 'tasks' | 'implementation' | null;
+  revisitTrigger: string;
+  tags: string[];
+  resolution: string | null;
+  resolvedInSpec: string | null;
+  supersededBy: string | null;
+  supersedes: string | null;
+  body: {
+    context: string;
+    decision: string;
+    revisitCriteria: string;
+  };
+}
+
 // Helper function to convert ToolResponse to MCP format
 export function toMCPResponse(response: ToolResponse, isError: boolean = false): MCPToolResponse {
   return {
