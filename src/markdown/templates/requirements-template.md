@@ -2,15 +2,19 @@
 
 ## Introduction
 
-[Provide a brief overview of the feature, its purpose, and its value to users]
+[Brief overview: what this feature is, why it exists, and what value it provides. 2-3 sentences.]
 
 ## Alignment with Product Vision
 
-[Explain how this feature supports the goals outlined in product.md]
+[How this feature supports the goals in product.md. Reference specific objectives or principles by name.]
 
 ## Requirements
 
-### Requirement 1
+<!-- Number requirements as R1, R2, etc. Number acceptance criteria as R1.1, R1.2, etc.
+     These IDs are referenced by downstream design and tasks documents.
+     Use EARS format (WHEN/IF/THEN/SHALL) for acceptance criteria. -->
+
+### R1: [Requirement Name]
 
 **User Story:** As a [role], I want [feature], so that [benefit]
 
@@ -20,7 +24,7 @@
 2. IF [precondition] THEN [system] SHALL [response]
 3. WHEN [event] AND [condition] THEN [system] SHALL [response]
 
-### Requirement 2
+### R2: [Requirement Name]
 
 **User Story:** As a [role], I want [feature], so that [benefit]
 
@@ -31,20 +35,20 @@
 
 ## Non-Functional Requirements
 
-### Code Architecture and Modularity
-- **Single Responsibility Principle**: Each file should have a single, well-defined purpose
-- **Modular Design**: Components, utilities, and services should be isolated and reusable
-- **Dependency Management**: Minimize interdependencies between modules
-- **Clear Interfaces**: Define clean contracts between components and layers
+<!-- List NFRs specific to this feature. Reference steering docs for project-wide
+     architectural standards if they exist. Only include performance, security,
+     reliability, and usability requirements that go beyond project defaults or
+     are particularly important for this feature. Omit categories that have
+     nothing feature-specific to say. -->
 
 ### Performance
-- [Performance requirements]
+- [Feature-specific performance requirements, if any]
 
 ### Security
-- [Security requirements]
+- [Feature-specific security requirements, if any]
 
 ### Reliability
-- [Reliability requirements]
+- [Feature-specific reliability requirements, if any]
 
 ### Usability
-- [Usability requirements]
+- [Feature-specific usability requirements, if any]
