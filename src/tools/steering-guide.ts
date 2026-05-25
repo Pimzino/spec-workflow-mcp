@@ -23,11 +23,13 @@ export async function steeringGuideHandler(args: any, context: ToolContext): Pro
     success: true,
     message: 'Steering workflow guide loaded - follow this workflow exactly to avoid errors',
     data: {
-      guide: getSteeringGuide(),
-      dashboardUrl: context.dashboardUrl
+      guide: getSteeringGuide(context.projectPath),
+      dashboardUrl: context.dashboardUrl,
+      workflowRoot: `${context.projectPath}/.spec-workflow`
     },
     nextSteps: [
       'Only proceed if user requested steering docs',
+      `All steering docs go under ABSOLUTE path: ${context.projectPath}/.spec-workflow/steering/`,
       'Create product.md first',
       'Then tech.md and structure.md',
       'Reference in future specs',
@@ -36,12 +38,23 @@ export async function steeringGuideHandler(args: any, context: ToolContext): Pro
   };
 }
 
-function getSteeringGuide(): string {
+function getSteeringGuide(projectPath: string): string {
   return `# Steering Workflow
 
 ## Overview
 
 Create project-level guidance documents when explicitly requested. Steering docs establish vision, architecture, and conventions for established codebases. Its important that you follow this workflow exactly to avoid errors.
+
+## Project Workflow Root (READ THIS FIRST)
+
+**ABSOLUTE PATH: \`${projectPath}/.spec-workflow/\`**
+
+⚠️ When you use file tools (Read/Write/Edit/Glob/Bash) on \`.spec-workflow/\` files, you MUST prefix paths with the absolute project workflow root above.
+
+The relative paths shown below (e.g. \`.spec-workflow/steering/product.md\`) are **display shorthand only**. Actual file operations must use the absolute form:
+\`${projectPath}/.spec-workflow/steering/product.md\`
+
+Why this matters: your current working directory may differ from the project root (this is common in git worktrees). Relative paths resolved against the wrong cwd will silently write to the wrong location, and the Spec Workflow Dashboard will not see your files.
 
 ## Workflow Diagram
 

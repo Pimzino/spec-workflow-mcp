@@ -44,11 +44,11 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
 
 1. **Check Current Status:**
    - Use the spec-status tool with specName "${specName}" to see overall progress
-   - Read .spec-workflow/specs/${specName}/tasks.md to see all tasks
+   - Read ${context.projectPath}/.spec-workflow/specs/${specName}/tasks.md to see all tasks
    - Identify ${taskId ? `task ${taskId}` : 'the next pending task marked with [ ]'}
 
 2. **Start the Task:**
-   - Edit .spec-workflow/specs/${specName}/tasks.md directly
+   - Edit ${context.projectPath}/.spec-workflow/specs/${specName}/tasks.md directly
    - Change the task marker from [ ] to [-] for the task you're starting
    - Only one task should be in-progress at a time
 
@@ -63,18 +63,18 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
 
 4. **Discover Existing Implementations (CRITICAL):**
    - BEFORE writing any code, search implementation logs to understand existing artifacts
-   - Implementation logs are stored as markdown files in: .spec-workflow/specs/${specName}/Implementation Logs/
+   - Implementation logs are stored as markdown files in: ${context.projectPath}/.spec-workflow/specs/${specName}/Implementation Logs/
 
    **Option 1: Use grep/ripgrep for fast searches**
    \`\`\`bash
    # Search for API endpoints
-   grep -r "GET\|POST\|PUT\|DELETE" ".spec-workflow/specs/${specName}/Implementation Logs/"
+   grep -r "GET\|POST\|PUT\|DELETE" "${context.projectPath}/.spec-workflow/specs/${specName}/Implementation Logs/"
 
    # Search for specific components
-   grep -r "ComponentName" ".spec-workflow/specs/${specName}/Implementation Logs/"
+   grep -r "ComponentName" "${context.projectPath}/.spec-workflow/specs/${specName}/Implementation Logs/"
 
    # Search for integration patterns
-   grep -r "integration\|dataFlow" ".spec-workflow/specs/${specName}/Implementation Logs/"
+   grep -r "integration\|dataFlow" "${context.projectPath}/.spec-workflow/specs/${specName}/Implementation Logs/"
    \`\`\`
 
    **Option 2: Read markdown files directly**
@@ -139,7 +139,7 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
    - Confirm that log-implementation returned success in step 6
    - Verify all success criteria from the _Prompt are met
    - Run any relevant tests to ensure nothing is broken
-   - Edit .spec-workflow/specs/${specName}/tasks.md directly
+   - Edit ${context.projectPath}/.spec-workflow/specs/${specName}/tasks.md directly
    - Change the task marker from [-] to [x] for the completed task
    - ⚠️ If you skipped step 6, go back now — a task marked [x] without a log is incomplete
 
@@ -165,7 +165,7 @@ ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
 - All logged implementations appear in the "Logs" tab of the dashboard
 - Filter by spec, task ID, or search by summary
 - View detailed statistics including files changed and lines modified
-- Or search directly using grep on markdown files in .spec-workflow/specs/{specName}/Implementation Logs/
+- Or search directly using grep on markdown files in ${context.projectPath}/.spec-workflow/specs/${specName}/Implementation Logs/
 
 Please proceed with implementing ${taskId ? `task ${taskId}` : 'the next task'} following this workflow.`
       }

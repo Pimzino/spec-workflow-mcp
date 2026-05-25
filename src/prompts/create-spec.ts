@@ -53,17 +53,17 @@ ${description ? `- Description: ${description}` : ''}
 ${context.dashboardUrl ? `- Dashboard: ${context.dashboardUrl}` : ''}
 
 **Instructions:**
-1. First, read the template at: .spec-workflow/templates/${documentType}-template.md
+1. First, read the template at: ${context.projectPath}/.spec-workflow/templates/${documentType}-template.md
 2. Follow the template structure exactly - this ensures consistency across the project
 3. Create comprehensive content that follows spec-driven development best practices
 4. Include all required sections from the template
 5. Use clear, actionable language
-6. Create the document at: .spec-workflow/specs/${specName}/${documentType}.md
+6. Create the document at: ${context.projectPath}/.spec-workflow/specs/${specName}/${documentType}.md
 7. After creating, use approvals tool with action:'request' to get user approval
 
-**File Paths:**
-- Template location: .spec-workflow/templates/${documentType}-template.md
-- Document destination: .spec-workflow/specs/${specName}/${documentType}.md
+**File Paths (ALWAYS use these absolute paths — do NOT resolve relative to cwd, which may differ from the project root in git worktrees):**
+- Template location: ${context.projectPath}/.spec-workflow/templates/${documentType}-template.md
+- Document destination: ${context.projectPath}/.spec-workflow/specs/${specName}/${documentType}.md
 
 **Workflow Guidelines:**
 - Requirements documents define WHAT needs to be built
