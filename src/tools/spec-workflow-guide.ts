@@ -28,12 +28,14 @@ export async function specWorkflowGuideHandler(args: any, context: ToolContext):
     success: true,
     message: 'Complete spec workflow guide loaded - follow this workflow exactly',
     data: {
-      guide: getSpecWorkflowGuide(),
+      guide: getSpecWorkflowGuide(context.projectPath),
       dashboardUrl: context.dashboardUrl,
-      dashboardAvailable: !!context.dashboardUrl
+      dashboardAvailable: !!context.dashboardUrl,
+      workflowRoot: `${context.projectPath}/.spec-workflow`
     },
     nextSteps: [
       'Follow sequence: Requirements → Design → Tasks → Implementation',
+      `All spec files go under ABSOLUTE path: ${context.projectPath}/.spec-workflow/`,
       'Load templates with get-template-context first',
       'Request approval after each document',
       'Use MCP tools only',
@@ -42,7 +44,7 @@ export async function specWorkflowGuideHandler(args: any, context: ToolContext):
   };
 }
 
-function getSpecWorkflowGuide(): string {
+function getSpecWorkflowGuide(projectPath: string): string {
   const currentYear = new Date().getFullYear();
   return `# Spec Development Workflow
 
@@ -50,6 +52,17 @@ function getSpecWorkflowGuide(): string {
 
 You guide users through spec-driven development using MCP tools. Transform rough ideas into detailed specifications through Requirements → Design → Tasks → Implementation phases. Use web search when available for current best practices (current year: ${currentYear}). Its important that you follow this workflow exactly to avoid errors.
 Feature names use kebab-case (e.g., user-authentication). Create ONE spec at a time.
+
+## Project Workflow Root (READ THIS FIRST)
+
+**ABSOLUTE PATH: \`${projectPath}/.spec-workflow/\`**
+
+⚠️ When you use file tools (Read/Write/Edit/Glob/Bash) on \`.spec-workflow/\` files, you MUST prefix paths with the absolute project workflow root above.
+
+The relative paths shown throughout this guide (e.g. \`.spec-workflow/specs/{name}/requirements.md\`) are **display shorthand only**. Actual file operations must use the absolute form:
+\`${projectPath}/.spec-workflow/specs/{name}/requirements.md\`
+
+Why this matters: your current working directory may differ from the project root (this is common in git worktrees, where the MCP server registers the main repository as the project root but your shell cwd is inside the worktree). Relative paths resolved against the wrong cwd will silently write to the wrong location, and the Spec Workflow Dashboard will not see your files.
 
 ## Workflow Diagram
 \`\`\`mermaid
