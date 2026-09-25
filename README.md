@@ -361,6 +361,10 @@ npm run dev
 
 [See development guide →](docs/DEVELOPMENT.md)
 
+## 🔗 Related Spec-Driven Development Tools
+
+- [MySpec](https://myspec.dev) — Interactive spec discovery platform producing structured 4-file specification bundles (`constitution.md`, `requirements.md`, `solution.md`, `tasks.md`) connected to AI assistants via `@myspec/mcp-server`.
+
 ## 📄 License
 
 GPL-3.0
